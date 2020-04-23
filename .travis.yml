@@ -1,3 +1,4 @@
+sudo: true
 notifications:
   slack:
     rooms:
@@ -30,6 +31,7 @@ before_deploy:
   - pip install -U pip
   - pip install awscli
   - aws --version
+  - sudo apt-get install libxml2-utils
 
 deploy:
 - provider: script
