@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using OwnIdSdk.NetCore3.Configuration;
+using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Store;
 
 namespace OwnIdSdk.NetCore3
@@ -24,7 +24,12 @@ namespace OwnIdSdk.NetCore3
 
         public string GenerateContext()
         {
-            // TODO: change to proper context geneation
+            // TODO: change to proper context generation
+            return Guid.NewGuid().ToString();
+        }
+
+        public string GenerateNonce()
+        {
             return Guid.NewGuid().ToString();
         }
 
@@ -36,12 +41,10 @@ namespace OwnIdSdk.NetCore3
 
         public string GenerateChallengeJwt(string context)
         {
-            //var a = new RsaSecurityKey(RSA.Create(new RSAParameters()));
-            var mySecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.TokenSecret));
-
+            var rsaSecurityKey = new RsaSecurityKey(_configuration.JwtSignCredentials);
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenTest = new JwtSecurityToken(
-                new JwtHeader(new SigningCredentials(mySecurityKey, SecurityAlgorithms.HmacSha256)),
+                new JwtHeader(new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)),
                 new JwtPayload(null, null, null, DateTime.UtcNow, DateTime.UtcNow.AddHours(1), DateTime.UtcNow)
                 {
                     {"jti", context},
@@ -57,7 +60,8 @@ namespace OwnIdSdk.NetCore3
                     },
                     {
                         "requestedFields",
-                        _configuration.ProfileFields.Select(x => new {label = x.Label, type = x.Type.ToString()}).ToArray()
+                        _configuration.ProfileFields.Select(x => new {label = x.Label, type = x.Type.ToString()})
+                            .ToArray()
                     }
                 });
             return tokenHandler.WriteToken(tokenTest);
@@ -65,14 +69,15 @@ namespace OwnIdSdk.NetCore3
 
         public Dictionary<ProfileFieldType, string> GetProfileDataFromJwt(string jwt)
         {
-            var mySecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.TokenSecret));
+            // TODO: parse jwt and get public key
+            var rsaSecurityKey = new RsaSecurityKey(RsaHelper.LoadKeys(jwt));
 
             var tokenHandler = new JwtSecurityTokenHandler();
             try
             {
                 tokenHandler.ValidateToken(jwt, new TokenValidationParameters
                 {
-                    IssuerSigningKey = mySecurityKey,
+                    IssuerSigningKey = rsaSecurityKey,
                     RequireSignedTokens = true,
                     RequireExpirationTime = true,
                     ValidateIssuerSigningKey = true,
@@ -116,6 +121,12 @@ namespace OwnIdSdk.NetCore3
             var cacheItem = await _cacheStore.GetAsync(context);
 
             return cacheItem?.Nonce != nonce ? (false, null) : (true, cacheItem?.DID);
+        }
+
+        public bool IsContextValid(string context)
+        {
+            return Regex.IsMatch(context,
+                "^([0-9A-Fa-f]{8}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{12})$");
         }
     }
 }
