@@ -2,7 +2,7 @@
 
 ENV=$1
 
-PKG_VERSION=`xpath ./OwnIdSdk.NetCore3.Web/OwnIdSdk.NetCore3.Web.csproj //Project/PropertyGroup/Version/text\(\)`
+PKG_VERSION=`xmllint --xpath "string(//Project/PropertyGroup/Version)" ./OwnIdSdk.NetCore3.Web/OwnIdSdk.NetCore3.Web.csproj`
 S3PATH=s3://ownid-sdks-bucket/$ENV/server-sdks/dotnetcore3
 FOLDER=$PKG_VERSION"_"$TRAVIS_BUILD_NUMBER
 
