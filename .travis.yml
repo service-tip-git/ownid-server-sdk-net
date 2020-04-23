@@ -1,4 +1,4 @@
-sudo: required
+sudo: true
 notifications:
   slack:
     rooms:
@@ -31,7 +31,7 @@ before_deploy:
   - pip install -U pip
   - pip install awscli
   - aws --version
-  - apt-get install libxml-xpath-perl
+  - sudo apt-get install libxml-xpath-perl
 
 deploy:
 - provider: script
