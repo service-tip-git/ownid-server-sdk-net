@@ -14,7 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\OwnIdSdk.NetCore3.Core\OwnIdSdk.NetCore3.Core.csproj" />
       <ProjectReference Include="..\OwnIdSdk.NetCore3\OwnIdSdk.NetCore3.csproj" />
     </ItemGroup>
 
