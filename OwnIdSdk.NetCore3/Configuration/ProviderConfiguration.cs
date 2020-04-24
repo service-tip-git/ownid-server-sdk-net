@@ -18,8 +18,7 @@ namespace OwnIdSdk.NetCore3.Configuration
             Requester = requester;
 
         }
-        
-        
+
         public string OwnIdApplicationUrl { get; }
         
         public RSA JwtSignCredentials { get; }

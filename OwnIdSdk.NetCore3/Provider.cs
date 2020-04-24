@@ -54,7 +54,7 @@ namespace OwnIdSdk.NetCore3
                         "requester", new
                         {
                             did = _configuration.Requester.DID,
-                            pubKey = _configuration.Requester.PublicKey,
+                            pubKey = Convert.ToBase64String(_configuration.JwtSignCredentials.ExportRSAPublicKey()),
                             name = _configuration.Requester.Name
                         }
                     },
