@@ -16,7 +16,6 @@ namespace OwnIdSdk.NetCore3.Configuration
             ProfileFields = fields;
             CallbackUrl = callbackUrl;
             Requester = requester;
-
         }
 
         public string OwnIdApplicationUrl { get; }
@@ -28,5 +27,7 @@ namespace OwnIdSdk.NetCore3.Configuration
         public string CallbackUrl { get; }
         
         public Requester Requester { get; }
+        
+        public string Instructions { get; set; }
     }
 }

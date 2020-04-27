@@ -1,4 +1,7 @@
 using System;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -27,13 +30,19 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 return;
             }
 
-            // TODO:  _provider.GetProfileDataFromJwt();
+            string body;
+            
+            using (var readStream = new StreamReader(context.Request.Body))
+            {
+                body = readStream.ReadToEnd();
+            }
 
-            var profile = new { };
-            var did = "ownid:did:" + Guid.NewGuid();
+            var (jwtContext, userData) =  _provider.GetProfileDataFromJwt(body);
 
-            await _challengeHandler.UpdateProfileAsync(did, profile);
-            await _provider.SetDIDAsync(challengeContext, did);
+            // preventing data substitution 
+            challengeContext = jwtContext;
+            await _challengeHandler.UpdateProfileAsync(userData.DID, userData.Profile);
+            await _provider.SetDIDAsync(challengeContext, userData.DID);
 
             Ok(context.Response);
         }

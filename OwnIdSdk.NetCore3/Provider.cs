@@ -1,11 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.IdentityModel.Tokens;
 using OwnIdSdk.NetCore3.Configuration;
+using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Store;
 
@@ -35,44 +36,59 @@ namespace OwnIdSdk.NetCore3
 
         public string GetDeepLink(string context)
         {
-            // TODO: change to proper link generation
-            return $"{_configuration.OwnIdApplicationUrl}/{context}";
+            var applicationUrl = new UriBuilder(_configuration.OwnIdApplicationUrl);
+            var query = HttpUtility.ParseQueryString(applicationUrl.Query);
+            query["q"] = HttpUtility.UrlEncode(GenerateCallbackUrl(context).ToString());
+            applicationUrl.Query = query.ToString();
+            return applicationUrl.ToString();
+        }
+
+        private Uri GenerateCallbackUrl(string context)
+        {
+            return new Uri(new Uri(_configuration.CallbackUrl), $"ownid/{context}/challenge");
         }
 
         public string GenerateChallengeJwt(string context)
         {
             var rsaSecurityKey = new RsaSecurityKey(_configuration.JwtSignCredentials);
             var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenTest = new JwtSecurityToken(
+            var jwt = new JwtSecurityToken(
                 new JwtHeader(new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)),
                 new JwtPayload(null, null, null, DateTime.UtcNow, DateTime.UtcNow.AddHours(1), DateTime.UtcNow)
                 {
                     {"jti", context},
-                    {"type", "login"},
+                    {"type", ChallengeType.Login.ToString().ToLowerInvariant()},
                     {"callback", _configuration.CallbackUrl},
                     {
                         "requester", new
                         {
                             did = _configuration.Requester.DID,
                             pubKey = Convert.ToBase64String(_configuration.JwtSignCredentials.ExportRSAPublicKey()),
-                            name = _configuration.Requester.Name
+                            name = _configuration.Requester.Name,
+                            icon = _configuration.Requester.Icon,
+                            description = _configuration.Requester.Description
                         }
                     },
                     {
                         "requestedFields",
-                        _configuration.ProfileFields.Select(x => new {label = x.Label, type = x.Type.ToString()})
-                            .ToArray()
+                        _configuration.ProfileFields
                     }
                 });
-            return tokenHandler.WriteToken(tokenTest);
+
+            return tokenHandler.WriteToken(jwt);
         }
 
-        public Dictionary<ProfileFieldType, string> GetProfileDataFromJwt(string jwt)
+        public (string, UserProfile) GetProfileDataFromJwt(string jwt)
         {
-            // TODO: parse jwt and get public key
-            var rsaSecurityKey = new RsaSecurityKey(RsaHelper.LoadKeys(jwt));
-
             var tokenHandler = new JwtSecurityTokenHandler();
+
+            if (!tokenHandler.CanReadToken(jwt)) throw new Exception("invalid jwt");
+
+            var token = tokenHandler.ReadJwtToken(jwt);
+            var user = JsonSerializer.Deserialize<UserProfile>(token.Payload["user"].ToString());
+
+            var rsaSecurityKey = new RsaSecurityKey(RsaHelper.LoadKeys(user.PublicKey));
+
             try
             {
                 tokenHandler.ValidateToken(jwt, new TokenValidationParameters
@@ -81,7 +97,10 @@ namespace OwnIdSdk.NetCore3
                     RequireSignedTokens = true,
                     RequireExpirationTime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidateLifetime = true
+                    ValidateLifetime = true,
+                    ValidateAudience = false,
+                    ValidateIssuer = false
+                    // TODO: add issuer to token for validation
                 }, out _);
             }
             catch (SecurityTokenValidationException ex)
@@ -93,8 +112,7 @@ namespace OwnIdSdk.NetCore3
                 throw new Exception($"Token was invalid: {ex.Message}");
             }
 
-            // TODO; add token parse to profile fields dictionary
-            return new Dictionary<ProfileFieldType, string>();
+            return (token.Id, user);
         }
 
         public async Task StoreNonceAsync(string context, string nonce)
