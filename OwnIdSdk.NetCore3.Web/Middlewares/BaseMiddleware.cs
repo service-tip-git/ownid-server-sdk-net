@@ -41,5 +41,10 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         {
             response.StatusCode = (int) HttpStatusCode.NotFound;
         }
+        
+        protected void BadRequest(HttpResponse response)
+        {
+            response.StatusCode = (int) HttpStatusCode.BadRequest;
+        }
     }
 }

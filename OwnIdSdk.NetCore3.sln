@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnIdSdk.NetCore3", "OwnIdS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnIdSdk.NetCore3.Web", "OwnIdSdk.NetCore3.Web\OwnIdSdk.NetCore3.Web.csproj", "{B8386AEE-2303-4617-AA49-3F425B74EEA5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnIdSdk.NetCore3.Server", "OwnIdSdk.NetCore3.Server\OwnIdSdk.NetCore3.Server.csproj", "{0DE8DB73-D8F7-4FB7-B6AA-166D4009E41A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{B8386AEE-2303-4617-AA49-3F425B74EEA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8386AEE-2303-4617-AA49-3F425B74EEA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8386AEE-2303-4617-AA49-3F425B74EEA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DE8DB73-D8F7-4FB7-B6AA-166D4009E41A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DE8DB73-D8F7-4FB7-B6AA-166D4009E41A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DE8DB73-D8F7-4FB7-B6AA-166D4009E41A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DE8DB73-D8F7-4FB7-B6AA-166D4009E41A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

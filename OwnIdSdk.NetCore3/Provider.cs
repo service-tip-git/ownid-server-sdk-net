@@ -34,11 +34,12 @@ namespace OwnIdSdk.NetCore3
             return Guid.NewGuid().ToString();
         }
 
-        public string GetDeepLink(string context)
+        public string GetDeepLink(string context, ChallengeType challengeType)
         {
             var applicationUrl = new UriBuilder(_configuration.OwnIdApplicationUrl);
             var query = HttpUtility.ParseQueryString(applicationUrl.Query);
             query["q"] = HttpUtility.UrlEncode(GenerateCallbackUrl(context).ToString());
+            query["type"] = challengeType.ToString().ToLowerInvariant();
             applicationUrl.Query = query.ToString();
             return applicationUrl.ToString();
         }
@@ -57,7 +58,6 @@ namespace OwnIdSdk.NetCore3
                 new JwtPayload(null, null, null, DateTime.UtcNow, DateTime.UtcNow.AddHours(1), DateTime.UtcNow)
                 {
                     {"jti", context},
-                    {"type", ChallengeType.Login.ToString().ToLowerInvariant()},
                     {"callback", _configuration.CallbackUrl},
                     {
                         "requester", new
@@ -86,7 +86,7 @@ namespace OwnIdSdk.NetCore3
 
             var token = tokenHandler.ReadJwtToken(jwt);
             var user = JsonSerializer.Deserialize<UserProfile>(token.Payload["user"].ToString());
-
+            // TODO: add type of challenge
             var rsaSecurityKey = new RsaSecurityKey(RsaHelper.LoadKeys(user.PublicKey));
 
             try
@@ -138,7 +138,9 @@ namespace OwnIdSdk.NetCore3
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
-            return cacheItem?.Nonce != nonce ? (false, null) : (true, cacheItem?.DID);
+            return cacheItem?.Nonce != nonce || string.IsNullOrEmpty(cacheItem?.DID)
+                ? (false, null)
+                : (true, cacheItem?.DID);
         }
 
         public bool IsContextValid(string context)
