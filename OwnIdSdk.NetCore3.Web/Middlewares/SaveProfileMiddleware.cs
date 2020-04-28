@@ -2,10 +2,13 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using OwnIdSdk.NetCore3.Configuration;
+using OwnIdSdk.NetCore3.Contracts;
+using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web.Abstractions;
 
@@ -29,15 +32,16 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 NotFound(context.Response);
                 return;
             }
-
-            string body;
             
-            using (var readStream = new StreamReader(context.Request.Body))
+            var request = await JsonSerializer.DeserializeAsync<JwtContainer>(context.Request.Body);
+
+            if (string.IsNullOrEmpty(request?.Jwt))
             {
-                body = readStream.ReadToEnd();
+                BadRequest(context.Response);
+                return;
             }
 
-            var (jwtContext, userData) =  _provider.GetProfileDataFromJwt(body);
+            var (jwtContext, userData) =  _provider.GetProfileDataFromJwt(request.Jwt);
 
             // preventing data substitution 
             challengeContext = jwtContext;

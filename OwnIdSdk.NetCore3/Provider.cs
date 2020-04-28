@@ -1,5 +1,6 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -58,7 +59,7 @@ namespace OwnIdSdk.NetCore3
                 new JwtPayload(null, null, null, DateTime.UtcNow, DateTime.UtcNow.AddHours(1), DateTime.UtcNow)
                 {
                     {"jti", context},
-                    {"callback", _configuration.CallbackUrl},
+                    {"callback", GenerateCallbackUrl(context)},
                     {
                         "requester", new
                         {
@@ -70,8 +71,14 @@ namespace OwnIdSdk.NetCore3
                         }
                     },
                     {
-                        "requestedFields",
-                        _configuration.ProfileFields
+                        "requestedFields", _configuration.ProfileFields.Select(x => new
+                        {
+                            type = x.Type.ToString().ToLowerInvariant(),
+                            key = x.Key,
+                            label = x.Label,
+                            placeholder = x.Placeholder,
+                            required = x.IsRequired
+                        })
                     }
                 });
 
