@@ -14,7 +14,7 @@ namespace OwnIdSdk.NetCore3.Server
             
         }
         
-        public async Task UpdateProfileAsync(string did, Dictionary<string, string> profileFields)
+        public async Task UpdateProfileAsync(string did, Dictionary<string, string> profileFields, string publicKey)
         {
             string apiKey = "3_s5-gLs4aLp5FXluP8HXs7_JN40XWNlbvYWVCCkbNCqlhW6Sm5Z4tXGGsHcSJYD3W";
             string userKey = "your-user/app-key";
@@ -32,6 +32,17 @@ namespace OwnIdSdk.NetCore3.Server
                         new KeyValuePair<string, string>("UID", "did:idw:951dd54b-ce06-4421-a0ed-4296d6085e96")
                     }));
                 var content = await s.Content.ReadAsStringAsync();
+                
+                
+                var a = await http.PostAsync(new Uri("https://accounts.us1.gigya.com/accounts.notifyLogin"), new FormUrlEncodedContent(
+                    new[]
+                    {
+                        new KeyValuePair<string, string>("apiKey", apiKey),
+                        new KeyValuePair<string, string>("secret", secretKey),
+                        new KeyValuePair<string, string>("siteUID", "did:idw:951dd54b-ce06-4421-a0ed-4296d6085e96"),
+                        new KeyValuePair<string, string>("targetEnv", "browser")
+                    }));
+                var content2 = await a.Content.ReadAsStringAsync();
             }
             catch (Exception e)
             {
@@ -40,7 +51,7 @@ namespace OwnIdSdk.NetCore3.Server
             }
         }
 
-        public Task OnSuccessLoginAsync(string did, HttpRequest context)
+        public Task OnSuccessLoginAsync(string did, HttpResponse response)
         {
             throw new NotImplementedException();
         }

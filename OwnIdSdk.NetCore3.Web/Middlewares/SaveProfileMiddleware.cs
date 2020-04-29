@@ -45,7 +45,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
             // preventing data substitution 
             challengeContext = jwtContext;
-            await _challengeHandler.UpdateProfileAsync(userData.DID, userData.Profile);
+            await _challengeHandler.UpdateProfileAsync(userData.DID, userData.Profile, userData.PublicKey);
             await _provider.SetDIDAsync(challengeContext, userData.DID);
 
             Ok(context.Response);

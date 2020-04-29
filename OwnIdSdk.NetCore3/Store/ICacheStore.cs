@@ -11,5 +11,9 @@ namespace OwnIdSdk.NetCore3.Store
         CacheItem Get(string key);
 
         Task<CacheItem> GetAsync(string key);
+
+        void Remove(string key);
+        
+        Task RemoveAsync(string key);
     }
 }

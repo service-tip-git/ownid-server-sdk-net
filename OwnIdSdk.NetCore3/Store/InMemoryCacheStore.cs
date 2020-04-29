@@ -32,5 +32,16 @@ namespace OwnIdSdk.NetCore3.Store
         {
             return await Task.FromResult(Get(key));
         }
+
+        public void Remove(string key)
+        {
+            _store.TryRemove(key, out _);
+        }
+
+        public async Task RemoveAsync(string key)
+        {
+            Remove(key);
+            await Task.CompletedTask;
+        }
     }
 }

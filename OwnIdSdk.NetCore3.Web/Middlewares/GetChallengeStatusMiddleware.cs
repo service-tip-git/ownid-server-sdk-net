@@ -38,9 +38,16 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
             var didResult = await _provider.GetDIDAsync(challengeContext, request.Nonce);
 
-            // TODO: call IChallengeHandler
-
-            // TODO: set session/token/auth-cookie
+            if (didResult.isSuccess)
+            {
+                await _provider.RemoveContextAsync(challengeContext);
+                
+                await _challengeHandler.OnSuccessLoginAsync(didResult.did, context.Response);
+                
+                if(context.Response.ContentLength > 0 || context.Response.StatusCode > 400)
+                    return;
+            }
+            
             await Ok(context.Response, new GetStatusResponse{IsSuccess = didResult.isSuccess});
         }
     }

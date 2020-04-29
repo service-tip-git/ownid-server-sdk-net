@@ -150,6 +150,11 @@ namespace OwnIdSdk.NetCore3
                 : (true, cacheItem?.DID);
         }
 
+        public async Task RemoveContextAsync(string context)
+        {
+            
+        }
+
         public bool IsContextValid(string context)
         {
             return Regex.IsMatch(context,
