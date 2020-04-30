@@ -27,6 +27,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             var routeData = context.GetRouteData();
             var challengeContext = routeData.Values["context"]?.ToString();
 
+            // add check for context
             if (string.IsNullOrEmpty(challengeContext) || !_provider.IsContextValid(challengeContext))
             {
                 NotFound(context.Response);
@@ -40,7 +41,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 BadRequest(context.Response);
                 return;
             }
-
+            
             var (jwtContext, userData) =  _provider.GetProfileDataFromJwt(request.Jwt);
 
             // preventing data substitution 

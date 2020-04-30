@@ -8,6 +8,8 @@ namespace OwnIdSdk.NetCore3.Cryptography
 {
     public static class RsaHelper
     {
+        private const string TopWrapper = "-----BEGIN PUBLIC KEY-----";
+        private const string BottomWrapper = "\n-----END PUBLIC KEY-----";
         private const string BeginString = "-----BEGIN ";
         private const string EndString = "-----END ";
 
@@ -72,6 +74,11 @@ namespace OwnIdSdk.NetCore3.Cryptography
                 throw new IOException("base64 data appears to be truncated");
 
             return buf.ToString();
+        }
+
+        public static string GetPublicKeyForTransfer(RSA rsa)
+        {
+            return $"{TopWrapper}\n{Convert.ToBase64String(rsa.ExportRSAPublicKey())}\n{BottomWrapper}";
         }
 
         private static bool StartsWith(string source, string prefix)

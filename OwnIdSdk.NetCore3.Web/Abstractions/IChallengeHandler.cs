@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using OwnIdSdk.NetCore3.Contracts;
 
 namespace OwnIdSdk.NetCore3.Web.Abstractions
 {
@@ -8,6 +9,6 @@ namespace OwnIdSdk.NetCore3.Web.Abstractions
     {
         Task UpdateProfileAsync(string did, Dictionary<string, string> profileFields, string publicKey);
 
-        Task OnSuccessLoginAsync(string did, HttpResponse response);
+        Task<LoginResult<object>> OnSuccessLoginAsync(string did, HttpResponse response);
     }
 }

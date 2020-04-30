@@ -33,9 +33,9 @@ namespace OwnIdSdk.NetCore3.Configuration
             new ProfileField("Email", "email", true, ProfileFieldType.Email, "john.doe@mail.com");
 
         public static ProfileField FirstName =>
-            new ProfileField("First Name", "firstname", true, ProfileFieldType.Text, "First name");
+            new ProfileField("First Name", "firstName", true, ProfileFieldType.Text, "First name");
 
         public static ProfileField LastName =>
-            new ProfileField("Last Name", "lastname", true, ProfileFieldType.Text, "Last name");
+            new ProfileField("Last Name", "lastName", true, ProfileFieldType.Text, "Last name");
     }
 }

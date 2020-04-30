@@ -42,10 +42,10 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             {
                 await _provider.RemoveContextAsync(challengeContext);
                 
-                await _challengeHandler.OnSuccessLoginAsync(didResult.did, context.Response);
+                var result = await _challengeHandler.OnSuccessLoginAsync(didResult.did, context.Response);
                 
-                if(context.Response.ContentLength > 0 || context.Response.StatusCode > 400)
-                    return;
+                await Json(context.Response, result.Data, result.HttpCode);
+                return;
             }
             
             await Ok(context.Response, new GetStatusResponse{IsSuccess = didResult.isSuccess});

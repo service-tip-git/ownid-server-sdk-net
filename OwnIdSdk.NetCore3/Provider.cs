@@ -1,5 +1,6 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -64,7 +65,7 @@ namespace OwnIdSdk.NetCore3
                         "requester", new
                         {
                             did = _configuration.Requester.DID,
-                            pubKey = Convert.ToBase64String(_configuration.JwtSignCredentials.ExportRSAPublicKey()),
+                            pubKey = RsaHelper.GetPublicKeyForTransfer(_configuration.JwtSignCredentials),
                             name = _configuration.Requester.Name,
                             icon = _configuration.Requester.Icon,
                             description = _configuration.Requester.Description
@@ -94,7 +95,8 @@ namespace OwnIdSdk.NetCore3
             var token = tokenHandler.ReadJwtToken(jwt);
             var user = JsonSerializer.Deserialize<UserProfile>(token.Payload["user"].ToString());
             // TODO: add type of challenge
-            var rsaSecurityKey = new RsaSecurityKey(RsaHelper.LoadKeys(user.PublicKey));
+            using var sr = new StringReader(user.PublicKey);
+            var rsaSecurityKey = new RsaSecurityKey(RsaHelper.LoadKeys(RsaHelper.ReadKeyFromPem(sr)));
 
             try
             {
@@ -152,7 +154,7 @@ namespace OwnIdSdk.NetCore3
 
         public async Task RemoveContextAsync(string context)
         {
-            
+            await _cacheStore.RemoveAsync(context);
         }
 
         public bool IsContextValid(string context)

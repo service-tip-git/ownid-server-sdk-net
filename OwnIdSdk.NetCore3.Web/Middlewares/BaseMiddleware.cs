@@ -36,6 +36,13 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         {
             response.StatusCode = (int) HttpStatusCode.OK;
         }
+        
+        protected async Task Json<T>(HttpResponse response, T responseBody, int statusCode) where T : class
+        {
+            response.StatusCode = statusCode;
+            response.ContentType = "application/json";
+            await response.WriteAsync(JsonSerializer.Serialize(responseBody));
+        }
 
         protected void NotFound(HttpResponse response)
         {

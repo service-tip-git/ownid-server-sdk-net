@@ -26,32 +26,48 @@ namespace OwnIdSdk.NetCore3.Server
         }
 
         public IConfiguration Configuration { get; }
-
+        private const string CorsPolicyName = "AllowAll";
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            using (var publicKeyReader = File.OpenText(@"./Keys/jwtRS256.key.pub"))
-            using (var privateKeyReader = File.OpenText(@"./Keys/jwtRS256.key"))   
+            services.AddHttpClient();
+            
+            services.AddCors(x =>
+            {
+                x.AddPolicy(CorsPolicyName , builder =>
+                {
+                    // builder.AllowCredentials();
+                    builder.AllowAnyHeader();
+                    builder.AllowAnyMethod();
+                    builder.AllowAnyOrigin();
+                });
+            });
+
+            var ownIdSection = Configuration.GetSection("ownid");
+            using (var publicKeyReader = File.OpenText(ownIdSection["pub_key"]))
+            using (var privateKeyReader = File.OpenText(ownIdSection["private_key"]))   
             {
                 services.AddOwnId<SampleChallengeHandler, InMemoryCacheStore>(new ProviderConfiguration(
                     RsaHelper.ReadKeyFromPem(publicKeyReader),
                     RsaHelper.ReadKeyFromPem(privateKeyReader),
-                    "http://a52b6bdc8e3954bdf8b129e49fc4fa0f-1986585172.us-east-2.elb.amazonaws.com",
+                    ownIdSection["web_app_url"],
                     new List<ProfileField>
                     {
                         ProfileField.Email,
                         ProfileField.FirstName,
                         ProfileField.LastName
                     }, 
-                    "http://localhost:5000/",
+                    ownIdSection["callback_url"],
                     new Requester
                     {
-                        DID = "ownid:did:123123123",
-                        Name = "mozambiquehe.re",
-                        Description = "My description"
+                        DID = ownIdSection["did"],
+                        Name = ownIdSection["name"],
+                        Description = ownIdSection["description"]
                     }
                 ));
             }
+            
+           
             services.AddControllers();
         }
 
@@ -63,6 +79,7 @@ namespace OwnIdSdk.NetCore3.Server
                 app.UseDeveloperExceptionPage();
             }
             
+            app.UseCors(CorsPolicyName);
             app.UseOwnId();
 
             app.UseRouting();
