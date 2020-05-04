@@ -40,9 +40,9 @@ namespace OwnIdSdk.NetCore3
         {
             var applicationUrl = new UriBuilder(_configuration.OwnIdApplicationUrl);
             var query = HttpUtility.ParseQueryString(applicationUrl.Query);
-            query["q"] = HttpUtility.UrlEncode(GenerateCallbackUrl(context).ToString());
+            query["q"] = GenerateCallbackUrl(context).ToString();
             query["type"] = challengeType.ToString().ToLowerInvariant();
-            applicationUrl.Query = query.ToString();
+            applicationUrl.Query = query.ToString() ?? string.Empty;
             return applicationUrl.ToString();
         }
 
