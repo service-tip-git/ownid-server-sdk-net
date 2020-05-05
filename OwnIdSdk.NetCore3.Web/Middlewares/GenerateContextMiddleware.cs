@@ -28,13 +28,13 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 return;
             }
             
-            var challengeContext = _provider.GenerateContext();
-            var nonce = _provider.GenerateNonce();
+            var challengeContext = Provider.GenerateContext();
+            var nonce = Provider.GenerateNonce();
 
-            await _provider.StoreNonceAsync(challengeContext, nonce);
+            await Provider.StoreNonceAsync(challengeContext, nonce);
 
             await Ok(context.Response,
-                new GetChallengeLinkResponse(challengeContext, _provider.GetDeepLink(challengeContext, challengeType), nonce
+                new GetChallengeLinkResponse(challengeContext, Provider.GetDeepLink(challengeContext, challengeType), nonce
                 ));
         }
     }

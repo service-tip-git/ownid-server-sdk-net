@@ -23,7 +23,7 @@ dotnet: 3.1
 
 script:
   - dotnet restore
-  - dotnet test
+  - dotnet test /p:CollectCoverage=true /p:Threshold=20
   - dotnet build
 
 before_deploy:

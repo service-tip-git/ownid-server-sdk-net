@@ -10,7 +10,7 @@ using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web;
 
-namespace OwnIdSdk.NetCore3.Server
+namespace OwnIdSdk.NetCore3.Server.Gigya
 {
     public class Startup
     {

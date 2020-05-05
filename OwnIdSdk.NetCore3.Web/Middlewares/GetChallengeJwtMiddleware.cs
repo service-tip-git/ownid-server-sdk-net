@@ -21,7 +21,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             var routeData = context.GetRouteData();
             var challengeContext = routeData.Values["context"]?.ToString();
 
-            if (string.IsNullOrEmpty(challengeContext) || !_provider.IsContextValid(challengeContext))
+            if (string.IsNullOrEmpty(challengeContext) || !Provider.IsContextValid(challengeContext))
             {
                 NotFound(context.Response);
                 return;
@@ -30,7 +30,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             // TODO: do we need to check if context exists
             await Ok(context.Response, new JwtContainer
             {
-                Jwt = _provider.GenerateChallengeJwt(challengeContext)
+                Jwt = Provider.GenerateChallengeJwt(challengeContext)
             });
         }
     }

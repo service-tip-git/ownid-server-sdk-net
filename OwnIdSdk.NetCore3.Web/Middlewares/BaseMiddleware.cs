@@ -10,16 +10,16 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public abstract class BaseMiddleware
     {
-        protected readonly RequestDelegate _next;
-        protected readonly IChallengeHandler _challengeHandler;
-        protected readonly Provider _provider;
+        protected readonly RequestDelegate Next;
+        protected readonly IChallengeHandler ChallengeHandler;
+        protected readonly Provider Provider;
 
         protected BaseMiddleware(RequestDelegate next, IChallengeHandler challengeHandler, ICacheStore cacheStore,
             ProviderConfiguration providerConfiguration)
         {
-            _next = next;
-            _challengeHandler = challengeHandler;
-            _provider = new Provider(cacheStore, providerConfiguration);
+            Next = next;
+            ChallengeHandler = challengeHandler;
+            Provider = new Provider(cacheStore, providerConfiguration);
             
         }
 

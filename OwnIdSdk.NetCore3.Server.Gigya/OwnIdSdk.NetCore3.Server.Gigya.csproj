@@ -9,20 +9,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="keys" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="Keys\jwtRS256.key.pub">
+      <None Update="keys\jwtRS256.key">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="Keys\jwtRS256.key">
+      <None Update="keys\jwtRS256.key.pub">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
     </ItemGroup>
 
 

@@ -22,17 +22,6 @@ namespace OwnIdSdk.NetCore3.Server.Controllers
         // GET
         public async Task<IActionResult> Index()
         {
-            var a = new SampleChallengeHandler(_httpClientFactory, _configuration);
-            try
-            {
-                await a.OnSuccessLoginAsync("did:idw:89e7fc58-be21-48ea-a06e-66bc5aa6d0e1", Response);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-            
             return Ok();
         }
     }

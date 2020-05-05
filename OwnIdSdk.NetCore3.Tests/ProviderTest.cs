@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
+using Moq;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Store;
@@ -9,6 +12,68 @@ namespace OwnIdSdk.NetCore3.Tests
 {
     public class ProviderTest
     {
+        private readonly Provider _provider;
+        private readonly Mock<ICacheStore> _cacheStore;
+        private readonly Mock<ProviderConfiguration> _configuration;
+
+        public ProviderTest()
+        {
+            _cacheStore = new Mock<ICacheStore>(MockBehavior.Strict);
+            // TODO: remove dependencies
+            using var publicKeyStream = File.OpenText("./Keys/jwtRS256.key.pub");
+            using var privateKeyStream = File.OpenText("./Keys/jwtRS256.key");
+            _configuration = new Mock<ProviderConfiguration>(RsaHelper.ReadKeyFromPem(publicKeyStream), 
+                RsaHelper.ReadKeyFromPem(privateKeyStream), "ownid-app.com", 
+                new List<ProfileField> {ProfileField.Email, ProfileField.FirstName, ProfileField.LastName},
+                "https://callback.com", new Requester
+                {
+                    DID = "did:tst:123-12-123-1",
+                    Description = "desc",
+                    Name = "My name"
+                });
+            _provider = new Provider(_cacheStore.Object, _configuration.Object);
+        }
+
+        [Fact]
+        public void GenerateContext_Success()
+        {
+            var result = _provider.GenerateContext();
+            
+            Assert.False(string.IsNullOrWhiteSpace(result));
+            Assert.True(Guid.TryParse(result, out _));
+            Assert.True(_provider.IsContextValid(result));
+        }
+
+        [Fact]
+        public void GenerateNonce_Success()
+        {
+            var result = _provider.GenerateNonce();
+            Assert.False(string.IsNullOrWhiteSpace(result));
+        }
+
+        [Theory]
+        [InlineData("B477A4FB-FE24-40D3-A467-56D4E2D2F354", true)]
+        [InlineData("B477A4FBFE2440D3A46756D4E2D2F354", true)]
+        [InlineData("b477a4fbfe2440d3a46756d4e2d2f354", true)]
+        [InlineData("B477A4FB-FE24-A467-56D4E2D2F354", false)]
+        [InlineData("B477A4FBFE2440D3A46756D4E2D2F35", false)]
+        [InlineData("b477a4fbfe2440d3a46756d4e2d2f354dds", false)]
+        [InlineData("123111231123311212112211", false)]
+        public void IsContextValid_Correct(string value, bool isCorrect)
+        {
+            Assert.Equal(isCorrect, _provider.IsContextValid(value));
+        }
+
+        [Fact]
+        public async Task StoreNonceAsync()
+        {
+            var context = Guid.NewGuid().ToString();
+            var nonce = Guid.NewGuid().ToString();
+            _cacheStore.Setup(x => x.SetAsync(It.Is<string>(s => s.Equals(context)),
+                It.Is<CacheItem>((o) => o.Nonce == nonce))).Returns(Task.CompletedTask);
+            await _provider.StoreNonceAsync(context, nonce);
+        }
+
         [Fact]
         public void GenerateChallengeJwt_Success()
         {

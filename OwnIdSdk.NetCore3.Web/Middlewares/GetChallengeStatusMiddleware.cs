@@ -22,7 +22,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             var routeData = context.GetRouteData();
             var challengeContext = routeData.Values["context"]?.ToString();
 
-            if (string.IsNullOrEmpty(challengeContext) || !_provider.IsContextValid(challengeContext))
+            if (string.IsNullOrEmpty(challengeContext) || !Provider.IsContextValid(challengeContext))
             {
                 NotFound(context.Response);
                 return;
@@ -36,13 +36,13 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 return;
             }
 
-            var didResult = await _provider.GetDIDAsync(challengeContext, request.Nonce);
+            var didResult = await Provider.GetDIDAsync(challengeContext, request.Nonce);
 
             if (didResult.isSuccess)
             {
-                await _provider.RemoveContextAsync(challengeContext);
+                await Provider.RemoveContextAsync(challengeContext);
                 
-                var result = await _challengeHandler.OnSuccessLoginAsync(didResult.did, context.Response);
+                var result = await ChallengeHandler.OnSuccessLoginAsync(didResult.did, context.Response);
                 
                 await Json(context.Response, result.Data, result.HttpCode);
                 return;

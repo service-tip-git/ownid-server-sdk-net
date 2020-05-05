@@ -9,7 +9,7 @@ namespace OwnIdSdk.NetCore3.Cryptography
     public static class RsaHelper
     {
         private const string TopWrapper = "-----BEGIN PUBLIC KEY-----";
-        private const string BottomWrapper = "\n-----END PUBLIC KEY-----";
+        private const string BottomWrapper = "-----END PUBLIC KEY-----";
         private const string BeginString = "-----BEGIN ";
         private const string EndString = "-----END ";
 

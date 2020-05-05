@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace OwnIdSdk.NetCore3.Server.Gigya.Login
+namespace OwnIdSdk.NetCore3.Server.Gigya.Gigya.Login
 {
     public class LoginResponse : BaseGigyaResponse
     {
