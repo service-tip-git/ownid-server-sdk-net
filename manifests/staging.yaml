@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ownid-server-netcore3-gigya-deployment
+  namespace: staging
+  labels:
+    app: ownid-server-netcore3-gigya
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ownid-server-netcore3-gigya
+  template:
+    metadata:
+      labels:
+        app: ownid-server-netcore3-gigya
+    spec:
+      containers:
+        - name: ownid-server-netcore3-gigya
+          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging:latest
+          ports:
+            - containerPort: 5002
+          env:
+            - name: OWNID__WEB_APP_URL
+              value: https://sign.staging.ownid.com/sign
+            - name: OWNID__CALLBACK_URL
+              value: https://client.staging.ownid.com/netcore3
+            - name: OWNID__DID
+              value: did:ownid:staging_151850889514
+            - name: OWNID__NAME
+              value: Staging Client NetCore3
+            - name: OWNID__DESCRIPTION
+              value: Staging Client NetCore3 environment
+            - name: GIGYA__SECRET
+              value: 0Hg/R8a/riSbbPiACeQZNFvg3c7s0f9uMx+BKaliaU8=
+            - name: GIGYA__API_KEY
+              value: 3_DS2fdSlSzClFXUfkKHaxJq9-Zknssg2UHamCntjp2jRcL74a_x5HbhDxvHZ6a4q2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ownid-server-netcore3-gigya-service
+  namespace: staging
+spec:
+  selector:
+    app: ownid-server-netcore3-gigya
+  ports:
+    - port: 5002
+      targetPort: 5002
