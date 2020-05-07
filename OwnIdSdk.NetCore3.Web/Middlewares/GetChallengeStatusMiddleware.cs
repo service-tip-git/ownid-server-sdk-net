@@ -22,7 +22,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             var routeData = context.GetRouteData();
             var challengeContext = routeData.Values["context"]?.ToString();
 
-            if (string.IsNullOrEmpty(challengeContext) || !Provider.IsContextValid(challengeContext))
+            if (string.IsNullOrEmpty(challengeContext) || !Provider.IsContextFormatValid(challengeContext))
             {
                 NotFound(context.Response);
                 return;

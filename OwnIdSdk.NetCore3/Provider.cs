@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Cryptography;
+using OwnIdSdk.NetCore3.Extensions;
 using OwnIdSdk.NetCore3.Store;
 
 namespace OwnIdSdk.NetCore3
@@ -27,8 +28,7 @@ namespace OwnIdSdk.NetCore3
 
         public string GenerateContext()
         {
-            // TODO: change to proper context generation
-            return Guid.NewGuid().ToString();
+            return Guid.NewGuid().ToShortString();
         }
 
         public string GenerateNonce()
@@ -40,10 +40,12 @@ namespace OwnIdSdk.NetCore3
         {
             var applicationUrl = new UriBuilder(_configuration.OwnIdApplicationUrl);
             var query = HttpUtility.ParseQueryString(applicationUrl.Query);
-            query["q"] = GenerateCallbackUrl(context).ToString();
-            query["type"] = challengeType.ToString().ToLowerInvariant();
+            query["t"] = challengeType.ToString().Substring(0, 1).ToLowerInvariant();
+            var callbackUrl = GenerateCallbackUrl(context);
+            query["q"] = $"{callbackUrl.Authority}{callbackUrl.PathAndQuery}";
+            
             applicationUrl.Query = query.ToString() ?? string.Empty;
-            return applicationUrl.ToString();
+            return applicationUrl.Uri.ToString();
         }
 
         private Uri GenerateCallbackUrl(string context)
@@ -157,10 +159,9 @@ namespace OwnIdSdk.NetCore3
             await _cacheStore.RemoveAsync(context);
         }
 
-        public bool IsContextValid(string context)
+        public bool IsContextFormatValid(string context)
         {
-            return Regex.IsMatch(context,
-                "^([0-9A-Fa-f]{8}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{12})$");
+            return Regex.IsMatch(context, "^([a-zA-Z0-9_-]{22})$");
         }
     }
 }

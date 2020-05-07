@@ -40,8 +40,7 @@ namespace OwnIdSdk.NetCore3.Tests
             var result = _provider.GenerateContext();
             
             Assert.False(string.IsNullOrWhiteSpace(result));
-            Assert.True(Guid.TryParse(result, out _));
-            Assert.True(_provider.IsContextValid(result));
+            Assert.True(_provider.IsContextFormatValid(result));
         }
 
         [Fact]
@@ -52,16 +51,14 @@ namespace OwnIdSdk.NetCore3.Tests
         }
 
         [Theory]
-        [InlineData("B477A4FB-FE24-40D3-A467-56D4E2D2F354", true)]
-        [InlineData("B477A4FBFE2440D3A46756D4E2D2F354", true)]
-        [InlineData("b477a4fbfe2440d3a46756d4e2d2f354", true)]
-        [InlineData("B477A4FB-FE24-A467-56D4E2D2F354", false)]
-        [InlineData("B477A4FBFE2440D3A46756D4E2D2F35", false)]
-        [InlineData("b477a4fbfe2440d3a46756d4e2d2f354dds", false)]
-        [InlineData("123111231123311212112211", false)]
+        [InlineData("q1Ocsj0m5keLZ95hBDaRgQ", true)]
+        [InlineData("q1Ocsj0m5keLZ95hBDaRg", false)]
+        [InlineData("q1Ocsj0m5keLZ95hBDaRgQc", false)]
+        [InlineData("q1Ocsj0m5keLZ95hBDaR/Q", false)]
+        [InlineData("q1Ocsj0m5keLZ95hBD+RgQ", false)]
         public void IsContextValid_Correct(string value, bool isCorrect)
         {
-            Assert.Equal(isCorrect, _provider.IsContextValid(value));
+            Assert.Equal(isCorrect, _provider.IsContextFormatValid(value));
         }
 
         [Fact]
