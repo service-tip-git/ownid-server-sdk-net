@@ -97,5 +97,5 @@ spec:
   selector:
     app: ownid-server-netcore3-gigya-2
   ports:
-    - port: 5002
+    - port: 5003
       targetPort: 5002
