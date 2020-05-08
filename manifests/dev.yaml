@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ownid-server-netcore3-gigya-deployment
+  namespace: dev
+  labels:
+    app: ownid-server-netcore3-gigya
+spec:
+  revisionHistoryLimit: 2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ownid-server-netcore3-gigya
+  template:
+    metadata:
+      labels:
+        app: ownid-server-netcore3-gigya
+    spec:
+      containers:
+        - name: ownid-server-netcore3-gigya
+          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-develop:latest
+          ports:
+            - containerPort: 5002
+          env:
+            - name: OWNID__WEB_APP_URL
+              value: https://sign.dev.ownid.com/sign
+            - name: OWNID__CALLBACK_URL
+              value: https://client.dev.ownid.com/netcore3
+            - name: OWNID__DID
+              value: did:ownid:dev_151850889514
+            - name: OWNID__NAME
+              value: Dev Client NetCore3
+            - name: OWNID__DESCRIPTION
+              value: Dev Client NetCore3 environment
+            - name: GIGYA__SECRET
+              value: g157+kUR3kxvgIX4MneEWnVgBVzhQe4dXfoNe9ceSNA=
+            - name: GIGYA__API_KEY
+              value: 3_s5-gLs4aLp5FXluP8HXs7_JN40XWNlbvYWVCCkbNCqlhW6Sm5Z4tXGGsHcSJYD3W 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ownid-server-netcore3-gigya-service
+  namespace: dev
+spec:
+  selector:
+    app: ownid-server-netcore3-gigya
+  ports:
+    - port: 5002
+      targetPort: 5002
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ownid-server-netcore3-gigya-2-deployment
+  namespace: dev
+  labels:
+    app: ownid-server-netcore3-gigya-2
+spec:
+  revisionHistoryLimit: 2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ownid-server-netcore3-gigya-2
+  template:
+    metadata:
+      labels:
+        app: ownid-server-netcore3-gigya-2
+    spec:
+      containers:
+        - name: ownid-server-netcore3-gigya-2
+          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-develop:latest
+          ports:
+            - containerPort: 5002
+          env:
+            - name: OWNID__WEB_APP_URL
+              value: https://sign.dev.ownid.com/sign
+            - name: OWNID__CALLBACK_URL
+              value: https://client2.dev.ownid.com/netcore3
+            - name: OWNID__DID
+              value: did:ownid:dev_151850889514
+            - name: OWNID__NAME
+              value: Dev Client 2 NetCore3
+            - name: OWNID__DESCRIPTION
+              value: Dev Client 2 NetCore3 environment
+            - name: GIGYA__SECRET
+              value: g157+kUR3kxvgIX4MneEWnVgBVzhQe4dXfoNe9ceSNA=
+            - name: GIGYA__API_KEY
+              value: 3_s5-gLs4aLp5FXluP8HXs7_JN40XWNlbvYWVCCkbNCqlhW6Sm5Z4tXGGsHcSJYD3W 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ownid-server-netcore3-gigya-2-service
+  namespace: dev
+spec:
+  selector:
+    app: ownid-server-netcore3-gigya-2
+  ports:
+    - port: 5003
+      targetPort: 5002
