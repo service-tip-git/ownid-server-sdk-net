@@ -11,7 +11,7 @@ FOLDER=$PKG_VERSION"_"$TRAVIS_BUILD_NUMBER
 echo Path: $S3PATH/$FOLDER
 
 # Publish Netcore3 library
-dotnet build  --configuration Release --version-suffix $FOLDER
+dotnet build  --configuration Release --version-suffix ci-build
 
 aws s3 cp ./OwnIdSdk.NetCore3.Web/bin/Release/netcoreapp3.1 $S3PATH/latest --recursive
 aws s3 cp ./OwnIdSdk.NetCore3.Web/bin/Release/netcoreapp3.1 $S3PATH/$FOLDER --recursive
