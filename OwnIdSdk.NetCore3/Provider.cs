@@ -43,7 +43,7 @@ namespace OwnIdSdk.NetCore3
             query["t"] = challengeType.ToString().Substring(0, 1).ToLowerInvariant();
             var callbackUrl = GenerateCallbackUrl(context);
             query["q"] = $"{callbackUrl.Authority}{callbackUrl.PathAndQuery}";
-            
+
             applicationUrl.Query = query.ToString() ?? string.Empty;
             return applicationUrl.Uri.ToString();
         }
@@ -61,8 +61,12 @@ namespace OwnIdSdk.NetCore3
             }
 
             var uri = new Uri(_configuration.CallbackUrl);
+            var path = "";
 
-            var path = uri.PathAndQuery.EndsWith("/") ? uri.PathAndQuery : uri.PathAndQuery + "/";
+            if (!string.IsNullOrEmpty(uri.PathAndQuery))
+            {
+                path = uri.PathAndQuery.EndsWith("/") ? uri.PathAndQuery : uri.PathAndQuery + "/";
+            }
 
             return new Uri(uri, path + $"ownid/{context}/challenge");
         }
