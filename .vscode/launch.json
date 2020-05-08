@@ -9,9 +9,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/OwnIdSdk.NetCore3.Tests/bin/Debug/netcoreapp3.1/OwnIdSdk.NetCore3.Tests.dll",
+            "program": "${workspaceFolder}/OwnIdSdk.NetCore3.Server.Gigya/bin/Debug/netcoreapp3.1/OwnIdSdk.NetCore3.Server.Gigya.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/OwnIdSdk.NetCore3.Tests",
+            "cwd": "${workspaceFolder}/OwnIdSdk.NetCore3.Server.Gigya",
             "console": "internalConsole",
             "stopAtEntry": false
         },

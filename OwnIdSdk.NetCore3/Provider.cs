@@ -43,14 +43,32 @@ namespace OwnIdSdk.NetCore3
             query["t"] = challengeType.ToString().Substring(0, 1).ToLowerInvariant();
             var callbackUrl = GenerateCallbackUrl(context);
             query["q"] = $"{callbackUrl.Authority}{callbackUrl.PathAndQuery}";
-            
+
             applicationUrl.Query = query.ToString() ?? string.Empty;
             return applicationUrl.Uri.ToString();
         }
 
         private Uri GenerateCallbackUrl(string context)
         {
-            return new Uri(new Uri(_configuration.CallbackUrl), $"ownid/{context}/challenge");
+            if (!Uri.IsWellFormedUriString(_configuration.CallbackUrl, UriKind.Absolute))
+            {
+                throw new Exception($"URL is not valid: {_configuration.CallbackUrl}");
+            }
+
+            if (_configuration.CallbackUrl.Contains("?"))
+            {
+                throw new Exception($"Callback URL cannot contain parameters: {_configuration.CallbackUrl}");
+            }
+
+            var uri = new Uri(_configuration.CallbackUrl);
+            var path = "";
+
+            if (!string.IsNullOrEmpty(uri.PathAndQuery))
+            {
+                path = uri.PathAndQuery.EndsWith("/") ? uri.PathAndQuery : uri.PathAndQuery + "/";
+            }
+
+            return new Uri(uri, path + $"ownid/{context}/challenge");
         }
 
         public string GenerateChallengeJwt(string context)
