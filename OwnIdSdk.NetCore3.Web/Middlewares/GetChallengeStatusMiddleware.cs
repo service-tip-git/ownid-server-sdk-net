@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts;
 using OwnIdSdk.NetCore3.Store;
@@ -12,7 +13,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     public class GetChallengeStatusMiddleware : BaseMiddleware
     {
         public GetChallengeStatusMiddleware(RequestDelegate next, IChallengeHandler challengeHandler,
-            ICacheStore cacheStore, ProviderConfiguration providerConfiguration) : base(next, challengeHandler,
+            ICacheStore cacheStore, IOptions<OwnIdConfiguration> providerConfiguration) : base(next, challengeHandler,
             cacheStore, providerConfiguration)
         {
         }
@@ -41,14 +42,14 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             if (didResult.isSuccess)
             {
                 await Provider.RemoveContextAsync(challengeContext);
-                
+
                 var result = await ChallengeHandler.OnSuccessLoginAsync(didResult.did, context.Response);
-                
+
                 await Json(context.Response, result.Data, result.HttpCode);
                 return;
             }
-            
-            await Ok(context.Response, new GetStatusResponse{IsSuccess = didResult.isSuccess});
+
+            await Ok(context.Response, new GetStatusResponse {IsSuccess = didResult.isSuccess});
         }
     }
 }

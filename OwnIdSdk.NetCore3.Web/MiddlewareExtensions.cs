@@ -1,6 +1,8 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web.Abstractions;
@@ -14,7 +16,7 @@ namespace OwnIdSdk.NetCore3.Web
         {
             var routeBuilder = new RouteBuilder(app);
 
-            routeBuilder.MapMiddlewarePost("ownid", 
+            routeBuilder.MapMiddlewarePost("ownid",
                 builder => builder.UseMiddleware<GenerateContextMiddleware>());
             routeBuilder.MapMiddlewareGet("ownid/{context}/challenge",
                 builder => builder.UseMiddleware<GetChallengeJwtMiddleware>());
@@ -27,14 +29,34 @@ namespace OwnIdSdk.NetCore3.Web
         }
 
         public static void AddOwnId<TChallengeHandler, TCacheStore>(this IServiceCollection services,
-            ProviderConfiguration config)
+            Action<OwnIdConfiguration> setupAction)
             where TChallengeHandler : class, IChallengeHandler
             where TCacheStore : class, ICacheStore
         {
+            services.AddOptions<OwnIdConfiguration>().Configure(setupAction);
+
+            services.AddSingleton<IValidateOptions<OwnIdConfiguration>, OwnIdConfigurationValidator>();
+
+            //Validate configuration and add to DI container
+            services.AddSingleton(container =>
+            {
+                try
+                {
+                    return container.GetService<IOptions<OwnIdConfiguration>>().Value;
+                }
+                catch (OptionsValidationException ex)
+                {
+                    foreach (var validationFailure in ex.Failures)
+                        Console.Error.WriteLine(
+                            $"appSettings section '{nameof(OwnIdConfiguration)}' failed validation. Reason: {validationFailure}");
+
+                    throw;
+                }
+            });
+
             // change from singleton
             services.AddSingleton<ICacheStore, TCacheStore>();
             services.AddTransient<IChallengeHandler, TChallengeHandler>();
-            services.AddSingleton(config);
         }
     }
 }

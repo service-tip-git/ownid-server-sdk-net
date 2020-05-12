@@ -18,9 +18,9 @@ namespace OwnIdSdk.NetCore3
     public class Provider
     {
         private readonly ICacheStore _cacheStore;
-        private readonly ProviderConfiguration _configuration;
+        private readonly OwnIdConfiguration _configuration;
 
-        public Provider(ICacheStore cacheStore, ProviderConfiguration configuration)
+        public Provider(ICacheStore cacheStore, OwnIdConfiguration configuration)
         {
             _cacheStore = cacheStore;
             _configuration = configuration;
@@ -38,37 +38,26 @@ namespace OwnIdSdk.NetCore3
 
         public string GetDeepLink(string context, ChallengeType challengeType)
         {
-            var applicationUrl = new UriBuilder(_configuration.OwnIdApplicationUrl);
-            var query = HttpUtility.ParseQueryString(applicationUrl.Query);
+            var deepLink = new UriBuilder(_configuration.OwnIdApplicationUrl);
+            var query = HttpUtility.ParseQueryString(deepLink.Query);
             query["t"] = challengeType.ToString().Substring(0, 1).ToLowerInvariant();
             var callbackUrl = GenerateCallbackUrl(context);
             query["q"] = $"{callbackUrl.Authority}{callbackUrl.PathAndQuery}";
 
-            applicationUrl.Query = query.ToString() ?? string.Empty;
-            return applicationUrl.Uri.ToString();
+            deepLink.Query = query.ToString() ?? string.Empty;
+            return deepLink.Uri.ToString();
         }
 
         private Uri GenerateCallbackUrl(string context)
         {
-            if (!Uri.IsWellFormedUriString(_configuration.CallbackUrl, UriKind.Absolute))
-            {
-                throw new Exception($"URL is not valid: {_configuration.CallbackUrl}");
-            }
-
-            if (_configuration.CallbackUrl.Contains("?"))
-            {
-                throw new Exception($"Callback URL cannot contain parameters: {_configuration.CallbackUrl}");
-            }
-
-            var uri = new Uri(_configuration.CallbackUrl);
             var path = "";
 
-            if (!string.IsNullOrEmpty(uri.PathAndQuery))
-            {
-                path = uri.PathAndQuery.EndsWith("/") ? uri.PathAndQuery : uri.PathAndQuery + "/";
-            }
+            if (!string.IsNullOrEmpty(_configuration.CallbackUrl.PathAndQuery))
+                path = _configuration.CallbackUrl.PathAndQuery.EndsWith("/")
+                    ? _configuration.CallbackUrl.PathAndQuery
+                    : _configuration.CallbackUrl.PathAndQuery + "/";
 
-            return new Uri(uri, path + $"ownid/{context}/challenge");
+            return new Uri(_configuration.CallbackUrl, path + $"ownid/{context}/challenge");
         }
 
         public string GenerateChallengeJwt(string context)

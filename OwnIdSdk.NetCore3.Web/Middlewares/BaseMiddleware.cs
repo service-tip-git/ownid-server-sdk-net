@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web.Abstractions;
@@ -10,21 +11,20 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public abstract class BaseMiddleware
     {
-        protected readonly RequestDelegate Next;
         protected readonly IChallengeHandler ChallengeHandler;
+        protected readonly RequestDelegate Next;
         protected readonly Provider Provider;
 
         protected BaseMiddleware(RequestDelegate next, IChallengeHandler challengeHandler, ICacheStore cacheStore,
-            ProviderConfiguration providerConfiguration)
+            IOptions<OwnIdConfiguration> providerConfiguration)
         {
             Next = next;
             ChallengeHandler = challengeHandler;
-            Provider = new Provider(cacheStore, providerConfiguration);
-            
+            Provider = new Provider(cacheStore, providerConfiguration.Value);
         }
 
         public abstract Task InvokeAsync(HttpContext context);
-        
+
         protected async Task Ok<T>(HttpResponse response, T responseBody) where T : class
         {
             Ok(response);
@@ -36,7 +36,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         {
             response.StatusCode = (int) HttpStatusCode.OK;
         }
-        
+
         protected async Task Json<T>(HttpResponse response, T responseBody, int statusCode) where T : class
         {
             response.StatusCode = statusCode;
@@ -48,7 +48,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         {
             response.StatusCode = (int) HttpStatusCode.NotFound;
         }
-        
+
         protected void BadRequest(HttpResponse response)
         {
             response.StatusCode = (int) HttpStatusCode.BadRequest;

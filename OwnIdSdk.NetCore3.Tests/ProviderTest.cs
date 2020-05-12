@@ -12,30 +12,69 @@ namespace OwnIdSdk.NetCore3.Tests
 {
     public class ProviderTest
     {
+        #region TestData
+        
+        private const string NotExistingContext = "QAfRWt_jtkSd5dUSl1NXnQ";
+        private const string NotExistingNonce = "3B782943-9AB7-4AAB-9C0F-F050F983253C";
+        private const string NotExistingDID = "did:ownid:123123123";
+
+        private const string ExistingContextWithDID = "QAfRWt_jtkSd5dUSl6NXnQ";
+        private readonly CacheItem _existingItemWithDID = new CacheItem
+        {
+            Nonce = "AC2A7890-F931-4646-9F8E-DAEDA69FBB3F",
+            DID = "did:ownid:98765543221"
+        };
+        
+        private const string ExistingContextWithoutDID = "QAfRWt_jtkSd5dUSl2NXnQ";
+        private readonly CacheItem _existingItemWithoutDID = new CacheItem
+        {
+            Nonce = "9D8BCF56-7738-4F66-905E-5A78DAD32DA2"
+        };
+        
+        #endregion
+        
         private readonly Provider _provider;
         private readonly Mock<ICacheStore> _cacheStore;
-        private readonly Mock<ProviderConfiguration> _configuration;
+        private readonly Mock<OwnIdConfiguration> _configuration;
 
         public ProviderTest()
         {
             _cacheStore = new Mock<ICacheStore>(MockBehavior.Strict);
             // TODO: remove dependencies
-            using var publicKeyStream = File.OpenText("./Keys/jwtRS256.key.pub");
-            using var privateKeyStream = File.OpenText("./Keys/jwtRS256.key");
-            _configuration = new Mock<ProviderConfiguration>(RsaHelper.ReadKeyFromPem(publicKeyStream), 
-                RsaHelper.ReadKeyFromPem(privateKeyStream), "ownid-app.com", 
-                new List<ProfileField> {ProfileField.Email, ProfileField.FirstName, ProfileField.LastName},
-                "https://callback.com", new Requester
-                {
-                    DID = "did:tst:123-12-123-1",
-                    Description = "desc",
-                    Name = "My name"
-                });
+            // using var publicKeyStream = File.OpenText("./Keys/jwtRS256.key.pub");
+            // using var privateKeyStream = File.OpenText("./Keys/jwtRS256.key");
+            _configuration = new Mock<OwnIdConfiguration>();
+
+            // RsaHelper.ReadKeyFromPem(publicKeyStream), 
+            // RsaHelper.ReadKeyFromPem(privateKeyStream), "ownid-app.com", 
+            // new List<ProfileField> {ProfileField.Email, ProfileField.FirstName, ProfileField.LastName},
+            // "https://callback.com", new Requester
+            // {
+            //     DID = "did:tst:123-12-123-1",
+            //     Description = "desc",
+            //     Name = "My name"
+            // }
             _provider = new Provider(_cacheStore.Object, _configuration.Object);
+
+            //Set NotExisting Element
+            _cacheStore.Setup(x => x.SetAsync(It.Is<string>(s => s.Equals(NotExistingContext)),
+                It.Is<CacheItem>((o) => o.Nonce == NotExistingNonce))).Returns(Task.CompletedTask);
+            
+            //Get NotExisting Element -> null
+            _cacheStore.Setup(x => x.GetAsync(It.Is<string>(c => c.Equals(NotExistingContext))))
+                .Returns(Task.FromResult<CacheItem>(null));
+            
+            //Get ExistingWithOutDID -> item without DID
+            _cacheStore.Setup(x => x.GetAsync(It.Is<string>(c => c.Equals(ExistingContextWithoutDID))))
+                .Returns(Task.FromResult(_existingItemWithoutDID));
+            
+            //Get ExistingWithDID -> item with did
+            _cacheStore.Setup(x => x.GetAsync(It.Is<string>(c => c.Equals(ExistingContextWithDID))))
+                .Returns(Task.FromResult(_existingItemWithDID));
         }
 
         [Fact]
-        public void GenerateContext_Success()
+        public void GenerateContext_ValidFormattedContext()
         {
             var result = _provider.GenerateContext();
             
@@ -44,7 +83,7 @@ namespace OwnIdSdk.NetCore3.Tests
         }
 
         [Fact]
-        public void GenerateNonce_Success()
+        public void GenerateNonce_NotNullOrEmptyString()
         {
             var result = _provider.GenerateNonce();
             Assert.False(string.IsNullOrWhiteSpace(result));
@@ -56,19 +95,73 @@ namespace OwnIdSdk.NetCore3.Tests
         [InlineData("q1Ocsj0m5keLZ95hBDaRgQc", false)]
         [InlineData("q1Ocsj0m5keLZ95hBDaR/Q", false)]
         [InlineData("q1Ocsj0m5keLZ95hBD+RgQ", false)]
-        public void IsContextValid_Correct(string value, bool isCorrect)
+        public void IsContextValid_22lengthStringBase64Encoded(string value, bool isCorrect)
         {
             Assert.Equal(isCorrect, _provider.IsContextFormatValid(value));
         }
 
         [Fact]
-        public async Task StoreNonceAsync()
+        public async Task StoreNonceAsync_NotExistingElement()
         {
-            var context = Guid.NewGuid().ToString();
-            var nonce = Guid.NewGuid().ToString();
-            _cacheStore.Setup(x => x.SetAsync(It.Is<string>(s => s.Equals(context)),
-                It.Is<CacheItem>((o) => o.Nonce == nonce))).Returns(Task.CompletedTask);
-            await _provider.StoreNonceAsync(context, nonce);
+            await _provider.StoreNonceAsync(NotExistingContext, NotExistingNonce);
+        }
+
+        [Fact]
+        public async Task SetDIDAsync_NotExistingElement()
+        {
+            await Assert.ThrowsAsync<ArgumentException>(() => _provider.SetDIDAsync(NotExistingContext, NotExistingDID));
+        }
+        
+        [Fact]
+        public async Task SetDIDAsync_ShouldGetAndUpdateValueInStore()
+        {
+            const string did = "did:ownid:123123123";
+
+            //Set ExistingWithoutDID
+            _cacheStore.Setup(x => x.SetAsync(It.Is<string>(s => s.Equals(ExistingContextWithoutDID)),
+                It.Is<CacheItem>((o) => o.DID == did))).Returns(Task.CompletedTask);
+
+            await _provider.SetDIDAsync(ExistingContextWithoutDID, did);
+        }
+
+        [Fact]
+        public async Task GetDIDAsync_NotExistingElement()
+        {
+            var result = await _provider.GetDIDAsync(NotExistingContext, NotExistingNonce);
+            Assert.False(result.isSuccess);
+            Assert.Null(result.did);
+        }
+        
+        [Fact]
+        public async Task GetDIDAsync_WrongNonce()
+        {
+            var result = await _provider.GetDIDAsync(ExistingContextWithDID, NotExistingNonce);
+            Assert.False(result.isSuccess);
+            Assert.Null(result.did);
+        }
+        
+        [Fact]
+        public async Task GetDIDAsync_ExistingWithoutDID()
+        {
+            var result = await _provider.GetDIDAsync(ExistingContextWithoutDID, _existingItemWithoutDID.Nonce);
+            Assert.False(result.isSuccess);
+            Assert.Null(result.did);
+        }
+
+        [Fact]
+        public async Task GetDIDAsync_ExistingWithDID()
+        {
+            var result = await _provider.GetDIDAsync(ExistingContextWithDID, _existingItemWithDID.Nonce);
+            Assert.True(result.isSuccess);
+            Assert.Equal(_existingItemWithDID.DID, result.did);
+        }
+
+        [Fact]
+        public async Task RemoveContextAsync_ShouldRemoveFromStore()
+        {
+            _cacheStore.Setup(x => x.RemoveAsync(It.Is<string>(c => c.Equals(ExistingContextWithDID))))
+                .Returns(Task.CompletedTask);
+            await _provider.RemoveContextAsync(ExistingContextWithDID);
         }
 
         [Fact]

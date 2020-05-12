@@ -16,6 +16,7 @@ using OwnIdSdk.NetCore3.Server.Gigya.Gigya;
 using OwnIdSdk.NetCore3.Server.Gigya.Gigya.Login;
 using OwnIdSdk.NetCore3.Server.Gigya.Gigya.UpdateProfile;
 using OwnIdSdk.NetCore3.Web.Abstractions;
+using OwnIdSdk.NetCore3.Web.FlowEntries;
 
 namespace OwnIdSdk.NetCore3.Server.Gigya
 {
@@ -50,17 +51,15 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 await JsonSerializer.DeserializeAsync<LoginResponse>(await responseMessage.Content.ReadAsStreamAsync());
 
             if (loginResponse.SessionInfo == null || loginResponse.ErrorCode != 0)
-            {
                 return new LoginResult<object>
                 {
-                    HttpCode = (int)HttpStatusCode.Unauthorized,
+                    HttpCode = (int) HttpStatusCode.Unauthorized,
                     Data = new
                     {
                         status = false,
                         errorMessage = $"Gigya: {loginResponse.ErrorCode}:{loginResponse.ErrorMessage}"
                     }
                 };
-            }
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_authSecret);
@@ -78,7 +77,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
             return new LoginResult<object>
             {
-                HttpCode = (int)HttpStatusCode.OK,
+                HttpCode = (int) HttpStatusCode.OK,
                 Data = new
                 {
                     status = true, jwt = token,
@@ -88,7 +87,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             };
         }
 
-        public async Task UpdateProfileAsync(string did, Dictionary<string, string> profileFields, string publicKey)
+        public async Task UpdateProfileAsync(UserProfileFormContext context)
         {
             var getAccountMessage = await _httpClient.PostAsync(
                 new Uri("https://accounts.us1.gigya.com/accounts.getAccountInfo"), new FormUrlEncodedContent(
@@ -96,7 +95,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                     {
                         new KeyValuePair<string, string>("apiKey", _apiKey),
                         new KeyValuePair<string, string>("secret", _secretKey),
-                        new KeyValuePair<string, string>("UID", did)
+                        new KeyValuePair<string, string>("UID", context.DID)
                     }));
 
             var content =
@@ -105,39 +104,55 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
             if (content.ErrorCode == 0)
             {
-                if(content.Data == null || !content.Data.ContainsKey("pubKey"))
+                if (content.Data == null || !content.Data.ContainsKey("pubKey"))
                     throw new Exception("Found gigya user without pubKey");
 
                 var key = content.Data["pubKey"];
 
-                if (key != publicKey)
+                if (key != context.PublicKey)
                     throw new Exception("Public key doesn't match gigya user key");
 
-                var exProfileSerializedFields = JsonSerializer.Serialize(profileFields);
+
+                var exProfileSerializedFields = JsonSerializer.Serialize(context.Values.Where(x => x.Value != default)
+                    .ToDictionary(x => x.Key, x => x.Value));
                 var setAccountResponse = await SetAccountInfo(new[]
                 {
                     new KeyValuePair<string, string>("apiKey", _apiKey),
                     new KeyValuePair<string, string>("secret", _secretKey),
-                    new KeyValuePair<string, string>("UID", did),
+                    new KeyValuePair<string, string>("UID", context.DID),
                     new KeyValuePair<string, string>("profile", exProfileSerializedFields)
                 });
 
+                if (setAccountResponse.ErrorCode == 403043)
+                {
+                    context.SetError("email", setAccountResponse.ErrorMessage);
+                    return;
+                }
+
                 if (setAccountResponse.ErrorCode > 0)
                 {
-                    await Console.Out.WriteLineAsync($"error did: {did}");
-                    await Console.Out.WriteLineAsync($"error profile: {exProfileSerializedFields}");
-                    
-                    throw new Exception(
+                    await Console.Error.WriteLineAsync(
+                        $"did: {context.DID}{Environment.NewLine}" +
+                        $"profile: {exProfileSerializedFields}{Environment.NewLine}" +
                         $"Gigya.setAccountInfo for EXISTING user failed with code {setAccountResponse.ErrorCode} : {setAccountResponse.ErrorMessage}");
+
+                    context.SetGeneralError($"{setAccountResponse.ErrorCode}: {setAccountResponse.ErrorMessage}");
+                    // throw new Exception(
+                    //     $"Gigya.setAccountInfo for EXISTING user failed with code {setAccountResponse.ErrorCode} : {setAccountResponse.ErrorMessage}");
                 }
-                
+
                 return;
             }
 
             // new user
             if (content.ErrorCode != 403005)
-                throw new Exception(
+            {
+                await Console.Error.WriteLineAsync(
                     $"Gigya.getAccountInfo error with code {content.ErrorCode} : {content.ErrorMessage}");
+                context.SetGeneralError($"{content.ErrorCode}: {content.ErrorMessage}");
+                // throw new Exception(
+                //     $"Gigya.getAccountInfo error with code {content.ErrorCode} : {content.ErrorMessage}");
+            }
 
             var loginMessage = await _httpClient.PostAsync(
                 new Uri("https://accounts.us1.gigya.com/accounts.notifyLogin"), new FormUrlEncodedContent(
@@ -145,7 +160,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                     {
                         new KeyValuePair<string, string>("apiKey", _apiKey),
                         new KeyValuePair<string, string>("secret", _secretKey),
-                        new KeyValuePair<string, string>("siteUID", did)
+                        new KeyValuePair<string, string>("siteUID", context.DID)
                     }));
 
             var loginStr = await loginMessage.Content.ReadAsStreamAsync();
@@ -158,8 +173,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             {
                 new KeyValuePair<string, string>("apiKey", _apiKey),
                 new KeyValuePair<string, string>("secret", _secretKey),
-                new KeyValuePair<string, string>("UID", did),
-                new KeyValuePair<string, string>("data", JsonSerializer.Serialize(new {pubKey = publicKey}))
+                new KeyValuePair<string, string>("UID", context.DID),
+                new KeyValuePair<string, string>("data", JsonSerializer.Serialize(new {pubKey = context.PublicKey}))
             });
 
             await Console.Out.WriteLineAsync(JsonSerializer.Serialize(setAccountPublicKeyMessage));
@@ -168,22 +183,32 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             //     throw new Exception(
             //         $"Gigya.setAccountInfo (public key) for NEW user failed with code {setAccountPublicKeyMessage.ErrorCode} : {setAccountPublicKeyMessage.ErrorMessage}");
 
-            var profileSerializedFields = JsonSerializer.Serialize(profileFields);
+            var profileSerializedFields = JsonSerializer.Serialize(context.Values.Where(x => x.Value != default)
+                .ToDictionary(x => x.Key, x => x.Value));
             var setAccountMessage = await SetAccountInfo(new[]
             {
                 new KeyValuePair<string, string>("apiKey", _apiKey),
                 new KeyValuePair<string, string>("secret", _secretKey),
-                new KeyValuePair<string, string>("UID", did),
+                new KeyValuePair<string, string>("UID", context.DID),
                 new KeyValuePair<string, string>("profile", profileSerializedFields)
             });
-            
+
+            if (setAccountMessage.ErrorCode == 403043)
+            {
+                context.SetError("email", setAccountMessage.ErrorMessage);
+                return;
+            }
+
             if (setAccountMessage.ErrorCode > 0)
             {
-                await Console.Out.WriteLineAsync($"error did: {did}");
-                await Console.Out.WriteLineAsync($"error profile: {profileSerializedFields}");
-                
-                throw new Exception(
+                await Console.Error.WriteLineAsync(
+                    $"did: {context.DID}{Environment.NewLine}" +
+                    $"profile: {profileSerializedFields}{Environment.NewLine}" +
                     $"Gigya.setAccountInfo (profile) for NEW user failed with code {setAccountMessage.ErrorCode} : {setAccountMessage.ErrorMessage}");
+
+                context.SetGeneralError($"{setAccountMessage.ErrorCode}: {setAccountMessage.ErrorMessage}");
+                // throw new Exception(
+                //     $"Gigya.setAccountInfo (profile) for NEW user failed with code {setAccountMessage.ErrorCode} : {setAccountMessage.ErrorMessage}");
             }
         }
 
@@ -198,13 +223,6 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                     .ReadAsStreamAsync());
 
             return setAccountResponse;
-        }
-
-        private async Task WriteJsonResponse<T>(HttpResponse response, HttpStatusCode code, T data) where T : class
-        {
-            response.StatusCode = (int)code;
-            response.ContentType = "application/json";
-            await response.WriteAsync(JsonSerializer.Serialize(data));
         }
     }
 }

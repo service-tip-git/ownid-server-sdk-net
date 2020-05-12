@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Builder;
@@ -21,6 +22,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
         public IConfiguration Configuration { get; }
 
+        public IWebHostEnvironment Environment { get; set; }
+
         private const string CorsPolicyName = "AllowAll";
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -39,31 +42,26 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             });
 
             var ownIdSection = Configuration.GetSection("ownid");
-            using var publicKeyReader = File.OpenText(ownIdSection["pub_key"]);
-            using var privateKeyReader = File.OpenText(ownIdSection["private_key"]);
-            services.AddOwnId<ClientAppChallengeHandler, InMemoryCacheStore>(new ProviderConfiguration(
-                RsaHelper.ReadKeyFromPem(publicKeyReader),
-                RsaHelper.ReadKeyFromPem(privateKeyReader),
-                ownIdSection["web_app_url"],
-                new List<ProfileField>
-                {
-                    ProfileField.Email,
-                    ProfileField.FirstName,
-                    ProfileField.LastName
-                }, 
-                ownIdSection["callback_url"],
-                new Requester
-                {
-                    DID = ownIdSection["did"],
-                    Name = ownIdSection["name"],
-                    Description = ownIdSection["description"]
-                }
-            ));
+            services.AddOwnId<ClientAppChallengeHandler, InMemoryCacheStore>(x =>
+            {
+                x.SetKeysFromFiles(ownIdSection["pub_key"], ownIdSection["private_key"]);
+                x.CallbackUrl = new Uri(ownIdSection["callback_url"]);
+                x.OwnIdApplicationUrl = new Uri(ownIdSection["web_app_url"]);
+                x.ProfileFields.Add(ProfileField.Email);
+                x.ProfileFields.Add(ProfileField.FirstName);
+                x.ProfileFields.Add(ProfileField.LastName);
+                x.Requester.DID = ownIdSection["did"];
+                x.Requester.Name = ownIdSection["name"];
+                x.Requester.Description = ownIdSection["description"];
+                x.IsDevEnvironment = Environment.IsDevelopment();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            Environment = env;
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

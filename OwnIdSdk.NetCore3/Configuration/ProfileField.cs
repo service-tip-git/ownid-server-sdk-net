@@ -4,6 +4,12 @@ namespace OwnIdSdk.NetCore3.Configuration
 {
     public class ProfileField
     {
+        // For options binding
+        public ProfileField()
+        {
+            Type = ProfileFieldType.Text;
+        }
+
         public ProfileField(string label, string key, bool isRequired = true,
             ProfileFieldType fieldType = ProfileFieldType.Text, string placeholder = null)
         {
@@ -14,20 +20,20 @@ namespace OwnIdSdk.NetCore3.Configuration
             Placeholder = placeholder;
         }
 
-        [JsonPropertyName("type")]
+        [JsonPropertyName("type")] 
         public ProfileFieldType Type { get; set; }
 
-        [JsonPropertyName("label")]
+        [JsonPropertyName("label")] 
         public string Label { get; set; }
 
-        [JsonPropertyName("key")]
+        [JsonPropertyName("key")] 
         public string Key { get; set; }
 
-        [JsonPropertyName("placeholder")]
+        [JsonPropertyName("placeholder")] 
         public string Placeholder { get; set; }
 
-        [JsonPropertyName("required")]
-        public bool IsRequired { get; set; }
+        [JsonPropertyName("required")] 
+        public bool IsRequired { get; }
 
         public static ProfileField Email =>
             new ProfileField("Email", "email", true, ProfileFieldType.Email, "john.doe@mail.com");

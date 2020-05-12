@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
@@ -11,7 +12,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     public class GetChallengeJwtMiddleware : BaseMiddleware
     {
         public GetChallengeJwtMiddleware(RequestDelegate next, IChallengeHandler challengeHandler,
-            ICacheStore cacheStore, ProviderConfiguration providerConfiguration) : base(next, challengeHandler,
+            ICacheStore cacheStore, IOptions<OwnIdConfiguration> providerConfiguration) : base(next, challengeHandler,
             cacheStore, providerConfiguration)
         {
         }
