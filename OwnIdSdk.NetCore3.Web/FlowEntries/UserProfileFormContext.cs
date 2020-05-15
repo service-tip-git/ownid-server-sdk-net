@@ -1,53 +1,83 @@
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using OwnIdSdk.NetCore3.Configuration;
-using OwnIdSdk.NetCore3.Contracts.Jwt;
+using System.Linq.Expressions;
+using System.Reflection;
+using OwnIdSdk.NetCore3.Web.Abstractions;
 
 namespace OwnIdSdk.NetCore3.Web.FlowEntries
 {
-    public class UserProfileFormContext : ReadOnlyDictionary<string, FieldContext<string>>
+    public class UserProfileFormContext<T> : IUserProfileContext where T : class
     {
-        internal UserProfileFormContext(UserProfile userProfile, IEnumerable<ProfileField> fieldConfigs) : base(
-            Init(userProfile.Profile, fieldConfigs))
+        private readonly Dictionary<string, IList<string>> _fieldErrors;
+
+        internal UserProfileFormContext(string did, string publicKey, T profile)    
         {
-            DID = userProfile.DID;
-            PublicKey = userProfile.PublicKey;
+            DID = did;
+            PublicKey = publicKey;
+            Profile = profile;
+            _fieldErrors = new Dictionary<string, IList<string>>();
             GeneralErrors = new List<string>();
         }
-
-        internal IList<string> GeneralErrors { get; }
 
         public string DID { get; }
 
         public string PublicKey { get; }
 
-        public bool HasErrors => GeneralErrors.Any() ||
-                                 Values.Any(x => x.IsInvalid);
+        public T Profile { get; }
 
-        public void SetError(string key, string error)
+        public List<string> GeneralErrors { get; set; }
+
+        public IReadOnlyDictionary<string, IList<string>> FieldErrors => _fieldErrors;
+
+        public bool HasErrors => GeneralErrors.Any() ||
+                                 FieldErrors.Any(x => x.Value.Any());
+
+        public void Validate()
         {
-            this[key].Errors.Add(error);
+            var results = new List<ValidationResult>();
+            _fieldErrors.Clear();
+
+            if (Validator.TryValidateObject(Profile, new ValidationContext(Profile), results, true)) 
+                return;
+            
+            var groupedErrors = results.SelectMany(x =>
+                    x.MemberNames.Select(m => (fieldName: m, message: x.ErrorMessage)))
+                .GroupBy(x => x.fieldName, x => x.message);
+
+            foreach (var groupedError in groupedErrors)
+            {
+                var messages = groupedError.ToList();
+                _fieldErrors.Add(groupedError.Key, messages);
+            }
+        }
+
+        // TODO: optimize checking with fallback type for each field
+        public void SetError<TField>(Expression<Func<T, TField>> exp, string errorText)
+        {
+            var type = typeof(T);
+
+            if (!(exp.Body is MemberExpression member))
+                throw new ArgumentException($"Expression '{exp}' refers to a method, not a property.");
+
+            var propInfo = member.Member as PropertyInfo;
+            if (propInfo == null)
+                throw new ArgumentException($"Expression '{exp}' refers to a field, not a property.");
+
+            if (type != propInfo.ReflectedType &&
+                !type.IsSubclassOf(propInfo.ReflectedType))
+                throw new ArgumentException($"Expression '{exp}' refers to a property that is not from type {type}.");
+
+            if (!_fieldErrors.ContainsKey(propInfo.Name))
+                _fieldErrors.Add(propInfo.Name, new List<string> {errorText});
+            else
+                _fieldErrors[propInfo.Name].Add(errorText);
         }
 
         public void SetGeneralError(string error)
         {
             GeneralErrors.Add(error);
-        }
-
-        private static Dictionary<string, FieldContext<string>> Init(Dictionary<string, string> userProfile,
-            IEnumerable<ProfileField> fieldConfigs)
-        {
-            var result = new Dictionary<string, FieldContext<string>>();
-
-            foreach (var fieldConfig in fieldConfigs)
-            {
-                userProfile.TryGetValue(fieldConfig.Key, out var value);
-                var field = new FieldContext<string>(fieldConfig, value);
-                result.Add(fieldConfig.Key, field);
-            }
-
-            return result;
         }
     }
 }

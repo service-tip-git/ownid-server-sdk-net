@@ -7,15 +7,13 @@ using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
-using OwnIdSdk.NetCore3.Web.Abstractions;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public class GenerateContextMiddleware : BaseMiddleware
     {
-        public GenerateContextMiddleware(RequestDelegate next, IChallengeHandler challengeHandler,
-            ICacheStore cacheStore, IOptions<OwnIdConfiguration> options) : base(next, challengeHandler,
-            cacheStore, options)
+        public GenerateContextMiddleware(RequestDelegate next, ICacheStore cacheStore,
+            IOptions<OwnIdConfiguration> options) : base(next, cacheStore, options)
         {
         }
 

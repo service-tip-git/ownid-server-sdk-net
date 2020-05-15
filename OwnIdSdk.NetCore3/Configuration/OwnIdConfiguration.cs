@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
+using OwnIdSdk.NetCore3.Configuration.Abstractions;
 using OwnIdSdk.NetCore3.Cryptography;
 
 namespace OwnIdSdk.NetCore3.Configuration
@@ -12,7 +12,6 @@ namespace OwnIdSdk.NetCore3.Configuration
         {
             OwnIdApplicationUrl = new Uri("https://ownid.com/sign");
             Requester = new Requester();
-            ProfileFields = new List<ProfileField>();
         }
 
         public Uri OwnIdApplicationUrl { get; set; }
@@ -21,11 +20,19 @@ namespace OwnIdSdk.NetCore3.Configuration
 
         public RSA JwtSignCredentials { get; set; }
 
-        public IList<ProfileField> ProfileFields { get; }
+        public IProfileConfiguration ProfileConfiguration { get; private set; }
 
         public Requester Requester { get; }
 
         public bool IsDevEnvironment { get; set; }
+
+        // public string RegisterInstructions { get; set; }
+        //
+        // public string LoginInstructions { get; set; }
+        public void Dispose()
+        {
+            JwtSignCredentials?.Dispose();
+        }
 
         /// <summary>
         ///     Set JWT sign RSA keys
@@ -45,12 +52,9 @@ namespace OwnIdSdk.NetCore3.Configuration
             SetKeysFromBase64(RsaHelper.ReadKeyFromPem(publicKeyReader), RsaHelper.ReadKeyFromPem(privateKeyReader));
         }
 
-        // public string RegisterInstructions { get; set; }
-        //
-        // public string LoginInstructions { get; set; }
-        public void Dispose()
+        public void SetProfileModel<T>() where T : class
         {
-            JwtSignCredentials?.Dispose();
+            ProfileConfiguration = new ProfileConfiguration(typeof(T));
         }
     }
 }

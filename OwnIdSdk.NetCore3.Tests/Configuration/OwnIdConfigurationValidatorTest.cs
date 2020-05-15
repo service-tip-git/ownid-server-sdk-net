@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using OwnIdSdk.NetCore3.Configuration;
 using Xunit;
 
-namespace OwnIdSdk.NetCore3.Tests
+namespace OwnIdSdk.NetCore3.Tests.Configuration
 {
     public class OwnIdConfigurationValidatorTest : IDisposable
     {
@@ -69,35 +69,6 @@ namespace OwnIdSdk.NetCore3.Tests
             config.Requester.Name = value;
             Assert.True(_validator.Validate(string.Empty, config).Failed);
         }
-
-        [Fact]
-        public void Validate_Invalid_ProfileFields()
-        {
-            var config = GetValidConfiguration();
-            var field = new ProfileField
-            {
-                Label = string.Empty,
-                Key = "key"
-            };
-            config.ProfileFields.Add(field);
-            
-            Assert.True(_validator.Validate(string.Empty, config).Failed);
-            field.Label = "  ";
-            Assert.True(_validator.Validate(string.Empty, config).Failed);
-            field.Label = null;
-            Assert.True(_validator.Validate(string.Empty, config).Failed);
-            
-            field.Label = "label";
-            field.Key = string.Empty;
-            Assert.True(_validator.Validate(string.Empty, config).Failed);
-            field.Key = "  ";
-            Assert.True(_validator.Validate(string.Empty, config).Failed);
-            field.Key = null;
-            Assert.True(_validator.Validate(string.Empty, config).Failed);
-            
-            config.ProfileFields.Clear();
-            Assert.True(_validator.Validate(string.Empty, config).Failed);
-        }
         
         private OwnIdConfiguration GetValidConfiguration()
         {
@@ -105,7 +76,6 @@ namespace OwnIdSdk.NetCore3.Tests
             {
                 OwnIdApplicationUrl = new Uri("https://ownid.com:12/sign"),
                 CallbackUrl = new Uri("https://localhost:12"),
-                ProfileFields = {ProfileField.Email, ProfileField.FirstName},
                 Requester = { DID = "did", Name = "name"},
                 JwtSignCredentials = _sign
             };

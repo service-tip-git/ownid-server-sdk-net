@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web.Abstractions;
+using OwnIdSdk.NetCore3.Web.FlowEntries;
 using OwnIdSdk.NetCore3.Web.Middlewares;
 
 namespace OwnIdSdk.NetCore3.Web
@@ -24,16 +25,23 @@ namespace OwnIdSdk.NetCore3.Web
                 builder => builder.UseMiddleware<SaveProfileMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/status",
                 builder => builder.UseMiddleware<GetChallengeStatusMiddleware>());
-
+            
             app.UseRouter(routeBuilder.Build());
         }
 
-        public static void AddOwnId<TChallengeHandler, TCacheStore>(this IServiceCollection services,
+        public static void AddOwnId<TModel, TChallengeHandler, TCacheStore>(this IServiceCollection services,
             Action<OwnIdConfiguration> setupAction)
-            where TChallengeHandler : class, IChallengeHandler
+            where TChallengeHandler : class, IChallengeHandler<TModel>
             where TCacheStore : class, ICacheStore
+            where TModel : class
         {
-            services.AddOptions<OwnIdConfiguration>().Configure(setupAction);
+            services.AddOptions<OwnIdConfiguration>()
+                .Configure(setupAction)
+                .PostConfigure(x =>
+                {
+                    x.SetProfileModel<TModel>();
+                    x.ProfileConfiguration.BuildMetadata();
+                });
 
             services.AddSingleton<IValidateOptions<OwnIdConfiguration>, OwnIdConfigurationValidator>();
 
@@ -56,7 +64,8 @@ namespace OwnIdSdk.NetCore3.Web
 
             // change from singleton
             services.AddSingleton<ICacheStore, TCacheStore>();
-            services.AddTransient<IChallengeHandler, TChallengeHandler>();
+            services.AddTransient<IChallengeHandler<TModel>, TChallengeHandler>();
+            services.AddTransient<IChallengeHandlerAdapter, ChallengeHandlerAdapter<TModel>>();
         }
     }
 }

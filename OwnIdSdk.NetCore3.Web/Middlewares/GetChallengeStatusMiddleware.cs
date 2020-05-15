@@ -12,10 +12,13 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public class GetChallengeStatusMiddleware : BaseMiddleware
     {
-        public GetChallengeStatusMiddleware(RequestDelegate next, IChallengeHandler challengeHandler,
-            ICacheStore cacheStore, IOptions<OwnIdConfiguration> providerConfiguration) : base(next, challengeHandler,
+        private readonly IChallengeHandlerAdapter _challengeHandlerAdapter;
+
+        public GetChallengeStatusMiddleware(RequestDelegate next, IChallengeHandlerAdapter challengeHandlerAdapter,
+            ICacheStore cacheStore, IOptions<OwnIdConfiguration> providerConfiguration) : base(next,
             cacheStore, providerConfiguration)
         {
+            _challengeHandlerAdapter = challengeHandlerAdapter;
         }
 
         public override async Task InvokeAsync(HttpContext context)
@@ -43,7 +46,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             {
                 await Provider.RemoveContextAsync(challengeContext);
 
-                var result = await ChallengeHandler.OnSuccessLoginAsync(didResult.did, context.Response);
+                var result = await _challengeHandlerAdapter.OnSuccessLoginAsync(didResult.did, context.Response);
 
                 await Json(context.Response, result.Data, result.HttpCode);
                 return;

@@ -1,13 +1,15 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using OwnIdSdk.NetCore3.Contracts;
-using OwnIdSdk.NetCore3.Web.FlowEntries;
+using OwnIdSdk.NetCore3.Contracts.Jwt;
 
 namespace OwnIdSdk.NetCore3.Web.Abstractions
 {
-    public interface IChallengeHandler<T> where T : class
+    public interface IChallengeHandlerAdapter
     {
-        Task UpdateProfileAsync(UserProfileFormContext<T> context);
+        IUserProfileContext CreateUserDefinedContext(UserProfile profile);
+
+        Task UpdateProfileAsync(IUserProfileContext context);
 
         Task<LoginResult<object>> OnSuccessLoginAsync(string did, HttpResponse response);
     }

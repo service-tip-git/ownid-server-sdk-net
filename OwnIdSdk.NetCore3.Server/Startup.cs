@@ -42,14 +42,11 @@ namespace OwnIdSdk.NetCore3.Server
             });
 
             var ownIdSection = Configuration.GetSection("ownid");
-            services.AddOwnId<ClientAppChallengeHandler, InMemoryCacheStore>(x =>
+            services.AddOwnId<UserProfile, ClientAppChallengeHandler, InMemoryCacheStore>(x =>
             {
                 x.SetKeysFromFiles(ownIdSection["pub_key"], ownIdSection["private_key"]);
                 x.CallbackUrl = new Uri(ownIdSection["callback_url"]);
                 x.OwnIdApplicationUrl = new Uri(ownIdSection["web_app_url"]);
-                x.ProfileFields.Add(ProfileField.Email);
-                x.ProfileFields.Add(ProfileField.FirstName);
-                x.ProfileFields.Add(ProfileField.LastName);
                 x.Requester.DID = ownIdSection["did"];
                 x.Requester.Name = ownIdSection["name"];
                 x.Requester.Description = ownIdSection["description"];

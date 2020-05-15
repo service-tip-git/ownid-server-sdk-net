@@ -20,7 +20,7 @@ using OwnIdSdk.NetCore3.Web.FlowEntries;
 
 namespace OwnIdSdk.NetCore3.Server.Gigya
 {
-    public class ClientAppChallengeHandler : IChallengeHandler
+    public class ClientAppChallengeHandler : IChallengeHandler<UserProfile>
     {
         private readonly string _apiKey;
         private readonly string _authSecret;
@@ -87,7 +87,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             };
         }
 
-        public async Task UpdateProfileAsync(UserProfileFormContext context)
+        public async Task UpdateProfileAsync(UserProfileFormContext<UserProfile> context)
         {
             var getAccountMessage = await _httpClient.PostAsync(
                 new Uri("https://accounts.us1.gigya.com/accounts.getAccountInfo"), new FormUrlEncodedContent(
@@ -113,8 +113,11 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                     throw new Exception("Public key doesn't match gigya user key");
 
 
-                var exProfileSerializedFields = JsonSerializer.Serialize(context.Values.Where(x => x.Value != default)
-                    .ToDictionary(x => x.Key, x => x.Value));
+                var exProfileSerializedFields = JsonSerializer.Serialize(context.Profile, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    IgnoreNullValues = true
+                });
                 var setAccountResponse = await SetAccountInfo(new[]
                 {
                     new KeyValuePair<string, string>("apiKey", _apiKey),
@@ -125,7 +128,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
                 if (setAccountResponse.ErrorCode == 403043)
                 {
-                    context.SetError("email", setAccountResponse.ErrorMessage);
+                    context.SetError(x=>x.Email, setAccountResponse.ErrorMessage);
                     return;
                 }
 
@@ -183,8 +186,11 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             //     throw new Exception(
             //         $"Gigya.setAccountInfo (public key) for NEW user failed with code {setAccountPublicKeyMessage.ErrorCode} : {setAccountPublicKeyMessage.ErrorMessage}");
 
-            var profileSerializedFields = JsonSerializer.Serialize(context.Values.Where(x => x.Value != default)
-                .ToDictionary(x => x.Key, x => x.Value));
+            var profileSerializedFields = JsonSerializer.Serialize(context.Profile, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                IgnoreNullValues = true
+            });
             var setAccountMessage = await SetAccountInfo(new[]
             {
                 new KeyValuePair<string, string>("apiKey", _apiKey),
@@ -195,7 +201,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
             if (setAccountMessage.ErrorCode == 403043)
             {
-                context.SetError("email", setAccountMessage.ErrorMessage);
+                context.SetError(x=>x.Email, setAccountMessage.ErrorMessage);
                 return;
             }
 

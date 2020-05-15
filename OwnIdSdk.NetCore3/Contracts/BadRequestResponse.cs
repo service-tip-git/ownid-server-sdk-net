@@ -9,6 +9,6 @@ namespace OwnIdSdk.NetCore3.Contracts
         public IEnumerable<string> GeneralErrors { get; set; }
 
         [JsonPropertyName("fieldErrors")] 
-        public IDictionary<string, IEnumerable<string>> FieldErrors { get; set; }
+        public IDictionary<string, IList<string>> FieldErrors { get; set; }
     }
 }

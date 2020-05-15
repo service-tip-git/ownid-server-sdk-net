@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -11,19 +10,18 @@ using OwnIdSdk.NetCore3.Contracts;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web.Abstractions;
-using OwnIdSdk.NetCore3.Web.FlowEntries;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public class SaveProfileMiddleware : BaseMiddleware
     {
-        private readonly OwnIdConfiguration _providerConfiguration;
+        private readonly IChallengeHandlerAdapter _challengeHandlerAdapter;
 
-        public SaveProfileMiddleware(RequestDelegate next, IChallengeHandler challengeHandler, ICacheStore cacheStore,
-            IOptions<OwnIdConfiguration> providerConfiguration) : base(next, challengeHandler, cacheStore,
+        public SaveProfileMiddleware(RequestDelegate next, IChallengeHandlerAdapter challengeHandlerAdapter, ICacheStore cacheStore,
+            IOptions<OwnIdConfiguration> providerConfiguration) : base(next, cacheStore,
             providerConfiguration)
         {
-            _providerConfiguration = providerConfiguration.Value;
+            _challengeHandlerAdapter = challengeHandlerAdapter;
         }
 
         public override async Task InvokeAsync(HttpContext context)
@@ -50,8 +48,22 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
             // preventing data substitution 
             challengeContext = jwtContext;
-            var formContext = new UserProfileFormContext(userData, _providerConfiguration.ProfileFields);
-            await ChallengeHandler.UpdateProfileAsync(formContext);
+            
+            var formContext = _challengeHandlerAdapter.CreateUserDefinedContext(userData);
+            
+            formContext.Validate();
+
+            if (formContext.HasErrors)
+            {
+                var response = new BadRequestResponse
+                {
+                    FieldErrors = formContext.FieldErrors as IDictionary<string, IList<string>>
+                };
+                await Json(context.Response, response, (int) HttpStatusCode.BadRequest);
+                return;
+            }
+            
+            await _challengeHandlerAdapter.UpdateProfileAsync(formContext);
 
             if (!formContext.HasErrors)
             {
@@ -62,8 +74,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             {
                 var response = new BadRequestResponse
                 {
-                    FieldErrors = formContext.Values.ToDictionary(x => x.Key,
-                        x => (IEnumerable<string>) x.Errors),
+                    FieldErrors = formContext.FieldErrors as IDictionary<string, IList<string>>,
                     GeneralErrors = formContext.GeneralErrors
                 };
                 await Json(context.Response, response, (int) HttpStatusCode.BadRequest);

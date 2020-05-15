@@ -81,13 +81,18 @@ namespace OwnIdSdk.NetCore3
                         }
                     },
                     {
-                        "requestedFields", _configuration.ProfileFields.Select(x => new
+                        // TODO : PROFILE
+                        "requestedFields", _configuration.ProfileConfiguration.ProfileFieldMetadata.Select(x => new
                         {
-                            type = x.Type.ToString().ToLowerInvariant(),
+                            type = x.Type,
                             key = x.Key,
                             label = x.Label,
                             placeholder = x.Placeholder,
-                            required = x.IsRequired
+                            validators = x.Validators.Select(v=> new
+                            {
+                                type = v.Type,
+                                errorMessage = v.ErrorMessage
+                            })
                         })
                     }
                 });

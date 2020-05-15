@@ -20,7 +20,7 @@ using OwnIdSdk.NetCore3.Web.FlowEntries;
 
 namespace OwnIdSdk.NetCore3.Server
 {
-    public class ClientAppChallengeHandler : IChallengeHandler
+    public class ClientAppChallengeHandler : IChallengeHandler<UserProfile>
     {
         private readonly string _apiKey;
         private readonly string _authSecret;
@@ -89,7 +89,7 @@ namespace OwnIdSdk.NetCore3.Server
             };
         }
 
-        public async Task UpdateProfileAsync(UserProfileFormContext context)
+        public async Task UpdateProfileAsync(UserProfileFormContext<UserProfile> context)
         {
             var getAccountMessage = await _httpClient.PostAsync(
                 new Uri("https://accounts.us1.gigya.com/accounts.getAccountInfo"), new FormUrlEncodedContent(
@@ -114,8 +114,7 @@ namespace OwnIdSdk.NetCore3.Server
                 if (key != context.PublicKey)
                     throw new Exception("Public key doesn't match gigya user key");
 
-                var exProfileSerializedFields = JsonSerializer.Serialize(context.Values.Where(x => x.Value != default)
-                    .ToDictionary(x => x.Key, x => x.Value));
+                var exProfileSerializedFields = JsonSerializer.Serialize(context.Profile);
                 var setAccountResponse = await SetAccountInfo(new[]
                 {
                     new KeyValuePair<string, string>("apiKey", _apiKey),
@@ -170,8 +169,7 @@ namespace OwnIdSdk.NetCore3.Server
             //     throw new Exception(
             //         $"Gigya.setAccountInfo (public key) for NEW user failed with code {setAccountPublicKeyMessage.ErrorCode} : {setAccountPublicKeyMessage.ErrorMessage}");
 
-            var profileSerializedFields = JsonSerializer.Serialize(context.Values.Where(x => x.Value != default)
-                .ToDictionary(x => x.Key, x => x.Value));
+            var profileSerializedFields = JsonSerializer.Serialize(context.Profile);
             var setAccountMessage = await SetAccountInfo(new[]
             {
                 new KeyValuePair<string, string>("apiKey", _apiKey),

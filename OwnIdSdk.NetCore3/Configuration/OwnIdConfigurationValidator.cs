@@ -27,16 +27,7 @@ namespace OwnIdSdk.NetCore3.Configuration
                 return ValidateOptionsResult.Fail(
                     $"{nameof(options.Requester.DID)} and {nameof(options.Requester.Name)} are required");
 
-            if (!options.ProfileFields?.Any() ?? true)
-                return ValidateOptionsResult.Fail($"{options.ProfileFields} are required");
-
-            if (options.ProfileFields.Any(x =>
-                string.IsNullOrWhiteSpace(x.Key) || string.IsNullOrWhiteSpace(x.Label)))
-                return ValidateOptionsResult.Fail(
-                    $"Some items in {nameof(options.ProfileFields)} are not filled correctly. " +
-                    $"{nameof(ProfileField.Key)} and {nameof(ProfileField.Label)} are required");
-
-            return ValidateOptionsResult.Success;
+            return options.ProfileConfiguration.Validate();
         }
 
         private ValidateOptionsResult ValidateUri(string name, Uri value, bool isDevEnvironment)

@@ -5,15 +5,13 @@ using Microsoft.Extensions.Options;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
-using OwnIdSdk.NetCore3.Web.Abstractions;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public class GetChallengeJwtMiddleware : BaseMiddleware
     {
-        public GetChallengeJwtMiddleware(RequestDelegate next, IChallengeHandler challengeHandler,
-            ICacheStore cacheStore, IOptions<OwnIdConfiguration> providerConfiguration) : base(next, challengeHandler,
-            cacheStore, providerConfiguration)
+        public GetChallengeJwtMiddleware(RequestDelegate next, ICacheStore cacheStore,
+            IOptions<OwnIdConfiguration> providerConfiguration) : base(next, cacheStore, providerConfiguration)
         {
         }
 
