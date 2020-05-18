@@ -171,6 +171,11 @@ namespace OwnIdSdk.NetCore3
             await _cacheStore.RemoveAsync(context);
         }
 
+        public async Task<CacheItem> GetCacheItemByContextAsync(string context)
+        {
+            return (await _cacheStore.GetAsync(context))?.Clone() as CacheItem;
+        }
+
         public bool IsContextFormatValid(string context)
         {
             return Regex.IsMatch(context, "^([a-zA-Z0-9_-]{22})$");

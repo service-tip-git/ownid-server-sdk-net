@@ -17,7 +17,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     {
         private readonly IChallengeHandlerAdapter _challengeHandlerAdapter;
 
-        public SaveProfileMiddleware(RequestDelegate next, IChallengeHandlerAdapter challengeHandlerAdapter, ICacheStore cacheStore,
+        public SaveProfileMiddleware(RequestDelegate next, IChallengeHandlerAdapter challengeHandlerAdapter,
+            ICacheStore cacheStore,
             IOptions<OwnIdConfiguration> providerConfiguration) : base(next, cacheStore,
             providerConfiguration)
         {
@@ -28,9 +29,11 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         {
             var routeData = context.GetRouteData();
             var challengeContext = routeData.Values["context"]?.ToString();
+            var cacheItem = await Provider.GetCacheItemByContextAsync(challengeContext);
 
             // add check for context
-            if (string.IsNullOrEmpty(challengeContext) || !Provider.IsContextFormatValid(challengeContext))
+            if (string.IsNullOrEmpty(challengeContext) || !Provider.IsContextFormatValid(challengeContext) ||
+                cacheItem == null)
             {
                 NotFound(context.Response);
                 return;
@@ -48,9 +51,9 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
             // preventing data substitution 
             challengeContext = jwtContext;
-            
+
             var formContext = _challengeHandlerAdapter.CreateUserDefinedContext(userData);
-            
+
             formContext.Validate();
 
             if (formContext.HasErrors)
@@ -62,7 +65,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 await Json(context.Response, response, (int) HttpStatusCode.BadRequest);
                 return;
             }
-            
+
             await _challengeHandlerAdapter.UpdateProfileAsync(formContext);
 
             if (!formContext.HasErrors)
