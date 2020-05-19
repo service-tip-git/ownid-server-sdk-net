@@ -78,7 +78,7 @@ spec:
             - name: OWNID__CALLBACK_URL
               value: https://client2.dev.ownid.com/netcore3
             - name: OWNID__DID
-              value: did:ownid:dev_151850889514
+              value: did:ownid:dev2_151850889514
             - name: OWNID__NAME
               value: Dev Client 2 NetCore3
             - name: OWNID__DESCRIPTION
