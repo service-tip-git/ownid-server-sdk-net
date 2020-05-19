@@ -33,7 +33,7 @@ script:
   - docker build -t ownid-server-netcore3-gigya:latest . --network=host
 
 before_deploy:
-  - pyenv global 3.7
+  - pyenv global 3.7.6
   - pip install -U pip
   - pip install awscli
   - aws --version
