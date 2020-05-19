@@ -50,6 +50,7 @@ namespace OwnIdSdk.NetCore3.Server
                 x.Requester.DID = ownIdSection["did"];
                 x.Requester.Name = ownIdSection["name"];
                 x.Requester.Description = ownIdSection["description"];
+                x.Requester.Icon = ownIdSection["icon"];
                 x.IsDevEnvironment = Environment.IsDevelopment();
             });
         }
