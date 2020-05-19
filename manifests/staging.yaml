@@ -79,7 +79,7 @@ spec:
             - name: OWNID__CALLBACK_URL
               value: https://client2.staging.ownid.com/netcore3
             - name: OWNID__DID
-              value: did:ownid:staging_151850889514
+              value: did:ownid:staging2_151850889514
             - name: OWNID__NAME
               value: Staging Client 2 NetCore3
             - name: OWNID__DESCRIPTION
