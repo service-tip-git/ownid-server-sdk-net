@@ -37,7 +37,7 @@ spec:
             - name: GIGYA__SECRET
               value: 0Hg/R8a/riSbbPiACeQZNFvg3c7s0f9uMx+BKaliaU8=
             - name: GIGYA__API_KEY
-              value: 3_DS2fdSlSzClFXUfkKHaxJq9-Zknssg2UHamCntjp2jRcL74a_x5HbhDxvHZ6a4q2
+              value: 3_dEHMimJM2kxcz8gaoI1Sss9kohyJ6LP17qDYd2UIlUfNowsPglEUANJX7R812-uh
 ---
 apiVersion: v1
 kind: Service
