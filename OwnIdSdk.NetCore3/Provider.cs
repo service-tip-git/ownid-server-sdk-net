@@ -74,7 +74,7 @@ namespace OwnIdSdk.NetCore3
                         "requester", new
                         {
                             did = _configuration.Requester.DID,
-                            pubKey = RsaHelper.GetPublicKeyForTransfer(_configuration.JwtSignCredentials),
+                            pubKey = RsaHelper.ExportPublicKeyToPkcsFormattedString(_configuration.JwtSignCredentials),
                             name = _configuration.Requester.Name,
                             icon = _configuration.Requester.Icon,
                             description = _configuration.Requester.Description
@@ -110,7 +110,7 @@ namespace OwnIdSdk.NetCore3
             var user = JsonSerializer.Deserialize<UserProfile>(token.Payload["user"].ToString());
             // TODO: add type of challenge
             using var sr = new StringReader(user.PublicKey);
-            var rsaSecurityKey = new RsaSecurityKey(RsaHelper.LoadKeys(RsaHelper.ReadKeyFromPem(sr)));
+            var rsaSecurityKey = new RsaSecurityKey(RsaHelper.LoadKeys(sr));
 
             try
             {

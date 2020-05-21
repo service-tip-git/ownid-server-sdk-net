@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 
-namespace OwnIdSdk.NetCore3.Configuration.Abstractions
+namespace OwnIdSdk.NetCore3.Configuration.Profile
 {
     public interface IProfileConfiguration
     {

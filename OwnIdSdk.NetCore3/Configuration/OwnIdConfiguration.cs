@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
-using OwnIdSdk.NetCore3.Configuration.Abstractions;
+using OwnIdSdk.NetCore3.Configuration.Profile;
 using OwnIdSdk.NetCore3.Cryptography;
 
 namespace OwnIdSdk.NetCore3.Configuration
@@ -34,22 +34,11 @@ namespace OwnIdSdk.NetCore3.Configuration
             JwtSignCredentials?.Dispose();
         }
 
-        /// <summary>
-        ///     Set JWT sign RSA keys
-        /// </summary>
-        /// <param name="publicKey">Without placeholders</param>
-        /// <param name="privateKey">Without placeholders</param>
-        /// <returns></returns>
-        public void SetKeysFromBase64(string publicKey, string privateKey)
-        {
-            JwtSignCredentials = RsaHelper.LoadKeys(publicKey, privateKey);
-        }
-
         public void SetKeysFromFiles(string pathToPublicKey, string pathToPrivateKey)
         {
             using var publicKeyReader = File.OpenText(pathToPublicKey);
             using var privateKeyReader = File.OpenText(pathToPrivateKey);
-            SetKeysFromBase64(RsaHelper.ReadKeyFromPem(publicKeyReader), RsaHelper.ReadKeyFromPem(privateKeyReader));
+            JwtSignCredentials = RsaHelper.LoadKeys(publicKeyReader, privateKeyReader);
         }
 
         public void SetProfileModel<T>() where T : class

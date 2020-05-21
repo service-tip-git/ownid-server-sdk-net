@@ -1,5 +1,4 @@
 using System;
-using OwnIdSdk.NetCore3.Configuration;
 
 namespace OwnIdSdk.NetCore3.Attributes
 {

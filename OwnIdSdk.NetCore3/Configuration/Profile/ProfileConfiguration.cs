@@ -5,9 +5,8 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Options;
 using OwnIdSdk.NetCore3.Attributes;
-using OwnIdSdk.NetCore3.Configuration.Abstractions;
 
-namespace OwnIdSdk.NetCore3.Configuration
+namespace OwnIdSdk.NetCore3.Configuration.Profile
 {
     public class ProfileConfiguration : IProfileConfiguration
     {
@@ -70,13 +69,10 @@ namespace OwnIdSdk.NetCore3.Configuration
         public void BuildMetadata()
         {
             var props = ProfileModelType.GetProperties();
-            
+
             var metadata = new List<ProfileFieldMetadata>();
 
-            foreach (var prop in props)
-            {
-                metadata.Add(GetField(prop));
-            }
+            foreach (var prop in props) metadata.Add(GetField(prop));
 
             ProfileFieldMetadata = metadata;
         }
@@ -85,7 +81,7 @@ namespace OwnIdSdk.NetCore3.Configuration
         {
             var displayAttr = memberInfo.GetCustomAttributes<OwnIdFieldAttribute>().FirstOrDefault();
             var typeAttr = memberInfo.GetCustomAttributes<OwnIdFieldTypeAttribute>().FirstOrDefault();
-            
+
             var fieldData = new ProfileFieldMetadata
             {
                 Label = displayAttr?.Label ?? memberInfo.Name,
@@ -98,36 +94,32 @@ namespace OwnIdSdk.NetCore3.Configuration
             foreach (var type in DataAnnotationAttrsMap.Keys)
             {
                 var validator = GetFieldValidator(type, memberInfo, fieldData.Label);
-                    
-                if(validator!=null)
+
+                if (validator != null)
                     fieldData.Validators.Add(validator);
             }
 
             if (typeAttr != null && typeAttr.FieldType != ProfileFieldType.Text)
-            {
                 fieldData.Validators.Add(new ProfileValidationRuleMetadata
                 {
                     ErrorMessage = typeAttr.FormatErrorMessage(fieldData.Label),
                     Type = fieldData.Type
                 });
-            }
-            
+
             return fieldData;
         }
-        
+
         private ProfileValidationRuleMetadata GetFieldValidator(Type type, MemberInfo memberInfo, string fieldName)
         {
             if (!type.IsSubclassOf(typeof(ValidationAttribute)))
                 return null;
 
             if (memberInfo.GetCustomAttributes(type).FirstOrDefault() is ValidationAttribute requireAttr)
-            {
                 return new ProfileValidationRuleMetadata
                 {
                     ErrorMessage = requireAttr.FormatErrorMessage(fieldName),
                     Type = DataAnnotationAttrsMap[type]
                 };
-            }
 
             return null;
         }

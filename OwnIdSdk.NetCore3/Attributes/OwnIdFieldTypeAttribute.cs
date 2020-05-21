@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using OwnIdSdk.NetCore3.Configuration;
+using OwnIdSdk.NetCore3.Configuration.Profile;
 
 namespace OwnIdSdk.NetCore3.Attributes
 {
@@ -10,6 +11,7 @@ namespace OwnIdSdk.NetCore3.Attributes
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class OwnIdFieldTypeAttribute : ValidationAttribute
     {
+        // TODO: dataanotations.datatypeattribute
         public OwnIdFieldTypeAttribute(ProfileFieldType profileFieldType = ProfileFieldType.Text)
         {
             FieldType = profileFieldType;

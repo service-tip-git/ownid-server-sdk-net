@@ -8,47 +8,73 @@ namespace OwnIdSdk.NetCore3.Cryptography
 {
     public static class RsaHelper
     {
-        private const string TopWrapper = "-----BEGIN PUBLIC KEY-----";
-        private const string BottomWrapper = "-----END PUBLIC KEY-----";
-        private const string BeginString = "-----BEGIN ";
-        private const string EndString = "-----END ";
+        private const string PublicPkcs1Type = "RSA PUBLIC KEY";
+        private const string PrivatePkcs1Type = "RSA PRIVATE KEY";
+        private const string PrivatePkcs8Type = "PRIVATE KEY";
+        private const string PublicSpkiType = "PUBLIC KEY";
+        private const string HeaderSeparator = "-----";
+        private const string BeginString = HeaderSeparator + "BEGIN ";
+        private const string EndString = HeaderSeparator + "END ";
 
-        /// <summary>
-        ///     Instantiate RSA object with public and private key
-        /// </summary>
-        /// <param name="publicKey">Public key in base64 format</param>
-        /// <param name="privateKey">Private key in base64 format</param>
-        public static RSA LoadKeys(string publicKey, string privateKey = null)
+        public static RSA LoadKeys(TextReader publicKeyReader, TextReader privateKey = null)
         {
-            if (publicKey.Length % 4 != 0 || privateKey != null && privateKey.Length % 4 != 0)
-                throw new IOException("base64 data appears to be truncated");
-
             var rsa = RSA.Create();
-            rsa.ImportSubjectPublicKeyInfo(new ReadOnlySpan<byte>(Convert.FromBase64String(publicKey)), out _);
+            var publicKeyData = ReadKey(publicKeyReader);
+
+            switch (publicKeyData.definitionWrapper)
+            {
+                case PublicPkcs1Type:
+                    rsa.ImportRSAPublicKey(new ReadOnlySpan<byte>(Convert.FromBase64String(publicKeyData.key)), out _);
+                    break;
+                case PublicSpkiType:
+                    rsa.ImportSubjectPublicKeyInfo(new ReadOnlySpan<byte>(Convert.FromBase64String(publicKeyData.key)),
+                        out _);
+                    break;
+                default:
+                    throw new NotSupportedException($"Not supported header {publicKeyData.definitionWrapper}");
+            }
 
             if (privateKey != null)
-                rsa.ImportRSAPrivateKey(new ReadOnlySpan<byte>(Convert.FromBase64String(privateKey)), out _);
+            {
+                var privateKeyData = ReadKey(privateKey);
+
+                switch (privateKeyData.definitionWrapper)
+                {
+                    case PrivatePkcs1Type:
+                        rsa.ImportRSAPrivateKey(new ReadOnlySpan<byte>(Convert.FromBase64String(privateKeyData.key)),
+                            out _);
+                        break;
+                    case PrivatePkcs8Type:
+                        rsa.ImportPkcs8PrivateKey(new ReadOnlySpan<byte>(Convert.FromBase64String(privateKeyData.key)),
+                            out _);
+                        break;
+                    default:
+                        throw new NotSupportedException($"Not supported header {privateKeyData.definitionWrapper}");
+                }
+            }
 
             return rsa;
         }
 
-        /// <summary>
-        ///     Read key from PEM encoded file
-        /// </summary>
-        /// <param name="reader">PEM file reader</param>
-        /// <returns>Base64 key</returns>
-        public static string ReadKeyFromPem(TextReader reader)
+        public static string ExportPublicKeyToPkcsFormattedString(RSA rsa)
+        {
+            return
+                $"{BeginString}{PublicSpkiType}{HeaderSeparator}{Environment.NewLine}{Convert.ToBase64String(rsa.ExportSubjectPublicKeyInfo())}{Environment.NewLine}{EndString}{PublicSpkiType}{HeaderSeparator}";
+        }
+
+        private static (string definitionWrapper, string key) ReadKey(TextReader reader)
         {
             var line = reader.ReadLine();
 
             if (line == null || !StartsWith(line, BeginString))
-                return null;
+                throw new FormatException($"No defining wrappers found '{BeginString}'");
 
             line = line.Substring(BeginString.Length);
             var index = line.IndexOf('-');
 
-            if (index <= 0 || !EndsWith(line, "-----") || line.Length - index != 5)
-                return null;
+            if (index <= 0 || !EndsWith(line, HeaderSeparator) || line.Length - index != 5)
+                throw new FormatException($"No defining wrappers found '{EndString}'");
+            ;
 
             var type = line.Substring(0, index);
 
@@ -68,17 +94,12 @@ namespace OwnIdSdk.NetCore3.Cryptography
             }
 
             if (line == null)
-                throw new IOException(endMarker + " not found");
+                throw new FormatException($"End wrapper {endMarker} not found");
 
             if (buf.Length % 4 != 0)
-                throw new IOException("base64 data appears to be truncated");
+                throw new FormatException("Base64 data appears to be truncated");
 
-            return buf.ToString();
-        }
-
-        public static string GetPublicKeyForTransfer(RSA rsa)
-        {
-            return $"{TopWrapper}\n{Convert.ToBase64String(rsa.ExportRSAPublicKey())}\n{BottomWrapper}";
+            return (type, buf.ToString());
         }
 
         private static bool StartsWith(string source, string prefix)
