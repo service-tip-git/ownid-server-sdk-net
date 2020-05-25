@@ -1,13 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OwnIdSdk.NetCore3.Configuration;
-using OwnIdSdk.NetCore3.Cryptography;
+using Microsoft.Extensions.Localization;
+using OwnIdSdk.NetCore3.Server.Gigya.Resources;
 using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web;
 
@@ -41,6 +40,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 });
             });
 
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
+            
             var ownIdSection = Configuration.GetSection("ownid");
             services.AddOwnId<UserProfile, ClientAppChallengeHandler, InMemoryCacheStore>(x =>
             {
@@ -52,6 +53,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 x.Requester.Description = ownIdSection["description"];
                 x.Requester.Icon = ownIdSection["icon"];
                 x.IsDevEnvironment = Environment.IsDevelopment();
+                x.LocalizationResourceType = typeof(Server_Gigya);
+                x.LocalizationResourceName = "Server.Gigya";
             });
         }
 
@@ -59,7 +62,6 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             Environment = env;
-            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -70,7 +72,14 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            
+
+            app.UseRequestLocalization(x =>
+            {
+                x.AddSupportedCultures("ru", "es", "en");
+                x.DefaultRequestCulture = new RequestCulture("en", "en");
+                x.AddSupportedUICultures("ru", "en", "es");
+                
+            });
             app.UseCors(CorsPolicyName);
             app.UseOwnId();
         }

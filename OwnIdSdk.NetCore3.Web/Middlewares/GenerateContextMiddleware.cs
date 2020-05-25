@@ -13,7 +13,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     public class GenerateContextMiddleware : BaseMiddleware
     {
         public GenerateContextMiddleware(RequestDelegate next, ICacheStore cacheStore,
-            IOptions<OwnIdConfiguration> options) : base(next, cacheStore, options)
+            IOptions<OwnIdConfiguration> options, ILocalizationService localizationService) : base(next, options,
+            cacheStore, localizationService)
         {
         }
 
@@ -28,15 +29,15 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 return;
             }
 
+
             var challengeContext = Provider.GenerateContext();
             var nonce = Provider.GenerateNonce();
 
             await Provider.StoreNonceAsync(challengeContext, nonce);
-
-            await Ok(context.Response,
-                new GetChallengeLinkResponse(challengeContext, Provider.GetDeepLink(challengeContext, challengeType),
-                    nonce
-                ));
+            await Json(context, new GetChallengeLinkResponse(challengeContext,
+                Provider.GetDeepLink(challengeContext, challengeType),
+                nonce
+            ), StatusCodes.Status200OK, false);
         }
     }
 }

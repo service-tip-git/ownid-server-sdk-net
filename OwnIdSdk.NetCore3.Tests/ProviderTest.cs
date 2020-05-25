@@ -13,6 +13,8 @@ namespace OwnIdSdk.NetCore3.Tests
     public class ProviderTest
     {
         #region TestData
+
+        private const string LocalizedString = "loco";
         
         private const string NotExistingContext = "QAfRWt_jtkSd5dUSl1NXnQ";
         private const string NotExistingNonce = "3B782943-9AB7-4AAB-9C0F-F050F983253C";
@@ -36,10 +38,12 @@ namespace OwnIdSdk.NetCore3.Tests
         private readonly Provider _provider;
         private readonly Mock<ICacheStore> _cacheStore;
         private readonly Mock<OwnIdConfiguration> _configuration;
+        private readonly Mock<ILocalizationService> _localization;
 
         public ProviderTest()
         {
             _cacheStore = new Mock<ICacheStore>(MockBehavior.Strict);
+            _localization = new Mock<ILocalizationService>(MockBehavior.Strict);
             // TODO: remove dependencies
             // using var publicKeyStream = File.OpenText("./Keys/jwtRS256.key.pub");
             // using var privateKeyStream = File.OpenText("./Keys/jwtRS256.key");
@@ -54,23 +58,25 @@ namespace OwnIdSdk.NetCore3.Tests
             //     Description = "desc",
             //     Name = "My name"
             // }
-            _provider = new Provider(_cacheStore.Object, _configuration.Object);
+            _provider = new Provider(_configuration.Object, _cacheStore.Object, _localization.Object);
 
             //Set NotExisting Element
             _cacheStore.Setup(x => x.SetAsync(It.Is<string>(s => s.Equals(NotExistingContext)),
                 It.Is<CacheItem>((o) => o.Nonce == NotExistingNonce))).Returns(Task.CompletedTask);
-            
+
             //Get NotExisting Element -> null
             _cacheStore.Setup(x => x.GetAsync(It.Is<string>(c => c.Equals(NotExistingContext))))
                 .Returns(Task.FromResult<CacheItem>(null));
-            
+
             //Get ExistingWithOutDID -> item without DID
             _cacheStore.Setup(x => x.GetAsync(It.Is<string>(c => c.Equals(ExistingContextWithoutDID))))
                 .Returns(Task.FromResult(_existingItemWithoutDID));
-            
+
             //Get ExistingWithDID -> item with did
             _cacheStore.Setup(x => x.GetAsync(It.Is<string>(c => c.Equals(ExistingContextWithDID))))
                 .Returns(Task.FromResult(_existingItemWithDID));
+
+            _localization.Setup(x => x.GetLocalizedString(It.IsAny<string>(), true)).Returns(() => LocalizedString);
         }
 
         [Fact]

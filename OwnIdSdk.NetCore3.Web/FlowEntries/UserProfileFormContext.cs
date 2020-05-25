@@ -11,12 +11,14 @@ namespace OwnIdSdk.NetCore3.Web.FlowEntries
     public class UserProfileFormContext<T> : IUserProfileContext where T : class
     {
         private readonly Dictionary<string, IList<string>> _fieldErrors;
+        private readonly ILocalizationService _localizationService;
 
-        internal UserProfileFormContext(string did, string publicKey, T profile)    
+        internal UserProfileFormContext(string did, string publicKey, T profile, ILocalizationService localizationService)    
         {
             DID = did;
             PublicKey = publicKey;
             Profile = profile;
+            _localizationService = localizationService;
             _fieldErrors = new Dictionary<string, IList<string>>();
             GeneralErrors = new List<string>();
         }
@@ -38,8 +40,10 @@ namespace OwnIdSdk.NetCore3.Web.FlowEntries
         {
             var results = new List<ValidationResult>();
             _fieldErrors.Clear();
-
-            if (Validator.TryValidateObject(Profile, new ValidationContext(Profile), results, true)) 
+            var validationContext = new ValidationContext(Profile);
+            // TODO: replace display name for each prop context to fix server field validation messages 
+            
+            if (Validator.TryValidateObject(Profile, validationContext, results, true)) 
                 return;
             
             var groupedErrors = results.SelectMany(x =>
@@ -69,10 +73,12 @@ namespace OwnIdSdk.NetCore3.Web.FlowEntries
                 !type.IsSubclassOf(propInfo.ReflectedType))
                 throw new ArgumentException($"Expression '{exp}' refers to a property that is not from type {type}.");
 
+            var localizedErrorMessage = _localizationService.GetLocalizedString(errorText, true);
+            
             if (!_fieldErrors.ContainsKey(propInfo.Name))
-                _fieldErrors.Add(propInfo.Name, new List<string> {errorText});
+                _fieldErrors.Add(propInfo.Name, new List<string> {localizedErrorMessage});
             else
-                _fieldErrors[propInfo.Name].Add(errorText);
+                _fieldErrors[propInfo.Name].Add(localizedErrorMessage);
         }
 
         public void SetGeneralError(string error)

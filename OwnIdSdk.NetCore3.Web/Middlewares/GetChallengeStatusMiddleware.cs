@@ -15,8 +15,9 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         private readonly IChallengeHandlerAdapter _challengeHandlerAdapter;
 
         public GetChallengeStatusMiddleware(RequestDelegate next, IChallengeHandlerAdapter challengeHandlerAdapter,
-            ICacheStore cacheStore, IOptions<OwnIdConfiguration> providerConfiguration) : base(next,
-            cacheStore, providerConfiguration)
+            IOptions<OwnIdConfiguration> providerConfiguration, ICacheStore cacheStore,
+            ILocalizationService localizationService) : base(next, providerConfiguration, cacheStore,
+            localizationService)
         {
             _challengeHandlerAdapter = challengeHandlerAdapter;
         }
@@ -48,11 +49,12 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
                 var result = await _challengeHandlerAdapter.OnSuccessLoginAsync(didResult.did, context.Response);
 
-                await Json(context.Response, result.Data, result.HttpCode);
+                await Json(context, result.Data, result.HttpCode, false);
                 return;
             }
 
-            await Ok(context.Response, new GetStatusResponse {IsSuccess = didResult.isSuccess});
+            await Json(context, new GetStatusResponse {IsSuccess = didResult.isSuccess}, StatusCodes.Status200OK,
+                false);
         }
     }
 }

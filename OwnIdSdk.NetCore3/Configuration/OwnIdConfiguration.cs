@@ -20,6 +20,12 @@ namespace OwnIdSdk.NetCore3.Configuration
 
         public RSA JwtSignCredentials { get; set; }
 
+        public Type LocalizationResourceType { get; set; }
+        
+        public string LocalizationResourceName { get; set; }
+        
+        public bool IgnoreInternalLocalization { get; set; }
+
         public IProfileConfiguration ProfileConfiguration { get; private set; }
 
         public Requester Requester { get; }

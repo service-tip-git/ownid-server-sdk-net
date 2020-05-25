@@ -5,14 +5,17 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Options;
 using OwnIdSdk.NetCore3.Attributes;
+using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
 
 namespace OwnIdSdk.NetCore3.Configuration.Profile
 {
     public class ProfileConfiguration : IProfileConfiguration
     {
-        private static readonly Dictionary<Type, string> DataAnnotationAttrsMap = new Dictionary<Type, string>
+        private const string FieldNamePlaceholder = "{0}";
+        
+        private static readonly Dictionary<Type, ProfileValidatorDescription> DataAnnotationAttrsMap = new Dictionary<Type, ProfileValidatorDescription>
         {
-            {typeof(RequiredAttribute), "required"}
+            {typeof(RequiredAttribute), new ProfileValidatorDescription("required", "Field {0} is required")}
             // add here MaxLength, MinLength, Regex
         };
 
@@ -93,33 +96,61 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
 
             foreach (var type in DataAnnotationAttrsMap.Keys)
             {
-                var validator = GetFieldValidator(type, memberInfo, fieldData.Label);
-
+                var validator = GetFieldValidator(type, memberInfo);
+                
                 if (validator != null)
                     fieldData.Validators.Add(validator);
             }
 
             if (typeAttr != null && typeAttr.FieldType != ProfileFieldType.Text)
-                fieldData.Validators.Add(new ProfileValidationRuleMetadata
+            {
+                var validator = new ProfileValidationRuleMetadata
                 {
-                    ErrorMessage = typeAttr.FormatErrorMessage(fieldData.Label),
-                    Type = fieldData.Type
-                });
+                    Type = fieldData.Type,
+                    GetErrorMessageKey = () => typeAttr.FormatErrorMessage(FieldNamePlaceholder),
+                    NeedsInternalLocalization = string.IsNullOrEmpty(typeAttr.ErrorMessageResourceName) &&
+                                                typeAttr.ErrorMessageResourceType == null
+                };
+                
+                fieldData.Validators.Add(validator);
+            }
 
             return fieldData;
         }
 
-        private ProfileValidationRuleMetadata GetFieldValidator(Type type, MemberInfo memberInfo, string fieldName)
+        private ProfileValidationRuleMetadata GetFieldValidator(Type type, MemberInfo memberInfo)
         {
             if (!type.IsSubclassOf(typeof(ValidationAttribute)))
                 return null;
 
-            if (memberInfo.GetCustomAttributes(type).FirstOrDefault() is ValidationAttribute requireAttr)
-                return new ProfileValidationRuleMetadata
+            if (memberInfo.GetCustomAttributes(type).FirstOrDefault() is ValidationAttribute attribute)
+            {
+                var validatorDescription = DataAnnotationAttrsMap[type];
+                
+                var validator = new ProfileValidationRuleMetadata
                 {
-                    ErrorMessage = requireAttr.FormatErrorMessage(fieldName),
-                    Type = DataAnnotationAttrsMap[type]
+                    Type = validatorDescription.ClientSideTypeNaming
                 };
+
+                if (!string.IsNullOrEmpty(attribute.ErrorMessageResourceName) &&
+                    attribute.ErrorMessageResourceType != null)
+                {
+                    validator.NeedsInternalLocalization = false;
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(attribute.ErrorMessage))
+                    {
+                        attribute.ErrorMessage = validatorDescription.DefaultErrorMessage;
+                    }
+
+                    validator.NeedsInternalLocalization = true;
+                }
+                
+                validator.GetErrorMessageKey = () => attribute.FormatErrorMessage(FieldNamePlaceholder);
+
+                return validator;
+            }
 
             return null;
         }

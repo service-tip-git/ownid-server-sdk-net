@@ -17,9 +17,11 @@ namespace OwnIdSdk.NetCore3.Web.FlowEntries
             _adaptee = adaptee;
         }
 
-        public IUserProfileContext CreateUserDefinedContext(UserProfile profile)
+        public IUserProfileContext CreateUserDefinedContext(UserProfile profile, 
+            ILocalizationService localizationService)
         {
-            return new UserProfileFormContext<T>(profile.DID, profile.PublicKey, JsonSerializer.Deserialize<T>(profile.Profile.GetRawText()));
+            return new UserProfileFormContext<T>(profile.DID, profile.PublicKey,
+                JsonSerializer.Deserialize<T>(profile.Profile.GetRawText()), localizationService);
         }
 
         public async Task UpdateProfileAsync(IUserProfileContext context)

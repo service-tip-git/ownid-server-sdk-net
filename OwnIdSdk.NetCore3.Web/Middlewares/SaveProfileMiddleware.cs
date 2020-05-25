@@ -18,9 +18,9 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         private readonly IChallengeHandlerAdapter _challengeHandlerAdapter;
 
         public SaveProfileMiddleware(RequestDelegate next, IChallengeHandlerAdapter challengeHandlerAdapter,
-            ICacheStore cacheStore,
-            IOptions<OwnIdConfiguration> providerConfiguration) : base(next, cacheStore,
-            providerConfiguration)
+            IOptions<OwnIdConfiguration> providerConfiguration, ICacheStore cacheStore,
+            ILocalizationService localizationService) : base(next, providerConfiguration, cacheStore,
+            localizationService)
         {
             _challengeHandlerAdapter = challengeHandlerAdapter;
         }
@@ -31,7 +31,6 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             var challengeContext = routeData.Values["context"]?.ToString();
             var cacheItem = await Provider.GetCacheItemByContextAsync(challengeContext);
 
-            // add check for context
             if (string.IsNullOrEmpty(challengeContext) || !Provider.IsContextFormatValid(challengeContext) ||
                 cacheItem == null)
             {
@@ -52,7 +51,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             // preventing data substitution 
             challengeContext = jwtContext;
 
-            var formContext = _challengeHandlerAdapter.CreateUserDefinedContext(userData);
+            var formContext = _challengeHandlerAdapter.CreateUserDefinedContext(userData, LocalizationService);
 
             formContext.Validate();
 
@@ -62,7 +61,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 {
                     FieldErrors = formContext.FieldErrors as IDictionary<string, IList<string>>
                 };
-                await Json(context.Response, response, (int) HttpStatusCode.BadRequest);
+                await Json(context, response, (int) HttpStatusCode.BadRequest);
                 return;
             }
 
@@ -80,7 +79,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                     FieldErrors = formContext.FieldErrors as IDictionary<string, IList<string>>,
                     GeneralErrors = formContext.GeneralErrors
                 };
-                await Json(context.Response, response, (int) HttpStatusCode.BadRequest);
+                await Json(context, response, (int) HttpStatusCode.BadRequest);
             }
         }
     }

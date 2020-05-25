@@ -10,8 +10,9 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public class GetChallengeJwtMiddleware : BaseMiddleware
     {
-        public GetChallengeJwtMiddleware(RequestDelegate next, ICacheStore cacheStore,
-            IOptions<OwnIdConfiguration> providerConfiguration) : base(next, cacheStore, providerConfiguration)
+        public GetChallengeJwtMiddleware(RequestDelegate next, IOptions<OwnIdConfiguration> providerConfiguration,
+            ICacheStore cacheStore, ILocalizationService localizationService) : base(next, providerConfiguration,
+            cacheStore, localizationService)
         {
         }
 
@@ -20,17 +21,19 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             var routeData = context.GetRouteData();
             var challengeContext = routeData.Values["context"]?.ToString();
 
+            // TODO: do we need to check if context exists
             if (string.IsNullOrEmpty(challengeContext) || !Provider.IsContextFormatValid(challengeContext))
             {
                 NotFound(context.Response);
                 return;
             }
 
-            // TODO: do we need to check if context exists
-            await Ok(context.Response, new JwtContainer
+            var culture = GetRequestCulture(context);
+
+            await Json(context, new JwtContainer
             {
-                Jwt = Provider.GenerateChallengeJwt(challengeContext)
-            });
+                Jwt = Provider.GenerateChallengeJwt(challengeContext, culture.Name)
+            }, StatusCodes.Status200OK);
         }
     }
 }

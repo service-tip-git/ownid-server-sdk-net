@@ -16,7 +16,7 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
             var config = new ProfileConfiguration(type);
             Assert.True(config.Validate().Succeeded);
         }
-        
+
         [Theory]
         [InlineData(typeof(TestProfileModelNoProps))]
         [InlineData(typeof(TestProfileNoSetterProp))]
@@ -34,7 +34,7 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         {
             var config = new ProfileConfiguration(typeof(TestProfileModelAllAttr));
             config.BuildMetadata();
-            
+
             Assert.NotNull(config.ProfileModelType);
             Assert.Equal(typeof(TestProfileModelAllAttr), config.ProfileModelType);
             Assert.NotNull(config.ProfileFieldMetadata);
@@ -71,7 +71,7 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         [Required]
         [OwnIdField("Emaii", "Email Placeholder")]
         public string Email { get; set; }
-        
+
         public string Name { get; set; }
     }
 
@@ -83,14 +83,14 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
     public class TestProfileNoSetterProp
     {
         public string Email { get; }
-        
+
         public string Name { get; }
     }
 
     public class TestProfileModelComplex
     {
         public string Email { get; set; }
-        
+
         [OwnIdField("Complex type", "complex Type placeholder")]
         public TestProfileModelNoProps Complextype { get; set; }
     }
@@ -110,7 +110,7 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
     {
         [OwnIdFieldType(ProfileFieldType.Number)]
         public int Age { get; set; }
-        
+
         [Required]
         [OwnIdField("My Email", "My Email Placeholder")]
         [OwnIdFieldType(ProfileFieldType.Email)]

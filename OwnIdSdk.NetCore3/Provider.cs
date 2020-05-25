@@ -18,11 +18,14 @@ namespace OwnIdSdk.NetCore3
     public class Provider
     {
         private readonly ICacheStore _cacheStore;
+        private readonly ILocalizationService _localizationService;
         private readonly OwnIdConfiguration _configuration;
 
-        public Provider(ICacheStore cacheStore, OwnIdConfiguration configuration)
+        public Provider(OwnIdConfiguration configuration, ICacheStore cacheStore,
+            ILocalizationService localizationService)
         {
             _cacheStore = cacheStore;
+            _localizationService = localizationService;
             _configuration = configuration;
         }
 
@@ -60,7 +63,7 @@ namespace OwnIdSdk.NetCore3
             return new Uri(_configuration.CallbackUrl, path + $"ownid/{context}/challenge");
         }
 
-        public string GenerateChallengeJwt(string context)
+        public string GenerateChallengeJwt(string context, string locale = null)
         {
             var rsaSecurityKey = new RsaSecurityKey(_configuration.JwtSignCredentials);
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -69,30 +72,38 @@ namespace OwnIdSdk.NetCore3
                 new JwtPayload(null, null, null, DateTime.UtcNow, DateTime.UtcNow.AddHours(1), DateTime.UtcNow)
                 {
                     {"jti", context},
+                    {"locale", locale},
                     {"callback", GenerateCallbackUrl(context)},
                     {
                         "requester", new
                         {
                             did = _configuration.Requester.DID,
                             pubKey = RsaHelper.ExportPublicKeyToPkcsFormattedString(_configuration.JwtSignCredentials),
-                            name = _configuration.Requester.Name,
+                            name = _localizationService.GetLocalizedString(_configuration.Requester.Name),
                             icon = _configuration.Requester.Icon,
-                            description = _configuration.Requester.Description
+                            description = _localizationService.GetLocalizedString(_configuration.Requester.Description)
                         }
                     },
                     {
                         // TODO : PROFILE
-                        "requestedFields", _configuration.ProfileConfiguration.ProfileFieldMetadata.Select(x => new
+                        "requestedFields", _configuration.ProfileConfiguration.ProfileFieldMetadata.Select(x =>
                         {
-                            type = x.Type,
-                            key = x.Key,
-                            label = x.Label,
-                            placeholder = x.Placeholder,
-                            validators = x.Validators.Select(v=> new
+                            var label = _localizationService.GetLocalizedString(x.Label);
+
+                                return new
                             {
-                                type = v.Type,
-                                errorMessage = v.ErrorMessage
-                            })
+                                type = x.Type,
+                                key = x.Key,
+                                label = label,
+                                placeholder = _localizationService.GetLocalizedString(x.Placeholder),
+                                validators = x.Validators.Select(v => new
+                                {
+                                    type = v.Type,
+                                    errorMessage = string.Format(v.NeedsInternalLocalization
+                                        ? _localizationService.GetLocalizedString(v.GetErrorMessageKey(), true)
+                                        : v.GetErrorMessageKey(), label)
+                                })
+                            };
                         })
                     }
                 });

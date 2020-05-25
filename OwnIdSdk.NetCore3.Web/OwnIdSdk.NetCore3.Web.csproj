@@ -10,12 +10,47 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Localization" Version="2.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.3" />
+      <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="3.1.4" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\OwnIdSdk.NetCore3\OwnIdSdk.NetCore3.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\OwnIdSdkDefault.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>OwnIdSdkDefault.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\OwnIdSdkDefault.es.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>OwnIdSdkDefault.es.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\OwnIdSdkDefault.ru.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>OwnIdSdkDefault.ru.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Resources\OwnIdSdkDefault.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>OwnIdSdkDefault.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\OwnIdSdkDefault.es.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>OwnIdSdkDefault.es.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\OwnIdSdkDefault.ru.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>OwnIdSdkDefault.ru.resx</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>

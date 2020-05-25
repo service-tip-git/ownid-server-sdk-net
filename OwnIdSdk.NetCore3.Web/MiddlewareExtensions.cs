@@ -66,6 +66,7 @@ namespace OwnIdSdk.NetCore3.Web
             services.AddSingleton<ICacheStore, TCacheStore>();
             services.AddTransient<IChallengeHandler<TModel>, TChallengeHandler>();
             services.AddTransient<IChallengeHandlerAdapter, ChallengeHandlerAdapter<TModel>>();
+            services.AddSingleton<ILocalizationService, LocalizationService>();
         }
     }
 }

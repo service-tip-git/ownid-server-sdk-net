@@ -7,7 +7,7 @@ namespace OwnIdSdk.NetCore3.Web.Abstractions
 {
     public interface IChallengeHandlerAdapter
     {
-        IUserProfileContext CreateUserDefinedContext(UserProfile profile);
+        IUserProfileContext CreateUserDefinedContext(UserProfile profile, ILocalizationService localizationService);
 
         Task UpdateProfileAsync(IUserProfileContext context);
 
