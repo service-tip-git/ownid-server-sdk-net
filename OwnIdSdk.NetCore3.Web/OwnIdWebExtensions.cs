@@ -30,11 +30,6 @@ namespace OwnIdSdk.NetCore3.Web
         public static void AddOwnId(this IServiceCollection services, Action<OwnIdConfigurationBuilder> configureAction = null)
         {
             var builder = new OwnIdConfigurationBuilder(services);
-            // builder.ModifyBaseSettings(x =>
-            // {
-            //     x.Requester = requester;
-            //     x.CallbackUrl = callbackUri;
-            // });
             builder.UseInMemoryCacheStore();
             configureAction?.Invoke(builder);
             builder.Configuration.Validate();

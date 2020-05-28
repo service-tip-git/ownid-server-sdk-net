@@ -46,7 +46,6 @@ namespace OwnIdSdk.NetCore3.Web.Features
         public IFeatureConfiguration FillEmptyWithOptional()
         {
             _configuration.OwnIdApplicationUrl ??= new Uri(Constants.OwinIdApplicationAddress);
-            _configuration.JwtSignCredentials ??= RSA.Create(4096);
 
             return this;
         }

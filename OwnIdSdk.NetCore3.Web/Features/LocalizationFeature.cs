@@ -49,7 +49,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
                 var factory = x.GetService<IStringLocalizerFactory>();
                 var type = typeof(OwnIdSdkDefault);
                 var assemblyName = new AssemblyName(type.GetTypeInfo().Assembly.FullName!);
-                var defaultLocalizer = factory.Create(type.Name, assemblyName.Name);
+                var defaultLocalizer = factory.Create(type.FullName, assemblyName.Name);
                 IStringLocalizer custom = null;
                 
                 if (_stringLocalizerType != null)
