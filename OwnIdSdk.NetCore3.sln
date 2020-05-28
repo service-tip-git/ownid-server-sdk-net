@@ -6,9 +6,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnIdSdk.NetCore3", "OwnIdS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnIdSdk.NetCore3.Web", "OwnIdSdk.NetCore3.Web\OwnIdSdk.NetCore3.Web.csproj", "{B8386AEE-2303-4617-AA49-3F425B74EEA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnIdSdk.NetCore3.Server", "OwnIdSdk.NetCore3.Server\OwnIdSdk.NetCore3.Server.csproj", "{0DE8DB73-D8F7-4FB7-B6AA-166D4009E41A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnIdSdk.NetCore3.Server.Gigya", "OwnIdSdk.NetCore3.Server.Gigya\OwnIdSdk.NetCore3.Server.Gigya.csproj", "{CE62B055-DFFE-4B54-B757-6E87226A7638}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnIdSdk.NetCore3.Web.Gigya", "OwnIdSdk.NetCore3.Web.Gigya\OwnIdSdk.NetCore3.Web.Gigya.csproj", "{54FE3E8D-B56C-4E33-885C-040E4DAB5E7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnIdSdk.NetCore3.Web.Extensibility", "OwnIdSdk.NetCore3.Web.Extensibility\OwnIdSdk.NetCore3.Web.Extensibility.csproj", "{31190FAF-695C-4BEA-AC63-0ECA2553A763}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,13 +30,17 @@ Global
 		{B8386AEE-2303-4617-AA49-3F425B74EEA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8386AEE-2303-4617-AA49-3F425B74EEA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8386AEE-2303-4617-AA49-3F425B74EEA5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0DE8DB73-D8F7-4FB7-B6AA-166D4009E41A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0DE8DB73-D8F7-4FB7-B6AA-166D4009E41A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0DE8DB73-D8F7-4FB7-B6AA-166D4009E41A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0DE8DB73-D8F7-4FB7-B6AA-166D4009E41A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CE62B055-DFFE-4B54-B757-6E87226A7638}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CE62B055-DFFE-4B54-B757-6E87226A7638}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE62B055-DFFE-4B54-B757-6E87226A7638}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE62B055-DFFE-4B54-B757-6E87226A7638}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54FE3E8D-B56C-4E33-885C-040E4DAB5E7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54FE3E8D-B56C-4E33-885C-040E4DAB5E7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54FE3E8D-B56C-4E33-885C-040E4DAB5E7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54FE3E8D-B56C-4E33-885C-040E4DAB5E7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31190FAF-695C-4BEA-AC63-0ECA2553A763}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31190FAF-695C-4BEA-AC63-0ECA2553A763}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31190FAF-695C-4BEA-AC63-0ECA2553A763}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31190FAF-695C-4BEA-AC63-0ECA2553A763}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

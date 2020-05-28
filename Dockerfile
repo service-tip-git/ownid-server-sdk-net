@@ -16,7 +16,10 @@ ENV GIGYA__API_KEY="3_s5-gLs4aLp5FXluP8HXs7_JN40XWNlbvYWVCCkbNCqlhW6Sm5Z4tXGGsHc
 # Copy csproj and restore as distinct layers
 COPY ./OwnIdSdk.NetCore3 ./OwnIdSdk.NetCore3
 COPY ./OwnIdSdk.NetCore3.Web ./OwnIdSdk.NetCore3.Web
+COPY ./OwnIdSdk.NetCore3.Web.Extensibility ./OwnIdSdk.NetCore3.Web.Extensibility
+COPY ./OwnIdSdk.NetCore3.Web.Gigya ./OwnIdSdk.NetCore3.Web.Gigya
 COPY ./OwnIdSdk.NetCore3.Server.Gigya ./OwnIdSdk.NetCore3.Server.Gigya
+
 
 RUN dotnet restore ./OwnIdSdk.NetCore3.Server.Gigya/OwnIdSdk.NetCore3.Server.Gigya.csproj
 RUN dotnet publish ./OwnIdSdk.NetCore3.Server.Gigya/OwnIdSdk.NetCore3.Server.Gigya.csproj -c Release -o out

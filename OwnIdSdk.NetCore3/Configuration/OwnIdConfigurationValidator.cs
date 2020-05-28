@@ -4,9 +4,9 @@ using Microsoft.Extensions.Options;
 
 namespace OwnIdSdk.NetCore3.Configuration
 {
-    public class OwnIdConfigurationValidator : IValidateOptions<OwnIdConfiguration>
+    public class OwnIdConfigurationValidator : IValidateOptions<OwnIdCoreConfiguration>
     {
-        public ValidateOptionsResult Validate(string name, OwnIdConfiguration options)
+        public ValidateOptionsResult Validate(string name, OwnIdCoreConfiguration options)
         {
             var callbackResult =
                 ValidateUri(nameof(options.CallbackUrl), options.CallbackUrl, options.IsDevEnvironment);
@@ -23,9 +23,9 @@ namespace OwnIdSdk.NetCore3.Configuration
             if (options.JwtSignCredentials == default)
                 return ValidateOptionsResult.Fail($"{nameof(options.JwtSignCredentials)} are required");
 
-            if (string.IsNullOrWhiteSpace(options.Requester.DID) || string.IsNullOrWhiteSpace(options.Requester.Name))
+            if (string.IsNullOrWhiteSpace(options.DID) || string.IsNullOrWhiteSpace(options.Name))
                 return ValidateOptionsResult.Fail(
-                    $"{nameof(options.Requester.DID)} and {nameof(options.Requester.Name)} are required");
+                    $"{nameof(options.DID)} and {nameof(options.Name)} are required");
 
             return options.ProfileConfiguration.Validate();
         }

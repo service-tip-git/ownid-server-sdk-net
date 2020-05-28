@@ -23,3 +23,4 @@ Sometimes you can face a problem that nothing was changed and you still see brow
 - *OWNID__DESCRIPTION* - requester description (will be shown in web-app)
 - *GIGYA__SECRET* - gigya account secret
 - *GIGYA__API_KEY* - gigya account api key
+- *GIGYA__SEGMENT* - gigya segment

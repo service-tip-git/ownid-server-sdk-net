@@ -5,10 +5,8 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Localization;
-using OwnIdSdk.NetCore3.Server.Gigya.Resources;
-using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web;
+using OwnIdSdk.NetCore3.Web.Gigya;
 
 namespace OwnIdSdk.NetCore3.Server.Gigya
 {
@@ -21,17 +19,13 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
         public IConfiguration Configuration { get; }
 
-        public IWebHostEnvironment Environment { get; set; }
-
         private const string CorsPolicyName = "AllowAll";
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHttpClient();
-            
             services.AddCors(x =>
             {
-                x.AddPolicy(CorsPolicyName , builder =>
+                x.AddPolicy(CorsPolicyName, builder =>
                 {
                     // builder.AllowCredentials();
                     builder.AllowAnyHeader();
@@ -40,28 +34,33 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 });
             });
 
-            services.AddLocalization(options => options.ResourcesPath = "Resources");
-            
             var ownIdSection = Configuration.GetSection("ownid");
-            services.AddOwnId<UserProfile, ClientAppChallengeHandler, InMemoryCacheStore>(x =>
-            {
-                x.SetKeysFromFiles(ownIdSection["pub_key"], ownIdSection["private_key"]);
-                x.CallbackUrl = new Uri(ownIdSection["callback_url"]);
-                x.OwnIdApplicationUrl = new Uri(ownIdSection["web_app_url"]);
-                x.Requester.DID = ownIdSection["did"];
-                x.Requester.Name = ownIdSection["name"];
-                x.Requester.Description = ownIdSection["description"];
-                x.Requester.Icon = ownIdSection["icon"];
-                x.IsDevEnvironment = Environment.IsDevelopment();
-                x.LocalizationResourceType = typeof(Server_Gigya);
-                x.LocalizationResourceName = "Server.Gigya";
-            });
+            var gigyaSection = Configuration.GetSection("gigya");
+            
+            services.AddOwnId(
+                builder =>
+                {
+                    builder.UseGigya(gigyaSection["segment"], gigyaSection["api_key"], gigyaSection["secret"], Configuration["auth_secret"]);
+                    builder.SetKeys(ownIdSection["pub_key"], ownIdSection["private_key"]);
+                    
+                    builder.ModifyBaseSettings(x =>
+                    {
+                        x.DID = ownIdSection["did"];
+                        x.Name = ownIdSection["name"];
+                        x.Description = ownIdSection["description"];
+                        x.Icon = ownIdSection["icon"];
+                        x.CallbackUrl = new Uri(ownIdSection["callback_url"]);
+                            
+                        //for development cases
+                        x.IsDevEnvironment = Configuration.GetValue("OwnIdDevelopmentMode", false);
+                        x.OwnIdApplicationUrl = new Uri(ownIdSection["web_app_url"]);
+                    });
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            Environment = env;
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

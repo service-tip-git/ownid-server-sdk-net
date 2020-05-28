@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using OwnIdSdk.NetCore3.Web.Abstractions;
+using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 
 namespace OwnIdSdk.NetCore3.Web.FlowEntries
 {
-    public class UserProfileFormContext<T> : IUserProfileContext where T : class
+    public class UserProfileFormContext<T> : IUserProfileFormContext<T> where T : class
     {
         private readonly Dictionary<string, IList<string>> _fieldErrors;
         private readonly ILocalizationService _localizationService;

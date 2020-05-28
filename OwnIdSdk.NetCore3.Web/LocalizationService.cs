@@ -1,42 +1,27 @@
-using System.Reflection;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
-using OwnIdSdk.NetCore3.Configuration;
-using OwnIdSdk.NetCore3.Web.Resources;
 
 namespace OwnIdSdk.NetCore3.Web
 {
     public class LocalizationService : ILocalizationService
     {
-        private readonly IStringLocalizer _localizer;
-        private readonly IStringLocalizer _defaultLocalizer;
+        private readonly IStringLocalizer _customLocalizer;
         private readonly bool _customWasSet;
-        private readonly bool _disabled;
+        private readonly IStringLocalizer _defaultLocalizer;
+        private readonly bool _disabled = false;
 
-        public LocalizationService(IStringLocalizerFactory factory, IOptions<OwnIdConfiguration> configuration)
+        public LocalizationService(IStringLocalizer defaultLocalizer, IStringLocalizer userDefinedLocalizer = null)
         {
-            if (configuration.Value.IgnoreInternalLocalization)
+            _defaultLocalizer = defaultLocalizer;
+
+            if (userDefinedLocalizer != null)
             {
-                _disabled = configuration.Value.IgnoreInternalLocalization;
-                return;
-            }
-            
-            var type = typeof(OwnIdSdkDefault);
-            var assemblyName = new AssemblyName(type.GetTypeInfo().Assembly.FullName!);
-            _defaultLocalizer = factory.Create(type.Name, assemblyName.Name);
-            
-            if (configuration.Value.LocalizationResourceType != null)
-            {
-                _localizer = factory.Create(configuration.Value.LocalizationResourceType);
-                var customLocalizerAssemblyName =
-                    new AssemblyName(configuration.Value.LocalizationResourceType.GetTypeInfo().Assembly.FullName!);
-                var a = configuration.Value.LocalizationResourceType.Name.Replace("_", ".");
-                _localizer = factory.Create(configuration.Value.LocalizationResourceName,
-                    customLocalizerAssemblyName.Name);
+                _customLocalizer = userDefinedLocalizer;
                 _customWasSet = true;
             }
             else
-                _localizer = _defaultLocalizer;
+            {
+                _customLocalizer = defaultLocalizer;
+            }
         }
 
         public string GetLocalizedString(string key, bool defaultAsAlternative = false)
@@ -44,7 +29,7 @@ namespace OwnIdSdk.NetCore3.Web
             if (_disabled)
                 return key;
 
-            var originalItem = _localizer[key];
+            var originalItem = _customLocalizer[key];
 
             if (originalItem.ResourceNotFound && defaultAsAlternative && _customWasSet)
             {

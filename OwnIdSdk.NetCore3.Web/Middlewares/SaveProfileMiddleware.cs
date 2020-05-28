@@ -4,34 +4,33 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Options;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
-using OwnIdSdk.NetCore3.Web.Abstractions;
+using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public class SaveProfileMiddleware : BaseMiddleware
     {
-        private readonly IChallengeHandlerAdapter _challengeHandlerAdapter;
+        private readonly IUserHandlerAdapter _userHandlerAdapter;
 
-        public SaveProfileMiddleware(RequestDelegate next, IChallengeHandlerAdapter challengeHandlerAdapter,
-            IOptions<OwnIdConfiguration> providerConfiguration, ICacheStore cacheStore,
-            ILocalizationService localizationService) : base(next, providerConfiguration, cacheStore,
+        public SaveProfileMiddleware(RequestDelegate next, IUserHandlerAdapter userHandlerAdapter,
+            IOwnIdCoreConfiguration coreConfiguration, ICacheStore cacheStore,
+            ILocalizationService localizationService) : base(next, coreConfiguration, cacheStore,
             localizationService)
         {
-            _challengeHandlerAdapter = challengeHandlerAdapter;
+            _userHandlerAdapter = userHandlerAdapter;
         }
 
         public override async Task InvokeAsync(HttpContext context)
         {
             var routeData = context.GetRouteData();
             var challengeContext = routeData.Values["context"]?.ToString();
-            var cacheItem = await Provider.GetCacheItemByContextAsync(challengeContext);
+            var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(challengeContext);
 
-            if (string.IsNullOrEmpty(challengeContext) || !Provider.IsContextFormatValid(challengeContext) ||
+            if (string.IsNullOrEmpty(challengeContext) || !OwnIdProvider.IsContextFormatValid(challengeContext) ||
                 cacheItem == null)
             {
                 NotFound(context.Response);
@@ -46,12 +45,12 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 return;
             }
 
-            var (jwtContext, userData) = Provider.GetProfileDataFromJwt(request.Jwt);
+            var (jwtContext, userData) = OwnIdProvider.GetProfileDataFromJwt(request.Jwt);
 
             // preventing data substitution 
             challengeContext = jwtContext;
 
-            var formContext = _challengeHandlerAdapter.CreateUserDefinedContext(userData, LocalizationService);
+            var formContext = _userHandlerAdapter.CreateUserDefinedContext(userData, LocalizationService);
 
             formContext.Validate();
 
@@ -65,11 +64,11 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 return;
             }
 
-            await _challengeHandlerAdapter.UpdateProfileAsync(formContext);
+            await _userHandlerAdapter.UpdateProfileAsync(formContext);
 
             if (!formContext.HasErrors)
             {
-                await Provider.SetDIDAsync(challengeContext, userData.DID);
+                await OwnIdProvider.SetDIDAsync(challengeContext, userData.DID);
                 Ok(context.Response);
             }
             else

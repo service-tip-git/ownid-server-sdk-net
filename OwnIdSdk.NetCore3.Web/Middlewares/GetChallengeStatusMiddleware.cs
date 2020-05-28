@@ -2,24 +2,23 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Options;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts;
 using OwnIdSdk.NetCore3.Store;
-using OwnIdSdk.NetCore3.Web.Abstractions;
+using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public class GetChallengeStatusMiddleware : BaseMiddleware
     {
-        private readonly IChallengeHandlerAdapter _challengeHandlerAdapter;
+        private readonly IUserHandlerAdapter _userHandlerAdapter;
 
-        public GetChallengeStatusMiddleware(RequestDelegate next, IChallengeHandlerAdapter challengeHandlerAdapter,
-            IOptions<OwnIdConfiguration> providerConfiguration, ICacheStore cacheStore,
-            ILocalizationService localizationService) : base(next, providerConfiguration, cacheStore,
+        public GetChallengeStatusMiddleware(RequestDelegate next, IUserHandlerAdapter userHandlerAdapter,
+            IOwnIdCoreConfiguration coreConfiguration, ICacheStore cacheStore,
+            ILocalizationService localizationService) : base(next, coreConfiguration, cacheStore,
             localizationService)
         {
-            _challengeHandlerAdapter = challengeHandlerAdapter;
+            _userHandlerAdapter = userHandlerAdapter;
         }
 
         public override async Task InvokeAsync(HttpContext context)
@@ -27,7 +26,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             var routeData = context.GetRouteData();
             var challengeContext = routeData.Values["context"]?.ToString();
 
-            if (string.IsNullOrEmpty(challengeContext) || !Provider.IsContextFormatValid(challengeContext))
+            if (string.IsNullOrEmpty(challengeContext) || !OwnIdProvider.IsContextFormatValid(challengeContext))
             {
                 NotFound(context.Response);
                 return;
@@ -41,13 +40,13 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 return;
             }
 
-            var didResult = await Provider.GetDIDAsync(challengeContext, request.Nonce);
+            var didResult = await OwnIdProvider.GetDIDAsync(challengeContext, request.Nonce);
 
             if (didResult.isSuccess)
             {
-                await Provider.RemoveContextAsync(challengeContext);
+                await OwnIdProvider.RemoveContextAsync(challengeContext);
 
-                var result = await _challengeHandlerAdapter.OnSuccessLoginAsync(didResult.did, context.Response);
+                var result = await _userHandlerAdapter.OnSuccessLoginAsync(didResult.did);
 
                 await Json(context, result.Data, result.HttpCode, false);
                 return;

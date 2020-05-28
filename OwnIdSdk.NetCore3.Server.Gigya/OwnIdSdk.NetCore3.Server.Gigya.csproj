@@ -5,6 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\OwnIdSdk.NetCore3.Web.Extensibility\OwnIdSdk.NetCore3.Web.Extensibility.csproj" />
+      <ProjectReference Include="..\OwnIdSdk.NetCore3.Web.Gigya\OwnIdSdk.NetCore3.Web.Gigya.csproj" />
       <ProjectReference Include="..\OwnIdSdk.NetCore3.Web\OwnIdSdk.NetCore3.Web.csproj" />
     </ItemGroup>
 
@@ -15,39 +17,6 @@
       <None Update="keys\jwtRS256.key.pub">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Update="Resources\Server.Gigya.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Server.Gigya.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Server.Gigya.ru.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Server.Gigya.ru.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Server.Gigya.es.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Server.Gigya.es.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="Resources\Server.Gigya.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Server.Gigya.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Server.Gigya.ru.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Server.Gigya.ru.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Server.Gigya.es.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Server.Gigya.es.resx</DependentUpon>
-      </Compile>
     </ItemGroup>
 
 

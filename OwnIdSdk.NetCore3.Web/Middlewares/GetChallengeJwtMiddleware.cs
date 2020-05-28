@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Options;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
@@ -10,8 +9,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public class GetChallengeJwtMiddleware : BaseMiddleware
     {
-        public GetChallengeJwtMiddleware(RequestDelegate next, IOptions<OwnIdConfiguration> providerConfiguration,
-            ICacheStore cacheStore, ILocalizationService localizationService) : base(next, providerConfiguration,
+        public GetChallengeJwtMiddleware(RequestDelegate next, IOwnIdCoreConfiguration coreConfiguration,
+            ICacheStore cacheStore, ILocalizationService localizationService) : base(next, coreConfiguration,
             cacheStore, localizationService)
         {
         }
@@ -22,7 +21,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             var challengeContext = routeData.Values["context"]?.ToString();
 
             // TODO: do we need to check if context exists
-            if (string.IsNullOrEmpty(challengeContext) || !Provider.IsContextFormatValid(challengeContext))
+            if (string.IsNullOrEmpty(challengeContext) || !OwnIdProvider.IsContextFormatValid(challengeContext))
             {
                 NotFound(context.Response);
                 return;
@@ -32,7 +31,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
             await Json(context, new JwtContainer
             {
-                Jwt = Provider.GenerateChallengeJwt(challengeContext, culture.Name)
+                Jwt = OwnIdProvider.GenerateChallengeJwt(challengeContext, culture.Name)
             }, StatusCodes.Status200OK);
         }
     }

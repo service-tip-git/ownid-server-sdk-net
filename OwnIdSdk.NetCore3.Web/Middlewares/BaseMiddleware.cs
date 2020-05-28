@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.Options;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Store;
 
@@ -12,16 +11,16 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public abstract class BaseMiddleware
     {
-        protected readonly RequestDelegate Next;
         protected readonly ILocalizationService LocalizationService;
-        protected readonly Provider Provider;
+        protected readonly RequestDelegate Next;
+        protected readonly OwnIdProvider OwnIdProvider;
 
-        protected BaseMiddleware(RequestDelegate next, IOptions<OwnIdConfiguration> providerConfiguration, 
+        protected BaseMiddleware(RequestDelegate next, IOwnIdCoreConfiguration coreConfiguration,
             ICacheStore cacheStore, ILocalizationService localizationService)
         {
             Next = next;
             LocalizationService = localizationService;
-            Provider = new Provider(providerConfiguration.Value, cacheStore, LocalizationService);
+            OwnIdProvider = new OwnIdProvider(coreConfiguration, cacheStore, LocalizationService);
         }
 
         public abstract Task InvokeAsync(HttpContext context);
@@ -31,7 +30,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             response.StatusCode = (int) HttpStatusCode.OK;
         }
 
-        protected async Task Json<T>(HttpContext context, T responseBody, int statusCode, bool addLocaleHeader = true) where T : class
+        protected async Task Json<T>(HttpContext context, T responseBody, int statusCode, bool addLocaleHeader = true)
+            where T : class
         {
             context.Response.StatusCode = statusCode;
             context.Response.ContentType = "application/json";
@@ -58,7 +58,6 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         protected CultureInfo GetRequestCulture(HttpContext context)
         {
             var rqf = context.Features.Get<IRequestCultureFeature>();
-            // Culture contains the information of the requested culture
             return rqf.RequestCulture.Culture;
         }
     }

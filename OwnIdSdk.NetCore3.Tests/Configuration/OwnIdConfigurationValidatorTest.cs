@@ -55,7 +55,7 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         public void Validate_Invalid_Requester_DID(string value)
         {
             var config = GetValidConfiguration();
-            config.Requester.DID = value;
+            config.DID = value;
             Assert.True(_validator.Validate(string.Empty, config).Failed);
         }
         
@@ -66,17 +66,18 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         public void Validate_Invalid_Requester_Name(string value)
         {
             var config = GetValidConfiguration();
-            config.Requester.Name = value;
+            config.Name = value;
             Assert.True(_validator.Validate(string.Empty, config).Failed);
         }
         
-        private OwnIdConfiguration GetValidConfiguration()
+        private OwnIdCoreConfiguration GetValidConfiguration()
         {
-            return new OwnIdConfiguration
+            return new OwnIdCoreConfiguration
             {
                 OwnIdApplicationUrl = new Uri("https://ownid.com:12/sign"),
                 CallbackUrl = new Uri("https://localhost:12"),
-                Requester = { DID = "did", Name = "name"},
+                DID = "did", 
+                Name = "name",
                 JwtSignCredentials = _sign
             };
         }
