@@ -5,28 +5,45 @@ using OwnIdSdk.NetCore3.Configuration.Profile;
 namespace OwnIdSdk.NetCore3.Attributes
 {
     /// <summary>
-    /// Format validation attribute
+    ///     Validation attribute to specify decorated property format, add validation and change the display control on OwnId
+    ///     application side,
     /// </summary>
+    /// <remarks>
+    ///     Has default error message <see cref="Constants.DefaultInvalidFormatErrorMessage" />
+    /// </remarks>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class OwnIdFieldTypeAttribute : ValidationAttribute
     {
-        // TODO: dataanotations.datatypeattribute
-        public OwnIdFieldTypeAttribute(ProfileFieldType profileFieldType = ProfileFieldType.Text) : base("Field {0} has incorrect format")
+        /// <summary>
+        /// </summary>
+        /// <param name="profileFieldType">
+        ///     Value for <see cref="FieldType" />. Determines property format with
+        ///     <see cref="OwnIdSdk.NetCore3.Configuration.Profile.ProfileFieldType" />
+        /// </param>
+        public OwnIdFieldTypeAttribute(ProfileFieldType profileFieldType = ProfileFieldType.Text) : base(
+            Constants.DefaultInvalidFormatErrorMessage)
         {
             FieldType = profileFieldType;
         }
 
+        /// <summary>
+        ///     Determines property format with <see cref="OwnIdSdk.NetCore3.Configuration.Profile.ProfileFieldType" />
+        /// </summary>
+        public ProfileFieldType FieldType { get; }
+
+        /// <summary>
+        ///     Validates provided value in context of <see cref="FieldType" />
+        /// </summary>
+        /// <param name="value">Property value</param>
+        /// <returns>Returns <c>True</c> wherever <paramref name="value" /> is valid</returns>
         public override bool IsValid(object value)
         {
-            if (FieldType == ProfileFieldType.Text)
-                return true;
-
-            if (FieldType == ProfileFieldType.Email)
-                return new EmailAddressAttribute().IsValid(value);
-
-            return true;
+            return FieldType switch
+            {
+                ProfileFieldType.Text => true,
+                ProfileFieldType.Email => new EmailAddressAttribute().IsValid(value),
+                _ => true
+            };
         }
-
-        public ProfileFieldType FieldType { get; }
     }
 }

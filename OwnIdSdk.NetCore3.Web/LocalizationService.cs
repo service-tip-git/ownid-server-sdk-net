@@ -2,6 +2,13 @@ using Microsoft.Extensions.Localization;
 
 namespace OwnIdSdk.NetCore3.Web
 {
+    /// <summary>
+    ///     Default localization mechanism
+    /// </summary>
+    /// <remarks>
+    ///     Uses default and userDefined localizer
+    /// </remarks>
+    /// <inheritdoc cref="ILocalizationService" />
     public class LocalizationService : ILocalizationService
     {
         private readonly IStringLocalizer _customLocalizer;
@@ -9,6 +16,8 @@ namespace OwnIdSdk.NetCore3.Web
         private readonly IStringLocalizer _defaultLocalizer;
         private readonly bool _disabled = false;
 
+        /// <param name="defaultLocalizer">Default localizer provided by OwnId SDK</param>
+        /// <param name="userDefinedLocalizer">User defined localizer</param>
         public LocalizationService(IStringLocalizer defaultLocalizer, IStringLocalizer userDefinedLocalizer = null)
         {
             _defaultLocalizer = defaultLocalizer;

@@ -8,12 +8,12 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
     public class OwnIdConfigurationValidatorTest : IDisposable
     {
         private readonly RSA _sign;
-        private readonly OwnIdConfigurationValidator _validator;
+        private readonly OwnIdCoreConfigurationValidator _validator;
         
         public OwnIdConfigurationValidatorTest()
         {
             _sign = RSA.Create();
-            _validator = new OwnIdConfigurationValidator();
+            _validator = new OwnIdCoreConfigurationValidator();
         }
 
         [Theory]

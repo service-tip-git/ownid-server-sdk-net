@@ -53,7 +53,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
         public void Validate()
         {
             // TODO refactor
-            var validator = new OwnIdConfigurationValidator();
+            var validator = new OwnIdCoreConfigurationValidator();
             var result = validator.Validate(string.Empty, _configuration);
 
             if (result.Failed)

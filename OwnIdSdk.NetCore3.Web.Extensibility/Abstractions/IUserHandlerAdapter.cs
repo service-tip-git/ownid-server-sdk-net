@@ -5,7 +5,7 @@ namespace OwnIdSdk.NetCore3.Web.Extensibility.Abstractions
 {
     public interface IUserHandlerAdapter
     {
-        IFormContext CreateUserDefinedContext(UserProfile profile, ILocalizationService localizationService);
+        IFormContext CreateUserDefinedContext(UserProfileData profileData, ILocalizationService localizationService);
 
         Task UpdateProfileAsync(IFormContext context);
 

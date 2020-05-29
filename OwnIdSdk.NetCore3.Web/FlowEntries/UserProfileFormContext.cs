@@ -8,12 +8,18 @@ using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 
 namespace OwnIdSdk.NetCore3.Web.FlowEntries
 {
-    public class UserProfileFormContext<T> : IUserProfileFormContext<T> where T : class
+    /// <summary>
+    ///     User Profile value, validation provider
+    /// </summary>
+    /// <typeparam name="TProfile">User Profile</typeparam>
+    /// <inheritdoc cref="IUserProfileFormContext{TProfile}" />
+    public class UserProfileFormContext<TProfile> : IUserProfileFormContext<TProfile> where TProfile : class
     {
         private readonly Dictionary<string, IList<string>> _fieldErrors;
         private readonly ILocalizationService _localizationService;
 
-        internal UserProfileFormContext(string did, string publicKey, T profile, ILocalizationService localizationService)    
+        internal UserProfileFormContext(string did, string publicKey, TProfile profile,
+            ILocalizationService localizationService)
         {
             DID = did;
             PublicKey = publicKey;
@@ -27,7 +33,7 @@ namespace OwnIdSdk.NetCore3.Web.FlowEntries
 
         public string PublicKey { get; }
 
-        public T Profile { get; }
+        public TProfile Profile { get; }
 
         public List<string> GeneralErrors { get; set; }
 
@@ -42,10 +48,10 @@ namespace OwnIdSdk.NetCore3.Web.FlowEntries
             _fieldErrors.Clear();
             var validationContext = new ValidationContext(Profile);
             // TODO: replace display name for each prop context to fix server field validation messages 
-            
-            if (Validator.TryValidateObject(Profile, validationContext, results, true)) 
+
+            if (Validator.TryValidateObject(Profile, validationContext, results, true))
                 return;
-            
+
             var groupedErrors = results.SelectMany(x =>
                     x.MemberNames.Select(m => (fieldName: m, message: x.ErrorMessage)))
                 .GroupBy(x => x.fieldName, x => x.message);
@@ -58,9 +64,9 @@ namespace OwnIdSdk.NetCore3.Web.FlowEntries
         }
 
         // TODO: optimize checking with fallback type for each field
-        public void SetError<TField>(Expression<Func<T, TField>> exp, string errorText)
+        public void SetError<TField>(Expression<Func<TProfile, TField>> exp, string errorText)
         {
-            var type = typeof(T);
+            var type = typeof(TProfile);
 
             if (!(exp.Body is MemberExpression member))
                 throw new ArgumentException($"Expression '{exp}' refers to a method, not a property.");
@@ -74,7 +80,7 @@ namespace OwnIdSdk.NetCore3.Web.FlowEntries
                 throw new ArgumentException($"Expression '{exp}' refers to a property that is not from type {type}.");
 
             var localizedErrorMessage = _localizationService.GetLocalizedString(errorText, true);
-            
+
             if (!_fieldErrors.ContainsKey(propInfo.Name))
                 _fieldErrors.Add(propInfo.Name, new List<string> {localizedErrorMessage});
             else

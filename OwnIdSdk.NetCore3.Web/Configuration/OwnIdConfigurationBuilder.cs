@@ -11,6 +11,9 @@ using OwnIdSdk.NetCore3.Web.Features;
 
 namespace OwnIdSdk.NetCore3.Web.Configuration
 {
+    /// <summary>
+    /// Configuration composition helper
+    /// </summary>
     public class OwnIdConfigurationBuilder : IExtendableConfigurationBuilder
     {
         public OwnIdConfigurationBuilder(IServiceCollection services) : this(
@@ -20,41 +23,71 @@ namespace OwnIdSdk.NetCore3.Web.Configuration
             AddOrUpdateFeature(new CoreFeature().FillEmptyWithOptional());
             AddOrUpdateFeature(new LocalizationFeature());
         }
-
+        
         public OwnIdConfigurationBuilder(OwnIdConfiguration configuration)
         {
             Configuration = configuration;
         }
 
+        /// <summary>
+        /// OwnId SDK features configuration
+        /// </summary>
         public OwnIdConfiguration Configuration { get; private set; }
         
+        /// <summary>
+        /// Provided Service Collection
+        /// </summary>
         public IServiceCollection Services { get; }
 
-        public void ModifyBaseSettings(Action<IOwnIdCoreConfiguration> modifyAction)
+        /// <summary>
+        /// Allows to change Core Configuration that is necessary for start 
+        /// </summary>
+        public void ModifyBaseSettings([NotNull] Action<IOwnIdCoreConfiguration> modifyAction)
         {
             WithFeature<CoreFeature>(x => x.WithConfiguration(modifyAction));
         }
 
-        public void SetKeys(string publicKeyPath, string privateKeyPath)
+        /// <summary>
+        /// Sets RSA keys for JWT signing and site / organization identification from files
+        /// </summary>
+        /// <param name="publicKeyPath">Path to public key file</param>
+        /// <param name="privateKeyPath">Path to private key file</param>
+        public void SetKeys([NotNull] string publicKeyPath, [NotNull] string privateKeyPath)
         {
             WithFeature<CoreFeature>(x => x.WithKeys(publicKeyPath, privateKeyPath));
         }
 
-        public void SetKeys(RSA rsa)
+        /// <summary>
+        /// Sets RSA keys directly as <see cref="RSA"/> object for JWT signing and site / organization identification
+        /// </summary>
+        /// <param name="rsa"></param>
+        public void SetKeys([NotNull] RSA rsa)
         {
             WithFeature<CoreFeature>(x => x.WithKeys(rsa));
         }
 
-        public void SetLocalizationResource(Type resourceType, string resourceName)
+        /// <summary>
+        /// Set custom localization resource to <see cref="LocalizationService"/>
+        /// </summary>
+        public void SetLocalizationResource([NotNull] Type resourceType, [NotNull] string resourceName)
         {
             WithFeature<LocalizationFeature>(x => x.WithResource(resourceType, resourceName));
         }
 
+        /// <summary>
+        /// Set custom <see cref="IStringLocalizer{T}"/> to <see cref="LocalizationService"/>
+        /// </summary>
+        /// <typeparam name="TLocalizer">Custom <see cref="IStringLocalizer{T}"/> localizer</typeparam>
         public void SetStringLocalizer<TLocalizer>() where TLocalizer : IStringLocalizer
         {
             WithFeature<LocalizationFeature>(x => x.WithStringLocalizer<TLocalizer>());
         }
 
+        /// <summary>
+        /// Sets <see cref="IUserHandler{TProfile}"/> for user authorization and profile update
+        /// </summary>
+        /// <typeparam name="TProfile">User Profile</typeparam>
+        /// <typeparam name="THandler">Custom implementation of <see cref="IUserHandler{TProfile}"/></typeparam>
         public void UseUserHandlerWithCustomProfile<TProfile, THandler>()
             where THandler : class, IUserHandler<TProfile> where TProfile : class
         {
@@ -69,16 +102,32 @@ namespace OwnIdSdk.NetCore3.Web.Configuration
             builder.AddOrUpdateFeature(handlerFeature.UseHandler<TProfile, THandler>());
         }
 
+        /// <summary>
+        /// Defines usage of any <see cref="ICacheStore"/> implementation to store technical authorization data
+        /// </summary>
+        /// <param name="serviceLifetime">Life time of <typeparamref name="TStore"/> instance</param>
+        /// <typeparam name="TStore"><see cref="ICacheStore"/> implementation</typeparam>
         public void UseCacheStore<TStore>(ServiceLifetime serviceLifetime) where TStore : class, ICacheStore
         {
             WithFeature<CacheStoreFeature>(x => x.UseStore<TStore>(serviceLifetime));
         }
 
+        /// <summary>
+        /// Defines usage of In Memory Cache Store
+        /// </summary>
+        /// <remarks>
+        /// Used by default
+        /// </remarks>
         public void UseInMemoryCacheStore()
         {
             WithFeature<CacheStoreFeature>(x => x.UseStoreInMemoryStore());
         }
 
+        /// <summary>
+        /// Allows to add features for further extensibility
+        /// </summary>
+        /// <param name="feature"><see cref="IFeatureConfiguration"/> implementation</param>
+        /// <typeparam name="TFeature">Feature to be added</typeparam>
         public void AddOrUpdateFeature<TFeature>([NotNull] TFeature feature)
             where TFeature : class, IFeatureConfiguration
         {

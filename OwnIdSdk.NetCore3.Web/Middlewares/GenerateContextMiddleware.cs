@@ -28,8 +28,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 BadRequest(context.Response);
                 return;
             }
-
-
+            
             var challengeContext = OwnIdProvider.GenerateContext();
             var nonce = OwnIdProvider.GenerateNonce();
 

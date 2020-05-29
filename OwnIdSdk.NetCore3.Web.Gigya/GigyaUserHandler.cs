@@ -13,19 +13,17 @@ using OwnIdSdk.NetCore3.Web.Gigya.Contracts.UpdateProfile;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya
 {
-    public class UserHandler : IUserHandler<Profile>
+    public class GigyaUserHandler : IUserHandler<GigyaUserProfile>
     {
         public static string ApiKey { get; internal set; }
         
-        public static string AuthSecret { get; internal set; }
-        
         public static string SecretKey { get; internal set; }
         
-        public static string Segment { get; internal set; }
+        public static string DataCenter { get; internal set; }
         
         private readonly HttpClient _httpClient;
         
-        public UserHandler(IHttpClientFactory httpClientFactory)
+        public GigyaUserHandler(IHttpClientFactory httpClientFactory)
         {
             _httpClient = httpClientFactory.CreateClient();
         }
@@ -33,7 +31,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
         public async Task<LoginResult<object>> OnSuccessLoginAsync(string did)
         {
             var responseMessage = await _httpClient.PostAsync(
-                new Uri($"https://accounts.{Segment}.gigya.com/accounts.notifyLogin"), new FormUrlEncodedContent(
+                new Uri($"https://accounts.{DataCenter}.gigya.com/accounts.notifyLogin"), new FormUrlEncodedContent(
                     new[]
                     {
                         new KeyValuePair<string, string>("apiKey", ApiKey),
@@ -67,10 +65,10 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             };
         }
 
-        public async Task UpdateProfileAsync(IUserProfileFormContext<Profile> context)
+        public async Task UpdateProfileAsync(IUserProfileFormContext<GigyaUserProfile> context)
         {
             var getAccountMessage = await _httpClient.PostAsync(
-                new Uri($"https://accounts.{Segment}.gigya.com/accounts.getAccountInfo"), new FormUrlEncodedContent(
+                new Uri($"https://accounts.{DataCenter}.gigya.com/accounts.getAccountInfo"), new FormUrlEncodedContent(
                     new[]
                     {
                         new KeyValuePair<string, string>("apiKey", ApiKey),
@@ -137,7 +135,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             }
 
             var loginMessage = await _httpClient.PostAsync(
-                new Uri($"https://accounts.{Segment}.gigya.com/accounts.notifyLogin"), new FormUrlEncodedContent(
+                new Uri($"https://accounts.{DataCenter}.gigya.com/accounts.notifyLogin"), new FormUrlEncodedContent(
                     new[]
                     {
                         new KeyValuePair<string, string>("apiKey", ApiKey),
@@ -200,7 +198,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
         private async Task<BaseGigyaResponse> SetAccountInfo(IEnumerable<KeyValuePair<string, string>> parameters)
         {
             var setAccountDataMessage = await _httpClient.PostAsync(
-                new Uri($"https://accounts.{Segment}.gigya.com/accounts.setAccountInfo"), new FormUrlEncodedContent(parameters
+                new Uri($"https://accounts.{DataCenter}.gigya.com/accounts.setAccountInfo"), new FormUrlEncodedContent(parameters
                 ));
 
             var setAccountResponse = await JsonSerializer.DeserializeAsync<BaseGigyaResponse>(

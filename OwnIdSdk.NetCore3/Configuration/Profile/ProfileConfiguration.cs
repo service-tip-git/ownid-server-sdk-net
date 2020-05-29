@@ -9,16 +9,28 @@ using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribut
 
 namespace OwnIdSdk.NetCore3.Configuration.Profile
 {
+    /// <inheritdoc cref="IProfileConfiguration"/>
+    /// <summary>Implements mechanism of User Profile serialization and validation</summary>
     public class ProfileConfiguration : IProfileConfiguration
     {
+        /// <summary>
+        /// Localized field label placeholder
+        /// </summary>
         private const string FieldNamePlaceholder = "{0}";
         
+        /// <summary>
+        /// Supported validation attributes map for OwnId application usage
+        /// </summary>
         private static readonly Dictionary<Type, ProfileValidatorDescription> DataAnnotationAttrsMap = new Dictionary<Type, ProfileValidatorDescription>
         {
             {typeof(RequiredAttribute), new ProfileValidatorDescription("required", "Field {0} is required")}
             // add here MaxLength, MinLength, Regex
         };
 
+        /// <summary>
+        /// Initializes instance of <see cref="ProfileConfiguration"/>
+        /// </summary>
+        /// <param name="profileType">Sets value to <see cref="ProfileModelType"/></param>
         public ProfileConfiguration(Type profileType)
         {
             ProfileModelType = profileType;

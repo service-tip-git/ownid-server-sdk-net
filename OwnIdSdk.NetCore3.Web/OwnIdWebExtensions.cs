@@ -11,6 +11,9 @@ namespace OwnIdSdk.NetCore3.Web
 {
     public static class OwnIdWebExtensions
     {
+        /// <summary>
+        /// Adds required for the OwnId authorization process Middlewares 
+        /// </summary>
         public static void UseOwnId(this IApplicationBuilder app)
         {
             var routeBuilder = new RouteBuilder(app);
@@ -27,6 +30,11 @@ namespace OwnIdSdk.NetCore3.Web
             app.UseRouter(routeBuilder.Build());
         }
 
+        /// <summary>
+        /// Adds OwnId features and services with configuration
+        /// </summary>
+        /// <remarks>Extension method for <see cref="IServiceCollection"/></remarks>
+        /// <param name="configureAction">Configuration builder. Allows to tune all available settings and features</param>
         public static void AddOwnId(this IServiceCollection services, Action<OwnIdConfigurationBuilder> configureAction = null)
         {
             var builder = new OwnIdConfigurationBuilder(services);

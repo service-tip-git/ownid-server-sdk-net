@@ -4,7 +4,11 @@ using Microsoft.Extensions.Options;
 
 namespace OwnIdSdk.NetCore3.Configuration
 {
-    public class OwnIdConfigurationValidator : IValidateOptions<OwnIdCoreConfiguration>
+    /// <summary>
+    ///     Stores <see cref="OwnIdCoreConfiguration" /> validation logic
+    /// </summary>
+    /// <remarks>Implements <see cref="IValidateOptions{TOptions}" /> default mechanism</remarks>
+    public class OwnIdCoreConfigurationValidator : IValidateOptions<OwnIdCoreConfiguration>
     {
         public ValidateOptionsResult Validate(string name, OwnIdCoreConfiguration options)
         {
@@ -40,7 +44,7 @@ namespace OwnIdSdk.NetCore3.Configuration
 
             if (!isDevEnvironment && value.Scheme != "https")
                 return ValidateOptionsResult.Fail($"{name}: https is required for production use");
-            
+
             if (isDevEnvironment && value.Scheme != "https" && value.Scheme != "http")
                 return ValidateOptionsResult.Fail($"{name}: https or http are supported only");
 

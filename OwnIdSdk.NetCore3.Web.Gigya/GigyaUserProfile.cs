@@ -4,7 +4,7 @@ using OwnIdSdk.NetCore3.Configuration.Profile;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya
 {
-    public class Profile
+    public class GigyaUserProfile
     {
         [OwnIdField(Constants.DefaultEmailLabel, Constants.DefaultEmailLabel)]
         [OwnIdFieldType(ProfileFieldType.Email)]
