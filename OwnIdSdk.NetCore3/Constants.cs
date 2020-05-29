@@ -6,7 +6,7 @@ namespace OwnIdSdk.NetCore3
 
         public const string DefaultEmailLabel = "Email";
         
-        public const string DefaultFirstNameLabel = "Fisrt Name";
+        public const string DefaultFirstNameLabel = "First Name";
 
         public const string DefaultLastNameLabel = "Last Name";
     }
