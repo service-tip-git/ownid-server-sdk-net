@@ -2,9 +2,7 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Web.Configuration;
-using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 using OwnIdSdk.NetCore3.Web.Middlewares;
 
 namespace OwnIdSdk.NetCore3.Web
@@ -12,7 +10,7 @@ namespace OwnIdSdk.NetCore3.Web
     public static class OwnIdWebExtensions
     {
         /// <summary>
-        /// Adds required for the OwnId authorization process Middlewares 
+        ///     Adds required for the OwnId authorization process Middlewares
         /// </summary>
         public static void UseOwnId(this IApplicationBuilder app)
         {
@@ -26,16 +24,17 @@ namespace OwnIdSdk.NetCore3.Web
                 builder => builder.UseMiddleware<SaveProfileMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/status",
                 builder => builder.UseMiddleware<GetChallengeStatusMiddleware>());
-            
+
             app.UseRouter(routeBuilder.Build());
         }
 
         /// <summary>
-        /// Adds OwnId features and services with configuration
+        ///     Adds OwnId features and services with configuration
         /// </summary>
-        /// <remarks>Extension method for <see cref="IServiceCollection"/></remarks>
+        /// <remarks>Extension method for <see cref="IServiceCollection" /></remarks>
         /// <param name="configureAction">Configuration builder. Allows to tune all available settings and features</param>
-        public static void AddOwnId(this IServiceCollection services, Action<OwnIdConfigurationBuilder> configureAction = null)
+        public static void AddOwnId(this IServiceCollection services,
+            Action<OwnIdConfigurationBuilder> configureAction = null)
         {
             var builder = new OwnIdConfigurationBuilder(services);
             builder.UseInMemoryCacheStore();

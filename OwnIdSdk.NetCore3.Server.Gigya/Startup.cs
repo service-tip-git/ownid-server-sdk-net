@@ -43,7 +43,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                     builder.UseGigya(gigyaSection["segment"], gigyaSection["api_key"], gigyaSection["secret"]);
                     builder.SetKeys(ownIdSection["pub_key"], ownIdSection["private_key"]);
                     
-                    builder.ModifyBaseSettings(x =>
+                    builder.WithBaseSettings(x =>
                     {
                         x.DID = ownIdSection["did"];
                         x.Name = ownIdSection["name"];
