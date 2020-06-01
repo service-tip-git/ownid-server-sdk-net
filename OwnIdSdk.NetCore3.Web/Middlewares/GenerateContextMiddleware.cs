@@ -18,7 +18,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         {
         }
 
-        public override async Task InvokeAsync(HttpContext context)
+        protected override async Task Execute(HttpContext context)
         {
             var request = await JsonSerializer.DeserializeAsync<GenerateContextRequest>(context.Request.Body);
 

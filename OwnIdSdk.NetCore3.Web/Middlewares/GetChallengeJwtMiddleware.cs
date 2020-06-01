@@ -15,7 +15,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         {
         }
 
-        public override async Task InvokeAsync(HttpContext context)
+        protected override async Task Execute(HttpContext context)
         {
             var routeData = context.GetRouteData();
             var challengeContext = routeData.Values["context"]?.ToString();

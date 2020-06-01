@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Net;
 using System.Text.Json;
@@ -23,7 +24,12 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             OwnIdProvider = new OwnIdProvider(coreConfiguration, cacheStore, LocalizationService);
         }
 
-        public abstract Task InvokeAsync(HttpContext context);
+        public async Task InvokeAsync(HttpContext context)
+        {
+            await InterceptErrors(Execute, context);
+        }
+
+        protected abstract Task Execute(HttpContext context);
 
         protected void Ok(HttpResponse response)
         {
@@ -59,6 +65,22 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         {
             var rqf = context.Features.Get<IRequestCultureFeature>();
             return rqf.RequestCulture.Culture;
+        }
+
+        protected async Task InterceptErrors(Func<HttpContext, Task> functionToInvoke, HttpContext context)
+        {
+            try
+            {
+                await functionToInvoke(context);
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e.ToString());
+                context.Response.Clear();
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                context.Response.ContentType = "text/html";
+                await context.Response.WriteAsync("Operation failed. Please try later");
+            }
         }
     }
 }
