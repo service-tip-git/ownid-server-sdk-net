@@ -9,7 +9,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts.UpdateProfile
         public string DID { get; set; }
         
         [JsonPropertyName("data")]
-        public Dictionary<string, string> Data { get; set; }
+        public Dictionary<string, object> Data { get; set; }
         
         [JsonPropertyName("profile")]
         public Dictionary<string, string> Profile { get; set; }
