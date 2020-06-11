@@ -1,7 +1,19 @@
 # OwnId server SDK for NET Core 3
 
 ## Running locally
-Use `dotnet run` or `dotnet run --urls http://0.0.0.0.:5002` to set specific urls.  
+Use 
+
+```shell
+dotnet run
+```
+
+or 
+
+```shell
+dotnet run --urls http://0.0.0.0.:5002
+``` 
+
+to set specific urls.  
 
 
 ### Development certificates for HTTPS binding
