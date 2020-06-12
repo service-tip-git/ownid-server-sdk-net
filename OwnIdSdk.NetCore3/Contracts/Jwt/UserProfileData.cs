@@ -7,7 +7,7 @@ namespace OwnIdSdk.NetCore3.Contracts.Jwt
     ///     Data provided by OwnId application after user enter requested fields with
     ///     <see cref="OwnIdSdk.NetCore3.Configuration.Profile.IProfileConfiguration" />
     /// </summary>
-    public class UserProfileData
+    public class UserProfileData : ISignedData
     {
         /// <summary>
         ///     User unique identifier

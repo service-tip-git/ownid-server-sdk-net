@@ -40,7 +40,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             services.AddOwnId(
                 builder =>
                 {
-                    builder.UseGigya(gigyaSection["segment"], gigyaSection["api_key"], gigyaSection["secret"]);
+                    builder.UseGigya(gigyaSection["data_center"], gigyaSection["api_key"], gigyaSection["secret"]);
                     builder.SetKeys(ownIdSection["pub_key"], ownIdSection["private_key"]);
                     
                     builder.WithBaseSettings(x =>

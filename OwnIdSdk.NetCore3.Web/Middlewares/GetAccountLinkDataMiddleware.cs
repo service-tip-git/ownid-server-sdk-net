@@ -4,15 +4,19 @@ using Microsoft.AspNetCore.Routing;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
+using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
-    public class GetChallengeJwtMiddleware : BaseMiddleware
+    public class GetAccountLinkDataMiddleware : BaseMiddleware
     {
-        public GetChallengeJwtMiddleware(RequestDelegate next, IOwnIdCoreConfiguration coreConfiguration,
+        private readonly IAccountLinkHandlerAdapter _linkHandlerAdapter;
+
+        public GetAccountLinkDataMiddleware(RequestDelegate next, IAccountLinkHandlerAdapter linkHandlerAdapter, IOwnIdCoreConfiguration coreConfiguration,
             ICacheStore cacheStore, ILocalizationService localizationService) : base(next, coreConfiguration,
             cacheStore, localizationService)
         {
+            _linkHandlerAdapter = linkHandlerAdapter;
         }
 
         protected override async Task Execute(HttpContext context)
@@ -29,11 +33,13 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 return;
             }
 
+            var profile = await _linkHandlerAdapter.GetUserProfileAsync(cacheItem.DID);
             var culture = GetRequestCulture(context);
 
             await Json(context, new JwtContainer
             {
-                Jwt = OwnIdProvider.GenerateChallengeJwt(challengeContext, cacheItem.ChallengeType, culture.Name)
+                Jwt = OwnIdProvider.GenerateLinkAccountJwt(challengeContext, cacheItem.ChallengeType, cacheItem.DID,
+                    profile, culture.Name)
             }, StatusCodes.Status200OK);
         }
     }

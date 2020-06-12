@@ -6,11 +6,11 @@ using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 
 namespace OwnIdSdk.NetCore3.Web.FlowEntries
 {
-    public class UserHandlerAdapter<T> : IUserHandlerAdapter where T : class
+    public class UserHandlerAdapter<TProfile> : IUserHandlerAdapter where TProfile : class
     {
-        private readonly IUserHandler<T> _adaptee;
+        private readonly IUserHandler<TProfile> _adaptee;
 
-        public UserHandlerAdapter(IUserHandler<T> adaptee)
+        public UserHandlerAdapter(IUserHandler<TProfile> adaptee)
         {
             _adaptee = adaptee;
         }
@@ -18,13 +18,13 @@ namespace OwnIdSdk.NetCore3.Web.FlowEntries
         public IFormContext CreateUserDefinedContext(UserProfileData profileData,
             ILocalizationService localizationService)
         {
-            return new UserProfileFormContext<T>(profileData.DID, profileData.PublicKey,
-                JsonSerializer.Deserialize<T>(profileData.Profile.GetRawText()), localizationService);
+            return new UserProfileFormContext<TProfile>(profileData.DID, profileData.PublicKey,
+                JsonSerializer.Deserialize<TProfile>(profileData.Profile.GetRawText()), localizationService);
         }
 
         public async Task UpdateProfileAsync(IFormContext context)
         {
-            await _adaptee.UpdateProfileAsync(context as UserProfileFormContext<T>);
+            await _adaptee.UpdateProfileAsync(context as UserProfileFormContext<TProfile>);
         }
 
         public async Task<LoginResult<object>> OnSuccessLoginAsync(string did)

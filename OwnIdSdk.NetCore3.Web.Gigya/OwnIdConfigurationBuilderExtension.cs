@@ -18,10 +18,18 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             string secret)
         {
             builder.Services.AddHttpClient();
-            GigyaUserHandler.ApiKey = apiKey;
-            GigyaUserHandler.SecretKey = secret;
-            GigyaUserHandler.DataCenter = dataCenter;
+            var gigyaFeature = new GigyaIntegrationFeature();
+            
+            gigyaFeature.WithConfig(x =>
+            {
+                x.DataCenter = dataCenter;
+                x.ApiKey = apiKey;
+                x.SecretKey = secret;
+            });
+            
+            builder.AddOrUpdateFeature(gigyaFeature);
             builder.UseUserHandlerWithCustomProfile<GigyaUserProfile, GigyaUserHandler>();
+            builder.UseAccountLinking<GigyaUserProfile, GigyaAccountLinkHandler>();
         }
     }
 }

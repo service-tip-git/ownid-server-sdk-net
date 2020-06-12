@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Moq;
 using OwnIdSdk.NetCore3.Configuration;
+using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
 using Xunit;
 
@@ -21,7 +22,8 @@ namespace OwnIdSdk.NetCore3.Tests
         private readonly CacheItem _existingItemWithDID = new CacheItem
         {
             Nonce = "AC2A7890-F931-4646-9F8E-DAEDA69FBB3F",
-            DID = "did:ownid:98765543221"
+            DID = "did:ownid:98765543221",
+            IsFinished = true
         };
         
         private const string ExistingContextWithoutDID = "QAfRWt_jtkSd5dUSl2NXnQ";
@@ -59,6 +61,8 @@ namespace OwnIdSdk.NetCore3.Tests
             //Get ExistingWithDID -> item with did
             _cacheStore.Setup(x => x.GetAsync(It.Is<string>(c => c.Equals(ExistingContextWithDID))))
                 .Returns(Task.FromResult(_existingItemWithDID));
+            _cacheStore.Setup(x => x.RemoveAsync(It.Is<string>(c => c.Equals(ExistingContextWithDID))))
+                .Returns(Task.CompletedTask);
 
             _localization.Setup(x => x.GetLocalizedString(It.IsAny<string>(), true)).Returns(() => LocalizedString);
         }
@@ -93,13 +97,13 @@ namespace OwnIdSdk.NetCore3.Tests
         [Fact]
         public async Task StoreNonceAsync_NotExistingElement()
         {
-            await _ownIdProvider.StoreNonceAsync(NotExistingContext, NotExistingNonce);
+            await _ownIdProvider.CreateAuthFlowSessionItemAsync(NotExistingContext, NotExistingNonce, ChallengeType.Login);
         }
 
         [Fact]
         public async Task SetDIDAsync_NotExistingElement()
         {
-            await Assert.ThrowsAsync<ArgumentException>(() => _ownIdProvider.SetDIDAsync(NotExistingContext, NotExistingDID));
+            await Assert.ThrowsAsync<ArgumentException>(() => _ownIdProvider.FinishAuthFlowSessionAsync(NotExistingContext, NotExistingDID));
         }
         
         [Fact]
@@ -111,13 +115,13 @@ namespace OwnIdSdk.NetCore3.Tests
             _cacheStore.Setup(x => x.SetAsync(It.Is<string>(s => s.Equals(ExistingContextWithoutDID)),
                 It.Is<CacheItem>((o) => o.DID == did))).Returns(Task.CompletedTask);
 
-            await _ownIdProvider.SetDIDAsync(ExistingContextWithoutDID, did);
+            await _ownIdProvider.FinishAuthFlowSessionAsync(ExistingContextWithoutDID, did);
         }
 
         [Fact]
         public async Task GetDIDAsync_NotExistingElement()
         {
-            var result = await _ownIdProvider.GetDIDAsync(NotExistingContext, NotExistingNonce);
+            var result = await _ownIdProvider.PopFinishedAuthFlowSessionAsync(NotExistingContext, NotExistingNonce);
             Assert.False(result.isSuccess);
             Assert.Null(result.did);
         }
@@ -125,7 +129,7 @@ namespace OwnIdSdk.NetCore3.Tests
         [Fact]
         public async Task GetDIDAsync_WrongNonce()
         {
-            var result = await _ownIdProvider.GetDIDAsync(ExistingContextWithDID, NotExistingNonce);
+            var result = await _ownIdProvider.PopFinishedAuthFlowSessionAsync(ExistingContextWithDID, NotExistingNonce);
             Assert.False(result.isSuccess);
             Assert.Null(result.did);
         }
@@ -133,7 +137,7 @@ namespace OwnIdSdk.NetCore3.Tests
         [Fact]
         public async Task GetDIDAsync_ExistingWithoutDID()
         {
-            var result = await _ownIdProvider.GetDIDAsync(ExistingContextWithoutDID, _existingItemWithoutDID.Nonce);
+            var result = await _ownIdProvider.PopFinishedAuthFlowSessionAsync(ExistingContextWithoutDID, _existingItemWithoutDID.Nonce);
             Assert.False(result.isSuccess);
             Assert.Null(result.did);
         }
@@ -141,17 +145,9 @@ namespace OwnIdSdk.NetCore3.Tests
         [Fact]
         public async Task GetDIDAsync_ExistingWithDID()
         {
-            var result = await _ownIdProvider.GetDIDAsync(ExistingContextWithDID, _existingItemWithDID.Nonce);
+            var result = await _ownIdProvider.PopFinishedAuthFlowSessionAsync(ExistingContextWithDID, _existingItemWithDID.Nonce);
             Assert.True(result.isSuccess);
             Assert.Equal(_existingItemWithDID.DID, result.did);
-        }
-
-        [Fact]
-        public async Task RemoveContextAsync_ShouldRemoveFromStore()
-        {
-            _cacheStore.Setup(x => x.RemoveAsync(It.Is<string>(c => c.Equals(ExistingContextWithDID))))
-                .Returns(Task.CompletedTask);
-            await _ownIdProvider.RemoveContextAsync(ExistingContextWithDID);
         }
     }
 }

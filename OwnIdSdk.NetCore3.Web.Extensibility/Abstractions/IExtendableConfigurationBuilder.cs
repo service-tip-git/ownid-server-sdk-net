@@ -9,6 +9,9 @@ namespace OwnIdSdk.NetCore3.Web.Extensibility.Abstractions
         
         void AddOrUpdateFeature<TFeature>([NotNull] TFeature feature) where TFeature : class, IFeatureConfiguration;
 
+        void UseAccountLinking<TProfile, THandler>() where THandler : class, IAccountLinkHandler<TProfile>
+            where TProfile : class;
+
         void UseUserHandlerWithCustomProfile<TProfile, THandler>()
             where THandler : class, IUserHandler<TProfile> where TProfile : class;
     }

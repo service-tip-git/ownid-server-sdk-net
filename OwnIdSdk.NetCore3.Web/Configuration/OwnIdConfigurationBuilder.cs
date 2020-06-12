@@ -39,6 +39,12 @@ namespace OwnIdSdk.NetCore3.Web.Configuration
         /// </summary>
         public IServiceCollection Services { get; }
 
+        public void UseAccountLinking<TProfile, THandler>() where TProfile : class
+            where THandler : class, IAccountLinkHandler<TProfile>
+        {
+            WithFeature<AccountLinkFeature>(x => x.UseAccountLinking<TProfile, THandler>());
+        }
+
         /// <summary>
         ///     Sets <see cref="IUserHandler{TProfile}" /> for user authorization and profile update
         /// </summary>

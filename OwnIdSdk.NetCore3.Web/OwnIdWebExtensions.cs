@@ -1,8 +1,13 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using OwnIdSdk.NetCore3.Web.Configuration;
+using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Web.Features;
+using OwnIdSdk.NetCore3.Web.FlowEntries;
 using OwnIdSdk.NetCore3.Web.Middlewares;
 
 namespace OwnIdSdk.NetCore3.Web
@@ -25,6 +30,16 @@ namespace OwnIdSdk.NetCore3.Web
             routeBuilder.MapMiddlewarePost("ownid/{context}/status",
                 builder => builder.UseMiddleware<GetChallengeStatusMiddleware>());
 
+            var configuration = app.ApplicationServices.GetService<OwnIdConfiguration>();
+
+            if (configuration.FindFeature<AccountLinkFeature>() != null)
+            {
+                routeBuilder.MapMiddlewarePost("ownid/{context}/link",
+                    builder => builder.UseMiddleware<SaveAccountLinkMiddleware>());
+                routeBuilder.MapMiddlewareGet("ownid/{context}/link",
+                    builder => builder.UseMiddleware<GetAccountLinkDataMiddleware>());
+            }
+
             app.UseRouter(routeBuilder.Build());
         }
 
@@ -41,6 +56,7 @@ namespace OwnIdSdk.NetCore3.Web
             configureAction?.Invoke(builder);
             builder.Configuration.Validate();
             builder.Configuration.IntegrateFeatures(services);
+            services.TryAddTransient<IAccountLinkHandlerAdapter, AccountLinkHandlerAdapter<LocalizationFeature>>();
         }
     }
 }

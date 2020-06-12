@@ -40,12 +40,10 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 return;
             }
 
-            var didResult = await OwnIdProvider.GetDIDAsync(challengeContext, request.Nonce);
+            var didResult = await OwnIdProvider.PopFinishedAuthFlowSessionAsync(challengeContext, request.Nonce);
 
             if (didResult.isSuccess)
             {
-                await OwnIdProvider.RemoveContextAsync(challengeContext);
-
                 var result = await _userHandlerAdapter.OnSuccessLoginAsync(didResult.did);
 
                 await Json(context, result.Data, result.HttpCode, false);

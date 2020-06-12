@@ -12,16 +12,15 @@ using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
-    public class SaveProfileMiddleware : BaseMiddleware
+    public class SaveAccountLinkMiddleware : BaseMiddleware
     {
-        private readonly IUserHandlerAdapter _userHandlerAdapter;
+        private readonly IAccountLinkHandlerAdapter _accountLinkHandlerAdapter;
 
-        public SaveProfileMiddleware(RequestDelegate next, IUserHandlerAdapter userHandlerAdapter,
-            IOwnIdCoreConfiguration coreConfiguration, ICacheStore cacheStore,
-            ILocalizationService localizationService) : base(next, coreConfiguration, cacheStore,
-            localizationService)
+        public SaveAccountLinkMiddleware(RequestDelegate next, IAccountLinkHandlerAdapter accountLinkHandlerAdapter,
+            IOwnIdCoreConfiguration coreConfiguration, ICacheStore cacheStore, ILocalizationService localizationService)
+            : base(next, coreConfiguration, cacheStore, localizationService)
         {
-            _userHandlerAdapter = userHandlerAdapter;
+            _accountLinkHandlerAdapter = accountLinkHandlerAdapter;
         }
 
         protected override async Task Execute(HttpContext context)
@@ -31,7 +30,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(challengeContext);
 
             if (string.IsNullOrEmpty(challengeContext) || !OwnIdProvider.IsContextFormatValid(challengeContext) ||
-                cacheItem == null)
+                cacheItem == null || _accountLinkHandlerAdapter == null)
             {
                 NotFound(context.Response);
                 return;
@@ -47,11 +46,10 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
             var (jwtContext, userData) = OwnIdProvider.GetDataFromJwt<UserProfileData>(request.Jwt);
 
-            // preventing data substitution 
             challengeContext = jwtContext;
-
-            var formContext = _userHandlerAdapter.CreateUserDefinedContext(userData, LocalizationService);
-
+            userData.DID = cacheItem.DID;
+            
+            var formContext = _accountLinkHandlerAdapter.CreateUserDefinedContext(userData, LocalizationService);
             formContext.Validate();
 
             if (formContext.HasErrors)
@@ -64,8 +62,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 return;
             }
 
-            await _userHandlerAdapter.UpdateProfileAsync(formContext);
-
+            await _accountLinkHandlerAdapter.OnLink(formContext);
+            
             if (!formContext.HasErrors)
             {
                 await OwnIdProvider.FinishAuthFlowSessionAsync(challengeContext, userData.DID);

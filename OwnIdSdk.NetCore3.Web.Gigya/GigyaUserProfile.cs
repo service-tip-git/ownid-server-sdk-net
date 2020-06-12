@@ -12,11 +12,9 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
         public string Email { get; set; }
         
         [OwnIdField(Constants.DefaultFirstNameLabel, Constants.DefaultFirstNameLabel)]
-        [Required]
         public string FirstName { get; set; }
         
         [OwnIdField(Constants.DefaultLastNameLabel, Constants.DefaultLastNameLabel)]
-        [Required]
         public string LastName { get; set; }
 
         [OwnIdField("Nickname", "Nickname")]
