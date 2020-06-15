@@ -72,7 +72,7 @@ namespace OwnIdSdk.NetCore3
         {
             var deepLink = new UriBuilder(_ownIdCoreConfiguration.OwnIdApplicationUrl);
             var query = HttpUtility.ParseQueryString(deepLink.Query);
-            query["t"] = challengeType.ToString().Substring(0, 1).ToLowerInvariant();
+            query["t"] = challengeType.ToString().Substring(0, 2).ToLowerInvariant();
             var callbackUrl = GenerateCallbackUrl(context, challengeType);
             query["q"] = $"{callbackUrl.Authority}{callbackUrl.PathAndQuery}";
 
