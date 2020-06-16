@@ -72,7 +72,6 @@ spec:
       containers:
         - name: ownid-server-netcore3-gigya-2
           image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging:latest
-          imagePullPolicy: Never
           ports:
             - containerPort: 5002
           env:
