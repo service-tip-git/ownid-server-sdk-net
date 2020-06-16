@@ -121,8 +121,7 @@ namespace OwnIdSdk.NetCore3
         /// <returns>Base64 encoded string that contains JWT</returns>
         public string GenerateChallengeJwt(string context, ChallengeType challengeType, string locale = null)
         {
-            var data = GetBaseConfigFieldsDictionary(context, challengeType,
-                challengeType == ChallengeType.Register ? GenerateUserDid() : null, locale);
+            var data = GetBaseConfigFieldsDictionary(context, challengeType, GenerateUserDid(), locale);
 
             return GenerateDataJwt(data);
         }
@@ -286,12 +285,13 @@ namespace OwnIdSdk.NetCore3
             return new Dictionary<string, object>{{"linkProfile", profile}};
         }
 
-        private Dictionary<string, object> GetBaseConfigFieldsDictionary(string context, ChallengeType challengeType, string did = null, string locale = null)
+        private Dictionary<string, object> GetBaseConfigFieldsDictionary(string context, ChallengeType challengeType, string did, string locale = null)
         {
             var data = new Dictionary<string, object>
             {
                 {"jti", context},
                 {"locale", locale},
+                {"did", did},
                 {"callback", GenerateCallbackUrl(context, challengeType)},
                 {
                     "requester", new
@@ -327,9 +327,6 @@ namespace OwnIdSdk.NetCore3
                     })
                 }
             };
-            
-            if(!string.IsNullOrEmpty(did))
-                data.Add("did", did);
 
             return data;
         }
