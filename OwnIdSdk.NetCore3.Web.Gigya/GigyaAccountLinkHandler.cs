@@ -96,6 +96,12 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             var setAccountMessage =
                 await _restApiClient.SetAccountInfo(context.DID, context.Profile, new {pubKey = context.PublicKey});
+            
+            if (setAccountMessage.ErrorCode == 403043)
+            {
+                context.SetError(x => x.Email, setAccountMessage.ErrorMessage);
+                return;
+            }
 
             if (setAccountMessage.ErrorCode != 0)
                 throw new Exception(
