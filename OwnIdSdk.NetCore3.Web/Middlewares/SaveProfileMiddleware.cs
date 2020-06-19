@@ -26,12 +26,15 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
         protected override async Task Execute(HttpContext context)
         {
-            var routeData = context.GetRouteData();
-            var challengeContext = routeData.Values["context"]?.ToString();
-            var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(challengeContext);
+            if (!TryGetRequestIdentity(context, out var requestIdentity) ||
+                !OwnIdProvider.IsContextFormatValid(requestIdentity.Context))
+            {
+                NotFound(context.Response);
+                return;
+            }
 
-            if (string.IsNullOrEmpty(challengeContext) || !OwnIdProvider.IsContextFormatValid(challengeContext) ||
-                cacheItem == null)
+            var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(requestIdentity.Context);
+            if (cacheItem == null || cacheItem.RequestToken != requestIdentity.RequestToken)
             {
                 NotFound(context.Response);
                 return;
@@ -46,9 +49,12 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             }
 
             var (jwtContext, userData) = OwnIdProvider.GetDataFromJwt<UserProfileData>(request.Jwt);
-
-            // preventing data substitution 
-            challengeContext = jwtContext;
+            
+            if (jwtContext != requestIdentity.Context )
+            {
+                BadRequest(context.Response);
+                return;
+            }
 
             var formContext = _userHandlerAdapter.CreateUserDefinedContext(userData, LocalizationService);
 
@@ -68,7 +74,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
             if (!formContext.HasErrors)
             {
-                await OwnIdProvider.FinishAuthFlowSessionAsync(challengeContext, userData.DID);
+                await OwnIdProvider.FinishAuthFlowSessionAsync(requestIdentity.Context, userData.DID);
                 Ok(context.Response);
             }
             else

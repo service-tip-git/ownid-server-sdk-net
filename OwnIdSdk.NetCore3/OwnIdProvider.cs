@@ -191,6 +191,23 @@ namespace OwnIdSdk.NetCore3
         }
 
         /// <summary>
+        /// Sets Web App request token to check in with the next request
+        /// </summary>
+        /// <param name="context">Challenge unique identifier</param>
+        /// <param name="token">Web App request token</param>
+        /// <exception cref="ArgumentException">If no <see cref="CacheItem" /> was found with <paramref name="context" /></exception>
+        public async Task SetRequestTokenAsync(string context, string token)
+        {
+            var cacheItem = await _cacheStore.GetAsync(context);
+
+            if (cacheItem == null)
+                throw new ArgumentException($"Can not find any item with context '{context}'");
+
+            cacheItem.RequestToken = token;
+            await _cacheStore.SetAsync(context, cacheItem);
+        }
+
+        /// <summary>
         ///     Try to find auth flow session item by <paramref name="context" /> in <see cref="ICacheStore" /> mark it as finish
         /// </summary>
         /// <param name="context">Challenge unique identifier</param>

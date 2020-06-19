@@ -5,8 +5,10 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Routing;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Store;
+using OwnIdSdk.NetCore3.Web.FlowEntries;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
@@ -75,12 +77,25 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine(e.ToString());
+                await Console.Error.WriteLineAsync(e.ToString());
                 context.Response.Clear();
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = "text/html";
                 await context.Response.WriteAsync("Operation failed. Please try later");
             }
+        }
+
+        protected bool TryGetRequestIdentity(HttpContext context, out (string Context, string RequestToken) identity)
+        {
+            var routeData = context.GetRouteData();
+            var challengeContext = routeData.Values["context"]?.ToString();
+            var isValidRequestIdentity = !string.IsNullOrWhiteSpace(challengeContext) &&
+                                           context.Request.Query.TryGetValue("rt", out var requestToken) &&
+                                           !string.IsNullOrWhiteSpace(requestToken.ToString());
+
+            identity = isValidRequestIdentity ? (challengeContext, requestToken.ToString()) : default;
+            
+            return isValidRequestIdentity;
         }
     }
 }

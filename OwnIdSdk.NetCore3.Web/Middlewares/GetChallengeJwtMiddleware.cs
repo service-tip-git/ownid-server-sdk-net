@@ -17,24 +17,25 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
         protected override async Task Execute(HttpContext context)
         {
-            var routeData = context.GetRouteData();
-            var challengeContext = routeData.Values["context"]?.ToString();
-
-            var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(challengeContext);
-
-            if (string.IsNullOrEmpty(challengeContext) || !OwnIdProvider.IsContextFormatValid(challengeContext) ||
-                cacheItem == null)
+            if (TryGetRequestIdentity(context, out var requestIdentity))
             {
-                NotFound(context.Response);
-                return;
+                var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(requestIdentity.Context);
+                if (OwnIdProvider.IsContextFormatValid(requestIdentity.Context) && cacheItem != null)
+                {
+                    var culture = GetRequestCulture(context);
+
+                    await OwnIdProvider.SetRequestTokenAsync(requestIdentity.Context, requestIdentity.RequestToken);
+
+                    await Json(context, new JwtContainer
+                    {
+                        Jwt = OwnIdProvider.GenerateChallengeJwt(requestIdentity.Context, cacheItem.ChallengeType, culture.Name)
+                    }, StatusCodes.Status200OK);
+                    
+                    return;
+                }
             }
-
-            var culture = GetRequestCulture(context);
-
-            await Json(context, new JwtContainer
-            {
-                Jwt = OwnIdProvider.GenerateChallengeJwt(challengeContext, cacheItem.ChallengeType, culture.Name)
-            }, StatusCodes.Status200OK);
+            
+            NotFound(context.Response);
         }
     }
 }

@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
@@ -21,26 +20,26 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
         protected override async Task Execute(HttpContext context)
         {
-            var routeData = context.GetRouteData();
-            var challengeContext = routeData.Values["context"]?.ToString();
-
-            var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(challengeContext);
-
-            if (string.IsNullOrEmpty(challengeContext) || !OwnIdProvider.IsContextFormatValid(challengeContext) ||
-                cacheItem == null)
+            if (TryGetRequestIdentity(context, out var requestIdentity))
             {
-                NotFound(context.Response);
-                return;
+                var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(requestIdentity.Context);
+                if (OwnIdProvider.IsContextFormatValid(requestIdentity.Context) && cacheItem != null)
+                {
+                    var profile = await _linkHandlerAdapter.GetUserProfileAsync(cacheItem.DID);
+                    var culture = GetRequestCulture(context);
+                    await OwnIdProvider.SetRequestTokenAsync(requestIdentity.Context, requestIdentity.RequestToken);
+
+                    await Json(context, new JwtContainer
+                    {
+                        Jwt = OwnIdProvider.GenerateLinkAccountJwt(requestIdentity.Context, cacheItem.ChallengeType, cacheItem.DID,
+                            profile, culture.Name)
+                    }, StatusCodes.Status200OK);
+                    
+                    return;
+                }
             }
-
-            var profile = await _linkHandlerAdapter.GetUserProfileAsync(cacheItem.DID);
-            var culture = GetRequestCulture(context);
-
-            await Json(context, new JwtContainer
-            {
-                Jwt = OwnIdProvider.GenerateLinkAccountJwt(challengeContext, cacheItem.ChallengeType, cacheItem.DID,
-                    profile, culture.Name)
-            }, StatusCodes.Status200OK);
+            
+            NotFound(context.Response);
         }
     }
 }
