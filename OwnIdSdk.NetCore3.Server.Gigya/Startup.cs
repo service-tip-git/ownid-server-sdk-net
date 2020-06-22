@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
@@ -7,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OwnIdSdk.NetCore3.Web;
 using OwnIdSdk.NetCore3.Web.Gigya;
+using Serilog;
+using Serilog.Sinks.Elasticsearch;
 
 namespace OwnIdSdk.NetCore3.Server.Gigya
 {
@@ -15,6 +18,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            ConfigureLogging();
         }
 
         public IConfiguration Configuration { get; }
@@ -81,6 +85,40 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             });
             app.UseCors(CorsPolicyName);
             app.UseOwnId();
+        }
+
+        private void ConfigureLogging()
+        {
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var elasticSection = Configuration.GetSection("ElasticConfiguration");
+            var elasticLoggingEnabled = Convert.ToBoolean(elasticSection["Enabled"]);
+
+            var logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .Enrich.WithMachineName()
+                .WriteTo.Debug()
+                .WriteTo.Console();
+
+             Console.WriteLine($"ELK_LOGGING_ENABLED is {elasticLoggingEnabled.ToString()}");
+
+            if (elasticLoggingEnabled)
+            {
+                logger.WriteTo.Elasticsearch(ConfigureElasticSink(elasticSection, environment));
+            }
+
+            Log.Logger = logger.Enrich.WithProperty("Environment", environment)
+            .ReadFrom.Configuration(Configuration)
+            .CreateLogger();
+        }
+
+        private ElasticsearchSinkOptions ConfigureElasticSink(IConfigurationSection configuration, string environment)
+        {
+            return new ElasticsearchSinkOptions(new Uri(configuration["Uri"]))
+            {
+                AutoRegisterTemplate = true,
+                IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
+                ModifyConnectionSettings = x => x.BasicAuthentication(configuration["Username"], configuration["Password"]),
+            };
         }
     }
 }
