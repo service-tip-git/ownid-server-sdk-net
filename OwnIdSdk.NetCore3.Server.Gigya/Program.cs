@@ -63,7 +63,11 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
             if (Convert.ToBoolean(configuration["ElasticConfiguration:Enabled"]))
             {
+                Console.Write("Logging to ELK is enabled");
                 logger.WriteTo.Elasticsearch(ConfigureElasticSink(configuration, environment));
+            }
+            else {
+                Console.Write("Logging to ELK is disabled");
             }
 
             Log.Logger = logger.Enrich.WithProperty("Environment", environment)
