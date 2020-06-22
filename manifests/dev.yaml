@@ -38,6 +38,8 @@ spec:
               value: g157+kUR3kxvgIX4MneEWnVgBVzhQe4dXfoNe9ceSNA=
             - name: GIGYA__API_KEY
               value: 3_s5-gLs4aLp5FXluP8HXs7_JN40XWNlbvYWVCCkbNCqlhW6Sm5Z4tXGGsHcSJYD3W 
+            - name: ELASTICCONFIGURATION__ENABLED
+              value: true
 ---
 apiVersion: v1
 kind: Service
@@ -91,6 +93,8 @@ spec:
               value: g157+kUR3kxvgIX4MneEWnVgBVzhQe4dXfoNe9ceSNA=
             - name: GIGYA__API_KEY
               value: 3_s5-gLs4aLp5FXluP8HXs7_JN40XWNlbvYWVCCkbNCqlhW6Sm5Z4tXGGsHcSJYD3W 
+            - name: ELASTICCONFIGURATION__ENABLED
+              value: true
 ---
 apiVersion: v1
 kind: Service
@@ -145,6 +149,8 @@ spec:
               value: 0Hg/R8a/riSbbPiACeQZNFvg3c7s0f9uMx+BKaliaU8=
             - name: GIGYA__API_KEY
               value: 3_hOdIVleWrXNvjArcZRwHJLiGA4e6Jrcwq7RfH5nL7ZUHyI_77z43_IQrJYxLbiq_
+            - name: ELASTICCONFIGURATION__ENABLED
+              value: true
 ---
 apiVersion: v1
 kind: Service

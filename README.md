@@ -36,3 +36,11 @@ Sometimes you can face a problem that nothing was changed and you still see brow
 - *GIGYA__SECRET* - gigya account secret
 - *GIGYA__API_KEY* - gigya account api key
 - *GIGYA__SEGMENT* - gigya segment
+
+## Logging logs are available in Kibana
+
+Kibana link: https://search-ownid-logs-yjr6aqw5uk7ezojoejxr4tpeim.us-east-2.es.amazonaws.com/_plugin/kibana/
+
+Username: ownid
+
+Password: Ownid_321
