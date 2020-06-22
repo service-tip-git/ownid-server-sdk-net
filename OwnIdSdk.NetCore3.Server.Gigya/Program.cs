@@ -36,13 +36,13 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 {
                     webBuilder.UseStartup<Startup>();
                 })
-                .ConfigureAppConfiguration(configuration =>
-                {
-                    configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-                    configuration.AddJsonFile(
-                        $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json",
-                        optional: true);
-                })
+                // .ConfigureAppConfiguration(configuration =>
+                // {
+                //     configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                //     configuration.AddJsonFile(
+                //         $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json",
+                //         optional: true);
+                // })
                 .UseSerilog();
 
         private static void ConfigureLogging()
