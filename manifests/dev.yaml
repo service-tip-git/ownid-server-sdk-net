@@ -39,7 +39,7 @@ spec:
             - name: GIGYA__API_KEY
               value: 3_s5-gLs4aLp5FXluP8HXs7_JN40XWNlbvYWVCCkbNCqlhW6Sm5Z4tXGGsHcSJYD3W 
             - name: ELASTICCONFIGURATION__ENABLED
-              value: true
+              value: 'true'
 ---
 apiVersion: v1
 kind: Service
@@ -94,7 +94,7 @@ spec:
             - name: GIGYA__API_KEY
               value: 3_s5-gLs4aLp5FXluP8HXs7_JN40XWNlbvYWVCCkbNCqlhW6Sm5Z4tXGGsHcSJYD3W 
             - name: ELASTICCONFIGURATION__ENABLED
-              value: true
+              value: 'true'
 ---
 apiVersion: v1
 kind: Service
@@ -150,7 +150,7 @@ spec:
             - name: GIGYA__API_KEY
               value: 3_hOdIVleWrXNvjArcZRwHJLiGA4e6Jrcwq7RfH5nL7ZUHyI_77z43_IQrJYxLbiq_
             - name: ELASTICCONFIGURATION__ENABLED
-              value: true
+              value: 'true'
 ---
 apiVersion: v1
 kind: Service
