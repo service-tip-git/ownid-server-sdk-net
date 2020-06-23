@@ -85,7 +85,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             }
         }
 
-        protected bool TryGetRequestIdentity(HttpContext context, out (string Context, string RequestToken) identity)
+        protected bool TryGetRequestIdentity(HttpContext context, out (string Context, string RequestToken, string ResponseToken) identity)
         {
             var routeData = context.GetRouteData();
             var challengeContext = routeData.Values["context"]?.ToString();
@@ -93,7 +93,9 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                                            context.Request.Query.TryGetValue("rt", out var requestToken) &&
                                            !string.IsNullOrWhiteSpace(requestToken.ToString());
 
-            identity = isValidRequestIdentity ? (challengeContext, requestToken.ToString()) : default;
+            context.Request.Query.TryGetValue("rst", out var responseToken);
+            
+            identity = isValidRequestIdentity ? (challengeContext, requestToken.ToString(), responseToken) : default;
             
             return isValidRequestIdentity;
         }

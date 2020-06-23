@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -101,13 +104,14 @@ namespace OwnIdSdk.NetCore3
         /// <param name="did">User unique identity</param>
         /// <param name="profile">User profile</param>
         /// <param name="locale">Optional. Content locale</param>
-        /// <returns>Base64 encoded string that contains JWT</returns>
-        public string GenerateLinkAccountJwt(string context, ChallengeType challengeType, string did, object profile,
+        /// <returns>Base64 encoded string that contains JWT with hash</returns>
+        public (string Jwt, string Hash) GenerateLinkAccountJwt(string context, ChallengeType challengeType, string did, object profile,
             string locale = null)
         {
             var data = GetBaseConfigFieldsDictionary(context, challengeType, did, locale)
                 .Union(GetProfileDataDictionary(profile))
                 .ToDictionary(x => x.Key, x => x.Value);
+            
             return GenerateDataJwt(data);
         }
 
@@ -118,8 +122,8 @@ namespace OwnIdSdk.NetCore3
         /// <param name="context">Challenge Unique identifier</param>
         /// <param name="challengeType">Requested <see cref="ChallengeType" /></param>
         /// <param name="locale">Optional. Content locale</param>
-        /// <returns>Base64 encoded string that contains JWT</returns>
-        public string GenerateChallengeJwt(string context, ChallengeType challengeType, string locale = null)
+        /// <returns>Base64 encoded string that contains JWT with hash</returns>
+        public (string Jwt, string Hash) GenerateChallengeJwt(string context, ChallengeType challengeType, string locale = null)
         {
             var data = GetBaseConfigFieldsDictionary(context, challengeType, GenerateUserDid(), locale);
 
@@ -206,6 +210,23 @@ namespace OwnIdSdk.NetCore3
             cacheItem.RequestToken = token;
             await _cacheStore.SetAsync(context, cacheItem);
         }
+        
+        /// <summary>
+        /// Sets Web App response token to check in with the next request
+        /// </summary>
+        /// <param name="context">Challenge unique identifier</param>
+        /// <param name="token">Web App response token</param>
+        /// <exception cref="ArgumentException">If no <see cref="CacheItem" /> was found with <paramref name="context" /></exception>
+        public async Task SetResponseTokenAsync(string context, string token)
+        {
+            var cacheItem = await _cacheStore.GetAsync(context);
+
+            if (cacheItem == null)
+                throw new ArgumentException($"Can not find any item with context '{context}'");
+
+            cacheItem.ResponseToken = token;
+            await _cacheStore.SetAsync(context, cacheItem);
+        }
 
         /// <summary>
         ///     Try to find auth flow session item by <paramref name="context" /> in <see cref="ICacheStore" /> mark it as finish
@@ -279,7 +300,7 @@ namespace OwnIdSdk.NetCore3
             return Regex.IsMatch(context, "^([a-zA-Z0-9_-]{22})$");
         }
         
-        private string GenerateDataJwt(Dictionary<string, object> data, TimeSpan? expiration = null)
+        private (string Jwt, string Hash) GenerateDataJwt(Dictionary<string, object> data, TimeSpan? expiration = null)
         {
             var rsaSecurityKey = new RsaSecurityKey(_ownIdCoreConfiguration.JwtSignCredentials);
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -294,7 +315,14 @@ namespace OwnIdSdk.NetCore3
             var jwt = new JwtSecurityToken(
                 new JwtHeader(new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)), payload);
 
-            return tokenHandler.WriteToken(jwt);
+            var tokenStr = tokenHandler.WriteToken(jwt);
+
+            using var sha1 = new SHA1Managed();
+
+            var b64 = Encoding.UTF8.GetBytes(tokenStr);
+            var hash =sha1.ComputeHash(b64);
+
+            return (tokenStr, Convert.ToBase64String(hash));
         }
 
         private Dictionary<string, object> GetProfileDataDictionary(object profile)

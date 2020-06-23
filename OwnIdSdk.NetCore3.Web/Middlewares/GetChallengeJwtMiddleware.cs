@@ -26,9 +26,13 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
                     await OwnIdProvider.SetRequestTokenAsync(requestIdentity.Context, requestIdentity.RequestToken);
 
+                    var tokenData = OwnIdProvider.GenerateChallengeJwt(requestIdentity.Context, cacheItem.ChallengeType,
+                        culture.Name);
+                    await OwnIdProvider.SetResponseTokenAsync(cacheItem.Context, tokenData.Hash);
+
                     await Json(context, new JwtContainer
                     {
-                        Jwt = OwnIdProvider.GenerateChallengeJwt(requestIdentity.Context, cacheItem.ChallengeType, culture.Name)
+                        Jwt = tokenData.Jwt
                     }, StatusCodes.Status200OK);
                     
                     return;

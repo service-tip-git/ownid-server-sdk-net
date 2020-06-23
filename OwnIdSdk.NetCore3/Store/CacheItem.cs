@@ -39,6 +39,11 @@ namespace OwnIdSdk.NetCore3.Store
         public string RequestToken { get; set; }
         
         /// <summary>
+        /// Request Token to send to Web App
+        /// </summary>
+        public string ResponseToken { get; set; }
+        
+        /// <summary>
         /// Creates new instance of <see cref="CacheItem"/> based on <see cref="Nonce"/> and <see cref="DID"/>
         /// </summary>
         public object Clone()
@@ -50,6 +55,7 @@ namespace OwnIdSdk.NetCore3.Store
                 ChallengeType = ChallengeType,
                 IsFinished = IsFinished,
                 RequestToken = RequestToken,
+                ResponseToken = ResponseToken,
                 Context = Context
             };
         }

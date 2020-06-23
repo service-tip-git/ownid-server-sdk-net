@@ -29,10 +29,15 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                     var culture = GetRequestCulture(context);
                     await OwnIdProvider.SetRequestTokenAsync(requestIdentity.Context, requestIdentity.RequestToken);
 
+                    var tokenData = OwnIdProvider.GenerateLinkAccountJwt(requestIdentity.Context,
+                        cacheItem.ChallengeType, cacheItem.DID,
+                        profile, culture.Name);
+
+                    await OwnIdProvider.SetResponseTokenAsync(cacheItem.Context, tokenData.Hash);
+                    
                     await Json(context, new JwtContainer
                     {
-                        Jwt = OwnIdProvider.GenerateLinkAccountJwt(requestIdentity.Context, cacheItem.ChallengeType, cacheItem.DID,
-                            profile, culture.Name)
+                        Jwt = tokenData.Jwt
                     }, StatusCodes.Status200OK);
                     
                     return;

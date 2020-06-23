@@ -33,7 +33,9 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             }
 
             var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(requestIdentity.Context);
-            if (cacheItem == null || cacheItem.RequestToken != requestIdentity.RequestToken)
+            if (cacheItem == null || cacheItem.RequestToken != requestIdentity.RequestToken ||
+                string.IsNullOrEmpty(cacheItem.ResponseToken) ||
+                cacheItem.ResponseToken != requestIdentity.ResponseToken)
             {
                 NotFound(context.Response);
                 return;
