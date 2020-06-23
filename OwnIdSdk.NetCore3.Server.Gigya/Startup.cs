@@ -60,6 +60,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         x.OwnIdApplicationUrl = new Uri(ownIdSection["web_app_url"]);
                     });
                 });
+
+            services.AddHostedService<CpuMemoryLogService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
