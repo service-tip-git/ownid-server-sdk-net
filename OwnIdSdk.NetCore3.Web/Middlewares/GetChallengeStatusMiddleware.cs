@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts;
 using OwnIdSdk.NetCore3.Store;
@@ -15,8 +16,9 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
         public GetChallengeStatusMiddleware(RequestDelegate next, IUserHandlerAdapter userHandlerAdapter,
             IOwnIdCoreConfiguration coreConfiguration, ICacheStore cacheStore,
-            ILocalizationService localizationService) : base(next, coreConfiguration, cacheStore,
-            localizationService)
+            ILocalizationService localizationService, ILogger<GetChallengeStatusMiddleware> logger) : base(next,
+            coreConfiguration, cacheStore,
+            localizationService, logger)
         {
             _userHandlerAdapter = userHandlerAdapter;
         }

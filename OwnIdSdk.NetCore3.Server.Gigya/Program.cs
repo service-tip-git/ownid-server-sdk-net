@@ -1,10 +1,8 @@
 using System;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Serilog.Sinks.Elasticsearch;
 
 namespace OwnIdSdk.NetCore3.Server.Gigya
 {
@@ -16,7 +14,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             {
                 CreateHostBuilder(args).Build().Run();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Log.Fatal($"Failed to start {Assembly.GetExecutingAssembly().GetName().Name}", ex);
                 throw;
@@ -26,12 +24,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                })
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
                 .UseSerilog();
-
         }
     }
 }

@@ -9,12 +9,15 @@ using Microsoft.Extensions.Hosting;
 using OwnIdSdk.NetCore3.Web;
 using OwnIdSdk.NetCore3.Web.Gigya;
 using Serilog;
+using Serilog.Formatting.Elasticsearch;
 using Serilog.Sinks.Elasticsearch;
 
 namespace OwnIdSdk.NetCore3.Server.Gigya
 {
     public class Startup
     {
+        private const string CorsPolicyName = "AllowAll";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -23,7 +26,6 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
         public IConfiguration Configuration { get; }
 
-        private const string CorsPolicyName = "AllowAll";
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -40,13 +42,13 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
             var ownIdSection = Configuration.GetSection("ownid");
             var gigyaSection = Configuration.GetSection("gigya");
-            
+
             services.AddOwnId(
                 builder =>
                 {
                     builder.UseGigya(gigyaSection["data_center"], gigyaSection["api_key"], gigyaSection["secret"]);
                     builder.SetKeys(ownIdSection["pub_key"], ownIdSection["private_key"]);
-                    
+
                     builder.WithBaseSettings(x =>
                     {
                         x.DID = ownIdSection["did"];
@@ -54,13 +56,14 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         x.Description = ownIdSection["description"];
                         x.Icon = ownIdSection["icon"];
                         x.CallbackUrl = new Uri(ownIdSection["callback_url"]);
-                            
+
                         //for development cases
                         x.IsDevEnvironment = Configuration.GetValue("OwnIdDevelopmentMode", false);
                         x.OwnIdApplicationUrl = new Uri(ownIdSection["web_app_url"]);
                     });
                 });
 
+            // TODO: not for prod
             services.AddHostedService<CpuMemoryLogService>();
         }
 
@@ -83,9 +86,12 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 x.AddSupportedCultures("ru", "es", "en");
                 x.DefaultRequestCulture = new RequestCulture("en", "en");
                 x.AddSupportedUICultures("ru", "en", "es");
-                
             });
             app.UseCors(CorsPolicyName);
+            
+            // TODO: not for prod
+            app.UseMiddleware<LogRequestMiddleware>();
+            
             app.UseOwnId();
         }
 
@@ -101,16 +107,17 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 .WriteTo.Debug()
                 .WriteTo.Console();
 
-             Console.WriteLine($"ELK_LOGGING_ENABLED is {elasticLoggingEnabled.ToString()}");
+            Console.WriteLine($"ELK_LOGGING_ENABLED is {elasticLoggingEnabled.ToString()}");
 
             if (elasticLoggingEnabled)
             {
-                logger.WriteTo.Elasticsearch(ConfigureElasticSink(elasticSection, environment));
+                logger.WriteTo.Elasticsearch(ConfigureElasticSink(elasticSection, environment))
+                    .Enrich.WithProperty("source", "net-core-3-sdk");
             }
 
-            Log.Logger = logger.Enrich.WithProperty("Environment", environment)
-            .ReadFrom.Configuration(Configuration)
-            .CreateLogger();
+            Log.Logger = logger.Enrich.WithProperty("environment", environment)
+                .ReadFrom.Configuration(Configuration)
+                .CreateLogger();
         }
 
         private ElasticsearchSinkOptions ConfigureElasticSink(IConfigurationSection configuration, string environment)
@@ -118,8 +125,13 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             return new ElasticsearchSinkOptions(new Uri(configuration["Uri"]))
             {
                 AutoRegisterTemplate = true,
-                IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
-                ModifyConnectionSettings = x => x.BasicAuthentication(configuration["Username"], configuration["Password"]),
+                IndexFormat =
+                    $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{(environment ?? "development").ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
+                ModifyConnectionSettings = x =>
+                    x.BasicAuthentication(configuration["Username"], configuration["Password"]),
+                InlineFields = true,
+                OverwriteTemplate = true,
+                CustomFormatter = new ElasticsearchJsonFormatter(renderMessageTemplate: false, inlineFields: true)
             };
         }
     }

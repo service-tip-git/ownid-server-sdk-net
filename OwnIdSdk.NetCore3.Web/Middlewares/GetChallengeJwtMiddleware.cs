@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
@@ -9,10 +9,14 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public class GetChallengeJwtMiddleware : BaseMiddleware
     {
+        private readonly ILogger<GetChallengeJwtMiddleware> _logger;
+
         public GetChallengeJwtMiddleware(RequestDelegate next, IOwnIdCoreConfiguration coreConfiguration,
-            ICacheStore cacheStore, ILocalizationService localizationService) : base(next, coreConfiguration,
-            cacheStore, localizationService)
+            ICacheStore cacheStore, ILocalizationService localizationService, ILogger<GetChallengeJwtMiddleware> logger)
+            : base(next, coreConfiguration,
+                cacheStore, localizationService, logger)
         {
+            _logger = logger;
         }
 
         protected override async Task Execute(HttpContext context)
@@ -34,11 +38,12 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                     {
                         Jwt = tokenData.Jwt
                     }, StatusCodes.Status200OK);
-                    
+
                     return;
                 }
             }
-            
+
+            _logger.LogDebug("Failed request identity validation or cache item doesn't exist");
             NotFound(context.Response);
         }
     }

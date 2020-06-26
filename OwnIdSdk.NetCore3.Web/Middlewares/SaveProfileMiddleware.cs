@@ -3,7 +3,7 @@ using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
@@ -15,13 +15,15 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     public class SaveProfileMiddleware : BaseMiddleware
     {
         private readonly IUserHandlerAdapter _userHandlerAdapter;
+        private readonly ILogger<SaveProfileMiddleware> _logger;
 
         public SaveProfileMiddleware(RequestDelegate next, IUserHandlerAdapter userHandlerAdapter,
             IOwnIdCoreConfiguration coreConfiguration, ICacheStore cacheStore,
-            ILocalizationService localizationService) : base(next, coreConfiguration, cacheStore,
-            localizationService)
+            ILocalizationService localizationService, ILogger<SaveProfileMiddleware> logger) : base(next, coreConfiguration, cacheStore,
+            localizationService, logger)
         {
             _userHandlerAdapter = userHandlerAdapter;
+            _logger = logger;
         }
 
         protected override async Task Execute(HttpContext context)
@@ -29,6 +31,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             if (!TryGetRequestIdentity(context, out var requestIdentity) ||
                 !OwnIdProvider.IsContextFormatValid(requestIdentity.Context))
             {
+                _logger.LogDebug("Failed request identity validation");
                 NotFound(context.Response);
                 return;
             }
@@ -38,6 +41,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 string.IsNullOrEmpty(cacheItem.ResponseToken) ||
                 cacheItem.ResponseToken != requestIdentity.ResponseToken)
             {
+                _logger.LogDebug("No such cache item or incorrect request/response token");
                 NotFound(context.Response);
                 return;
             }

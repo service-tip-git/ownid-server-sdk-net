@@ -6,28 +6,40 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Store;
-using OwnIdSdk.NetCore3.Web.FlowEntries;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public abstract class BaseMiddleware
     {
+        protected readonly ILogger Logger;
         protected readonly ILocalizationService LocalizationService;
         protected readonly RequestDelegate Next;
         protected readonly OwnIdProvider OwnIdProvider;
 
         protected BaseMiddleware(RequestDelegate next, IOwnIdCoreConfiguration coreConfiguration,
-            ICacheStore cacheStore, ILocalizationService localizationService)
+            ICacheStore cacheStore, ILocalizationService localizationService, ILogger logger)
         {
             Next = next;
             LocalizationService = localizationService;
             OwnIdProvider = new OwnIdProvider(coreConfiguration, cacheStore, LocalizationService);
+            Logger = logger;
         }
+
+        public string Context { get; private set; }
 
         public async Task InvokeAsync(HttpContext context)
         {
+            var routeData = context.GetRouteData();
+            Context = routeData.Values["context"]?.ToString();
+
+            using var scope = Logger.BeginScope(new
+            {
+                context = Context
+            });
+            
             await InterceptErrors(Execute, context);
         }
 
@@ -69,7 +81,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             return rqf.RequestCulture.Culture;
         }
 
-        protected async Task InterceptErrors(Func<HttpContext, Task> functionToInvoke, HttpContext context)
+        private async Task InterceptErrors(Func<HttpContext, Task> functionToInvoke, HttpContext context)
         {
             try
             {
@@ -77,7 +89,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             }
             catch (Exception e)
             {
-                await Console.Error.WriteLineAsync(e.ToString());
+                Logger.LogError(e, "Middleware error interceptor");
                 context.Response.Clear();
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = "text/html";
@@ -85,18 +97,17 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             }
         }
 
-        protected bool TryGetRequestIdentity(HttpContext context, out (string Context, string RequestToken, string ResponseToken) identity)
+        protected bool TryGetRequestIdentity(HttpContext context,
+            out (string Context, string RequestToken, string ResponseToken) identity)
         {
-            var routeData = context.GetRouteData();
-            var challengeContext = routeData.Values["context"]?.ToString();
-            var isValidRequestIdentity = !string.IsNullOrWhiteSpace(challengeContext) &&
-                                           context.Request.Query.TryGetValue("rt", out var requestToken) &&
-                                           !string.IsNullOrWhiteSpace(requestToken.ToString());
+            var isValidRequestIdentity = !string.IsNullOrWhiteSpace(Context) &&
+                                         context.Request.Query.TryGetValue("rt", out var requestToken) &&
+                                         !string.IsNullOrWhiteSpace(requestToken.ToString());
 
             context.Request.Query.TryGetValue("rst", out var responseToken);
-            
-            identity = isValidRequestIdentity ? (challengeContext, requestToken.ToString(), responseToken) : default;
-            
+
+            identity = isValidRequestIdentity ? (Context, requestToken.ToString(), responseToken) : default;
+
             return isValidRequestIdentity;
         }
     }

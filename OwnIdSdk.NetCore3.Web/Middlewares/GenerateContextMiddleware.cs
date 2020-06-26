@@ -14,22 +14,18 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     public class GenerateContextMiddleware : BaseMiddleware
     {
         private readonly IAccountLinkHandlerAdapter _linkHandlerAdapter;
-        private readonly ILogger _logger;
 
         public GenerateContextMiddleware(RequestDelegate next, ICacheStore cacheStore,
             IOwnIdCoreConfiguration coreConfiguration, ILocalizationService localizationService, ILogger<GenerateContextMiddleware> logger,
             IAccountLinkHandlerAdapter linkHandlerAdapter = null) : base(next,
             coreConfiguration,
-            cacheStore, localizationService)
+            cacheStore, localizationService, logger)
         {
             _linkHandlerAdapter = linkHandlerAdapter;
-            _logger = logger;
         }
 
         protected override async Task Execute(HttpContext context)
         {
-            _logger.LogInformation("GenerateContextMiddleware called", DateTime.UtcNow);
-
             context.Request.EnableBuffering();
             var request = await JsonSerializer.DeserializeAsync<GenerateContextRequest>(context.Request.Body);
             context.Request.Body.Position = 0;

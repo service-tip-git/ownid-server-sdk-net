@@ -3,7 +3,7 @@ using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
@@ -15,12 +15,15 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     public class SaveAccountLinkMiddleware : BaseMiddleware
     {
         private readonly IAccountLinkHandlerAdapter _accountLinkHandlerAdapter;
+        private readonly ILogger<SaveAccountLinkMiddleware> _logger;
 
         public SaveAccountLinkMiddleware(RequestDelegate next, IAccountLinkHandlerAdapter accountLinkHandlerAdapter,
-            IOwnIdCoreConfiguration coreConfiguration, ICacheStore cacheStore, ILocalizationService localizationService)
-            : base(next, coreConfiguration, cacheStore, localizationService)
+            IOwnIdCoreConfiguration coreConfiguration, ICacheStore cacheStore, ILocalizationService localizationService,
+            ILogger<SaveAccountLinkMiddleware> logger)
+            : base(next, coreConfiguration, cacheStore, localizationService, logger)
         {
             _accountLinkHandlerAdapter = accountLinkHandlerAdapter;
+            _logger = logger;
         }
 
         protected override async Task Execute(HttpContext context)
@@ -28,6 +31,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             if (!TryGetRequestIdentity(context, out var requestIdentity) ||
                 !OwnIdProvider.IsContextFormatValid(requestIdentity.Context))
             {
+                _logger.LogDebug("Failed request identity validation");
                 NotFound(context.Response);
                 return;
             }
@@ -37,6 +41,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 string.IsNullOrEmpty(cacheItem.ResponseToken) ||
                 cacheItem.ResponseToken != requestIdentity.ResponseToken)
             {
+                _logger.LogDebug("No such cache item or incorrect request/response token");
                 NotFound(context.Response);
                 return;
             }
@@ -50,16 +55,16 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             }
 
             var (jwtContext, userData) = OwnIdProvider.GetDataFromJwt<UserProfileData>(request.Jwt);
-            
+
             if (jwtContext != requestIdentity.Context)
             {
                 BadRequest(context.Response);
                 return;
             }
-            
+
             //preventing data substitution
             userData.DID = cacheItem.DID;
-            
+
             var formContext = _accountLinkHandlerAdapter.CreateUserDefinedContext(userData, LocalizationService);
             formContext.Validate();
 
@@ -74,7 +79,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             }
 
             await _accountLinkHandlerAdapter.OnLink(formContext);
-            
+
             if (!formContext.HasErrors)
             {
                 await OwnIdProvider.FinishAuthFlowSessionAsync(requestIdentity.Context, userData.DID);

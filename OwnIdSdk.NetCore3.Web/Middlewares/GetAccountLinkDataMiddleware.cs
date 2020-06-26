@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
@@ -10,12 +11,16 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     public class GetAccountLinkDataMiddleware : BaseMiddleware
     {
         private readonly IAccountLinkHandlerAdapter _linkHandlerAdapter;
+        private readonly ILogger<GetAccountLinkDataMiddleware> _logger;
 
-        public GetAccountLinkDataMiddleware(RequestDelegate next, IAccountLinkHandlerAdapter linkHandlerAdapter, IOwnIdCoreConfiguration coreConfiguration,
-            ICacheStore cacheStore, ILocalizationService localizationService) : base(next, coreConfiguration,
-            cacheStore, localizationService)
+        public GetAccountLinkDataMiddleware(RequestDelegate next, IAccountLinkHandlerAdapter linkHandlerAdapter,
+            IOwnIdCoreConfiguration coreConfiguration,
+            ICacheStore cacheStore, ILocalizationService localizationService,
+            ILogger<GetAccountLinkDataMiddleware> logger) : base(next, coreConfiguration,
+            cacheStore, localizationService, logger)
         {
             _linkHandlerAdapter = linkHandlerAdapter;
+            _logger = logger;
         }
 
         protected override async Task Execute(HttpContext context)
@@ -34,16 +39,17 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                         profile, culture.Name);
 
                     await OwnIdProvider.SetResponseTokenAsync(cacheItem.Context, tokenData.Hash);
-                    
+
                     await Json(context, new JwtContainer
                     {
                         Jwt = tokenData.Jwt
                     }, StatusCodes.Status200OK);
-                    
+
                     return;
                 }
             }
-            
+
+            _logger.LogDebug("Failed request identity validation or cache item doesn't exist");
             NotFound(context.Response);
         }
     }

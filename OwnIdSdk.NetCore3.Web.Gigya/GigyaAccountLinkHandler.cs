@@ -27,11 +27,11 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             var jwt = (await JsonSerializer.DeserializeAsync<LinkChallengeData>(request.Body))?.Data?.Jwt;
 
             if (string.IsNullOrEmpty(jwt))
-                throw new Exception("No JWT was found");
+                throw new Exception("No JWT was found in HttpRequest");
             
             var tokenHandler = new JwtSecurityTokenHandler();
 
-            if (!tokenHandler.CanReadToken(jwt)) throw new Exception("invalid jwt");
+            if (!tokenHandler.CanReadToken(jwt)) throw new Exception("Invalid jwt");
 
             var rsaSecurityKey = await _restApiClient.GetPublicKey();
 
@@ -62,7 +62,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             if (!token.Payload.ContainsKey(ApiKeyPayloadKey) ||
                 (string) token.Payload[ApiKeyPayloadKey] != _configuration.ApiKey)
-                throw new Exception("jwt was created with different apiKey");
+                throw new Exception($"Jwt was created for different apiKey");
 
             return token.Subject;
         }
@@ -73,7 +73,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             if (accountInfo.ErrorCode != 0)
                 throw new Exception(
-                    $"Gigya.getAccountInfo error -> {accountInfo.ErrorCode}: {accountInfo.ErrorMessage}");
+                    $"Gigya.getAccountInfo error -> {accountInfo.GetFailureMessage()}");
 
             // TODO: refactor. add type parameter
             // TODO: use reflection to fill fields
@@ -92,7 +92,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             if (accountInfo.ErrorCode != 0)
                 throw new Exception(
-                    $"Gigya.getAccountInfo error -> {accountInfo.ErrorCode}: {accountInfo.ErrorMessage}");
+                    $"Gigya.getAccountInfo error -> {accountInfo.GetFailureMessage()}");
 
             var setAccountMessage =
                 await _restApiClient.SetAccountInfo(context.DID, context.Profile, new {pubKey = context.PublicKey});
@@ -105,7 +105,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             if (setAccountMessage.ErrorCode != 0)
                 throw new Exception(
-                    $"Gigya.getAccountInfo error -> {accountInfo.ErrorCode}: {accountInfo.ErrorMessage}");
+                    $"Gigya.getAccountInfo error -> {accountInfo.GetFailureMessage()}");
         }
 
         private string TryGetValue(Dictionary<string, string> data, string key)

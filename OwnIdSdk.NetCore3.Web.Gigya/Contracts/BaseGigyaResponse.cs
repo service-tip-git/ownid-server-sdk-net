@@ -9,5 +9,13 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts
         
         [JsonPropertyName("errorMessage")]
         public string ErrorMessage { get; set; }
+       
+        [JsonPropertyName("errorDetails")]
+        public string ErrorDetails { get; set; }
+
+        public string GetFailureMessage()
+        {
+            return $"{ErrorCode} : {ErrorMessage} ({ErrorDetails})";
+        }
     }
 }

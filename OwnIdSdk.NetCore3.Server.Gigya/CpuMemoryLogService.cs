@@ -4,6 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OwnIdSdk.NetCore3.Web;
+using Serilog.Events;
 
 namespace OwnIdSdk.NetCore3.Server.Gigya
 {
@@ -24,7 +26,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _timer = new Timer(LogTelemetry, null, TimeSpan.Zero,
-                TimeSpan.FromSeconds(10));
+                TimeSpan.FromMinutes(3));
 
             return Task.CompletedTask;
         }
@@ -39,15 +41,18 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
             var cpuTimeElapsed = (DateTime.UtcNow - _lastTimeStamp).TotalMilliseconds * Environment.ProcessorCount;
             _lastTimeStamp = DateTime.UtcNow;
-
-            _logger.LogInformation($"total cpu: {totalCpuTimeUsed * 100 / cpuTimeElapsed}");
-            _logger.LogInformation($"user cpu: {userCpuTimeUsed * 100 / cpuTimeElapsed}");
-            _logger.LogInformation($"WorkingSet64: {_process.WorkingSet64}");
-            _logger.LogInformation($"NonpagedSystemMemorySize64: {_process.NonpagedSystemMemorySize64}");
-            _logger.LogInformation($"PagedMemorySize64: {_process.PagedMemorySize64}");
-            _logger.LogInformation($"PagedSystemMemorySize64: {_process.PagedSystemMemorySize64}");
-            _logger.LogInformation($"PrivateMemorySize64: {_process.PrivateMemorySize64}");
-            _logger.LogInformation($"VirtualMemorySize64: {_process.VirtualMemorySize64}");
+            
+            _logger.LogWithData(LogLevel.Information, "CPU / RAM telemetry", new
+            {
+                totalCpu = totalCpuTimeUsed * 100 / cpuTimeElapsed,
+                userCpu = userCpuTimeUsed * 100 / cpuTimeElapsed,
+                workingSet64 = _process.WorkingSet64,
+                nonpagedSystemMemorySize64 = _process.NonpagedSystemMemorySize64,
+                pagedMemorySize64 = _process.PagedMemorySize64,
+                pagedSystemMemorySize64 = _process.PagedSystemMemorySize64,
+                privateMemorySize64 = _process.PrivateMemorySize64,
+                virtualMemorySize64 = _process.VirtualMemorySize64
+            });
         } 
 
         public Task StopAsync(CancellationToken cancellationToken)
