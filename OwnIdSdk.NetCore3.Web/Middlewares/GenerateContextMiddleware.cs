@@ -14,7 +14,6 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     public class GenerateContextMiddleware : BaseMiddleware
     {
         private readonly IAccountLinkHandlerAdapter _linkHandlerAdapter;
-        private readonly ILogger _logger;
 
         public GenerateContextMiddleware(
             RequestDelegate next

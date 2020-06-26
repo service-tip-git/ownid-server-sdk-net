@@ -18,7 +18,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             , ICacheStore cacheStore
             , ILocalizationService localizationService
             , IAccountRecoveryHandler accountRecoveryHandler
-            , ILogger logger
+            , ILogger<RecoverAccountMiddleware> logger
             ) : base(next, coreConfiguration, cacheStore, localizationService, logger)
         {
             _accountRecoveryHandler = accountRecoveryHandler;
