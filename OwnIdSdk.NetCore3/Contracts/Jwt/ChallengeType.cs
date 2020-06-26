@@ -7,6 +7,7 @@ namespace OwnIdSdk.NetCore3.Contracts.Jwt
     {
         Register,
         Login,
-        Link
+        Link,
+        Recover,
     }
 }

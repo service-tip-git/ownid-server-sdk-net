@@ -105,7 +105,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             if (setAccountMessage.ErrorCode != 0)
                 throw new Exception(
-                    $"Gigya.getAccountInfo error -> {accountInfo.GetFailureMessage()}");
+                    $"Gigya.setAccountInfo error -> {setAccountMessage.GetFailureMessage()}");
         }
 
         private string TryGetValue(Dictionary<string, string> data, string key)

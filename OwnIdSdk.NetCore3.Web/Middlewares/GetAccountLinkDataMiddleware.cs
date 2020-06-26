@@ -34,7 +34,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                     var culture = GetRequestCulture(context);
                     await OwnIdProvider.SetRequestTokenAsync(requestIdentity.Context, requestIdentity.RequestToken);
 
-                    var tokenData = OwnIdProvider.GenerateLinkAccountJwt(requestIdentity.Context,
+                    var tokenData = OwnIdProvider.GenerateProfileDataJwt(requestIdentity.Context,
                         cacheItem.ChallengeType, cacheItem.DID,
                         profile, culture.Name);
 

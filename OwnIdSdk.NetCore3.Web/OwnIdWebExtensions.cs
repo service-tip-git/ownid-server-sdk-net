@@ -31,12 +31,20 @@ namespace OwnIdSdk.NetCore3.Web
 
             var configuration = app.ApplicationServices.GetService<OwnIdConfiguration>();
 
-            if (configuration.FindFeature<AccountLinkFeature>() != null)
+            if (configuration.HasFeature<AccountLinkFeature>())
             {
                 routeBuilder.MapMiddlewarePost("ownid/{context}/link",
                     builder => builder.UseMiddleware<SaveAccountLinkMiddleware>());
                 routeBuilder.MapMiddlewareGet("ownid/{context}/link",
                     builder => builder.UseMiddleware<GetAccountLinkDataMiddleware>());
+            }
+
+            if (configuration.HasFeature<AccountRecoveryFeature>())
+            {
+                routeBuilder.MapMiddlewareGet("ownid/{context}/recover",
+                    builder => builder.UseMiddleware<RecoverAccountMiddleware>());
+                routeBuilder.MapMiddlewarePost("ownid/{context}/recover",
+                    builder => builder.UseMiddleware<SaveAccountPublicKeyMiddleware>());
             }
 
             app.UseRouter(routeBuilder.Build());
@@ -46,6 +54,7 @@ namespace OwnIdSdk.NetCore3.Web
         ///     Adds OwnId features and services with configuration
         /// </summary>
         /// <remarks>Extension method for <see cref="IServiceCollection" /></remarks>
+        /// <param name="services"></param>
         /// <param name="configureAction">Configuration builder. Allows to tune all available settings and features</param>
         public static void AddOwnId(this IServiceCollection services,
             Action<OwnIdConfigurationBuilder> configureAction = null)

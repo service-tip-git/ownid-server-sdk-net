@@ -36,6 +36,17 @@ namespace OwnIdSdk.NetCore3.Web.Configuration
         }
 
         /// <summary>
+        /// Check if feature has been added
+        /// </summary>
+        /// <typeparam name="TFeature">type of feature to check</typeparam>
+        /// <returns>true if feature with <typeparamref name="TFeature"/> has been added, otherwise false</returns>
+        public bool HasFeature<TFeature>()
+            where TFeature : class, IFeatureConfiguration
+        {
+            return _features.ContainsKey(typeof(TFeature));
+        }
+        
+        /// <summary>
         ///     Tries to set (adds or updates) feature with <typeparamref name="TFeature" />
         /// </summary>
         /// <param name="feature"><typeparamref name="TFeature" /> instance</param>

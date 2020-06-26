@@ -74,7 +74,7 @@ namespace OwnIdSdk.NetCore3
         {
             var deepLink = new UriBuilder(_ownIdCoreConfiguration.OwnIdApplicationUrl);
             var query = HttpUtility.ParseQueryString(deepLink.Query);
-            query["t"] = challengeType.ToString().Substring(0, 2).ToLowerInvariant();
+            query["t"] = challengeType.ToString("D");
             var callbackUrl = GenerateCallbackUrl(context, challengeType);
             query["q"] = $"{callbackUrl.Authority}{callbackUrl.PathAndQuery}";
 
@@ -91,8 +91,21 @@ namespace OwnIdSdk.NetCore3
                     ? _ownIdCoreConfiguration.CallbackUrl.PathAndQuery
                     : _ownIdCoreConfiguration.CallbackUrl.PathAndQuery + "/";
 
-            var action = challengeType == ChallengeType.Link ? "link" : "challenge";
-            return new Uri(_ownIdCoreConfiguration.CallbackUrl, path + $"ownid/{context}/{action}");
+            String action;
+            switch (challengeType)
+            {
+                case ChallengeType.Link:
+                    action = "link";
+                    break;
+                case ChallengeType.Recover:
+                    action = "recover";
+                    break;
+                default:
+                    action = "challenge";
+                    break;
+            }
+
+            return new Uri(_ownIdCoreConfiguration.CallbackUrl, $"{path}ownid/{context}/{action}");
         }
 
         /// <summary>
@@ -104,7 +117,7 @@ namespace OwnIdSdk.NetCore3
         /// <param name="profile">User profile</param>
         /// <param name="locale">Optional. Content locale</param>
         /// <returns>Base64 encoded string that contains JWT with hash</returns>
-        public (string Jwt, string Hash) GenerateLinkAccountJwt(string context, ChallengeType challengeType, string did, object profile,
+        public (string Jwt, string Hash) GenerateProfileDataJwt(string context, ChallengeType challengeType, string did, object profile,
             string locale = null)
         {
             var data = GetBaseConfigFieldsDictionary(context, challengeType, did, locale)
@@ -181,15 +194,17 @@ namespace OwnIdSdk.NetCore3
         /// <param name="nonce">Nonce</param>
         /// <param name="challengeType">Requested challenge type</param>
         /// <param name="did">User unique identity, should be null for register or login</param>
+        /// <param name="payload">payload</param>
         public async Task CreateAuthFlowSessionItemAsync(string context, string nonce, ChallengeType challengeType,
-            string did = null)
+            string did = null, string payload = null)
         {
             await _cacheStore.SetAsync(context, new CacheItem
             {
                 ChallengeType = challengeType,
                 Nonce = nonce,
                 Context = context,
-                DID = did
+                DID = did,
+                Payload = payload,
             });
         }
 
@@ -326,7 +341,7 @@ namespace OwnIdSdk.NetCore3
 
         private Dictionary<string, object> GetProfileDataDictionary(object profile)
         {
-            return new Dictionary<string, object>{{"linkProfile", profile}};
+            return new Dictionary<string, object>{{"profile", profile}};
         }
 
         private Dictionary<string, object> GetBaseConfigFieldsDictionary(string context, ChallengeType challengeType, string did, string locale = null)

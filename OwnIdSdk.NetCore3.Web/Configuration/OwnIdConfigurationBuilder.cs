@@ -45,6 +45,12 @@ namespace OwnIdSdk.NetCore3.Web.Configuration
             WithFeature<AccountLinkFeature>(x => x.UseAccountLinking<TProfile, THandler>());
         }
 
+        public void UseAccountRecovery<THandler>()
+            where THandler : class, IAccountRecoveryHandler
+        {
+            WithFeature<AccountRecoveryFeature>(x => x.UseAccountRecovery<THandler>());
+        }
+
         /// <summary>
         ///     Sets <see cref="IUserHandler{TProfile}" /> for user authorization and profile update
         /// </summary>

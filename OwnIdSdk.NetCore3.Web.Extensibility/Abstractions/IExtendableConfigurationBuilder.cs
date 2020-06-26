@@ -12,6 +12,9 @@ namespace OwnIdSdk.NetCore3.Web.Extensibility.Abstractions
         void UseAccountLinking<TProfile, THandler>() where THandler : class, IAccountLinkHandler<TProfile>
             where TProfile : class;
 
+        void UseAccountRecovery<THandler>()
+            where THandler : class, IAccountRecoveryHandler;
+
         void UseUserHandlerWithCustomProfile<TProfile, THandler>()
             where THandler : class, IUserHandler<TProfile> where TProfile : class;
     }

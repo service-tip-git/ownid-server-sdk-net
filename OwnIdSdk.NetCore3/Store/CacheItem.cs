@@ -43,6 +43,16 @@ namespace OwnIdSdk.NetCore3.Store
         /// </summary>
         public string ResponseToken { get; set; }
         
+
+        /// <summary>
+        /// Payload
+        /// </summary>
+        /// <remarks>
+        /// General purpose payload to be used by integrated providers for theirs needs
+        /// (for example, account recover payload can store password reset token)
+        /// </remarks>
+        public string Payload { get; set; }
+
         /// <summary>
         /// Creates new instance of <see cref="CacheItem"/> based on <see cref="Nonce"/> and <see cref="DID"/>
         /// </summary>
@@ -56,7 +66,8 @@ namespace OwnIdSdk.NetCore3.Store
                 IsFinished = IsFinished,
                 RequestToken = RequestToken,
                 ResponseToken = ResponseToken,
-                Context = Context
+                Context = Context,
+                Payload = Payload,
             };
         }
     }

@@ -14,10 +14,16 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     public class GenerateContextMiddleware : BaseMiddleware
     {
         private readonly IAccountLinkHandlerAdapter _linkHandlerAdapter;
+        private readonly ILogger _logger;
 
-        public GenerateContextMiddleware(RequestDelegate next, ICacheStore cacheStore,
-            IOwnIdCoreConfiguration coreConfiguration, ILocalizationService localizationService, ILogger<GenerateContextMiddleware> logger,
-            IAccountLinkHandlerAdapter linkHandlerAdapter = null) : base(next,
+        public GenerateContextMiddleware(
+            RequestDelegate next
+            , ICacheStore cacheStore
+            , IOwnIdCoreConfiguration coreConfiguration
+            , ILocalizationService localizationService
+            , ILogger<GenerateContextMiddleware> logger
+            , IAccountLinkHandlerAdapter linkHandlerAdapter = null
+            ) : base(next,
             coreConfiguration,
             cacheStore, localizationService, logger)
         {
@@ -32,7 +38,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
             if (string.IsNullOrWhiteSpace(request.Type) ||
                 !Enum.TryParse(request.Type, true, out ChallengeType challengeType) ||
-                challengeType == ChallengeType.Link && _linkHandlerAdapter == null)
+                challengeType == ChallengeType.Link && _linkHandlerAdapter == null
+            )
             {
                 BadRequest(context.Response);
                 return;
@@ -42,9 +49,22 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             var nonce = OwnIdProvider.GenerateNonce();
 
             string did = null;
-
-            if (challengeType == ChallengeType.Link)
-                did = await _linkHandlerAdapter.GetCurrentUserIdAsync(context.Request);
+            string payload = null;
+            switch (challengeType)
+            {
+                case ChallengeType.Register:
+                    break;
+                case ChallengeType.Login:
+                    break;
+                case ChallengeType.Link:
+                    did = await _linkHandlerAdapter.GetCurrentUserIdAsync(context.Request);
+                    break;
+                case ChallengeType.Recover:
+                    payload = request.Payload.ToString();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
             
             await OwnIdProvider.CreateAuthFlowSessionItemAsync(challengeContext, nonce, challengeType, did);
 
