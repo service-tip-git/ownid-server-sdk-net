@@ -107,8 +107,6 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 .WriteTo.Debug()
                 .WriteTo.Console();
 
-            Console.WriteLine($"ELK_LOGGING_ENABLED is {elasticLoggingEnabled.ToString()}");
-
             if (elasticLoggingEnabled)
             {
                 logger.WriteTo.Elasticsearch(ConfigureElasticSink(elasticSection, environment))
