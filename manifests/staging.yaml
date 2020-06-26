@@ -40,6 +40,8 @@ spec:
               value: 3_dEHMimJM2kxcz8gaoI1Sss9kohyJ6LP17qDYd2UIlUfNowsPglEUANJX7R812-uh
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
+            - name: ASPNETCORE_ENVIRONMENT
+              value: staging
 ---
 apiVersion: v1
 kind: Service
@@ -95,6 +97,8 @@ spec:
               value: 3_DS2fdSlSzClFXUfkKHaxJq9-Zknssg2UHamCntjp2jRcL74a_x5HbhDxvHZ6a4q2
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
+            - name: ASPNETCORE_ENVIRONMENT
+              value: staging
 ---
 apiVersion: v1
 kind: Service
@@ -150,6 +154,8 @@ spec:
               value: 3_O4QE0Kk7QstG4VGDPED5omrr8mgbTuf_Gim8V_Y19YDP75m_msuGtNGQz89X0KWP
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
+            - name: ASPNETCORE_ENVIRONMENT
+              value: staging
 ---
 apiVersion: v1
 kind: Service

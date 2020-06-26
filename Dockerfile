@@ -13,6 +13,7 @@ ENV OWNID__DESCRIPTION="Local Client NetCore3 environment"
 ENV GIGYA__SECRET="g157+kUR3kxvgIX4MneEWnVgBVzhQe4dXfoNe9ceSNA="
 ENV GIGYA__API_KEY="3_s5-gLs4aLp5FXluP8HXs7_JN40XWNlbvYWVCCkbNCqlhW6Sm5Z4tXGGsHcSJYD3W"
 ENV ELASTICCONFIGURATION__ENABLED="false"
+ENV ASPNETCORE_ENVIRONMENT="dev"
 
 # Copy csproj and restore as distinct layers
 COPY ./OwnIdSdk.NetCore3 ./OwnIdSdk.NetCore3
