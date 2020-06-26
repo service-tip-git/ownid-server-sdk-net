@@ -65,7 +65,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                     throw new ArgumentOutOfRangeException();
             }
             
-            await OwnIdProvider.CreateAuthFlowSessionItemAsync(challengeContext, nonce, challengeType, did);
+            await OwnIdProvider.CreateAuthFlowSessionItemAsync(challengeContext, nonce, challengeType, did, payload);
 
             await Json(context, new GetChallengeLinkResponse(challengeContext,
                 OwnIdProvider.GetDeepLink(challengeContext, challengeType),
