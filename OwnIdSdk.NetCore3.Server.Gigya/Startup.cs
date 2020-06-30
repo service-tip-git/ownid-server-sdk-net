@@ -3,13 +3,13 @@ using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OwnIdSdk.NetCore3.Web;
 using OwnIdSdk.NetCore3.Web.Gigya;
 using Serilog;
-using Serilog.Formatting.Elasticsearch;
 using Serilog.Sinks.Elasticsearch;
 
 namespace OwnIdSdk.NetCore3.Server.Gigya
@@ -91,6 +91,10 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             
             // TODO: not for prod
             app.UseMiddleware<LogRequestMiddleware>();
+            var routeBuilder = new RouteBuilder(app);
+            routeBuilder.MapMiddlewarePost("log",
+                builder => builder.UseMiddleware<LogMiddleware>());
+            app.UseRouter(routeBuilder.Build());
             
             app.UseOwnId();
         }
@@ -129,7 +133,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                     x.BasicAuthentication(configuration["Username"], configuration["Password"]),
                 InlineFields = true,
                 OverwriteTemplate = true,
-                CustomFormatter = new ElasticsearchJsonFormatter(renderMessageTemplate: false, inlineFields: true)
+                CustomFormatter = new OwnIdFormatter()
             };
         }
     }

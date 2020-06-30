@@ -35,10 +35,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             var routeData = context.GetRouteData();
             Context = routeData.Values["context"]?.ToString();
 
-            using var scope = Logger.BeginScope(new
-            {
-                context = Context
-            });
+            using var scope = Logger.BeginScope("context: {context}", Context);
             
             await InterceptErrors(Execute, context);
         }

@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Web;
 
@@ -21,8 +20,14 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
         public async Task InvokeAsync(HttpContext context)
         {
+            if (string.Equals(context.Request.Path, "/log", StringComparison.InvariantCultureIgnoreCase))
+            {
+                await _next(context);
+                return;
+            }
+
             using (_logger.BeginScope("Log request ({requestId})", context.TraceIdentifier))
-            using (var respStream = new MemoryStream())
+            await using (var respStream = new MemoryStream())
             {
                 var originalRespStream = context.Response.Body;
                 
