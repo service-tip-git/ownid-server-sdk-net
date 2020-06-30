@@ -31,7 +31,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             if (!TryGetRequestIdentity(context, out var requestIdentity) ||
                 !OwnIdProvider.IsContextFormatValid(requestIdentity.Context))
             {
-                _logger.LogDebug("Failed request identity validation");
+                _logger.LogError("Failed request identity validation");
                 NotFound(context.Response);
                 return;
             }
@@ -41,7 +41,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 string.IsNullOrEmpty(cacheItem.ResponseToken) ||
                 cacheItem.ResponseToken != requestIdentity.ResponseToken)
             {
-                _logger.LogDebug("No such cache item or incorrect request/response token");
+                _logger.LogError("No such cache item or incorrect request/response token");
                 NotFound(context.Response);
                 return;
             }

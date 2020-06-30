@@ -12,6 +12,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     public class SaveAccountPublicKeyMiddleware: BaseMiddleware
     {
         private readonly IAccountRecoveryHandler _accountRecoveryHandler;
+        private readonly ILogger<SaveAccountPublicKeyMiddleware> _logger;
 
         public SaveAccountPublicKeyMiddleware(
             RequestDelegate next
@@ -23,13 +24,16 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             ) : base(next, coreConfiguration, cacheStore, localizationService, logger)
         {
             _accountRecoveryHandler = accountRecoveryHandler;
+            _logger = logger;
         }
 
         protected override async Task Execute(HttpContext context)
         {
+            // TODO: add request/response token validation
             if (!TryGetRequestIdentity(context, out var requestIdentity) ||
                 !OwnIdProvider.IsContextFormatValid(requestIdentity.Context))
             {
+                _logger.LogError("Failed request identity validation");
                 NotFound(context.Response);
                 return;
             }
@@ -37,6 +41,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(requestIdentity.Context);
             if (cacheItem == null || cacheItem.RequestToken != requestIdentity.RequestToken)
             {
+                _logger.LogError("No such cache item or incorrect request/response token");
                 NotFound(context.Response);
                 return;
             }

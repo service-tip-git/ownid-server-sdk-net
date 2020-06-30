@@ -5,6 +5,7 @@ using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Web.Extensions;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
@@ -38,7 +39,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                         cacheItem.ChallengeType, cacheItem.DID,
                         profile, culture.Name);
 
-                    await OwnIdProvider.SetResponseTokenAsync(cacheItem.Context, tokenData.Hash);
+                    await OwnIdProvider.SetResponseTokenAsync(cacheItem.Context, tokenData.Hash.GetUrlEncodeString());
 
                     await Json(context, new JwtContainer
                     {

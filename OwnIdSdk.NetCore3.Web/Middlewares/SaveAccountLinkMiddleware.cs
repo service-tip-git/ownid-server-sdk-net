@@ -41,7 +41,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 string.IsNullOrEmpty(cacheItem.ResponseToken) ||
                 cacheItem.ResponseToken != requestIdentity.ResponseToken)
             {
-                _logger.LogDebug("No such cache item or incorrect request/response token");
+                _logger.LogError("No such cache item or incorrect request/response token");
                 NotFound(context.Response);
                 return;
             }
