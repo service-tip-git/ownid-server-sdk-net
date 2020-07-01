@@ -14,8 +14,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public abstract class BaseMiddleware
     {
-        protected readonly ILogger Logger;
         protected readonly ILocalizationService LocalizationService;
+        protected readonly ILogger Logger;
         protected readonly RequestDelegate Next;
         protected readonly OwnIdProvider OwnIdProvider;
 
@@ -36,7 +36,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             Context = routeData.Values["context"]?.ToString();
 
             using var scope = Logger.BeginScope("context: {context}", Context);
-            
+
             await InterceptErrors(Execute, context);
         }
 

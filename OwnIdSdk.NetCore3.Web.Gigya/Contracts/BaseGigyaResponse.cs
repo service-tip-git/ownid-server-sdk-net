@@ -12,10 +12,13 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts
        
         [JsonPropertyName("errorDetails")]
         public string ErrorDetails { get; set; }
+        
+        [JsonPropertyName("callId")]
+        public string CallId { get; set; }
 
         public string GetFailureMessage()
         {
-            return $"{ErrorCode} : {ErrorMessage} ({ErrorDetails})";
+            return $"(CallId={CallId}) {ErrorCode} : {ErrorMessage} ({ErrorDetails})";
         }
     }
 }

@@ -7,12 +7,11 @@ using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 using OwnIdSdk.NetCore3.Web.Extensions;
 
-namespace OwnIdSdk.NetCore3.Web.Middlewares
+namespace OwnIdSdk.NetCore3.Web.Middlewares.Link
 {
     public class GetAccountLinkDataMiddleware : BaseMiddleware
     {
         private readonly IAccountLinkHandlerAdapter _linkHandlerAdapter;
-        private readonly ILogger<GetAccountLinkDataMiddleware> _logger;
 
         public GetAccountLinkDataMiddleware(RequestDelegate next, IAccountLinkHandlerAdapter linkHandlerAdapter,
             IOwnIdCoreConfiguration coreConfiguration,
@@ -21,7 +20,6 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             cacheStore, localizationService, logger)
         {
             _linkHandlerAdapter = linkHandlerAdapter;
-            _logger = logger;
         }
 
         protected override async Task Execute(HttpContext context)
@@ -29,7 +27,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             if (TryGetRequestIdentity(context, out var requestIdentity))
             {
                 var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(requestIdentity.Context);
-                if (OwnIdProvider.IsContextFormatValid(requestIdentity.Context) && cacheItem != null)
+                if (OwnIdProvider.IsContextFormatValid(requestIdentity.Context) && cacheItem != null &&
+                    cacheItem.IsValidForLoginRegister)
                 {
                     var profile = await _linkHandlerAdapter.GetUserProfileAsync(cacheItem.DID);
                     var culture = GetRequestCulture(context);
@@ -50,7 +49,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 }
             }
 
-            _logger.LogDebug("Failed request identity validation or cache item doesn't exist");
+            Logger.LogDebug("Failed request identity validation or cache item doesn't exist");
             NotFound(context.Response);
         }
     }

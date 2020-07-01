@@ -30,14 +30,14 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             if (resetPasswordResponse.ErrorCode != 0)
             {
                 throw new Exception(
-                    $"Gigya.resetPassword error -> {resetPasswordResponse.ErrorCode}: {resetPasswordResponse.ErrorMessage}");
+                    $"Gigya.resetPassword error -> {resetPasswordResponse.GetFailureMessage()}");
             }
 
             var accountInfo = await _apiClient.GetUserInfoByUid(resetPasswordResponse.UID);
             if (accountInfo.ErrorCode != 0)
             {
                 throw new Exception(
-                    $"Gigya.getAccountInfo error -> {accountInfo.ErrorCode}: {accountInfo.ErrorMessage}");
+                    $"Gigya.getAccountInfo error -> {accountInfo.GetFailureMessage()}");
             }
 
             //
@@ -62,7 +62,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             if (responseMessage.ErrorCode != 0)
             {
-                throw new Exception($"Gigya.setAccountInfo error -> {responseMessage.ErrorCode}: {responseMessage.ErrorMessage}");
+                throw new Exception($"Gigya.setAccountInfo error -> {responseMessage.GetFailureMessage()}");
             }
         }
 

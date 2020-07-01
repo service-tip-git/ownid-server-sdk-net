@@ -6,18 +6,15 @@ using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web.Extensions;
 
-namespace OwnIdSdk.NetCore3.Web.Middlewares
+namespace OwnIdSdk.NetCore3.Web.Middlewares.RegisterLogin
 {
     public class GetChallengeJwtMiddleware : BaseMiddleware
     {
-        private readonly ILogger<GetChallengeJwtMiddleware> _logger;
-
         public GetChallengeJwtMiddleware(RequestDelegate next, IOwnIdCoreConfiguration coreConfiguration,
             ICacheStore cacheStore, ILocalizationService localizationService, ILogger<GetChallengeJwtMiddleware> logger)
             : base(next, coreConfiguration,
                 cacheStore, localizationService, logger)
         {
-            _logger = logger;
         }
 
         protected override async Task Execute(HttpContext context)
@@ -25,7 +22,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             if (TryGetRequestIdentity(context, out var requestIdentity))
             {
                 var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(requestIdentity.Context);
-                if (OwnIdProvider.IsContextFormatValid(requestIdentity.Context) && cacheItem != null)
+                if (OwnIdProvider.IsContextFormatValid(requestIdentity.Context) &&
+                    cacheItem != null && cacheItem.IsValidForLoginRegister)
                 {
                     var culture = GetRequestCulture(context);
 
@@ -44,7 +42,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 }
             }
 
-            _logger.LogError("Failed request identity validation or cache item doesn't exist");
+            Logger.LogError("Failed request identity validation or cache item doesn't exist");
             NotFound(context.Response);
         }
     }

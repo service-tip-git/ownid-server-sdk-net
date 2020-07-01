@@ -22,7 +22,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             , ILocalizationService localizationService
             , ILogger<GenerateContextMiddleware> logger
             , IAccountLinkHandlerAdapter linkHandlerAdapter = null
-            ) : base(next,
+        ) : base(next,
             coreConfiguration,
             cacheStore, localizationService, logger)
         {
@@ -64,7 +64,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            
+
             await OwnIdProvider.CreateAuthFlowSessionItemAsync(challengeContext, nonce, challengeType, did, payload);
 
             await Json(context, new GetChallengeLinkResponse(challengeContext,

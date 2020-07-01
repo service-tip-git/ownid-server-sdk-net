@@ -7,12 +7,11 @@ using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 
-namespace OwnIdSdk.NetCore3.Web.Middlewares
+namespace OwnIdSdk.NetCore3.Web.Middlewares.Recover
 {
-    public class SaveAccountPublicKeyMiddleware: BaseMiddleware
+    public class SaveAccountPublicKeyMiddleware : BaseMiddleware
     {
         private readonly IAccountRecoveryHandler _accountRecoveryHandler;
-        private readonly ILogger<SaveAccountPublicKeyMiddleware> _logger;
 
         public SaveAccountPublicKeyMiddleware(
             RequestDelegate next
@@ -21,31 +20,31 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             , ILocalizationService localizationService
             , IAccountRecoveryHandler accountRecoveryHandler
             , ILogger<SaveAccountPublicKeyMiddleware> logger
-            ) : base(next, coreConfiguration, cacheStore, localizationService, logger)
+        ) : base(next, coreConfiguration, cacheStore, localizationService, logger)
         {
             _accountRecoveryHandler = accountRecoveryHandler;
-            _logger = logger;
         }
 
         protected override async Task Execute(HttpContext context)
         {
-            // TODO: add request/response token validation
             if (!TryGetRequestIdentity(context, out var requestIdentity) ||
                 !OwnIdProvider.IsContextFormatValid(requestIdentity.Context))
             {
-                _logger.LogError("Failed request identity validation");
+                Logger.LogError("Failed request identity validation");
                 NotFound(context.Response);
                 return;
             }
 
             var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(requestIdentity.Context);
-            if (cacheItem == null || cacheItem.RequestToken != requestIdentity.RequestToken)
+            if (cacheItem == null || !cacheItem.IsValidForLoginRegister || cacheItem.RequestToken != requestIdentity.RequestToken ||
+                string.IsNullOrEmpty(cacheItem.ResponseToken) ||
+                cacheItem.ResponseToken != requestIdentity.ResponseToken)
             {
-                _logger.LogError("No such cache item or incorrect request/response token");
+                Logger.LogError("No such cache item or incorrect request/response token");
                 NotFound(context.Response);
                 return;
             }
-            
+
             var request = await JsonSerializer.DeserializeAsync<JwtContainer>(context.Request.Body);
             if (string.IsNullOrEmpty(request?.Jwt))
             {
@@ -61,9 +60,9 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             }
 
             await _accountRecoveryHandler.OnRecoverAsync(userData);
-            
+
             await OwnIdProvider.FinishAuthFlowSessionAsync(requestIdentity.Context, userData.DID);
-            
+
             Ok(context.Response);
         }
     }

@@ -8,6 +8,9 @@ using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 using OwnIdSdk.NetCore3.Web.Features;
 using OwnIdSdk.NetCore3.Web.FlowEntries;
 using OwnIdSdk.NetCore3.Web.Middlewares;
+using OwnIdSdk.NetCore3.Web.Middlewares.Link;
+using OwnIdSdk.NetCore3.Web.Middlewares.Recover;
+using OwnIdSdk.NetCore3.Web.Middlewares.RegisterLogin;
 
 namespace OwnIdSdk.NetCore3.Web
 {

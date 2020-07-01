@@ -53,6 +53,15 @@ namespace OwnIdSdk.NetCore3.Store
         /// </remarks>
         public string Payload { get; set; }
 
+
+        public bool IsValidForLoginRegister => !IsFinished &&
+                                               (ChallengeType == ChallengeType.Register ||
+                                                ChallengeType == ChallengeType.Login);
+
+        public bool IsValidForLink => !IsFinished && ChallengeType == ChallengeType.Link;
+
+        public bool IsValidForRecover => !IsFinished && ChallengeType == ChallengeType.Recover;
+        
         /// <summary>
         /// Creates new instance of <see cref="CacheItem"/> based on <see cref="Nonce"/> and <see cref="DID"/>
         /// </summary>
