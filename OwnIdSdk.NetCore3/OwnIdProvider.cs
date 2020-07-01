@@ -320,9 +320,9 @@ namespace OwnIdSdk.NetCore3
             var tokenHandler = new JwtSecurityTokenHandler();
 
             //TODO: should be received from the user's phone
-            var issuedAt = DateTime.UtcNow;
-            var notBefore = issuedAt.Add(TimeSpan.FromHours(-1));
-            var expires = issuedAt.Add(expiration ?? TimeSpan.FromHours(1));
+            var issuedAt = DateTime.UtcNow.Add(TimeSpan.FromHours(-1));
+            var notBefore = issuedAt;
+            var expires = DateTime.UtcNow.Add(expiration ?? TimeSpan.FromHours(1));
 
             var payload = new JwtPayload(null, null, null, notBefore, expires, issuedAt);
 
