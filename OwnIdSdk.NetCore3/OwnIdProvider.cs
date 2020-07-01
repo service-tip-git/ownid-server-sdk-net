@@ -123,7 +123,7 @@ namespace OwnIdSdk.NetCore3
             var data = GetBaseConfigFieldsDictionary(context, challengeType, did, locale)
                 .Union(GetProfileDataDictionary(profile))
                 .ToDictionary(x => x.Key, x => x.Value);
-            
+
             return GenerateDataJwt(data);
         }
 
@@ -224,7 +224,7 @@ namespace OwnIdSdk.NetCore3
             cacheItem.RequestToken = token;
             await _cacheStore.SetAsync(context, cacheItem);
         }
-        
+
         /// <summary>
         /// Sets Web App response token to check in with the next request
         /// </summary>
@@ -287,8 +287,8 @@ namespace OwnIdSdk.NetCore3
                                                   string.IsNullOrEmpty(cacheItem.DID)
                 ? (false, null)
                 : (true, cacheItem.DID);
-            
-            if(result.Item1)
+
+            if (result.Item1)
                 await _cacheStore.RemoveAsync(context);
 
             return result;
@@ -313,19 +313,24 @@ namespace OwnIdSdk.NetCore3
         {
             return Regex.IsMatch(context, "^([a-zA-Z0-9_-]{22})$");
         }
-        
+
         private (string Jwt, string Hash) GenerateDataJwt(Dictionary<string, object> data, TimeSpan? expiration = null)
         {
             var rsaSecurityKey = new RsaSecurityKey(_ownIdCoreConfiguration.JwtSignCredentials);
             var tokenHandler = new JwtSecurityTokenHandler();
-            var payload = new JwtPayload(null, null, null, DateTime.UtcNow,
-                DateTime.UtcNow.Add(expiration ?? TimeSpan.FromHours(1)), DateTime.UtcNow);
+
+            //TODO: should be received from the user's phone
+            var issuedAt = DateTime.UtcNow;
+            var notBefore = issuedAt.Add(TimeSpan.FromHours(-1));
+            var expires = issuedAt.Add(expiration ?? TimeSpan.FromHours(1));
+
+            var payload = new JwtPayload(null, null, null, notBefore, expires, issuedAt);
 
             foreach (var (key, value) in data)
             {
                 payload.Add(key, value);
             }
-            
+
             var jwt = new JwtSecurityToken(
                 new JwtHeader(new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)), payload);
 
@@ -334,14 +339,14 @@ namespace OwnIdSdk.NetCore3
             using var sha1 = new SHA1Managed();
 
             var b64 = Encoding.UTF8.GetBytes(tokenStr);
-            var hash =sha1.ComputeHash(b64);
+            var hash = sha1.ComputeHash(b64);
 
             return (tokenStr, Convert.ToBase64String(hash));
         }
 
         private Dictionary<string, object> GetProfileDataDictionary(object profile)
         {
-            return new Dictionary<string, object>{{"profile", profile}};
+            return new Dictionary<string, object> { { "profile", profile } };
         }
 
         private Dictionary<string, object> GetBaseConfigFieldsDictionary(string context, ChallengeType challengeType, string did, string locale = null)
