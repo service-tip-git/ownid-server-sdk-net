@@ -133,6 +133,23 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             return await JsonSerializer.DeserializeAsync<ResetPasswordResponse>(
                 await responseMessage.Content.ReadAsStreamAsync());
         }
+        
+        public async Task<BaseGigyaResponse> DeleteAccountAsync(string did)
+        {
+            var parameters = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("apiKey", _configuration.ApiKey),
+                new KeyValuePair<string, string>("secret", _configuration.SecretKey),
+                new KeyValuePair<string, string>("UID", did)
+            };
+            
+            var responseMessage = await _httpClient.PostAsync(
+                new Uri($"https://accounts.{_configuration.DataCenter}/accounts.deleteAccount"),
+                new FormUrlEncodedContent(parameters));
+
+            return await JsonSerializer.DeserializeAsync<BaseGigyaResponse>(
+                await responseMessage.Content.ReadAsStreamAsync());
+        }
 
         private async Task<GetAccountInfoResponse> GetUserProfile(string uid = null, string regToken = null)
         {

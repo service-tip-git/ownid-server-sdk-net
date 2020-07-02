@@ -76,7 +76,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                         IgnoreNullValues = true
                     });
-                    
+
                     _logger.LogError(
                         $"did: {context.DID}{Environment.NewLine}" +
                         $"profile: {exProfileSerializedFields}{Environment.NewLine}" +
@@ -103,19 +103,16 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                     $"Gigya.notifyLogin error -> {loginResponse.GetFailureMessage()}");
             }
 
-            var setAccountPublicKeyMessage =
-                await _restApiClient.SetAccountInfo(context.DID, data: new {pubKey = context.PublicKey});
-
-            if (setAccountPublicKeyMessage.ErrorCode != 0)
-            {
-                throw new Exception(
-                    $"Gigya.setAccountInfo with public key error -> {setAccountPublicKeyMessage.GetFailureMessage()}");
-            }
-
-            var setAccountMessage = await _restApiClient.SetAccountInfo(context.DID, context.Profile);
+            var setAccountMessage =
+                await _restApiClient.SetAccountInfo(context.DID, context.Profile, new {pubKey = context.PublicKey});
 
             if (setAccountMessage.ErrorCode == 403043)
             {
+                var removeUserResult = await _restApiClient.DeleteAccountAsync(context.DID);
+
+                if (removeUserResult.ErrorCode != 0)
+                    throw new Exception($"Gigya.deleteAccount with uid={context.DID} error -> {loginResponse.GetFailureMessage()}");
+                
                 context.SetError(x => x.Email, setAccountMessage.ErrorMessage);
                 return;
             }
