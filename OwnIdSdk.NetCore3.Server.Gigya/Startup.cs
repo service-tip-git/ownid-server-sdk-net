@@ -56,6 +56,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         x.Description = ownIdSection["description"];
                         x.Icon = ownIdSection["icon"];
                         x.CallbackUrl = new Uri(ownIdSection["callback_url"]);
+                        x.CacheExpirationTimeout =  ownIdSection.GetValue("cache_expiration", (uint) TimeSpan.FromMinutes(10).TotalMilliseconds);
 
                         //for development cases
                         x.IsDevEnvironment = Configuration.GetValue("OwnIdDevelopmentMode", false);

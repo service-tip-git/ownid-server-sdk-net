@@ -222,6 +222,7 @@ namespace OwnIdSdk.NetCore3
                 throw new ArgumentException($"Can not find any item with context '{context}'");
 
             cacheItem.RequestToken = token;
+            cacheItem.Status = CacheItemStatus.Processing;
             await _cacheStore.SetAsync(context, cacheItem);
         }
 
@@ -239,6 +240,7 @@ namespace OwnIdSdk.NetCore3
                 throw new ArgumentException($"Can not find any item with context '{context}'");
 
             cacheItem.ResponseToken = token;
+            cacheItem.Status = CacheItemStatus.Processing;
             await _cacheStore.SetAsync(context, cacheItem);
         }
 
@@ -265,7 +267,7 @@ namespace OwnIdSdk.NetCore3
                 throw new ArgumentException($"Wrong user for linking {did}");
 
             cacheItem.DID = did;
-            cacheItem.IsFinished = true;
+            cacheItem.Status = CacheItemStatus.Finished;
             await _cacheStore.SetAsync(context, cacheItem);
         }
 
@@ -276,22 +278,28 @@ namespace OwnIdSdk.NetCore3
         /// <param name="context">Challenge unique identifier</param>
         /// <param name="nonce">Nonce</param>
         /// <returns>
-        ///     <c>isSuccess = true</c> and <c>did</c> if <see cref="CacheItem" /> was found or <c>isSuccess = false</c> there
-        ///     is no such <see cref="CacheItem" />
+        ///     <see cref="CacheItemStatus"/> and <c>did</c> if <see cref="CacheItem" /> was found, otherwise null
         /// </returns>
-        public async Task<(bool isSuccess, string did)> PopFinishedAuthFlowSessionAsync(string context, string nonce)
+        public async Task<(CacheItemStatus Status, string DID)?> PopFinishedAuthFlowSessionAsync(string context, string nonce)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
+            
+            if (cacheItem == null
+                || cacheItem.Nonce != nonce
+                || cacheItem.Status == CacheItemStatus.Finished && String.IsNullOrEmpty(cacheItem.DID)
+            )
+            {
+                return null;
+            }
 
-            (bool isSuccess, string did) result = cacheItem == null || cacheItem.Nonce != nonce || !cacheItem.IsFinished ||
-                                                  string.IsNullOrEmpty(cacheItem.DID)
-                ? (false, null)
-                : (true, cacheItem.DID);
+            // If not finished - return just status
+            if (cacheItem.Status != CacheItemStatus.Finished) 
+                return (cacheItem.Status, null);
+            
+            // If finished - clear cache
+            await _cacheStore.RemoveAsync(context);
 
-            if (result.Item1)
-                await _cacheStore.RemoveAsync(context);
-
-            return result;
+            return (Status: CacheItemStatus.Finished, cacheItem.DID);
         }
 
         /// <summary>

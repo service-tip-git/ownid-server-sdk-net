@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using OwnIdSdk.NetCore3.Configuration;
@@ -46,6 +47,9 @@ namespace OwnIdSdk.NetCore3.Web.Features
         public IFeatureConfiguration FillEmptyWithOptional()
         {
             _configuration.OwnIdApplicationUrl ??= new Uri(Constants.OwinIdApplicationAddress);
+
+            if (_configuration.CacheExpirationTimeout == default)
+                _configuration.CacheExpirationTimeout = (uint) TimeSpan.FromMinutes(10).TotalMilliseconds;
 
             return this;
         }

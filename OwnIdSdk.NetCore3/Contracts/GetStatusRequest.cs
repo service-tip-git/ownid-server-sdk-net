@@ -3,10 +3,15 @@ using System.Text.Json.Serialization;
 namespace OwnIdSdk.NetCore3.Contracts
 {
     /// <summary>
-    ///     POST /ownid/{context/status request body structure
+    ///     POST /ownid/status request item structure
     /// </summary>
     public class GetStatusRequest
     {
+        /// <summary>
+        ///     Context
+        /// </summary>
+        [JsonPropertyName("context")]
+        public string Context { get; set; }
         /// <summary>
         ///     Nonce
         /// </summary>

@@ -30,6 +30,10 @@ namespace OwnIdSdk.NetCore3.Configuration
             if (string.IsNullOrWhiteSpace(options.DID) || string.IsNullOrWhiteSpace(options.Name))
                 return ValidateOptionsResult.Fail(
                     $"{nameof(options.DID)} and {nameof(options.Name)} are required");
+            
+            if (options.CacheExpirationTimeout == 0)
+                return ValidateOptionsResult.Fail(
+                    $"{nameof(options.CacheExpirationTimeout)} can not be equal to 0");
 
             return options.ProfileConfiguration.Validate();
         }

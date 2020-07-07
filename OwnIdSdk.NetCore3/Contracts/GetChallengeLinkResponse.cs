@@ -13,11 +13,13 @@ namespace OwnIdSdk.NetCore3.Contracts
         /// <param name="context">Value for <see cref="Context" />. Context identifier</param>
         /// <param name="url">Value for <see cref="Url" />. Url for qr or link that leads to OwnId app</param>
         /// <param name="nonce">Value for <see cref="Nonce" /></param>
-        public GetChallengeLinkResponse(string context, string url, string nonce)
+        /// <param name="expiration">expiration</param>
+        public GetChallengeLinkResponse(string context, string url, string nonce, uint expiration)
         {
             Context = context;
             Url = url;
             Nonce = nonce;
+            Expiration = expiration;
         }
 
         /// <summary>
@@ -37,5 +39,11 @@ namespace OwnIdSdk.NetCore3.Contracts
         /// </summary>
         [JsonPropertyName("nonce")]
         public string Nonce { get; }
+        
+        /// <summary>
+        ///     Expiration
+        /// </summary>
+        [JsonPropertyName("expiration")]
+        public uint Expiration { get; set; }
     }
 }

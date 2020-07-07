@@ -86,5 +86,11 @@ namespace OwnIdSdk.NetCore3.Configuration
         ///     Marks if OwnIdSdk is using for development cases
         /// </summary>
         bool IsDevEnvironment { get; set; }
+        
+        /// <summary>
+        ///     Cache timeout expiration in milliseconds 
+        /// </summary>
+        /// <remarks>Default value is 10 minutes</remarks>
+        uint CacheExpirationTimeout { get; set; }
     }
 }

@@ -23,7 +23,7 @@ namespace OwnIdSdk.NetCore3.Tests
         {
             Nonce = "AC2A7890-F931-4646-9F8E-DAEDA69FBB3F",
             DID = "did:ownid:98765543221",
-            IsFinished = true
+            Status = CacheItemStatus.Finished,
         };
         
         private const string ExistingContextWithoutDID = "QAfRWt_jtkSd5dUSl2NXnQ";
@@ -122,32 +122,32 @@ namespace OwnIdSdk.NetCore3.Tests
         public async Task GetDIDAsync_NotExistingElement()
         {
             var result = await _ownIdProvider.PopFinishedAuthFlowSessionAsync(NotExistingContext, NotExistingNonce);
-            Assert.False(result.isSuccess);
-            Assert.Null(result.did);
+            Assert.Null(result);
         }
         
         [Fact]
         public async Task GetDIDAsync_WrongNonce()
         {
             var result = await _ownIdProvider.PopFinishedAuthFlowSessionAsync(ExistingContextWithDID, NotExistingNonce);
-            Assert.False(result.isSuccess);
-            Assert.Null(result.did);
+            Assert.Null(result);
         }
         
         [Fact]
         public async Task GetDIDAsync_ExistingWithoutDID()
         {
             var result = await _ownIdProvider.PopFinishedAuthFlowSessionAsync(ExistingContextWithoutDID, _existingItemWithoutDID.Nonce);
-            Assert.False(result.isSuccess);
-            Assert.Null(result.did);
+            Assert.NotNull(result);
+            Assert.NotEqual(CacheItemStatus.Finished, result.Value.Status);
+            Assert.Null(result.Value.DID);
         }
 
         [Fact]
         public async Task GetDIDAsync_ExistingWithDID()
         {
             var result = await _ownIdProvider.PopFinishedAuthFlowSessionAsync(ExistingContextWithDID, _existingItemWithDID.Nonce);
-            Assert.True(result.isSuccess);
-            Assert.Equal(_existingItemWithDID.DID, result.did);
+            Assert.NotNull(result);
+            Assert.Equal(CacheItemStatus.Finished, result.Value.Status);
+            Assert.Equal(_existingItemWithDID.DID, result.Value.DID);
         }
     }
 }

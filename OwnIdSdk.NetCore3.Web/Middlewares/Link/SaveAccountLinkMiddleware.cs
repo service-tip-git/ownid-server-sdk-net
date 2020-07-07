@@ -35,7 +35,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Link
             }
 
             var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(requestIdentity.Context);
-            if (cacheItem == null || !cacheItem.IsValidForLoginRegister ||
+            if (cacheItem == null || !cacheItem.IsValidForLink ||
                 cacheItem.RequestToken != requestIdentity.RequestToken ||
                 string.IsNullOrEmpty(cacheItem.ResponseToken) ||
                 cacheItem.ResponseToken != requestIdentity.ResponseToken)

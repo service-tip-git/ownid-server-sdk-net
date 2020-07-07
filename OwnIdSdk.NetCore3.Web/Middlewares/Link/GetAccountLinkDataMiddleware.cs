@@ -28,7 +28,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Link
             {
                 var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(requestIdentity.Context);
                 if (OwnIdProvider.IsContextFormatValid(requestIdentity.Context) && cacheItem != null &&
-                    cacheItem.IsValidForLoginRegister)
+                    cacheItem.IsValidForLink)
                 {
                     var profile = await _linkHandlerAdapter.GetUserProfileAsync(cacheItem.DID);
                     var culture = GetRequestCulture(context);

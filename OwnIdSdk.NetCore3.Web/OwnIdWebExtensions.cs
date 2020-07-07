@@ -29,7 +29,7 @@ namespace OwnIdSdk.NetCore3.Web
                 builder => builder.UseMiddleware<GetChallengeJwtMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/challenge",
                 builder => builder.UseMiddleware<SaveProfileMiddleware>());
-            routeBuilder.MapMiddlewarePost("ownid/{context}/status",
+            routeBuilder.MapMiddlewarePost("ownid/status",
                 builder => builder.UseMiddleware<GetChallengeStatusMiddleware>());
 
             var configuration = app.ApplicationServices.GetService<OwnIdConfiguration>();
@@ -63,6 +63,7 @@ namespace OwnIdSdk.NetCore3.Web
             Action<OwnIdConfigurationBuilder> configureAction = null)
         {
             var builder = new OwnIdConfigurationBuilder(services);
+
             builder.UseInMemoryCacheStore();
             configureAction?.Invoke(builder);
             builder.Configuration.Validate();

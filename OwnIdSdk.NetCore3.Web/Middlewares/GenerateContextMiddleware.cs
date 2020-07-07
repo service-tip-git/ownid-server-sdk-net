@@ -14,6 +14,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     public class GenerateContextMiddleware : BaseMiddleware
     {
         private readonly IAccountLinkHandlerAdapter _linkHandlerAdapter;
+        private readonly uint _expiration;
 
         public GenerateContextMiddleware(
             RequestDelegate next
@@ -27,6 +28,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             cacheStore, localizationService, logger)
         {
             _linkHandlerAdapter = linkHandlerAdapter;
+            _expiration = coreConfiguration.CacheExpirationTimeout;
         }
 
         protected override async Task Execute(HttpContext context)
@@ -67,10 +69,15 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
             await OwnIdProvider.CreateAuthFlowSessionItemAsync(challengeContext, nonce, challengeType, did, payload);
 
-            await Json(context, new GetChallengeLinkResponse(challengeContext,
-                OwnIdProvider.GetDeepLink(challengeContext, challengeType),
-                nonce
-            ), StatusCodes.Status200OK, false);
+            await Json(
+                context
+                , new GetChallengeLinkResponse(
+                    challengeContext
+                    , OwnIdProvider.GetDeepLink(challengeContext, challengeType)
+                    , nonce
+                    , _expiration)
+                , StatusCodes.Status200OK
+                , false);
         }
     }
 }

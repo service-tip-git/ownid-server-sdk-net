@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts;
@@ -14,46 +14,74 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     {
         private readonly IUserHandlerAdapter _userHandlerAdapter;
 
-        public GetChallengeStatusMiddleware(RequestDelegate next, IUserHandlerAdapter userHandlerAdapter,
-            IOwnIdCoreConfiguration coreConfiguration, ICacheStore cacheStore,
-            ILocalizationService localizationService, ILogger<GetChallengeStatusMiddleware> logger) : base(next,
-            coreConfiguration, cacheStore,
-            localizationService, logger)
+        public GetChallengeStatusMiddleware(
+            RequestDelegate next
+            , IUserHandlerAdapter userHandlerAdapter
+            , IOwnIdCoreConfiguration coreConfiguration
+            , ICacheStore cacheStore
+            , ILocalizationService localizationService
+            , ILogger<GetChallengeStatusMiddleware> logger
+        ) : base(next, coreConfiguration, cacheStore, localizationService, logger)
         {
             _userHandlerAdapter = userHandlerAdapter;
         }
 
         protected override async Task Execute(HttpContext context)
         {
-            var routeData = context.GetRouteData();
-            var challengeContext = routeData.Values["context"]?.ToString();
-
-            if (string.IsNullOrEmpty(challengeContext) || !OwnIdProvider.IsContextFormatValid(challengeContext))
+            List<GetStatusRequest> request;
+            try
             {
-                NotFound(context.Response);
+                request = await JsonSerializer.DeserializeAsync<List<GetStatusRequest>>(context.Request.Body);
+            }
+            catch
+            {
+                BadRequest(context.Response);
                 return;
             }
 
-            var request = await JsonSerializer.DeserializeAsync<GetStatusRequest>(context.Request.Body);
+            var response = new List<GetStatusResponse>();
 
-            if (string.IsNullOrEmpty(request.Nonce))
+            foreach (var statusRequestItem in request)
             {
-                NotFound(context.Response);
-                return;
+                var responseItem = await GetContextStatus(statusRequestItem);
+
+                if (responseItem == null)
+                    continue;
+
+                if (responseItem.Status == CacheItemStatus.Finished)
+                {
+                    response = new List<GetStatusResponse>(1) {responseItem};
+                    break;
+                }
+
+                response.Add(responseItem);
             }
 
-            var didResult = await OwnIdProvider.PopFinishedAuthFlowSessionAsync(challengeContext, request.Nonce);
+            await Json(context, response, StatusCodes.Status200OK, false);
+        }
 
-            if (didResult.isSuccess)
+        private async Task<GetStatusResponse> GetContextStatus(GetStatusRequest requestItem)
+        {
+            if (string.IsNullOrEmpty(requestItem.Context) || !OwnIdProvider.IsContextFormatValid(requestItem.Context))
+                return null;
+
+            if (string.IsNullOrEmpty(requestItem.Nonce))
+                return null;
+
+            var didResult = await OwnIdProvider.PopFinishedAuthFlowSessionAsync(requestItem.Context, requestItem.Nonce);
+            if (didResult == null)
+                return null;
+
+            var result = new GetStatusResponse
             {
-                var result = await _userHandlerAdapter.OnSuccessLoginAsync(didResult.did);
+                Status = didResult.Value.Status,
+                Context = requestItem.Context
+            };
 
-                await Json(context, result.Data, result.HttpCode, false);
-                return;
-            }
+            if (didResult.Value.Status == CacheItemStatus.Finished)
+                result.Payload = await _userHandlerAdapter.OnSuccessLoginAsync(didResult.Value.DID);
 
-            await Json(context, new GetStatusResponse {IsSuccess = didResult.isSuccess}, StatusCodes.Status200OK,
-                false);
+            return result;
         }
     }
 }

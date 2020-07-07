@@ -62,6 +62,8 @@ namespace OwnIdSdk.NetCore3.Configuration
         public string Description { get; set; }
 
         public bool IsDevEnvironment { get; set; }
+        
+        public uint CacheExpirationTimeout { get; set; }
 
         /// <summary>
         ///     Sets <see cref="ProfileConfiguration" /> based on <typeparamref name="TProfile" />

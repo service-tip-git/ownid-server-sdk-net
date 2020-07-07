@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Web;
-using Serilog.Events;
 
 namespace OwnIdSdk.NetCore3.Server.Gigya
 {

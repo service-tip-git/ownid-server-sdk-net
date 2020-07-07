@@ -36,9 +36,11 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Recover
             }
 
             var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(requestIdentity.Context);
-            if (cacheItem == null || !cacheItem.IsValidForLoginRegister || cacheItem.RequestToken != requestIdentity.RequestToken ||
-                string.IsNullOrEmpty(cacheItem.ResponseToken) ||
-                cacheItem.ResponseToken != requestIdentity.ResponseToken)
+            if (cacheItem == null 
+                || !cacheItem.IsValidForRecover 
+                || cacheItem.RequestToken != requestIdentity.RequestToken 
+                || string.IsNullOrEmpty(cacheItem.ResponseToken) 
+                || cacheItem.ResponseToken != requestIdentity.ResponseToken)
             {
                 Logger.LogError("No such cache item or incorrect request/response token");
                 NotFound(context.Response);

@@ -9,6 +9,11 @@ namespace OwnIdSdk.NetCore3.Store
     public class CacheItem : ICloneable
     {
         /// <summary>
+        /// State
+        /// </summary>
+        public CacheItemStatus Status { get; set; } = CacheItemStatus.Started;
+        
+        /// <summary>
         /// Auth flow unique identifier
         /// </summary>
         public string Context { get; set; }
@@ -27,12 +32,7 @@ namespace OwnIdSdk.NetCore3.Store
         /// Challenge type related to the <c>Context</c> and <see cref="Nonce"/>
         /// </summary>
         public ChallengeType ChallengeType { get; set; }
-        
-        /// <summary>
-        /// Flags if auth process is finished
-        /// </summary>
-        public bool IsFinished { get; set; }
-        
+
         /// <summary>
         /// Request Token from Web App
         /// </summary>
@@ -42,7 +42,6 @@ namespace OwnIdSdk.NetCore3.Store
         /// Request Token to send to Web App
         /// </summary>
         public string ResponseToken { get; set; }
-        
 
         /// <summary>
         /// Payload
@@ -54,13 +53,13 @@ namespace OwnIdSdk.NetCore3.Store
         public string Payload { get; set; }
 
 
-        public bool IsValidForLoginRegister => !IsFinished &&
+        public bool IsValidForLoginRegister => Status != CacheItemStatus.Finished &&
                                                (ChallengeType == ChallengeType.Register ||
                                                 ChallengeType == ChallengeType.Login);
 
-        public bool IsValidForLink => !IsFinished && ChallengeType == ChallengeType.Link;
+        public bool IsValidForLink => Status != CacheItemStatus.Finished && ChallengeType == ChallengeType.Link;
 
-        public bool IsValidForRecover => !IsFinished && ChallengeType == ChallengeType.Recover;
+        public bool IsValidForRecover => Status != CacheItemStatus.Finished && ChallengeType == ChallengeType.Recover;
         
         /// <summary>
         /// Creates new instance of <see cref="CacheItem"/> based on <see cref="Nonce"/> and <see cref="DID"/>
@@ -72,7 +71,7 @@ namespace OwnIdSdk.NetCore3.Store
                 DID = DID,
                 Nonce = Nonce,
                 ChallengeType = ChallengeType,
-                IsFinished = IsFinished,
+                Status = Status,
                 RequestToken = RequestToken,
                 ResponseToken = ResponseToken,
                 Context = Context,
