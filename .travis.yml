@@ -53,7 +53,7 @@ deploy:
   on:
     branch: develop
 - provider: script
-  script: sh scripts/publish.sh $REPOSITORY_URI_DEVELOP $IMAGE_TAG staging
+  script: sh scripts/publish.sh $REPOSITORY_URI_STAGING $IMAGE_TAG staging
   skip_cleanup: true
   on:
     branch: master
