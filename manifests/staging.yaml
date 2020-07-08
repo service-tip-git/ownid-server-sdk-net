@@ -82,7 +82,7 @@ spec:
             - name: OWNID__WEB_APP_URL
               value: https://sign.staging.ownid.com/sign
             - name: OWNID__CALLBACK_URL
-              value: https://client2.staging.ownid.com/netcore3
+              value: https://client2-server.staging.ownid.com
             - name: OWNID__DID
               value: did:ownid:staging2_151850889514
             - name: OWNID__NAME

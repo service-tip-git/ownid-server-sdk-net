@@ -82,7 +82,7 @@ spec:
             - name: OWNID__WEB_APP_URL
               value: https://sign.dev.ownid.com/sign
             - name: OWNID__CALLBACK_URL
-              value: https://client2.dev.ownid.com/netcore3
+              value: https://client2-server.dev.ownid.com
             - name: OWNID__DID
               value: did:ownid:dev2_151850889514
             - name: OWNID__NAME
