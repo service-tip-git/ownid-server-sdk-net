@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -8,12 +10,19 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Configuration;
+using OwnIdSdk.NetCore3.Contracts;
+using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
+using OwnIdSdk.NetCore3.Web.Exceptions;
+using OwnIdSdk.NetCore3.Web.Extensions;
+using OwnIdSdk.NetCore3.Web.FlowEntries.RequestHandling;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public abstract class BaseMiddleware
     {
+        private readonly BaseRequestFields _fields;
+
         protected readonly ILocalizationService LocalizationService;
         protected readonly ILogger Logger;
         protected readonly RequestDelegate Next;
@@ -26,25 +35,143 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             LocalizationService = localizationService;
             OwnIdProvider = new OwnIdProvider(coreConfiguration, cacheStore, LocalizationService);
             Logger = logger;
+
+            var attrs = GetType().GetCustomAttribute(typeof(RequestDescriptorAttribute));
+
+            if (attrs != null && attrs is RequestDescriptorAttribute descriptor)
+                _fields = descriptor.Fields;
+            else
+                _fields = BaseRequestFields.None;
         }
 
-        public string Context { get; private set; }
+        protected RequestIdentity RequestIdentity { get; private set; }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext httpContext)
         {
-            var routeData = context.GetRouteData();
-            Context = routeData.Values["context"]?.ToString();
+            RequestIdentity = new RequestIdentity();
+            var routeData = httpContext.GetRouteData();
 
-            using var scope = Logger.BeginScope("context: {context}", Context);
+            RequestIdentity.Context = routeData.Values["context"]?.ToString();
 
-            await InterceptErrors(Execute, context);
+            using var scope = Logger.BeginScope("context: {context}", RequestIdentity.Context);
+
+            await InterceptErrors(InternalExecuteAsync, httpContext);
         }
 
-        protected abstract Task Execute(HttpContext context);
+        protected abstract Task Execute(HttpContext httpContext);
 
-        protected void Ok(HttpResponse response)
+        protected async Task<CacheItem> GetRequestRelatedCacheItemAsync()
         {
-            response.StatusCode = (int) HttpStatusCode.OK;
+            var item = await OwnIdProvider.GetCacheItemByContextAsync(RequestIdentity.Context);
+
+            if (item == null)
+                throw new RequestValidationException($"No cache item was found with context={RequestIdentity.Context}");
+
+            return item;
+        }
+
+        protected void ValidateCacheItemTokens(CacheItem item)
+        {
+            if (item.RequestToken != RequestIdentity.RequestToken)
+                throw new RequestValidationException(
+                    $"{nameof(RequestIdentity.RequestToken)} doesn't match. Expected={item.RequestToken} Actual={RequestIdentity.RequestToken}");
+
+            if (item.ResponseToken != RequestIdentity.ResponseToken)
+                throw new RequestValidationException(
+                    $"{nameof(RequestIdentity.ResponseToken)} doesn't match. Expected={item.ResponseToken} Actual={RequestIdentity.ResponseToken}");
+        }
+
+        protected async Task<TData> GetRequestJwtDataAsync<TData>(HttpContext httpContext) where TData : ISignedData
+        {
+            var request = await JsonSerializer.DeserializeAsync<JwtContainer>(httpContext.Request.Body);
+
+            if (string.IsNullOrEmpty(request?.Jwt))
+                throw new RequestValidationException("No JWT was found in request");
+
+            var (jwtContext, userData) = OwnIdProvider.GetDataFromJwt<TData>(request.Jwt);
+
+            if (jwtContext != RequestIdentity.Context)
+                throw new RequestValidationException(
+                    $"Request Context({RequestIdentity.Context}) is not equal to JWT Context({jwtContext})");
+
+            return userData;
+        }
+
+        protected CultureInfo GetRequestCulture(HttpContext context)
+        {
+            var rqf = context.Features.Get<IRequestCultureFeature>();
+            return rqf.RequestCulture.Culture;
+        }
+
+        private async Task InternalExecuteAsync(HttpContext httpContext)
+        {
+            if (_fields != BaseRequestFields.None)
+            {
+                if (_fields.HasFlag(BaseRequestFields.Context) &&
+                    (string.IsNullOrEmpty(RequestIdentity.Context) ||
+                     !OwnIdProvider.IsContextFormatValid(RequestIdentity.Context)))
+                    throw new RequestValidationException(
+                        $"{nameof(RequestIdentity.Context)} is required and should have correct format. Path={httpContext.Request.Path.ToString()}");
+
+                if (_fields.HasFlag(BaseRequestFields.RequestToken))
+                {
+                    if (httpContext.Request.Query.TryGetValue("rt", out var requestToken))
+                        RequestIdentity.RequestToken = requestToken;
+                    else
+                        throw new RequestValidationException(
+                            $"{nameof(RequestIdentity.RequestToken)} is required. Path={httpContext.Request.Path.ToString()} Query={httpContext.Request.QueryString.ToString()}");
+                }
+
+                if (_fields.HasFlag(BaseRequestFields.ResponseToken))
+                {
+                    if (httpContext.Request.Query.TryGetValue("rst", out var responseToken))
+                        RequestIdentity.ResponseToken = responseToken.ToString().GetUrlEncodeString();
+                    else
+                        throw new RequestValidationException(
+                            $"{nameof(RequestIdentity.ResponseToken)} is required. Path={httpContext.Request.Path.ToString()} Query={httpContext.Request.QueryString.ToString()}");
+                }
+            }
+
+            await Execute(httpContext);
+        }
+
+        private async Task InterceptErrors(Func<HttpContext, Task> functionToInvoke, HttpContext httpContext)
+        {
+            try
+            {
+                await functionToInvoke(httpContext);
+            }
+            catch (RequestValidationException e)
+            {
+                Logger.LogError(e, e.Message);
+                httpContext.Response.Clear();
+                httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+            }
+            catch (BusinessValidationException e)
+            {
+                var response = new BadRequestResponse
+                {
+                    FieldErrors = e.FormContext.FieldErrors as IDictionary<string, IList<string>>,
+                    GeneralErrors = e.FormContext.GeneralErrors
+                };
+                httpContext.Response.Clear();
+                await Json(httpContext, response, StatusCodes.Status400BadRequest);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Middleware error interceptor");
+                httpContext.Response.Clear();
+                httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                httpContext.Response.ContentType = "text/html";
+                await httpContext.Response.WriteAsync("Operation failed. Please try later");
+            }
+        }
+
+        #region Response Shortcuts
+
+        protected void OkNoContent(HttpResponse response)
+        {
+            response.StatusCode = (int) HttpStatusCode.NoContent;
         }
 
         protected async Task Json<T>(HttpContext context, T responseBody, int statusCode, bool addLocaleHeader = true)
@@ -72,40 +199,6 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             response.StatusCode = (int) HttpStatusCode.BadRequest;
         }
 
-        protected CultureInfo GetRequestCulture(HttpContext context)
-        {
-            var rqf = context.Features.Get<IRequestCultureFeature>();
-            return rqf.RequestCulture.Culture;
-        }
-
-        private async Task InterceptErrors(Func<HttpContext, Task> functionToInvoke, HttpContext context)
-        {
-            try
-            {
-                await functionToInvoke(context);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Middleware error interceptor");
-                context.Response.Clear();
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                context.Response.ContentType = "text/html";
-                await context.Response.WriteAsync("Operation failed. Please try later");
-            }
-        }
-
-        protected bool TryGetRequestIdentity(HttpContext context,
-            out (string Context, string RequestToken, string ResponseToken) identity)
-        {
-            var isValidRequestIdentity = !string.IsNullOrWhiteSpace(Context) &&
-                                         context.Request.Query.TryGetValue("rt", out var requestToken) &&
-                                         !string.IsNullOrWhiteSpace(requestToken.ToString());
-
-            context.Request.Query.TryGetValue("rst", out var responseToken);
-
-            identity = isValidRequestIdentity ? (Context, requestToken.ToString(), responseToken) : default;
-
-            return isValidRequestIdentity;
-        }
+        #endregion
     }
 }

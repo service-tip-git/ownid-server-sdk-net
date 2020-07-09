@@ -83,6 +83,14 @@ namespace OwnIdSdk.NetCore3.Configuration
         public string Description { get; set; }
 
         /// <summary>
+        ///     Interval for polling operations that will be used by client side.
+        /// </summary>
+        /// <remarks>
+        ///     In milliseconds
+        /// </remarks>
+        public int PollingInterval { get; set; }
+
+        /// <summary>
         ///     Marks if OwnIdSdk is using for development cases
         /// </summary>
         bool IsDevEnvironment { get; set; }

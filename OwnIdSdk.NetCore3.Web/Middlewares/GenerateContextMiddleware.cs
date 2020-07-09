@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
+using OwnIdSdk.NetCore3.Flow;
 using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 
@@ -13,8 +14,9 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public class GenerateContextMiddleware : BaseMiddleware
     {
-        private readonly IAccountLinkHandlerAdapter _linkHandlerAdapter;
         private readonly uint _expiration;
+        private readonly IAccountLinkHandlerAdapter _linkHandlerAdapter;
+        private readonly IUrlProvider _urlProvider;
 
         public GenerateContextMiddleware(
             RequestDelegate next
@@ -22,27 +24,29 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             , IOwnIdCoreConfiguration coreConfiguration
             , ILocalizationService localizationService
             , ILogger<GenerateContextMiddleware> logger
+            , IUrlProvider urlProvider
             , IAccountLinkHandlerAdapter linkHandlerAdapter = null
         ) : base(next,
             coreConfiguration,
             cacheStore, localizationService, logger)
         {
+            _urlProvider = urlProvider;
             _linkHandlerAdapter = linkHandlerAdapter;
             _expiration = coreConfiguration.CacheExpirationTimeout;
         }
 
-        protected override async Task Execute(HttpContext context)
+        protected override async Task Execute(HttpContext httpContext)
         {
-            context.Request.EnableBuffering();
-            var request = await JsonSerializer.DeserializeAsync<GenerateContextRequest>(context.Request.Body);
-            context.Request.Body.Position = 0;
+            httpContext.Request.EnableBuffering();
+            var request = await JsonSerializer.DeserializeAsync<GenerateContextRequest>(httpContext.Request.Body);
+            httpContext.Request.Body.Position = 0;
 
             if (string.IsNullOrWhiteSpace(request.Type) ||
                 !Enum.TryParse(request.Type, true, out ChallengeType challengeType) ||
                 challengeType == ChallengeType.Link && _linkHandlerAdapter == null
             )
             {
-                BadRequest(context.Response);
+                BadRequest(httpContext.Response);
                 return;
             }
 
@@ -51,29 +55,34 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
             string did = null;
             string payload = null;
+            FlowType flowType;
+
             switch (challengeType)
             {
                 case ChallengeType.Register:
-                    break;
                 case ChallengeType.Login:
+                    flowType = FlowType.Authorize;
                     break;
                 case ChallengeType.Link:
-                    did = await _linkHandlerAdapter.GetCurrentUserIdAsync(context.Request);
+                    did = await _linkHandlerAdapter.GetCurrentUserIdAsync(httpContext.Request);
+                    flowType = request.IsQr ? FlowType.LinkWithPin : FlowType.Link;
                     break;
                 case ChallengeType.Recover:
                     payload = request.Payload.ToString();
+                    flowType = request.IsQr ? FlowType.RecoverWithPin : FlowType.Recover;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            await OwnIdProvider.CreateAuthFlowSessionItemAsync(challengeContext, nonce, challengeType, did, payload);
+            await OwnIdProvider.CreateAuthFlowSessionItemAsync(challengeContext, nonce, challengeType, flowType, did,
+                payload);
 
             await Json(
-                context
+                httpContext
                 , new GetChallengeLinkResponse(
                     challengeContext
-                    , OwnIdProvider.GetDeepLink(challengeContext, challengeType)
+                    , _urlProvider.GetWebAppWithCallbackUrl(_urlProvider.GetStartFlowUrl(challengeContext)).ToString()
                     , nonce
                     , _expiration)
                 , StatusCodes.Status200OK

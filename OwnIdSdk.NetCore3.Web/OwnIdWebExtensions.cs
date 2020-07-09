@@ -8,9 +8,10 @@ using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 using OwnIdSdk.NetCore3.Web.Features;
 using OwnIdSdk.NetCore3.Web.FlowEntries;
 using OwnIdSdk.NetCore3.Web.Middlewares;
+using OwnIdSdk.NetCore3.Web.Middlewares.Approval;
+using OwnIdSdk.NetCore3.Web.Middlewares.Authorize;
 using OwnIdSdk.NetCore3.Web.Middlewares.Link;
 using OwnIdSdk.NetCore3.Web.Middlewares.Recover;
-using OwnIdSdk.NetCore3.Web.Middlewares.RegisterLogin;
 
 namespace OwnIdSdk.NetCore3.Web
 {
@@ -25,12 +26,16 @@ namespace OwnIdSdk.NetCore3.Web
 
             routeBuilder.MapMiddlewarePost("ownid",
                 builder => builder.UseMiddleware<GenerateContextMiddleware>());
-            routeBuilder.MapMiddlewareGet("ownid/{context}/challenge",
-                builder => builder.UseMiddleware<GetChallengeJwtMiddleware>());
+            routeBuilder.MapMiddlewarePost("ownid/{context}/start",
+                builder => builder.UseMiddleware<StartFlowMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/challenge",
                 builder => builder.UseMiddleware<SaveProfileMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/status",
                 builder => builder.UseMiddleware<GetChallengeStatusMiddleware>());
+            routeBuilder.MapMiddlewarePost("ownid/{context}/approve",
+                builder => builder.UseMiddleware<ApproveActionMiddleware>());
+            routeBuilder.MapMiddlewarePost("ownid/{context}/approval-status",
+                builder => builder.UseMiddleware<GetActionApprovalStatusMiddleware>());
 
             var configuration = app.ApplicationServices.GetService<OwnIdConfiguration>();
 
@@ -68,7 +73,6 @@ namespace OwnIdSdk.NetCore3.Web
             configureAction?.Invoke(builder);
             builder.Configuration.Validate();
             builder.Configuration.IntegrateFeatures(services);
-            services.TryAddTransient<IAccountLinkHandlerAdapter, AccountLinkHandlerAdapter<LocalizationFeature>>();
         }
     }
 }

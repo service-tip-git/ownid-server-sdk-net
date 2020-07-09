@@ -60,6 +60,8 @@ namespace OwnIdSdk.NetCore3.Configuration
         public string Icon { get; set; }
 
         public string Description { get; set; }
+        
+        public int PollingInterval { get; set; }
 
         public bool IsDevEnvironment { get; set; }
         

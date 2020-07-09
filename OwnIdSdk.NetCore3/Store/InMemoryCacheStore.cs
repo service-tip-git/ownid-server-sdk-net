@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 namespace OwnIdSdk.NetCore3.Store
 {
     /// <summary>
-    /// In memory implementation of <see cref="ICacheStore"/>
+    ///     In memory implementation of <see cref="ICacheStore" />
     /// </summary>
-    /// <inheritdoc cref="ICacheStore"/>
+    /// <inheritdoc cref="ICacheStore" />
     public class InMemoryCacheStore : ICacheStore
     {
         private readonly ConcurrentDictionary<string, CacheItem> _store;

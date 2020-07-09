@@ -3,15 +3,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
+using OwnIdSdk.NetCore3.Flow;
 using OwnIdSdk.NetCore3.Store;
+using OwnIdSdk.NetCore3.Web.Exceptions;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
-using OwnIdSdk.NetCore3.Web.Extensions;
+using OwnIdSdk.NetCore3.Web.FlowEntries.RequestHandling;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares.Recover
 {
+    [RequestDescriptor(BaseRequestFields.Context | BaseRequestFields.RequestToken | BaseRequestFields.ResponseToken)]
     public class RecoverAccountMiddleware : BaseMiddleware
     {
         private readonly IAccountRecoveryHandler _accountRecoveryHandler;
+        private readonly FlowController _flowController;
 
         public RecoverAccountMiddleware(
             RequestDelegate next
@@ -19,46 +23,34 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Recover
             , ICacheStore cacheStore
             , ILocalizationService localizationService
             , IAccountRecoveryHandler accountRecoveryHandler
+            , FlowController flowController
             , ILogger<RecoverAccountMiddleware> logger
         ) : base(next, coreConfiguration, cacheStore, localizationService, logger)
         {
             _accountRecoveryHandler = accountRecoveryHandler;
+            _flowController = flowController;
         }
 
         protected override async Task Execute(HttpContext httpContext)
         {
-            if (!TryGetRequestIdentity(httpContext, out var requestIdentity)
-                || !OwnIdProvider.IsContextFormatValid(requestIdentity.Context))
-            {
-                Logger.LogDebug("Failed request identity validation");
-                NotFound(httpContext.Response);
-                return;
-            }
+            var cacheItem = await GetRequestRelatedCacheItemAsync();
 
-            var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(requestIdentity.Context);
-            if (cacheItem == null || !cacheItem.IsValidForRecover)
-            {
-                Logger.LogError("No such cache item or incorrect request/response token");
-                NotFound(httpContext.Response);
-                return;
-            }
+            if (!cacheItem.IsValidForRecover)
+                throw new RequestValidationException(
+                    "Cache item should be not Finished with Link challenge type. " +
+                    $"Actual Status={cacheItem.Status.ToString()} ChallengeType={cacheItem.ChallengeType}");
 
             // Recover access and get user profile
             var recoverResult = await _accountRecoveryHandler.RecoverAsync(cacheItem.Payload);
 
             var culture = GetRequestCulture(httpContext);
-            await OwnIdProvider.SetRequestTokenAsync(requestIdentity.Context, requestIdentity.RequestToken);
 
-            var jwt = OwnIdProvider.GenerateProfileDataJwt(requestIdentity.Context, cacheItem.ChallengeType,
+            var jwt = OwnIdProvider.GenerateProfileWithConfigDataJwt(RequestIdentity.Context,
+                _flowController.GetNextStep(cacheItem, StepType.Starting),
                 recoverResult.DID,
                 recoverResult.Profile, culture.Name);
 
-            await OwnIdProvider.SetResponseTokenAsync(cacheItem.Context, jwt.Hash.GetUrlEncodeString());
-
-            await Json(httpContext, new JwtContainer
-            {
-                Jwt = jwt.Jwt
-            }, StatusCodes.Status200OK);
+            await Json(httpContext, new JwtContainer(jwt), StatusCodes.Status200OK);
         }
     }
 }

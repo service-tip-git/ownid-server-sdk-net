@@ -1,21 +1,38 @@
 namespace OwnIdSdk.NetCore3.Store
 {
     /// <summary>
-    /// Specifies the <see cref="CacheItem"/> state
+    ///     Specifies the <see cref="CacheItem" /> state
     /// </summary>
     public enum CacheItemStatus
     {
         /// <summary>
-        /// Started
+        ///     Item was created but no interaction was made
         /// </summary>
-        Started = 1,
+        Initiated = 1,
+
         /// <summary>
-        /// Processing started
+        ///     Processing started
         /// </summary>
-        Processing = 2,
+        Started = 2,
+
         /// <summary>
-        /// Processing finished
+        ///     Waiting for user to approve the action
         /// </summary>
-        Finished = 3
+        WaitingForApproval = 3,
+
+        /// <summary>
+        ///     Action approved by user
+        /// </summary>
+        Approved = 4,
+
+        /// <summary>
+        ///     Action declined by user
+        /// </summary>
+        Declined = 5,
+        
+        /// <summary>
+        ///     Process is finished
+        /// </summary>
+        Finished = 99
     }
 }

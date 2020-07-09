@@ -9,12 +9,12 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.IdentityModel.Tokens;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Extensions;
+using OwnIdSdk.NetCore3.Flow;
 using OwnIdSdk.NetCore3.Store;
 
 namespace OwnIdSdk.NetCore3
@@ -57,74 +57,33 @@ namespace OwnIdSdk.NetCore3
             return Guid.NewGuid().ToString();
         }
 
-        public string GenerateUserDid()
-        {
-            return Guid.NewGuid().ToString();
-        }
-
         /// <summary>
-        ///     Creates redirection link to OwnId application
-        /// </summary>
-        /// <param name="context">Challenge Unique identifierChallenge Unique identifier</param>
-        /// <param name="challengeType">
-        ///     <see cref="ChallengeType" />
-        /// </param>
-        /// <returns>Well formatted url string</returns>
-        public string GetDeepLink(string context, ChallengeType challengeType)
-        {
-            var deepLink = new UriBuilder(_ownIdCoreConfiguration.OwnIdApplicationUrl);
-            var query = HttpUtility.ParseQueryString(deepLink.Query);
-            query["t"] = challengeType.ToString("D");
-            var callbackUrl = GenerateCallbackUrl(context, challengeType);
-            query["q"] = $"{callbackUrl.Authority}{callbackUrl.PathAndQuery}";
-
-            deepLink.Query = query.ToString() ?? string.Empty;
-            return deepLink.Uri.ToString();
-        }
-
-        private Uri GenerateCallbackUrl(string context, ChallengeType challengeType)
-        {
-            var path = "";
-
-            if (!string.IsNullOrEmpty(_ownIdCoreConfiguration.CallbackUrl.PathAndQuery))
-                path = _ownIdCoreConfiguration.CallbackUrl.PathAndQuery.EndsWith("/")
-                    ? _ownIdCoreConfiguration.CallbackUrl.PathAndQuery
-                    : _ownIdCoreConfiguration.CallbackUrl.PathAndQuery + "/";
-
-            String action;
-            switch (challengeType)
-            {
-                case ChallengeType.Link:
-                    action = "link";
-                    break;
-                case ChallengeType.Recover:
-                    action = "recover";
-                    break;
-                default:
-                    action = "challenge";
-                    break;
-            }
-
-            return new Uri(_ownIdCoreConfiguration.CallbackUrl, $"{path}ownid/{context}/{action}");
-        }
-
-        /// <summary>
-        /// Generates JWT with configuration and user profile for account linking process 
+        ///     Generates JWT with configuration and user profile for account linking process
         /// </summary>
         /// <param name="context">Challenge Unique identifier</param>
-        /// <param name="challengeType">Requested <see cref="ChallengeType" /></param>
+        /// <param name="nextStep">Next flow step description</param>
         /// <param name="did">User unique identity</param>
         /// <param name="profile">User profile</param>
         /// <param name="locale">Optional. Content locale</param>
-        /// <returns>Base64 encoded string that contains JWT with hash</returns>
-        public (string Jwt, string Hash) GenerateProfileDataJwt(string context, ChallengeType challengeType, string did, object profile,
-            string locale = null)
+        /// <param name="includeRequester">Optional. Default = false. True if should add requester info to jwt</param>
+        /// <returns>Base64 encoded string that contains JWT</returns>
+        public string GenerateProfileWithConfigDataJwt(string context, Step nextStep, string did,
+            object profile,
+            string locale = null, bool includeRequester = false)
         {
-            var data = GetBaseConfigFieldsDictionary(context, challengeType, did, locale)
-                .Union(GetProfileDataDictionary(profile))
+            var data = GetConfigFieldsDictionary(did).Union(GetProfileDataDictionary(profile))
                 .ToDictionary(x => x.Key, x => x.Value);
 
-            return GenerateDataJwt(data);
+            if (includeRequester)
+            {
+                var (key, value) = GetRequester();
+                data[key] = value;
+            }
+
+            var fields = GetBaseFlowFieldsDictionary(context, nextStep, data,
+                locale);
+
+            return GenerateDataJwt(fields);
         }
 
 
@@ -132,14 +91,54 @@ namespace OwnIdSdk.NetCore3
         ///     Creates JWT challenge with requested information by OwnId app
         /// </summary>
         /// <param name="context">Challenge Unique identifier</param>
-        /// <param name="challengeType">Requested <see cref="ChallengeType" /></param>
+        /// <param name="nextStep">Next flow step description</param>
         /// <param name="locale">Optional. Content locale</param>
+        /// <param name="includeRequester">Optional. Default = false. True if should add requester info to jwt</param>
         /// <returns>Base64 encoded string that contains JWT with hash</returns>
-        public (string Jwt, string Hash) GenerateChallengeJwt(string context, ChallengeType challengeType, string locale = null)
+        public string GenerateProfileConfigJwt(string context, Step nextStep, string locale = null,
+            bool includeRequester = false)
         {
-            var data = GetBaseConfigFieldsDictionary(context, challengeType, GenerateUserDid(), locale);
+            var data = GetConfigFieldsDictionary(GenerateUserDid());
 
-            return GenerateDataJwt(data);
+            if (includeRequester)
+            {
+                var (key, value) = GetRequester();
+                data[key] = value;
+            }
+
+            var fields = GetBaseFlowFieldsDictionary(context, nextStep, data,
+                locale);
+
+            return GenerateDataJwt(fields);
+        }
+
+        /// <summary>
+        ///     Generates JWT for pin step
+        /// </summary>
+        /// <param name="context">Challenge Unique identifier</param>
+        /// <param name="nextStep">Next flow step description</param>
+        /// <param name="pin">PIN code generated by <see cref="SetSecurityCode" /></param>
+        /// <param name="locale">Optional. Content locale</param>
+        /// <returns></returns>
+        public string GeneratePinStepJwt(string context, Step nextStep, string pin,
+            string locale = null)
+        {
+            var requester = GetRequester();
+
+            var data = new Dictionary<string, object>
+            {
+                {"pin", pin},
+                {requester.Key, requester.Value}
+            };
+
+            var fields = GetBaseFlowFieldsDictionary(context, nextStep, data, locale);
+            return GenerateDataJwt(fields);
+        }
+
+        public string GenerateFinalStepJwt(string context, Step nextStep, string locale = null)
+        {
+            var fields = GetBaseFlowFieldsDictionary(context, nextStep, null, locale);
+            return GenerateDataJwt(fields);
         }
 
         /// <summary>
@@ -193,9 +192,11 @@ namespace OwnIdSdk.NetCore3
         /// <param name="context">Challenge unique identifier</param>
         /// <param name="nonce">Nonce</param>
         /// <param name="challengeType">Requested challenge type</param>
+        /// <param name="flowType">Flow type for OwnID process</param>
         /// <param name="did">User unique identity, should be null for register or login</param>
         /// <param name="payload">payload</param>
         public async Task CreateAuthFlowSessionItemAsync(string context, string nonce, ChallengeType challengeType,
+            FlowType flowType,
             string did = null, string payload = null)
         {
             await _cacheStore.SetAsync(context, new CacheItem
@@ -205,43 +206,56 @@ namespace OwnIdSdk.NetCore3
                 Context = context,
                 DID = did,
                 Payload = payload,
+                FlowType = flowType
             }
-            , TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.CacheExpirationTimeout));
+            ,TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.CacheExpirationTimeout));
         }
 
         /// <summary>
-        /// Sets Web App request token to check in with the next request
+        ///     Sets Web App request/response token to check with the next request
         /// </summary>
         /// <param name="context">Challenge unique identifier</param>
-        /// <param name="token">Web App request token</param>
-        /// <exception cref="ArgumentException">If no <see cref="CacheItem" /> was found with <paramref name="context" /></exception>
-        public async Task SetRequestTokenAsync(string context, string token)
+        /// <param name="requestToken">Web App request token</param>
+        /// <param name="responseToken">Server-side response token</param>
+        /// <exception cref="ArgumentException">
+        ///     If no <see cref="CacheItem" /> was found with <paramref name="context" />
+        /// </exception>
+        public async Task SetSecurityTokensAsync(string context, string requestToken, string responseToken)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
             if (cacheItem == null)
                 throw new ArgumentException($"Can not find any item with context '{context}'");
 
-            cacheItem.RequestToken = token;
-            cacheItem.Status = CacheItemStatus.Processing;
+            cacheItem.RequestToken = requestToken;
+            cacheItem.ResponseToken = responseToken;
+
+            // TODO: move somewhere and rework logic
+            if (cacheItem.Status == CacheItemStatus.Initiated)
+                cacheItem.Status = CacheItemStatus.Started;
+
             await _cacheStore.SetAsync(context, cacheItem, TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.CacheExpirationTimeout));
         }
 
         /// <summary>
-        /// Sets Web App response token to check in with the next request
+        ///     Sets approval result
         /// </summary>
-        /// <param name="context">Challenge unique identifier</param>
-        /// <param name="token">Web App response token</param>
-        /// <exception cref="ArgumentException">If no <see cref="CacheItem" /> was found with <paramref name="context" /></exception>
-        public async Task SetResponseTokenAsync(string context, string token)
+        /// <param name="context">Challenge Unique identifier</param>
+        /// <param name="nonce">Nonce</param>
+        /// <param name="isApproved">True if approved</param>
+        /// <exception cref="ArgumentException">Cache item was not found</exception>
+        /// <exception cref="ArgumentException">Cache item has incorrect status to set resolution</exception>
+        public async Task SetApprovalResolutionAsync(string context, string nonce, bool isApproved)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
-            if (cacheItem == null)
+            if (cacheItem == null || cacheItem.Context != context || cacheItem.Nonce != nonce)
                 throw new ArgumentException($"Can not find any item with context '{context}'");
 
-            cacheItem.ResponseToken = token;
-            cacheItem.Status = CacheItemStatus.Processing;
+            if (cacheItem.Status != CacheItemStatus.WaitingForApproval)
+                throw new ArgumentException($"Incorrect status={cacheItem.Status.ToString()} for approval '{context}'");
+
+            cacheItem.Status = isApproved ? CacheItemStatus.Approved : CacheItemStatus.Declined;
             await _cacheStore.SetAsync(context, cacheItem, TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.CacheExpirationTimeout));
         }
 
@@ -250,7 +264,6 @@ namespace OwnIdSdk.NetCore3
         /// </summary>
         /// <param name="context">Challenge unique identifier</param>
         /// <param name="did">User unique identifier</param>
-        /// <param name="challengeType"></param>
         /// <exception cref="ArgumentException">
         ///     If no <see cref="CacheItem" /> was found with <paramref name="context" />
         /// </exception>
@@ -267,6 +280,10 @@ namespace OwnIdSdk.NetCore3
             if (cacheItem.ChallengeType == ChallengeType.Link && cacheItem.DID != did)
                 throw new ArgumentException($"Wrong user for linking {did}");
 
+            if (cacheItem.HasFinalState)
+                throw new ArgumentException(
+                    $"Cache item with context='{context}' has final status={cacheItem.Status.ToString()}");
+
             cacheItem.DID = did;
             cacheItem.Status = CacheItemStatus.Finished;
             await _cacheStore.SetAsync(context, cacheItem, TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.CacheExpirationTimeout));
@@ -279,28 +296,28 @@ namespace OwnIdSdk.NetCore3
         /// <param name="context">Challenge unique identifier</param>
         /// <param name="nonce">Nonce</param>
         /// <returns>
-        ///     <see cref="CacheItemStatus"/> and <c>did</c> if <see cref="CacheItem" /> was found, otherwise null
+        ///     <see cref="CacheItemStatus" /> and <c>did</c> if <see cref="CacheItem" /> was found, otherwise null
         /// </returns>
-        public async Task<(CacheItemStatus Status, string DID)?> PopFinishedAuthFlowSessionAsync(string context, string nonce)
+        public async Task<(CacheItemStatus Status, string DID, string Pin)?> PopFinishedAuthFlowSessionAsync(
+            string context,
+            string nonce)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
-            
+
             if (cacheItem == null
                 || cacheItem.Nonce != nonce
-                || cacheItem.Status == CacheItemStatus.Finished && String.IsNullOrEmpty(cacheItem.DID)
+                || cacheItem.Status == CacheItemStatus.Finished && string.IsNullOrEmpty(cacheItem.DID)
             )
-            {
                 return null;
-            }
 
             // If not finished - return just status
-            if (cacheItem.Status != CacheItemStatus.Finished) 
-                return (cacheItem.Status, null);
-            
+            if (cacheItem.Status != CacheItemStatus.Finished)
+                return (cacheItem.Status, null, cacheItem.SecurityCode);
+
             // If finished - clear cache
             await _cacheStore.RemoveAsync(context);
 
-            return (Status: CacheItemStatus.Finished, cacheItem.DID);
+            return (Status: CacheItemStatus.Finished, cacheItem.DID, null);
         }
 
         /// <summary>
@@ -323,7 +340,53 @@ namespace OwnIdSdk.NetCore3
             return Regex.IsMatch(context, "^([a-zA-Z0-9_-]{22})$");
         }
 
-        private (string Jwt, string Hash) GenerateDataJwt(Dictionary<string, object> data, TimeSpan? expiration = null)
+        /// <summary>
+        ///     Sets security code to cache item and changes status to <see cref="CacheItemStatus.WaitingForApproval" />
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task<string> SetSecurityCode(string context)
+        {
+            var random = new Random();
+            var pin = random.Next(0, 9999).ToString("D4");
+            var cacheItem = await _cacheStore.GetAsync(context);
+
+            if (cacheItem == null)
+                throw new ArgumentException($"Can not find any item with context '{context}'");
+
+            if (cacheItem.Status != CacheItemStatus.Initiated && cacheItem.Status != CacheItemStatus.Started)
+                throw new ArgumentException(
+                    $"Wrong status '{cacheItem.Status.ToString()}' for cache item with context '{context}' to set PIN");
+
+            if (cacheItem.ConcurrentId != null)
+                throw new ArgumentException($"Context '{context}' is already modified with PIN");
+
+            cacheItem.ConcurrentId = Guid.NewGuid().ToString();
+            cacheItem.SecurityCode = pin;
+            cacheItem.Status = CacheItemStatus.WaitingForApproval;
+
+            await _cacheStore.SetAsync(context, cacheItem, TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.CacheExpirationTimeout));
+
+            return pin;
+        }
+
+        /// <summary>
+        ///     Gets hash of Base64 encoded JWT string
+        /// </summary>
+        /// <param name="jwt">Base64 encoded JWT string</param>
+        /// <returns>SHA1 Base64 encoded string</returns>
+        public string GetJwtHash(string jwt)
+        {
+            using var sha1 = new SHA1Managed();
+
+            var b64 = Encoding.UTF8.GetBytes(jwt);
+            var hash = sha1.ComputeHash(b64);
+
+            return Convert.ToBase64String(hash);
+        }
+
+        private string GenerateDataJwt(Dictionary<string, object> data, TimeSpan? expiration = null)
         {
             var rsaSecurityKey = new RsaSecurityKey(_ownIdCoreConfiguration.JwtSignCredentials);
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -335,48 +398,64 @@ namespace OwnIdSdk.NetCore3
 
             var payload = new JwtPayload(null, null, null, notBefore, expires, issuedAt);
 
-            foreach (var (key, value) in data)
-            {
-                payload.Add(key, value);
-            }
+            foreach (var (key, value) in data) payload.Add(key, value);
 
             var jwt = new JwtSecurityToken(
                 new JwtHeader(new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)), payload);
 
-            var tokenStr = tokenHandler.WriteToken(jwt);
-
-            using var sha1 = new SHA1Managed();
-
-            var b64 = Encoding.UTF8.GetBytes(tokenStr);
-            var hash = sha1.ComputeHash(b64);
-
-            return (tokenStr, Convert.ToBase64String(hash));
+            return tokenHandler.WriteToken(jwt);
         }
 
         private Dictionary<string, object> GetProfileDataDictionary(object profile)
         {
-            return new Dictionary<string, object> { { "profile", profile } };
+            return new Dictionary<string, object> {{"profile", profile}};
         }
 
-        private Dictionary<string, object> GetBaseConfigFieldsDictionary(string context, ChallengeType challengeType, string did, string locale = null)
+        private Dictionary<string, object> GetBaseFlowFieldsDictionary(string context, Step nextStep,
+            object data = null, string locale = null)
         {
-            var data = new Dictionary<string, object>
+            var stepType = nextStep.Type.ToString();
+            var actionType = nextStep.ActionType.ToString();
+            var stepDict = new Dictionary<string, object>
+            {
+                {"type", stepType.First().ToString().ToLowerInvariant() + stepType.Substring(1)},
+                {"actionType", actionType.First().ToString().ToLowerInvariant() + actionType.Substring(1)},
+                {"challengeType", nextStep.ChallengeType.ToString().ToLowerInvariant()}
+            };
+
+            if (nextStep.Polling != null)
+                stepDict.Add("polling", new
+                {
+                    url = nextStep.Polling.Url.ToString(),
+                    method = nextStep.Polling.Method,
+                    interval = nextStep.Polling.Interval
+                });
+
+            if (nextStep.Callback != null)
+                stepDict.Add("callback", new
+                {
+                    url = nextStep.Callback.Url,
+                    method = nextStep.Callback.Method
+                });
+
+            var fields = new Dictionary<string, object>
             {
                 {"jti", context},
                 {"locale", locale},
+                {"nextStep", stepDict}
+            };
+
+            if (data != null)
+                fields.Add("data", data);
+
+            return fields;
+        }
+
+        private Dictionary<string, object> GetConfigFieldsDictionary(string did)
+        {
+            var dataFields = new Dictionary<string, object>
+            {
                 {"did", did},
-                {"callback", GenerateCallbackUrl(context, challengeType)},
-                {
-                    "requester", new
-                    {
-                        did = _ownIdCoreConfiguration.DID,
-                        pubKey = RsaHelper.ExportPublicKeyToPkcsFormattedString(_ownIdCoreConfiguration
-                            .JwtSignCredentials),
-                        name = Localize(_ownIdCoreConfiguration.Name),
-                        icon = _ownIdCoreConfiguration.Icon,
-                        description = Localize(_ownIdCoreConfiguration.Description)
-                    }
-                },
                 {
                     // TODO : PROFILE
                     "requestedFields", _ownIdCoreConfiguration.ProfileConfiguration.ProfileFieldMetadata.Select(x =>
@@ -401,7 +480,25 @@ namespace OwnIdSdk.NetCore3
                 }
             };
 
-            return data;
+            return dataFields;
+        }
+
+        private KeyValuePair<string, object> GetRequester()
+        {
+            return new KeyValuePair<string, object>("requester", new
+            {
+                did = _ownIdCoreConfiguration.DID,
+                pubKey = RsaHelper.ExportPublicKeyToPkcsFormattedString(_ownIdCoreConfiguration
+                    .JwtSignCredentials),
+                name = Localize(_ownIdCoreConfiguration.Name),
+                icon = _ownIdCoreConfiguration.Icon,
+                description = Localize(_ownIdCoreConfiguration.Description)
+            });
+        }
+
+        private string GenerateUserDid()
+        {
+            return Guid.NewGuid().ToString();
         }
 
         private string Localize(string key, bool defaultAsAlternative = false)

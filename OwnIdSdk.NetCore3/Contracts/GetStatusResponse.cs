@@ -18,7 +18,7 @@ namespace OwnIdSdk.NetCore3.Contracts
         /// Context
         /// </summary>
         [JsonPropertyName("context")]
-        public String Context { get; set; }
+        public string Context { get; set; }
         /// <summary>
         /// Custom payload
         /// </summary>

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Moq;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
+using OwnIdSdk.NetCore3.Flow;
 using OwnIdSdk.NetCore3.Store;
 using Xunit;
 
@@ -103,8 +104,7 @@ namespace OwnIdSdk.NetCore3.Tests
         [Fact]
         public async Task StoreNonceAsync_NotExistingElement()
         {
-            await _ownIdProvider.CreateAuthFlowSessionItemAsync(NotExistingContext, NotExistingNonce,
-                ChallengeType.Login);
+            await _ownIdProvider.CreateAuthFlowSessionItemAsync(NotExistingContext, NotExistingNonce, ChallengeType.Login, FlowType.Authorize);
         }
 
         [Fact]

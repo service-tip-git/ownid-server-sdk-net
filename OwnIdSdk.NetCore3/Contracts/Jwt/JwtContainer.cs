@@ -7,6 +7,15 @@ namespace OwnIdSdk.NetCore3.Contracts.Jwt
     /// </summary>
     public class JwtContainer
     {
+        public JwtContainer()
+        {
+        }
+        
+        public JwtContainer(string jwt)
+        {
+            Jwt = jwt;
+        }
+        
         [JsonPropertyName("jwt")] 
         public string Jwt { get; set; }
     }

@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Cryptography;
+using OwnIdSdk.NetCore3.Flow;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 
 namespace OwnIdSdk.NetCore3.Web.Features
@@ -42,6 +43,9 @@ namespace OwnIdSdk.NetCore3.Web.Features
         public void ApplyServices(IServiceCollection services)
         {
             services.TryAddSingleton(x => (IOwnIdCoreConfiguration) _configuration);
+            
+            services.TryAddSingleton<IUrlProvider, UrlProvider>();
+            services.TryAddSingleton<FlowController>();
         }
 
         public IFeatureConfiguration FillEmptyWithOptional()
@@ -50,6 +54,9 @@ namespace OwnIdSdk.NetCore3.Web.Features
 
             if (_configuration.CacheExpirationTimeout == default)
                 _configuration.CacheExpirationTimeout = (uint) TimeSpan.FromMinutes(10).TotalMilliseconds;
+
+            if (_configuration.PollingInterval == default)
+                _configuration.PollingInterval = 2000;
 
             return this;
         }

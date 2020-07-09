@@ -78,6 +78,13 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 Context = requestItem.Context
             };
 
+            if (didResult.Value.Pin != null && didResult.Value.Status == CacheItemStatus.WaitingForApproval)
+                // TODO: refactor
+                result.Payload = new
+                {
+                    pin = didResult.Value.Pin
+                };
+
             if (didResult.Value.Status == CacheItemStatus.Finished)
                 result.Payload = await _userHandlerAdapter.OnSuccessLoginAsync(didResult.Value.DID);
 

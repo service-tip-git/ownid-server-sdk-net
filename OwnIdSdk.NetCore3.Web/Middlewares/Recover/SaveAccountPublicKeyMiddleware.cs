@@ -1,17 +1,21 @@
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
+using OwnIdSdk.NetCore3.Flow;
 using OwnIdSdk.NetCore3.Store;
+using OwnIdSdk.NetCore3.Web.Exceptions;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Web.FlowEntries.RequestHandling;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares.Recover
 {
+    [RequestDescriptor(BaseRequestFields.Context | BaseRequestFields.RequestToken | BaseRequestFields.ResponseToken)]
     public class SaveAccountPublicKeyMiddleware : BaseMiddleware
     {
         private readonly IAccountRecoveryHandler _accountRecoveryHandler;
+        private readonly FlowController _flowControl;
 
         public SaveAccountPublicKeyMiddleware(
             RequestDelegate next
@@ -20,52 +24,34 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Recover
             , ILocalizationService localizationService
             , IAccountRecoveryHandler accountRecoveryHandler
             , ILogger<SaveAccountPublicKeyMiddleware> logger
+            , FlowController flowControl
         ) : base(next, coreConfiguration, cacheStore, localizationService, logger)
         {
             _accountRecoveryHandler = accountRecoveryHandler;
+            _flowControl = flowControl;
         }
 
-        protected override async Task Execute(HttpContext context)
+        protected override async Task Execute(HttpContext httpContext)
         {
-            if (!TryGetRequestIdentity(context, out var requestIdentity) ||
-                !OwnIdProvider.IsContextFormatValid(requestIdentity.Context))
-            {
-                Logger.LogError("Failed request identity validation");
-                NotFound(context.Response);
-                return;
-            }
+            var cacheItem = await GetRequestRelatedCacheItemAsync();
 
-            var cacheItem = await OwnIdProvider.GetCacheItemByContextAsync(requestIdentity.Context);
-            if (cacheItem == null 
-                || !cacheItem.IsValidForRecover 
-                || cacheItem.RequestToken != requestIdentity.RequestToken 
-                || string.IsNullOrEmpty(cacheItem.ResponseToken) 
-                || cacheItem.ResponseToken != requestIdentity.ResponseToken)
-            {
-                Logger.LogError("No such cache item or incorrect request/response token");
-                NotFound(context.Response);
-                return;
-            }
+            if (!cacheItem.IsValidForRecover)
+                throw new RequestValidationException(
+                    "Cache item should be not Finished with Recover challenge type. " +
+                    $"Actual Status={cacheItem.Status.ToString()} ChallengeType={cacheItem.ChallengeType}");
 
-            var request = await JsonSerializer.DeserializeAsync<JwtContainer>(context.Request.Body);
-            if (string.IsNullOrEmpty(request?.Jwt))
-            {
-                BadRequest(context.Response);
-                return;
-            }
+            ValidateCacheItemTokens(cacheItem);
 
-            var (jwtContext, userData) = OwnIdProvider.GetDataFromJwt<UserProfileData>(request.Jwt);
-            if (jwtContext != requestIdentity.Context)
-            {
-                BadRequest(context.Response);
-                return;
-            }
+            var userData = await GetRequestJwtDataAsync<UserProfileData>(httpContext);
 
             await _accountRecoveryHandler.OnRecoverAsync(userData);
 
-            await OwnIdProvider.FinishAuthFlowSessionAsync(requestIdentity.Context, userData.DID);
+            await OwnIdProvider.FinishAuthFlowSessionAsync(RequestIdentity.Context, userData.DID);
 
-            Ok(context.Response);
+            var jwt = OwnIdProvider.GenerateFinalStepJwt(cacheItem.Context,
+                _flowControl.GetNextStep(cacheItem, StepType.Recover), GetRequestCulture(httpContext).Name);
+
+            await Json(httpContext, new JwtContainer(jwt), StatusCodes.Status200OK);
         }
     }
 }
