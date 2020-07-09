@@ -45,9 +45,15 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             services.AddOwnId(
                 builder =>
                 {
-                    builder.UseGigya(gigyaSection["data_center"], gigyaSection["api_key"], gigyaSection["secret"]);
+                    var loginTypeString = gigyaSection["login_type"];
+
+                    if (string.IsNullOrEmpty(loginTypeString) || !Enum.TryParse(gigyaSection["login_type"], true,
+                        out GigyaLoginType loginType)) loginType = GigyaLoginType.Session;
+
+                    builder.UseGigya(gigyaSection["data_center"], gigyaSection["api_key"], gigyaSection["secret"],
+                        loginType);
                     builder.SetKeys(ownIdSection["pub_key"], ownIdSection["private_key"]);
-                    
+
                     builder.UseWebCacheStore();
 
                     builder.WithBaseSettings(x =>
@@ -57,7 +63,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         x.Description = ownIdSection["description"];
                         x.Icon = ownIdSection["icon"];
                         x.CallbackUrl = new Uri(ownIdSection["callback_url"]);
-                        x.CacheExpirationTimeout = ownIdSection.GetValue("cache_expiration", (uint)TimeSpan.FromMinutes(10).TotalMilliseconds);
+                        x.CacheExpirationTimeout = ownIdSection.GetValue("cache_expiration",
+                            (uint) TimeSpan.FromMinutes(10).TotalMilliseconds);
 
                         //for development cases
                         x.IsDevEnvironment = Configuration.GetValue("OwnIdDevelopmentMode", false);
@@ -114,10 +121,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 .WriteTo.Console();
 
             if (elasticLoggingEnabled)
-            {
                 logger.WriteTo.Elasticsearch(ConfigureElasticSink(elasticSection, environment))
                     .Enrich.WithProperty("source", "net-core-3-sdk");
-            }
 
             Log.Logger = logger.Enrich.WithProperty("environment", environment)
                 .ReadFrom.Configuration(Configuration)
