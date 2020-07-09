@@ -22,8 +22,8 @@ spec:
           ports:
             - containerPort: 5002
           env:
-            - name: OWNID__WEBSITE_URL
-              value: https://client.staging.ownid.com
+            - name: ALLOWEDHOSTS
+              value: https://sign.staging.ownid.com;https://client.staging.ownid.com
             - name: OWNID__WEB_APP_URL
               value: https://sign.staging.ownid.com/sign
             - name: OWNID__CALLBACK_URL
@@ -81,8 +81,8 @@ spec:
           ports:
             - containerPort: 5002
           env:
-            - name: OWNID__WEBSITE_URL
-              value: https://client2.staging.ownid.com
+            - name: ALLOWEDHOSTS
+              value: https://sign.staging.ownid.com;https://client2.staging.ownid.com
             - name: OWNID__WEB_APP_URL
               value: https://sign.staging.ownid.com/sign
             - name: OWNID__CALLBACK_URL
@@ -171,8 +171,8 @@ spec:
           ports:
             - containerPort: 5002
           env:
-            - name: OWNID__WEBSITE_URL
-              value: https://demo.ownid.com
+            - name: ALLOWEDHOSTS
+              value: https://sign.staging.ownid.com;https://demo.ownid.com
             - name: OWNID__WEB_APP_URL
               value: https://sign.staging.ownid.com/sign
             - name: OWNID__CALLBACK_URL
