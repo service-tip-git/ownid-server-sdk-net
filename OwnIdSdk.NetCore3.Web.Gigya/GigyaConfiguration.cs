@@ -7,5 +7,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
         public string ApiKey { get; set; }
         
         public string SecretKey { get; set; }
+        
+        public GigyaLoginType LoginType { get; set; }
     }
 }

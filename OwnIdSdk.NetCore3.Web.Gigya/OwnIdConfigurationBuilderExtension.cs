@@ -14,8 +14,9 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
         /// </param>
         /// <param name="apiKey">Gigya API key</param>
         /// <param name="secret">Gigya Secret key</param>
+        /// <param name="loginType">Login result. Cookie session or JWT ID Token</param>
         public static void UseGigya(this IExtendableConfigurationBuilder builder, string dataCenter, string apiKey,
-            string secret)
+            string secret, GigyaLoginType loginType = GigyaLoginType.Session)
         {
             builder.Services.AddHttpClient();
             var gigyaFeature = new GigyaIntegrationFeature();
@@ -25,6 +26,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 x.DataCenter = dataCenter;
                 x.ApiKey = apiKey;
                 x.SecretKey = secret;
+                x.LoginType = loginType;
             });
             
             builder.AddOrUpdateFeature(gigyaFeature);

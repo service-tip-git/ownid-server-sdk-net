@@ -11,38 +11,71 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 {
     public class GigyaUserHandler : IUserHandler<GigyaUserProfile>
     {
-        private readonly GigyaRestApiClient _restApiClient;
+        private readonly GigyaConfiguration _configuration;
         private readonly ILogger<GigyaUserHandler> _logger;
+        private readonly GigyaRestApiClient _restApiClient;
 
-        public GigyaUserHandler(GigyaRestApiClient restApiClient, ILogger<GigyaUserHandler> logger)
+        public GigyaUserHandler(GigyaRestApiClient restApiClient, GigyaConfiguration configuration,
+            ILogger<GigyaUserHandler> logger)
         {
             _restApiClient = restApiClient;
+            _configuration = configuration;
             _logger = logger;
         }
 
         public async Task<LoginResult<object>> OnSuccessLoginAsync(string did)
         {
-            var loginResponse = await _restApiClient.NotifyLogin(did, "browser");
+            if (_configuration.LoginType == GigyaLoginType.Session)
+            {
+                var loginResponse = await _restApiClient.NotifyLogin(did, "browser");
 
-            if (loginResponse.SessionInfo == null || loginResponse.ErrorCode != 0)
+                if (loginResponse.SessionInfo == null || loginResponse.ErrorCode != 0)
+                    return new LoginResult<object>
+                    {
+                        HttpCode = (int) HttpStatusCode.Unauthorized,
+                        Data = new
+                        {
+                            status = false,
+                            errorMessage = $"Gigya: {loginResponse.GetFailureMessage()}"
+                        }
+                    };
+
+                return new LoginResult<object>
+                {
+                    HttpCode = (int) HttpStatusCode.OK,
+                    Data = new
+                    {
+                        status = true,
+                        sessionInfo = loginResponse.SessionInfo,
+                        identities = loginResponse.Identities.FirstOrDefault()
+                    }
+                };
+            }
+
+            var jwtResponse = await _restApiClient.GetJwt(did);
+
+            if (jwtResponse.IdToken == null || jwtResponse.ErrorCode != 0)
                 return new LoginResult<object>
                 {
                     HttpCode = (int) HttpStatusCode.Unauthorized,
                     Data = new
                     {
                         status = false,
-                        errorMessage = $"Gigya: {loginResponse.ErrorCode}:{loginResponse.ErrorMessage}"
+                        errorMessage = $"Gigya: {jwtResponse.GetFailureMessage()}"
                     }
                 };
 
             return new LoginResult<object>
             {
-                HttpCode = (int) HttpStatusCode.OK,
+                HttpCode = (int) HttpStatusCode.Unauthorized,
                 Data = new
                 {
                     status = true,
-                    sessionInfo = loginResponse.SessionInfo,
-                    identities = loginResponse.Identities.FirstOrDefault()
+                    Data = new
+                    {
+                        status = true,
+                        idToken = jwtResponse.IdToken
+                    }
                 }
             };
         }
@@ -90,18 +123,14 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             // new user
             if (getAccountMessage.ErrorCode != 403005)
-            {
                 throw new Exception(
                     $"Gigya.getAccountInfo error -> {getAccountMessage.GetFailureMessage()}");
-            }
 
             var loginResponse = await _restApiClient.NotifyLogin(context.DID);
 
             if (loginResponse.ErrorCode != 0)
-            {
                 throw new Exception(
                     $"Gigya.notifyLogin error -> {loginResponse.GetFailureMessage()}");
-            }
 
             var setAccountMessage =
                 await _restApiClient.SetAccountInfo(context.DID, context.Profile, new {pubKey = context.PublicKey});
@@ -111,8 +140,9 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 var removeUserResult = await _restApiClient.DeleteAccountAsync(context.DID);
 
                 if (removeUserResult.ErrorCode != 0)
-                    throw new Exception($"Gigya.deleteAccount with uid={context.DID} error -> {loginResponse.GetFailureMessage()}");
-                
+                    throw new Exception(
+                        $"Gigya.deleteAccount with uid={context.DID} error -> {loginResponse.GetFailureMessage()}");
+
                 context.SetError(x => x.Email, setAccountMessage.ErrorMessage);
                 return;
             }

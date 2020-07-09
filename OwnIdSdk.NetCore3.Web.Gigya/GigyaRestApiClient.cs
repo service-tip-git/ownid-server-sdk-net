@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Accounts;
+using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Login;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.UpdateProfile;
 
@@ -90,7 +91,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             return await JsonSerializer.DeserializeAsync<LoginResponse>(
                 await responseMessage.Content.ReadAsStreamAsync());
         }
-
+        
         public async Task<JsonWebKey> GetPublicKey()
         {
             var parameters = new List<KeyValuePair<string, string>>
@@ -102,6 +103,22 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getJWTPublicKey"),
                 new FormUrlEncodedContent(parameters));
             return new JsonWebKey(await responseMessage.Content.ReadAsStringAsync());
+        }
+
+        public async Task<GetJwtResponse> GetJwt(string did)
+        {
+            var parameters = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("apiKey", _configuration.ApiKey),
+                new KeyValuePair<string, string>("secret", _configuration.SecretKey),
+                new KeyValuePair<string, string>("targetUID", did)
+            };
+
+            var responseMessage = await _httpClient.PostAsync(
+                new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getJWT"),
+                new FormUrlEncodedContent(parameters));
+            return await JsonSerializer.DeserializeAsync<GetJwtResponse>(
+                await responseMessage.Content.ReadAsStreamAsync());
         }
 
         /// <summary>
