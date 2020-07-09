@@ -16,7 +16,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 {
     public class Startup
     {
-        private const string CorsPolicyName = "AllowAll";
+        private const string CorsPolicyName = "_defaultPolicy";
 
         public Startup(IConfiguration configuration)
         {
@@ -29,19 +29,18 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors(x =>
-            {
-                x.AddPolicy(CorsPolicyName, builder =>
-                {
-                    // builder.AllowCredentials();
-                    builder.AllowAnyHeader();
-                    builder.AllowAnyMethod();
-                    builder.AllowAnyOrigin();
-                });
-            });
-
             var ownIdSection = Configuration.GetSection("ownid");
             var gigyaSection = Configuration.GetSection("gigya");
+
+            services.AddCors(x =>
+            {
+                x.AddDefaultPolicy(builder =>
+                {
+                    builder.WithOrigins("https://*.ownid.com", ownIdSection["website_url"])
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
 
             services.AddOwnId(
                 builder =>
@@ -56,11 +55,11 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         x.Description = ownIdSection["description"];
                         x.Icon = ownIdSection["icon"];
                         x.CallbackUrl = new Uri(ownIdSection["callback_url"]);
-                        x.CacheExpirationTimeout =  ownIdSection.GetValue("cache_expiration", (uint) TimeSpan.FromMinutes(10).TotalMilliseconds);
+                        x.CacheExpirationTimeout = ownIdSection.GetValue("cache_expiration", (uint)TimeSpan.FromMinutes(10).TotalMilliseconds);
 
                         //for development cases
                         x.IsDevEnvironment = Configuration.GetValue("OwnIdDevelopmentMode", false);
-                        x.OwnIdApplicationUrl = new Uri(ownIdSection["web_app_url"]);
+                        x.OwnIdApplicationUrl = new Uri(ownIdSection["web_app_url"] ?? "https://sign.ownid.com");
                     });
                 });
 
@@ -89,14 +88,14 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 x.AddSupportedUICultures("ru", "en", "es");
             });
             app.UseCors(CorsPolicyName);
-            
+
             // TODO: not for prod
             app.UseMiddleware<LogRequestMiddleware>();
             var routeBuilder = new RouteBuilder(app);
             routeBuilder.MapMiddlewarePost("log",
                 builder => builder.UseMiddleware<LogMiddleware>());
             app.UseRouter(routeBuilder.Build());
-            
+
             app.UseOwnId();
         }
 
