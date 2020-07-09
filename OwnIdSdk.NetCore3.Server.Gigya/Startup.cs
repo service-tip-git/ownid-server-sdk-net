@@ -16,7 +16,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 {
     public class Startup
     {
-        private const string CorsPolicyName = "_defaultPolicy";
+        private const string CorsPolicyName = "AllowAll";
 
         public Startup(IConfiguration configuration)
         {
@@ -36,9 +36,9 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             {
                 x.AddPolicy(CorsPolicyName, builder =>
                 {
-                    builder.AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
+                    builder.AllowAnyHeader();
+                    builder.AllowAnyMethod();
+                    builder.AllowAnyOrigin();
                 });
             });
 
