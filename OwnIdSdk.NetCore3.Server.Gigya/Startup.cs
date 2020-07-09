@@ -36,7 +36,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             {
                 x.AddPolicy(CorsPolicyName, builder =>
                 {
-                    builder.WithOrigins("https://*.ownid.com", ownIdSection["website_url"])
+                    builder.AllowAnyOrigin()
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                 });
