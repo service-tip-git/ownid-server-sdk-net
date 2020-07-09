@@ -23,7 +23,7 @@ spec:
             - containerPort: 5002
           env:
             - name: ALLOWEDHOSTS
-              value: https://sign.dev.ownid.com;https://client.dev.ownid.com
+              value: sign.dev.ownid.com;client.dev.ownid.com
             - name: OWNID__WEB_APP_URL
               value: https://sign.dev.ownid.com/sign
             - name: OWNID__CALLBACK_URL
@@ -82,7 +82,7 @@ spec:
             - containerPort: 5002
           env:
             - name: ALLOWEDHOSTS
-              value: https://sign.dev.ownid.com;https://client2.dev.ownid.com
+              value: sign.dev.ownid.com;client2.dev.ownid.com
             - name: OWNID__WEB_APP_URL
               value: https://sign.dev.ownid.com/sign
             - name: OWNID__CALLBACK_URL
@@ -172,7 +172,7 @@ spec:
             - containerPort: 5002
           env:
             - name: ALLOWEDHOSTS
-              value: https://sign.dev.ownid.com;https://demo.dev.ownid.com
+              value: sign.dev.ownid.com;demo.dev.ownid.com
             - name: OWNID__WEB_APP_URL
               value: https://sign.dev.ownid.com/sign
             - name: OWNID__CALLBACK_URL
