@@ -205,7 +205,8 @@ namespace OwnIdSdk.NetCore3
                 Context = context,
                 DID = did,
                 Payload = payload,
-            });
+            }
+            , TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.CacheExpirationTimeout));
         }
 
         /// <summary>
@@ -223,7 +224,7 @@ namespace OwnIdSdk.NetCore3
 
             cacheItem.RequestToken = token;
             cacheItem.Status = CacheItemStatus.Processing;
-            await _cacheStore.SetAsync(context, cacheItem);
+            await _cacheStore.SetAsync(context, cacheItem, TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.CacheExpirationTimeout));
         }
 
         /// <summary>
@@ -241,7 +242,7 @@ namespace OwnIdSdk.NetCore3
 
             cacheItem.ResponseToken = token;
             cacheItem.Status = CacheItemStatus.Processing;
-            await _cacheStore.SetAsync(context, cacheItem);
+            await _cacheStore.SetAsync(context, cacheItem, TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.CacheExpirationTimeout));
         }
 
         /// <summary>
@@ -268,7 +269,7 @@ namespace OwnIdSdk.NetCore3
 
             cacheItem.DID = did;
             cacheItem.Status = CacheItemStatus.Finished;
-            await _cacheStore.SetAsync(context, cacheItem);
+            await _cacheStore.SetAsync(context, cacheItem, TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.CacheExpirationTimeout));
         }
 
         /// <summary>

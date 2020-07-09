@@ -48,6 +48,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 {
                     builder.UseGigya(gigyaSection["data_center"], gigyaSection["api_key"], gigyaSection["secret"]);
                     builder.SetKeys(ownIdSection["pub_key"], ownIdSection["private_key"]);
+                    
+                    builder.UseWebCacheStore();
 
                     builder.WithBaseSettings(x =>
                     {

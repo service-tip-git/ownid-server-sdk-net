@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Web.Store;
 
 namespace OwnIdSdk.NetCore3.Web.Features
 {
@@ -10,33 +12,42 @@ namespace OwnIdSdk.NetCore3.Web.Features
     {
         private Type _storeType;
         private ServiceLifetime _serviceLifetime;
+        private Action<IServiceCollection> _servicesInitialization;
 
         public CacheStoreFeature()
         {
-        }
-
-        protected CacheStoreFeature(CacheStoreFeature feature)
-        {
-            _storeType = feature._storeType;
-            _serviceLifetime = feature._serviceLifetime;
         }
 
         public CacheStoreFeature UseStoreInMemoryStore()
         {
             _storeType = typeof(InMemoryCacheStore);
             _serviceLifetime = ServiceLifetime.Singleton;
-            return new CacheStoreFeature(this);
+            return this;
+        }
+
+        public CacheStoreFeature UseWebCacheStore()
+        {
+            _servicesInitialization = 
+                services => services.AddMemoryCache();
+            
+            _storeType = typeof(WebCacheStore);
+            _serviceLifetime = ServiceLifetime.Singleton;
+            
+            return this;
         }
 
         public CacheStoreFeature UseStore<TStore>(ServiceLifetime serviceLifetime) where TStore : class, ICacheStore
         {
             _serviceLifetime = serviceLifetime;
             _storeType = typeof(TStore);
-            return new CacheStoreFeature(this);
+            
+            return this;
         }
         
         public void ApplyServices(IServiceCollection services)
         {
+            _servicesInitialization?.Invoke(services);
+            
             services.TryAdd(new ServiceDescriptor(typeof(ICacheStore), _storeType, _serviceLifetime));
         }
 

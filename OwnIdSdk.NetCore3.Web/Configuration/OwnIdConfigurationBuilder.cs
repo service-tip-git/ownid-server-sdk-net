@@ -138,12 +138,21 @@ namespace OwnIdSdk.NetCore3.Web.Configuration
         /// <summary>
         ///     Defines usage of In Memory Cache Store
         /// </summary>
-        /// <remarks>
-        ///     Used by default
-        /// </remarks>
+
         public void UseInMemoryCacheStore()
         {
             WithFeature<CacheStoreFeature>(x => x.UseStoreInMemoryStore());
+        }
+        
+        /// <summary>
+        ///     Defines usage of Default ASP.NET Core Web Cache Store
+        /// </summary>
+        /// <remarks>
+        ///     Used by default
+        /// </remarks>
+        public void UseWebCacheStore()
+        {
+            WithFeature<CacheStoreFeature>(x => x.UseWebCacheStore());
         }
 
         private OwnIdConfigurationBuilder WithFeature<TFeature>(Func<TFeature, TFeature> setupFunc)

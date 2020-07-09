@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
@@ -16,15 +17,15 @@ namespace OwnIdSdk.NetCore3.Store
             _store = new ConcurrentDictionary<string, CacheItem>();
         }
 
-        public void Set(string key, CacheItem data)
+        public void Set(string key, CacheItem data, TimeSpan expiration)
         {
             _store.AddOrUpdate(key, data, (s, o) => data);
         }
 
-        public async Task SetAsync(string key, CacheItem data)
+        public Task SetAsync(string key, CacheItem data, TimeSpan expiration)
         {
-            Set(key, data);
-            await Task.CompletedTask;
+            Set(key, data, expiration);
+            return Task.CompletedTask;
         }
 
         public CacheItem Get(string key)
@@ -32,9 +33,9 @@ namespace OwnIdSdk.NetCore3.Store
             return !_store.TryGetValue(key, out var item) ? null : item;
         }
 
-        public async Task<CacheItem> GetAsync(string key)
+        public Task<CacheItem> GetAsync(string key)
         {
-            return await Task.FromResult(Get(key));
+            return Task.FromResult(Get(key));
         }
 
         public void Remove(string key)
@@ -42,10 +43,10 @@ namespace OwnIdSdk.NetCore3.Store
             _store.TryRemove(key, out _);
         }
 
-        public async Task RemoveAsync(string key)
+        public Task RemoveAsync(string key)
         {
             Remove(key);
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
     }
 }
