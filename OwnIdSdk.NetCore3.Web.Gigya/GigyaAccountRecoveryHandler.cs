@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Contracts.AccountRecovery;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.AccountRecovery;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya
@@ -48,27 +49,22 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 DID = resetPasswordResponse.UID,
                 Profile = new GigyaUserProfile
                 {
-                    Email = TryGetValue(accountInfo.Profile, "email"),
-                    FirstName = TryGetValue(accountInfo.Profile, "firstName"),
-                    LastName = TryGetValue(accountInfo.Profile, "lastName"),
-                    Nickname = TryGetValue(accountInfo.Profile, "nickName")
+                    Email = accountInfo.Profile.GetValueOrDefault("email"),
+                    FirstName = accountInfo.Profile.GetValueOrDefault("firstName"),
+                    LastName = accountInfo.Profile.GetValueOrDefault("lastName"),
+                    Nickname = accountInfo.Profile.GetValueOrDefault("nickName")
                 }
             };
         }
 
         public async Task OnRecoverAsync(UserProfileData userData)
         {
-            var responseMessage = await _apiClient.SetAccountInfo(userData.DID, data: new { pubKey = userData.PublicKey });
+            var responseMessage = await _apiClient.SetAccountInfo(userData.DID, data: new AccountData(userData.PublicKey));
 
             if (responseMessage.ErrorCode != 0)
             {
                 throw new Exception($"Gigya.setAccountInfo error -> {responseMessage.GetFailureMessage()}");
             }
-        }
-
-        private string TryGetValue(Dictionary<string, string> data, string key)
-        {
-            return data.TryGetValue(key, out var value) ? value : null;
         }
     }
 }

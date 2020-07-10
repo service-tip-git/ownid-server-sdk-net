@@ -60,12 +60,14 @@ namespace OwnIdSdk.NetCore3.Configuration
         public string Icon { get; set; }
 
         public string Description { get; set; }
-        
+
         public int PollingInterval { get; set; }
 
         public bool IsDevEnvironment { get; set; }
-        
+
         public uint CacheExpirationTimeout { get; set; }
+        
+        public uint MaximumNumberOfConnectedDevices { get; set; }
 
         /// <summary>
         ///     Sets <see cref="ProfileConfiguration" /> based on <typeparamref name="TProfile" />

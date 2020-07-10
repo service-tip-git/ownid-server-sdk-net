@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Web.Extensibility;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya
 {
@@ -86,13 +87,11 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             if (getAccountMessage.ErrorCode == 0)
             {
-                if (getAccountMessage.Data == null || !getAccountMessage.Data.ContainsKey("pubKey"))
+                if (getAccountMessage.Data == null || !getAccountMessage.Data.PubKeys.Any())
                     throw new Exception($"Found gigya user uid={context.DID} without pubKey");
-
-                var key = getAccountMessage.Data["pubKey"].ToString();
-
-                if (key != context.PublicKey)
-                    throw new Exception("Public key doesn't match gigya user key");
+                
+                if (!getAccountMessage.Data.PubKeys.Contains(context.PublicKey))
+                    throw new Exception("Public key doesn't match any of gigya user keys");
 
                 var setAccountResponse = await _restApiClient.SetAccountInfo(context.DID, context.Profile);
 
@@ -133,7 +132,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                     $"Gigya.notifyLogin error -> {loginResponse.GetFailureMessage()}");
 
             var setAccountMessage =
-                await _restApiClient.SetAccountInfo(context.DID, context.Profile, new {pubKey = context.PublicKey});
+                await _restApiClient.SetAccountInfo(context.DID, context.Profile, new AccountData(context.PublicKey));
 
             if (setAccountMessage.ErrorCode == 403043)
             {

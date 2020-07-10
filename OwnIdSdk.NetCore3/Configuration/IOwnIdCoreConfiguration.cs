@@ -100,5 +100,11 @@ namespace OwnIdSdk.NetCore3.Configuration
         /// </summary>
         /// <remarks>Default value is 10 minutes</remarks>
         uint CacheExpirationTimeout { get; set; }
+        
+        /// <summary>
+        ///     Maximum number of connected devices
+        /// </summary>
+        /// <remarks>Default value is 5</remarks>
+        uint MaximumNumberOfConnectedDevices { get; set; }
     }
 }

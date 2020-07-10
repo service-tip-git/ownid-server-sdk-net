@@ -34,7 +34,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
         }
 
         public async Task<BaseGigyaResponse> SetAccountInfo(string did, GigyaUserProfile profile = null,
-            object data = null)
+            AccountData data = null)
         {
             var serializationSettings = new JsonSerializerOptions
             {
@@ -80,10 +80,10 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 new KeyValuePair<string, string>("secret", _configuration.SecretKey),
                 new KeyValuePair<string, string>("siteUID", did)
             };
-            
-            if(targetEnvironment !=null)
+
+            if (targetEnvironment != null)
                 parameters.Add(new KeyValuePair<string, string>("targetEnv", targetEnvironment));
-            
+
             var responseMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.notifyLogin"),
                 new FormUrlEncodedContent(parameters));
@@ -91,14 +91,14 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             return await JsonSerializer.DeserializeAsync<LoginResponse>(
                 await responseMessage.Content.ReadAsStreamAsync());
         }
-        
+
         public async Task<JsonWebKey> GetPublicKey()
         {
             var parameters = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("apiKey", _configuration.ApiKey)
             };
-            
+
             var responseMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getJWTPublicKey"),
                 new FormUrlEncodedContent(parameters));
@@ -142,7 +142,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 new KeyValuePair<string, string>("newPassword", newPassword),
                 new KeyValuePair<string, string>("passwordResetToken", resetToken),
             };
-            
+
             var responseMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.resetPassword"),
                 new FormUrlEncodedContent(parameters));
@@ -150,7 +150,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             return await JsonSerializer.DeserializeAsync<ResetPasswordResponse>(
                 await responseMessage.Content.ReadAsStreamAsync());
         }
-        
+
         public async Task<BaseGigyaResponse> DeleteAccountAsync(string did)
         {
             var parameters = new List<KeyValuePair<string, string>>
@@ -159,7 +159,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 new KeyValuePair<string, string>("secret", _configuration.SecretKey),
                 new KeyValuePair<string, string>("UID", did)
             };
-            
+
             var responseMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.deleteAccount"),
                 new FormUrlEncodedContent(parameters));
@@ -183,12 +183,10 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             var getAccountMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getAccountInfo"),
                 new FormUrlEncodedContent(data));
-
-            var content =
+            
+            return
                 await JsonSerializer.DeserializeAsync<GetAccountInfoResponse>(await getAccountMessage.Content
                     .ReadAsStreamAsync());
-
-            return content;
         }
     }
 }

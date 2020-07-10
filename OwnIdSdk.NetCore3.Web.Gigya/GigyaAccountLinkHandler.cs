@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
+using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Jwt;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya
@@ -14,12 +17,18 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
     {
         private const string ApiKeyPayloadKey = "apiKey";
         private readonly GigyaConfiguration _configuration;
+        private readonly IOwnIdCoreConfiguration _ownIdConfiguration;
         private readonly GigyaRestApiClient _restApiClient;
 
-        public GigyaAccountLinkHandler(GigyaRestApiClient restApiClient, GigyaConfiguration configuration)
+        public GigyaAccountLinkHandler(
+            GigyaRestApiClient restApiClient
+            , GigyaConfiguration configuration
+            , IOwnIdCoreConfiguration ownIdConfiguration
+        )
         {
             _restApiClient = restApiClient;
             _configuration = configuration;
+            _ownIdConfiguration = ownIdConfiguration;
         }
 
         public async Task<string> GetCurrentUserIdAsync(HttpRequest request)
@@ -28,7 +37,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             if (string.IsNullOrEmpty(jwt))
                 throw new Exception("No JWT was found in HttpRequest");
-            
+
             var tokenHandler = new JwtSecurityTokenHandler();
 
             if (!tokenHandler.CanReadToken(jwt)) throw new Exception("Invalid jwt");
@@ -79,10 +88,10 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             // TODO: use reflection to fill fields
             return new GigyaUserProfile
             {
-                Email = TryGetValue(accountInfo.Profile, "email"),
-                FirstName = TryGetValue(accountInfo.Profile, "firstName"),
-                LastName = TryGetValue(accountInfo.Profile, "lastName"),
-                Nickname = TryGetValue(accountInfo.Profile, "nickName")
+                Email = accountInfo.Profile.GetValueOrDefault("email"),
+                FirstName = accountInfo.Profile.GetValueOrDefault("firstName"),
+                LastName = accountInfo.Profile.GetValueOrDefault("lastName"),
+                Nickname = accountInfo.Profile.GetValueOrDefault("nickName")
             };
         }
 
@@ -91,12 +100,23 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             var accountInfo = await _restApiClient.GetUserInfoByUid(context.DID);
 
             if (accountInfo.ErrorCode != 0)
+            {
                 throw new Exception(
                     $"Gigya.getAccountInfo error -> {accountInfo.GetFailureMessage()}");
+            }
+
+            if (accountInfo.Data.PubKeys.Count >= _ownIdConfiguration.MaximumNumberOfConnectedDevices)
+            {
+                throw new Exception(
+                    $"Gigya.OnLink error -> maximum number ({_ownIdConfiguration.MaximumNumberOfConnectedDevices}) of linked devices reached");
+            }
+
+            // add new public key to 
+            accountInfo.Data.PubKeys.Add(context.PublicKey);
 
             var setAccountMessage =
-                await _restApiClient.SetAccountInfo(context.DID, context.Profile, new {pubKey = context.PublicKey});
-            
+                await _restApiClient.SetAccountInfo(context.DID, context.Profile, accountInfo.Data);
+
             if (setAccountMessage.ErrorCode == 403043)
             {
                 context.SetError(x => x.Email, setAccountMessage.ErrorMessage);
@@ -106,11 +126,6 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             if (setAccountMessage.ErrorCode != 0)
                 throw new Exception(
                     $"Gigya.setAccountInfo error -> {setAccountMessage.GetFailureMessage()}");
-        }
-
-        private string TryGetValue(Dictionary<string, string> data, string key)
-        {
-            return data.TryGetValue(key, out var value) ? value : null;
         }
     }
 }

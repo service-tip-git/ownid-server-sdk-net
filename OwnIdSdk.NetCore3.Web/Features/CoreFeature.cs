@@ -58,6 +58,9 @@ namespace OwnIdSdk.NetCore3.Web.Features
             if (_configuration.PollingInterval == default)
                 _configuration.PollingInterval = 2000;
 
+            if (_configuration.MaximumNumberOfConnectedDevices == default)
+                _configuration.MaximumNumberOfConnectedDevices = 5;
+
             return this;
         }
 
