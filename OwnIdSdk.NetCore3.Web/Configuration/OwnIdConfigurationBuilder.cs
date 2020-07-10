@@ -138,7 +138,6 @@ namespace OwnIdSdk.NetCore3.Web.Configuration
         /// <summary>
         ///     Defines usage of In Memory Cache Store
         /// </summary>
-
         public void UseInMemoryCacheStore()
         {
             WithFeature<CacheStoreFeature>(x => x.UseStoreInMemoryStore());

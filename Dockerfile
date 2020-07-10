@@ -13,6 +13,8 @@ ENV OWNID__NAME="Local Client NetCore3"
 ENV OWNID__DESCRIPTION="Local Client NetCore3 environment"
 ENV GIGYA__SECRET="g157+kUR3kxvgIX4MneEWnVgBVzhQe4dXfoNe9ceSNA="
 ENV GIGYA__API_KEY="3_s5-gLs4aLp5FXluP8HXs7_JN40XWNlbvYWVCCkbNCqlhW6Sm5Z4tXGGsHcSJYD3W"
+ENV OWNID__CACHE_TYPE="redis"
+ENV OWNID__CACHE_CONFIG="ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:6379"
 ENV ELASTICCONFIGURATION__ENABLED="false"
 ENV ASPNETCORE_ENVIRONMENT="dev"
 
@@ -22,6 +24,7 @@ COPY ./OwnIdSdk.NetCore3.Web ./OwnIdSdk.NetCore3.Web
 COPY ./OwnIdSdk.NetCore3.Web.Extensibility ./OwnIdSdk.NetCore3.Web.Extensibility
 COPY ./OwnIdSdk.NetCore3.Web.Gigya ./OwnIdSdk.NetCore3.Web.Gigya
 COPY ./OwnIdSdk.NetCore3.Server.Gigya ./OwnIdSdk.NetCore3.Server.Gigya
+COPY ./OwnIdSdk.NetCore3.Redis ./OwnIdSdk.NetCore3.Redis
 
 
 RUN dotnet restore ./OwnIdSdk.NetCore3.Server.Gigya/OwnIdSdk.NetCore3.Server.Gigya.csproj

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OwnIdSdk.NetCore3.Redis;
 using OwnIdSdk.NetCore3.Web;
 using OwnIdSdk.NetCore3.Web.Gigya;
 using Serilog;
@@ -54,7 +55,15 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         loginType);
                     builder.SetKeys(ownIdSection["pub_key"], ownIdSection["private_key"]);
 
-                    builder.UseWebCacheStore();
+                    switch (ownIdSection["cache_type"])
+                    {
+                        case "web-cache":
+                            builder.UseWebCacheStore();
+                            break;
+                        case "redis":
+                            builder.UseCacheStore<RedisCacheStore>(ServiceLifetime.Singleton);
+                            break;
+                    }
 
                     builder.WithBaseSettings(x =>
                     {

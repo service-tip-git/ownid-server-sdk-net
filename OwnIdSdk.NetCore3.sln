@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnIdSdk.NetCore3.Web.Gigya
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnIdSdk.NetCore3.Web.Extensibility", "OwnIdSdk.NetCore3.Web.Extensibility\OwnIdSdk.NetCore3.Web.Extensibility.csproj", "{31190FAF-695C-4BEA-AC63-0ECA2553A763}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnIdSdk.NetCore3.Redis", "OwnIdSdk.NetCore3.Redis\OwnIdSdk.NetCore3.Redis.csproj", "{954E8166-A843-436F-B0A7-2E160E6FF9C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{31190FAF-695C-4BEA-AC63-0ECA2553A763}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31190FAF-695C-4BEA-AC63-0ECA2553A763}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31190FAF-695C-4BEA-AC63-0ECA2553A763}.Release|Any CPU.Build.0 = Release|Any CPU
+		{954E8166-A843-436F-B0A7-2E160E6FF9C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{954E8166-A843-436F-B0A7-2E160E6FF9C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{954E8166-A843-436F-B0A7-2E160E6FF9C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{954E8166-A843-436F-B0A7-2E160E6FF9C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

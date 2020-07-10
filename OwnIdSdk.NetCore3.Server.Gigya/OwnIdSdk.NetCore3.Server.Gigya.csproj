@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\OwnIdSdk.NetCore3.Redis\OwnIdSdk.NetCore3.Redis.csproj" />
       <ProjectReference Include="..\OwnIdSdk.NetCore3.Web.Extensibility\OwnIdSdk.NetCore3.Web.Extensibility.csproj" />
       <ProjectReference Include="..\OwnIdSdk.NetCore3.Web.Gigya\OwnIdSdk.NetCore3.Web.Gigya.csproj" />
       <ProjectReference Include="..\OwnIdSdk.NetCore3.Web\OwnIdSdk.NetCore3.Web.csproj" />
