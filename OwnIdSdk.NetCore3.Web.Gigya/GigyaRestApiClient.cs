@@ -78,7 +78,8 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             {
                 new KeyValuePair<string, string>("apiKey", _configuration.ApiKey),
                 new KeyValuePair<string, string>("secret", _configuration.SecretKey),
-                new KeyValuePair<string, string>("siteUID", did)
+                new KeyValuePair<string, string>("siteUID", did),
+                new KeyValuePair<string, string>("skipValidation", Boolean.TrueString)
             };
 
             if (targetEnvironment != null)
