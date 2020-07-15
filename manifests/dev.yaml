@@ -7,7 +7,7 @@ metadata:
     app: ownid-server-netcore3-gigya
 spec:
   revisionHistoryLimit: 2
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: ownid-server-netcore3-gigya
@@ -211,3 +211,97 @@ spec:
   ports:
     - port: 5004
       targetPort: 5002
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ownid-server-netcore3-nestle-deployment
+  namespace: dev
+  labels:
+    app: ownid-server-netcore3-nestle
+spec:
+  revisionHistoryLimit: 2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ownid-server-netcore3-nestle
+  template:
+    metadata:
+      labels:
+        app: ownid-server-netcore3-nestle
+    spec:
+      containers:
+        - name: ownid-server-netcore3-nestle
+          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-develop:latest
+          ports:
+            - containerPort: 5002
+          env:
+            - name: OWNID__WEB_APP_URL
+              value: https://sign.dev.ownid.com/sign
+            - name: OWNID__CALLBACK_URL
+              value: https://nestle-server.dev.ownid.com
+            - name: OWNID__DID
+              value: did:nestle:dev_12801424
+            - name: OWNID__NAME
+              value: Nestle
+            - name: OWNID__DESCRIPTION
+              value: Nestle
+            - name: OWNID__ICON
+              value:
+            - name: OWNID__CACHE_TYPE
+              value: redis
+            - name: OWNID__CACHE_CONFIG
+              value: ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:6379
+            - name: GIGYA__SECRET
+              value: T01f+9cFE3uHmMv7hZSSrN+F4JsqelG4
+            - name: GIGYA__API_KEY
+              value: 3_hOdIVleWrXNvjArcZRwHJLiGA4e6Jrcwq7RfH5nL7ZUHyI_77z43_IQrJYxLbiq_
+            - name: GIGYA_USER_KEY
+              value: ACz0oF+V/kNC
+            - name: ELASTICCONFIGURATION__ENABLED
+              value: 'true'
+            - name: ASPNETCORE_ENVIRONMENT
+              value: dev
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ownid-server-netcore3-nestle-service
+  namespace: dev
+spec:
+  type: NodePort
+  selector:
+    app: ownid-server-netcore3-nestle
+  ports:
+    - name: http
+      port: 80
+      targetPort: 5002
+    - name: https
+      port: 443
+      targetPort: 5002
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ownid-server-netcore3-nestle-ingress
+  namespace: dev
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:571861302935:certificate/c484a4ec-4e6a-408d-b0eb-3c8f1fc1ab68
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+  labels:
+    app: ownid-server-netcore3-nestle
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /*
+            backend:
+              serviceName: ssl-redirect
+              servicePort: use-annotation
+          - path: /*
+            backend:
+              serviceName: ownid-server-netcore3-nestle-service
+              servicePort: 80
