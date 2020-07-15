@@ -29,3 +29,4 @@ sleep 3
 kubectl -n=$ENV set image deployment/ownid-server-netcore3-gigya-deployment ownid-server-netcore3-gigya=$REPOSITORY_URI:$IMAGE_TAG --record
 kubectl -n=$ENV set image deployment/ownid-server-netcore3-gigya-2-deployment ownid-server-netcore3-gigya-2=$REPOSITORY_URI:$IMAGE_TAG --record
 kubectl -n=$ENV set image deployment/ownid-server-netcore3-demo-gigya-deployment ownid-server-netcore3-demo-gigya=$REPOSITORY_URI:$IMAGE_TAG --record
+kubectl -n=$ENV set image deployment/ownid-server-netcore3-nestle-deployment ownid-server-netcore3-nestle=$REPOSITORY_URI:$IMAGE_TAG --record
