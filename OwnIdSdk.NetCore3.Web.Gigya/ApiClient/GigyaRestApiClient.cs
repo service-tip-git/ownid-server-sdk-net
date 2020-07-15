@@ -146,13 +146,13 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
             var getAccountMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getAccountInfo"),
                 new FormUrlEncodedContent(parameters));
-            
+
             var serializerOptions = new JsonSerializerOptions();
             serializerOptions.Converters.Add(new AutoPrimitiveToStringConverter());
-            
+
             return
                 await JsonSerializer.DeserializeAsync<GetAccountInfoResponse>(await getAccountMessage.Content
-                    .ReadAsStreamAsync());
+                    .ReadAsStreamAsync(), serializerOptions);
         }
     }
 }
