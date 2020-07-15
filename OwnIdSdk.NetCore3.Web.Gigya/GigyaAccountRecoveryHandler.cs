@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Contracts.AccountRecovery;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Web.Gigya.ApiClient;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.AccountRecovery;
 

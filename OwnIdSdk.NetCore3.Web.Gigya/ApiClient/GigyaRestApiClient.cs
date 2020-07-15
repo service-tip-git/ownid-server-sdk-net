@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -11,7 +10,7 @@ using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Login;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.UpdateProfile;
 using OwnIdSdk.NetCore3.Web.Gigya.Json;
 
-namespace OwnIdSdk.NetCore3.Web.Gigya
+namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
 {
     public class GigyaRestApiClient
     {
@@ -37,30 +36,14 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
         public async Task<BaseGigyaResponse> SetAccountInfo(string did, GigyaUserProfile profile = null,
             AccountData data = null)
         {
-            var serializationSettings = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                IgnoreNullValues = true
-            };
-
-            var parameters = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("apiKey", _configuration.ApiKey),
-                new KeyValuePair<string, string>("secret", _configuration.SecretKey),
-                new KeyValuePair<string, string>("UID", did)
-            };
+            var parameters = ParametersFactory.CreateAuthParameters(_configuration)
+                .AddParameter("UID", did);
 
             if (profile != null)
-            {
-                var serializedProfile = JsonSerializer.Serialize(profile, serializationSettings);
-                parameters.Add(new KeyValuePair<string, string>("profile", serializedProfile));
-            }
+                parameters.AddParameter("profile", profile);
 
             if (data != null)
-            {
-                var serializedData = JsonSerializer.Serialize(data, serializationSettings);
-                parameters.Add(new KeyValuePair<string, string>("data", serializedData));
-            }
+                parameters.AddParameter("data", data);
 
             var setAccountDataMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.setAccountInfo"),
@@ -75,16 +58,12 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
         public async Task<LoginResponse> NotifyLogin(string did, string targetEnvironment = null)
         {
-            var parameters = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("apiKey", _configuration.ApiKey),
-                new KeyValuePair<string, string>("secret", _configuration.SecretKey),
-                new KeyValuePair<string, string>("siteUID", did),
-                new KeyValuePair<string, string>("skipValidation", Boolean.TrueString)
-            };
+            var parameters = ParametersFactory.CreateAuthParameters(_configuration)
+                .AddParameter("siteUID", did)
+                .AddParameter("skipValidation", Boolean.TrueString);
 
-            if (targetEnvironment != null)
-                parameters.Add(new KeyValuePair<string, string>("targetEnv", targetEnvironment));
+            if (!string.IsNullOrEmpty(targetEnvironment))
+                parameters.AddParameter("targetEnv", targetEnvironment);
 
             var responseMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.notifyLogin"),
@@ -96,10 +75,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
         public async Task<JsonWebKey> GetPublicKey()
         {
-            var parameters = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("apiKey", _configuration.ApiKey)
-            };
+            var parameters = ParametersFactory.CreateApiKeyParameter(_configuration);
 
             var responseMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getJWTPublicKey"),
@@ -109,12 +85,8 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
         public async Task<GetJwtResponse> GetJwt(string did)
         {
-            var parameters = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("apiKey", _configuration.ApiKey),
-                new KeyValuePair<string, string>("secret", _configuration.SecretKey),
-                new KeyValuePair<string, string>("targetUID", did)
-            };
+            var parameters = ParametersFactory.CreateAuthParameters(_configuration)
+                .AddParameter("targetUID", did);
 
             var responseMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getJWT"),
@@ -137,13 +109,9 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
         /// </remarks>
         public async Task<ResetPasswordResponse> ResetPasswordAsync(string resetToken, string newPassword)
         {
-            var parameters = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("apiKey", _configuration.ApiKey),
-                new KeyValuePair<string, string>("secret", _configuration.SecretKey),
-                new KeyValuePair<string, string>("newPassword", newPassword),
-                new KeyValuePair<string, string>("passwordResetToken", resetToken),
-            };
+            var parameters = ParametersFactory.CreateAuthParameters(_configuration)
+                .AddParameter("newPassword", newPassword)
+                .AddParameter("passwordResetToken", resetToken);
 
             var responseMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.resetPassword"),
@@ -155,12 +123,8 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
         public async Task<BaseGigyaResponse> DeleteAccountAsync(string did)
         {
-            var parameters = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("apiKey", _configuration.ApiKey),
-                new KeyValuePair<string, string>("secret", _configuration.SecretKey),
-                new KeyValuePair<string, string>("UID", did)
-            };
+            var parameters = ParametersFactory.CreateAuthParameters(_configuration)
+                .AddParameter("UID", did);
 
             var responseMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.deleteAccount"),
@@ -172,26 +136,23 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
         private async Task<GetAccountInfoResponse> GetUserProfile(string uid = null, string regToken = null)
         {
-            var data = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("apiKey", _configuration.ApiKey),
-                new KeyValuePair<string, string>("secret", _configuration.SecretKey)
-            };
+            var parameters = ParametersFactory.CreateAuthParameters(_configuration);
 
-            data.Add(!string.IsNullOrEmpty(uid)
-                ? new KeyValuePair<string, string>("UID", uid)
-                : new KeyValuePair<string, string>("regToken", regToken));
+            if (!String.IsNullOrEmpty(uid))
+                parameters.AddParameter("UID", uid);
+            else
+                parameters.AddParameter("regToken", regToken);
 
             var getAccountMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getAccountInfo"),
-                new FormUrlEncodedContent(data));
+                new FormUrlEncodedContent(parameters));
             
             var serializerOptions = new JsonSerializerOptions();
             serializerOptions.Converters.Add(new AutoPrimitiveToStringConverter());
             
             return
                 await JsonSerializer.DeserializeAsync<GetAccountInfoResponse>(await getAccountMessage.Content
-                    .ReadAsStreamAsync(), serializerOptions);
+                    .ReadAsStreamAsync());
         }
     }
 }
