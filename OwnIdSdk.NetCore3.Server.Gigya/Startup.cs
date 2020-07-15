@@ -52,7 +52,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         out GigyaLoginType loginType)) loginType = GigyaLoginType.Session;
 
                     builder.UseGigya(gigyaSection["data_center"], gigyaSection["api_key"], gigyaSection["secret"],
-                        loginType);
+                        gigyaSection["userKey"], loginType);
                     builder.SetKeys(ownIdSection["pub_key"], ownIdSection["private_key"]);
 
                     switch (ownIdSection["cache_type"])
