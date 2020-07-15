@@ -9,6 +9,7 @@ using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Accounts;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Login;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.UpdateProfile;
+using OwnIdSdk.NetCore3.Web.Gigya.Json;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya
 {
@@ -185,9 +186,12 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getAccountInfo"),
                 new FormUrlEncodedContent(data));
             
+            var serializerOptions = new JsonSerializerOptions();
+            serializerOptions.Converters.Add(new AutoPrimitiveToStringConverter());
+            
             return
                 await JsonSerializer.DeserializeAsync<GetAccountInfoResponse>(await getAccountMessage.Content
-                    .ReadAsStreamAsync());
+                    .ReadAsStreamAsync(), serializerOptions);
         }
     }
 }
