@@ -2,6 +2,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Web.Gigya.ApiClient;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya
 {

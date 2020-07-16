@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Web.Gigya.ApiClient;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Jwt;
 
