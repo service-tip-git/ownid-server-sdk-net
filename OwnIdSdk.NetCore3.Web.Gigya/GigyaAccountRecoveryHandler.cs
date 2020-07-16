@@ -51,7 +51,8 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 Profile = new GigyaUserProfile
                 {
                     Email = accountInfo.Profile.GetValueOrDefault("email"),
-                    FirstName = accountInfo.Profile.GetValueOrDefault("firstName")
+                    FirstName = accountInfo.Profile.GetValueOrDefault("firstName"),
+                    LastName = accountInfo.Profile.GetValueOrDefault("lastName")
                 }
             };
         }

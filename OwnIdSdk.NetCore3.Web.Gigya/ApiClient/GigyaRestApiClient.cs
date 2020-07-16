@@ -59,8 +59,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
         public async Task<LoginResponse> NotifyLogin(string did, string targetEnvironment = null)
         {
             var parameters = ParametersFactory.CreateAuthParameters(_configuration)
-                .AddParameter("siteUID", did)
-                .AddParameter("skipValidation", Boolean.TrueString);
+                .AddParameter("siteUID", did);
 
             if (!string.IsNullOrEmpty(targetEnvironment))
                 parameters.AddParameter("targetEnv", targetEnvironment);
