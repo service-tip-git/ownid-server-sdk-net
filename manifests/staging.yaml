@@ -239,7 +239,7 @@ spec:
             - name: OWNID__WEB_APP_URL
               value: https://sign.staging.ownid.com/sign
             - name: OWNID__CALLBACK_URL
-              value: https://nestle-server.staging.ownid.com/netcore3
+              value: https://nestle-server.staging.ownid.com
             - name: OWNID__DID
               value: did:nestle:staging_822386385
             - name: OWNID__NAME
