@@ -267,7 +267,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: ownid-server-netcore3-nestle-service
-  namespace: dev
+  namespace: staging
 spec:
   type: NodePort
   selector:
