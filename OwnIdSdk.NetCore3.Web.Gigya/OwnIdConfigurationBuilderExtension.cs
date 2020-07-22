@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Web.Extensibility;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya
 {

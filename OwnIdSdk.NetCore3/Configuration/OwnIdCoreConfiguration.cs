@@ -1,6 +1,8 @@
 using System;
 using System.Security.Cryptography;
 using OwnIdSdk.NetCore3.Configuration.Profile;
+using OwnIdSdk.NetCore3.Extensibility.Configuration;
+using OwnIdSdk.NetCore3.Extensibility.Configuration.Profile;
 
 namespace OwnIdSdk.NetCore3.Configuration
 {

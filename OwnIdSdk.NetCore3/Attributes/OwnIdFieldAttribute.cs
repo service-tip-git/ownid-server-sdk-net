@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using OwnIdSdk.NetCore3.Extensibility.Services;
 
 namespace OwnIdSdk.NetCore3.Attributes
 {
@@ -11,11 +12,11 @@ namespace OwnIdSdk.NetCore3.Attributes
     {
         /// <param name="label">
         ///     Value for <see cref="Label" />. Label text that will be localized by value (as resource key) with
-        ///     <see cref="OwnIdSdk.NetCore3.ILocalizationService" />
+        ///     <see cref="ILocalizationService" />
         /// </param>
         /// <param name="placeholder">
         ///     Value for <see cref="Placeholder" />. Placeholder that will be localized by value (as resource key) with
-        ///     <see cref="OwnIdSdk.NetCore3.ILocalizationService" />
+        ///     <see cref="ILocalizationService" />
         /// </param>
         public OwnIdFieldAttribute([NotNull] string label, string placeholder = null)
         {
@@ -24,12 +25,12 @@ namespace OwnIdSdk.NetCore3.Attributes
         }
 
         /// <summary>
-        ///     Label text that will be localized by value (as resource key) with <see cref="OwnIdSdk.NetCore3.ILocalizationService" />
+        ///     Label text that will be localized by value (as resource key) with <see cref="ILocalizationService" />
         /// </summary>
         public string Label { get; }
 
         /// <summary>
-        ///     Place holder that will be localized by value (as resource key) with <see cref="OwnIdSdk.NetCore3.ILocalizationService" />
+        ///     Place holder that will be localized by value (as resource key) with <see cref="ILocalizationService" />
         /// </summary>
         public string Placeholder { get; }
     }

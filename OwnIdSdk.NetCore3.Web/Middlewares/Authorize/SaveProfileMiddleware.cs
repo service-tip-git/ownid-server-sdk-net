@@ -1,13 +1,12 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using OwnIdSdk.NetCore3.Configuration;
-using OwnIdSdk.NetCore3.Contracts.Jwt;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Flow;
-using OwnIdSdk.NetCore3.Store;
-using OwnIdSdk.NetCore3.Web.Exceptions;
-using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
-using OwnIdSdk.NetCore3.Web.FlowEntries.RequestHandling;
+using OwnIdSdk.NetCore3.Flow.Commands;
+using OwnIdSdk.NetCore3.Flow.Interfaces;
+using OwnIdSdk.NetCore3.Web.Attributes;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares.Authorize
 {
@@ -15,55 +14,27 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Authorize
                        BaseRequestFields.ResponseToken)]
     public class SaveProfileMiddleware : BaseMiddleware
     {
-        private readonly FlowController _flowController;
-        private readonly IUserHandlerAdapter _userHandlerAdapter;
+        private readonly IFlowRunner _flowRunner;
 
-        public SaveProfileMiddleware(RequestDelegate next, IUserHandlerAdapter userHandlerAdapter,
-            IOwnIdCoreConfiguration coreConfiguration, ICacheStore cacheStore,
-            ILocalizationService localizationService, ILogger<SaveProfileMiddleware> logger,
-            FlowController flowController) : base(next,
-            coreConfiguration, cacheStore,
-            localizationService, logger)
+        public SaveProfileMiddleware(RequestDelegate next, IFlowRunner flowRunner,
+            ILogger<SaveProfileMiddleware> logger) : base(next, logger)
         {
-            _userHandlerAdapter = userHandlerAdapter;
-            _flowController = flowController;
+            _flowRunner = flowRunner;
         }
 
         protected override async Task Execute(HttpContext httpContext)
         {
-            var cacheItem = await GetRequestRelatedCacheItemAsync();
-
-            if (!cacheItem.IsValidForLoginRegister)
-                throw new RequestValidationException(
-                    "Cache item should be not be Finished with Login or Register challenge type. " +
-                    $"Actual Status={cacheItem.Status.ToString()} ChallengeType={cacheItem.ChallengeType}");
-
-            ValidateCacheItemTokens(cacheItem);
-
-            var userData = await GetRequestJwtDataAsync<UserProfileData>(httpContext);
-
-            var formContext = _userHandlerAdapter.CreateUserDefinedContext(userData, LocalizationService);
-
-            formContext.Validate();
-
-            if (formContext.HasErrors)
-                throw new BusinessValidationException(formContext);
-
-            await _userHandlerAdapter.UpdateProfileAsync(formContext);
-
-            if (!formContext.HasErrors)
+            var jwtContainer = await GetRequestJwtContainerAsync(httpContext);
+            var result = await _flowRunner.RunAsync(new CommandInput<JwtContainer>
             {
-                var locale = GetRequestCulture(httpContext).Name;
-                await OwnIdProvider.FinishAuthFlowSessionAsync(RequestIdentity.Context, userData.DID);
-                var jwt = OwnIdProvider.GenerateFinalStepJwt(cacheItem.Context,
-                    _flowController.GetNextStep(cacheItem, StepType.Authorize), locale);
+                Context = RequestIdentity.Context,
+                RequestToken = RequestIdentity.RequestToken,
+                ResponseToken = RequestIdentity.RequestToken,
+                CultureInfo = GetRequestCulture(httpContext),
+                Data = jwtContainer
+            }, StepType.Authorize);
 
-                await Json(httpContext, new JwtContainer(jwt), StatusCodes.Status200OK);
-            }
-            else
-            {
-                throw new BusinessValidationException(formContext);
-            }
+            await Json(httpContext, result, StatusCodes.Status200OK);
         }
     }
 }

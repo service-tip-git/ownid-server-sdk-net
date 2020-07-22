@@ -20,6 +20,7 @@ ENV ASPNETCORE_ENVIRONMENT="dev"
 
 # Copy csproj and restore as distinct layers
 COPY ./OwnIdSdk.NetCore3 ./OwnIdSdk.NetCore3
+COPY ./OwnIdSdk.NetCore3.Extensibility ./OwnIdSdk.NetCore3.Extensibility
 COPY ./OwnIdSdk.NetCore3.Web ./OwnIdSdk.NetCore3.Web
 COPY ./OwnIdSdk.NetCore3.Web.Extensibility ./OwnIdSdk.NetCore3.Web.Extensibility
 COPY ./OwnIdSdk.NetCore3.Web.Gigya ./OwnIdSdk.NetCore3.Web.Gigya

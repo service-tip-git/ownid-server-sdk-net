@@ -2,11 +2,8 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using OwnIdSdk.NetCore3.Web.Configuration;
-using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 using OwnIdSdk.NetCore3.Web.Features;
-using OwnIdSdk.NetCore3.Web.FlowEntries;
 using OwnIdSdk.NetCore3.Web.Middlewares;
 using OwnIdSdk.NetCore3.Web.Middlewares.Approval;
 using OwnIdSdk.NetCore3.Web.Middlewares.Authorize;
@@ -45,14 +42,14 @@ namespace OwnIdSdk.NetCore3.Web
             {
                 routeBuilder.MapMiddlewarePost("ownid/{context}/link",
                     builder => builder.UseMiddleware<SaveAccountLinkMiddleware>());
-                routeBuilder.MapMiddlewareGet("ownid/{context}/link",
-                    builder => builder.UseMiddleware<GetAccountLinkDataMiddleware>());
+                // routeBuilder.MapMiddlewareGet("ownid/{context}/link",
+                //     builder => builder.UseMiddleware<GetAccountLinkDataMiddleware>());
             }
 
             if (configuration.HasFeature<AccountRecoveryFeature>())
             {
-                routeBuilder.MapMiddlewareGet("ownid/{context}/recover",
-                    builder => builder.UseMiddleware<RecoverAccountMiddleware>());
+                // routeBuilder.MapMiddlewareGet("ownid/{context}/recover",
+                //     builder => builder.UseMiddleware<RecoverAccountMiddleware>());
                 routeBuilder.MapMiddlewarePost("ownid/{context}/recover",
                     builder => builder.UseMiddleware<SaveAccountPublicKeyMiddleware>());
             }
