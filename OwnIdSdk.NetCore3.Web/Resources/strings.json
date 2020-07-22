@@ -1,0 +1,10 @@
+{
+  "OwnIdSdkDefault": {
+    "Email": "Email",
+    "First Name": "First Name",
+    "Last Name": "Last Name",
+    "Nickname": "Nickname",
+    "Field {0} is required": "Field {0} is required",
+    "Field {0} has incorrect format": "Field {0} has incorrect format"
+  }
+}

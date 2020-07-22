@@ -1,0 +1,19 @@
+{
+  "collections":[
+    {
+      "collectionName":"OwnIdSdk",
+      "folders":[
+        {
+          "startingFolderPath":"Resources",
+          "sourceFilters":["strings.json"],
+          "targetFolderPath":"."
+        }
+      ]
+    }
+  ],
+  "defaultConfiguration":{
+    "pseudoLocFolderPath":".",
+    "oneQFolderPath":".",
+    "targetFileNamingConvention": "[filename]_[langCode].[extension]"
+  }
+}

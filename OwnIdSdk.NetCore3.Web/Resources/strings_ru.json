@@ -1,0 +1,10 @@
+{
+  "OwnIdSdkDefault": {
+    "Email": "Ел. почта",
+    "First Name": "Имя",
+    "Last Name": "Фамилия",
+    "Nickname": "Ник",
+    "Field {0} is required": "Поле {0} обязательно для заполнения",
+    "Field {0} has incorrect format": "Поле {0} имеет неправильный формат"
+  }
+}
