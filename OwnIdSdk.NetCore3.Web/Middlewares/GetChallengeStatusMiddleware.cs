@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Contracts;
+using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 
@@ -68,25 +69,47 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             if (string.IsNullOrEmpty(requestItem.Nonce))
                 return null;
 
-            var didResult = await OwnIdProvider.PopFinishedAuthFlowSessionAsync(requestItem.Context, requestItem.Nonce);
-            if (didResult == null)
+            var cacheItem = await OwnIdProvider.PopFinishedAuthFlowSessionAsync(requestItem.Context, requestItem.Nonce);
+
+            if (cacheItem == null)
                 return null;
 
             var result = new GetStatusResponse
             {
-                Status = didResult.Value.Status,
+                Status = cacheItem.Status,
                 Context = requestItem.Context
             };
 
-            if (didResult.Value.Pin != null && didResult.Value.Status == CacheItemStatus.WaitingForApproval)
+            if (cacheItem.SecurityCode != null && cacheItem.Status == CacheItemStatus.WaitingForApproval)
                 // TODO: refactor
                 result.Payload = new
                 {
-                    pin = didResult.Value.Pin
+                    data = new
+                    {
+                        pin = cacheItem.SecurityCode
+                    }
                 };
 
-            if (didResult.Value.Status == CacheItemStatus.Finished)
-                result.Payload = await _userHandlerAdapter.OnSuccessLoginAsync(didResult.Value.DID);
+            if (cacheItem.Status == CacheItemStatus.Finished)
+            {
+                if (cacheItem.PublicKey == null)
+                {
+                    result.Payload = await _userHandlerAdapter.OnSuccessLoginAsync(cacheItem.DID);
+                }
+                else
+                {
+                    if (cacheItem.ChallengeType == ChallengeType.Login)
+                        result.Payload = await _userHandlerAdapter.OnSuccessLoginByPublicKeyAsync(cacheItem.PublicKey);
+                    else
+                        result.Payload = new
+                        {
+                            data = new
+                            {
+                                publicKey = cacheItem.PublicKey
+                            }
+                        };
+                }
+            }
 
             return result;
         }

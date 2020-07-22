@@ -4,7 +4,7 @@ using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Web.Extensibility;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 
-namespace OwnIdSdk.NetCore3.Web.FlowEntries
+namespace OwnIdSdk.NetCore3.Web.FlowEntries.Adapters
 {
     public class UserHandlerAdapter<TProfile> : IUserHandlerAdapter where TProfile : class
     {
@@ -30,6 +30,11 @@ namespace OwnIdSdk.NetCore3.Web.FlowEntries
         public async Task<LoginResult<object>> OnSuccessLoginAsync(string did)
         {
             return await _adaptee.OnSuccessLoginAsync(did);
+        }
+
+        public async Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)
+        {
+            return await _adaptee.OnSuccessLoginByPublicKeyAsync(publicKey);
         }
     }
 }

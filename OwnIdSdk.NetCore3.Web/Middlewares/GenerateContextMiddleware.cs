@@ -61,7 +61,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             {
                 case ChallengeType.Register:
                 case ChallengeType.Login:
-                    flowType = FlowType.Authorize;
+                    flowType = !request.IsPartial ? FlowType.Authorize : FlowType.PartialAuthorize;
                     break;
                 case ChallengeType.Link:
                     did = await _linkHandlerAdapter.GetCurrentUserIdAsync(httpContext.Request);

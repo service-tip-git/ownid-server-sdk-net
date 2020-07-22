@@ -13,11 +13,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
         private Type _storeType;
         private ServiceLifetime _serviceLifetime;
         private Action<IServiceCollection> _servicesInitialization;
-
-        public CacheStoreFeature()
-        {
-        }
-
+        
         public CacheStoreFeature UseStoreInMemoryStore()
         {
             _storeType = typeof(InMemoryCacheStore);

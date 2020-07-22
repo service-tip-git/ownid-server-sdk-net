@@ -8,39 +8,50 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts
     ///     Account data save at Gigya profile
     /// </summary>
     /// <remarks>
-    ///    Being passed as a <code>data</code> parameter during calling accounts.setAccountInfo method
-    ///    https://developers.gigya.com/display/GD/accounts.setAccountInfo+REST
+    ///     Being passed as a <code>data</code> parameter during calling accounts.setAccountInfo method
+    ///     https://developers.gigya.com/display/GD/accounts.setAccountInfo+REST
     /// </remarks>
     public class AccountData
     {
-        /// <summary>
-        ///     Contains public keys linked to account
-        /// </summary>
-        [JsonPropertyName("pubKeys")]
-        public List<string> PubKeys { get; set; } = new List<string>(0);
-
-        
         /// <summary>
         ///     Constructor
         /// </summary>
         public AccountData()
         {
         }
+
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="pubKey">public key</param>
         public AccountData(string pubKey)
         {
-            PubKeys = new List<string>(1) {pubKey};
+            Connections = new List<OwnIdConnection>(1) {new OwnIdConnection {PublicKey = pubKey}};
         }
+
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="pubKeys">public keys</param>
         public AccountData(IEnumerable<string> pubKeys)
         {
-            PubKeys = pubKeys.Distinct().ToList();
+            Connections = pubKeys.Distinct().Select(x => new OwnIdConnection {PublicKey = x}).ToList();
         }
+
+        /// <summary>
+        ///     Contains public keys linked to account
+        /// </summary>
+        [JsonPropertyName("ownIdConnections")]
+        public List<OwnIdConnection> Connections { get; set; } = new List<OwnIdConnection>(0);
+    }
+
+    public class OwnIdConnection
+    {
+        [JsonPropertyName("pubKey")] 
+        public string PublicKey { get; set; }
+        
+        // hsh is correct, gigya can not find field hash
+        [JsonPropertyName("keyHsh")]
+        public string Hash { get; set; }
     }
 }

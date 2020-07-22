@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
@@ -71,7 +72,7 @@ namespace OwnIdSdk.NetCore3
             object profile,
             string locale = null, bool includeRequester = false)
         {
-            var data = GetConfigFieldsDictionary(did).Union(GetProfileDataDictionary(profile))
+            var data = GetFieldsConfigDictionary(did).Union(GetProfileDataDictionary(profile))
                 .ToDictionary(x => x.Key, x => x.Value);
 
             if (includeRequester)
@@ -98,7 +99,7 @@ namespace OwnIdSdk.NetCore3
         public string GenerateProfileConfigJwt(string context, Step nextStep, string locale = null,
             bool includeRequester = false)
         {
-            var data = GetConfigFieldsDictionary(GenerateUserDid());
+            var data = GetFieldsConfigDictionary(GenerateUserDid());
 
             if (includeRequester)
             {
@@ -141,6 +142,17 @@ namespace OwnIdSdk.NetCore3
             return GenerateDataJwt(fields);
         }
 
+        public string GeneratePartialDidStep(string context, Step nextStep, string locale = null)
+        {
+            var (didKey, didValue) = GetDid(GenerateUserDid());
+            var (reqKey, reqValue) = GetRequester();
+            var fields = GetBaseFlowFieldsDictionary(context, nextStep,
+                new Dictionary<string, object>
+                    {{didKey, didValue}, {reqKey, reqValue}, {"requestedFields", new object[0]}}, locale);
+
+            return GenerateDataJwt(fields);
+        }
+
         /// <summary>
         ///     Decodes provided by OwnId application JWT with data
         /// </summary>
@@ -155,7 +167,9 @@ namespace OwnIdSdk.NetCore3
             if (!tokenHandler.CanReadToken(jwt)) throw new Exception("invalid jwt");
 
             var token = tokenHandler.ReadJwtToken(jwt);
-            var data = JsonSerializer.Deserialize<TData>(token.Payload["data"].ToString());
+            var serializerOptions = new JsonSerializerOptions();
+            serializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            var data = JsonSerializer.Deserialize<TData>(token.Payload["data"].ToString(), serializerOptions);
             // TODO: add type of challenge
             using var sr = new StringReader(data.PublicKey);
             var rsaSecurityKey = new RsaSecurityKey(RsaHelper.LoadKeys(sr));
@@ -259,6 +273,36 @@ namespace OwnIdSdk.NetCore3
             await _cacheStore.SetAsync(context, cacheItem, TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.CacheExpirationTimeout));
         }
 
+        public async Task SetPublicKeyAsync(string context, string publicKey, ChallengeType? actualChallengeType = null)
+        {
+            var cacheItem = await _cacheStore.GetAsync(context);
+
+            if (cacheItem == null || cacheItem.Context != context)
+                throw new ArgumentException($"Can not find any item with context '{context}'");
+
+            if (cacheItem.FlowType != FlowType.PartialAuthorize)
+                throw new ArgumentException($"Can not set public key for FlowType != PartialAuthorize for context '{context}'");
+            
+            if (cacheItem.Status != CacheItemStatus.Started)
+                throw new ArgumentException($"Incorrect status={cacheItem.Status.ToString()} for setting public key for context '{context}'");
+            
+            if(cacheItem.ChallengeType != ChallengeType.Register && cacheItem.ChallengeType != ChallengeType.Login)
+                throw new ArgumentException($"Can not update actual challenge type from {cacheItem.ChallengeType.ToString()} for setting public key for context '{context}'");
+
+            if (actualChallengeType.HasValue)
+            {
+                if (actualChallengeType != ChallengeType.Login && actualChallengeType != ChallengeType.Register)
+                    throw new ArgumentException(
+                        $"Wrong new actual challenge type  {cacheItem.ChallengeType.ToString()} for setting public key for context '{context}'");
+                cacheItem.ChallengeType = actualChallengeType.Value;
+            }
+            
+            cacheItem.PublicKey = publicKey;
+            
+            await _cacheStore.SetAsync(context, cacheItem,
+                TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.CacheExpirationTimeout));
+        }
+
         /// <summary>
         ///     Try to find auth flow session item by <paramref name="context" /> in <see cref="ICacheStore" /> mark it as finish
         /// </summary>
@@ -298,7 +342,7 @@ namespace OwnIdSdk.NetCore3
         /// <returns>
         ///     <see cref="CacheItemStatus" /> and <c>did</c> if <see cref="CacheItem" /> was found, otherwise null
         /// </returns>
-        public async Task<(CacheItemStatus Status, string DID, string Pin)?> PopFinishedAuthFlowSessionAsync(
+        public async Task<CacheItem> PopFinishedAuthFlowSessionAsync(
             string context,
             string nonce)
         {
@@ -310,14 +354,11 @@ namespace OwnIdSdk.NetCore3
             )
                 return null;
 
-            // If not finished - return just status
-            if (cacheItem.Status != CacheItemStatus.Finished)
-                return (cacheItem.Status, null, cacheItem.SecurityCode);
-
             // If finished - clear cache
-            await _cacheStore.RemoveAsync(context);
-
-            return (Status: CacheItemStatus.Finished, cacheItem.DID, null);
+            if (cacheItem.Status == CacheItemStatus.Finished)
+                await _cacheStore.RemoveAsync(context);
+            
+            return cacheItem.Clone() as CacheItem;
         }
 
         /// <summary>
@@ -386,7 +427,7 @@ namespace OwnIdSdk.NetCore3
             return Convert.ToBase64String(hash);
         }
 
-        private string GenerateDataJwt(Dictionary<string, object> data, TimeSpan? expiration = null)
+        private string GenerateDataJwt(Dictionary<string, object> data)
         {
             var rsaSecurityKey = new RsaSecurityKey(_ownIdCoreConfiguration.JwtSignCredentials);
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -394,7 +435,7 @@ namespace OwnIdSdk.NetCore3
             //TODO: should be received from the user's phone
             var issuedAt = DateTime.UtcNow.Add(TimeSpan.FromHours(-1));
             var notBefore = issuedAt;
-            var expires = DateTime.UtcNow.Add(expiration ?? TimeSpan.FromHours(1));
+            var expires = DateTime.UtcNow.Add(TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.JwtExpirationTimeout));
 
             var payload = new JwtPayload(null, null, null, notBefore, expires, issuedAt);
 
@@ -451,11 +492,10 @@ namespace OwnIdSdk.NetCore3
             return fields;
         }
 
-        private Dictionary<string, object> GetConfigFieldsDictionary(string did)
+        private Dictionary<string, object> GetFieldsConfigDictionary(string did)
         {
             var dataFields = new Dictionary<string, object>
             {
-                {"did", did},
                 {
                     // TODO : PROFILE
                     "requestedFields", _ownIdCoreConfiguration.ProfileConfiguration.ProfileFieldMetadata.Select(x =>
@@ -480,7 +520,15 @@ namespace OwnIdSdk.NetCore3
                 }
             };
 
+            var (didKey, didValue) = GetDid(did);
+            dataFields.Add(didKey, didValue);
+
             return dataFields;
+        }
+
+        private KeyValuePair<string, string> GetDid(string did)
+        {
+            return new KeyValuePair<string, string>("did", did);
         }
 
         private KeyValuePair<string, object> GetRequester()

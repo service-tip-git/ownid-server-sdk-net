@@ -18,12 +18,12 @@ namespace OwnIdSdk.NetCore3.Flow
             InitMap();
         }
 
+        protected Dictionary<FlowType, Dictionary<StepType, Func<CacheItem, Step>>> NextStepMap { get; private set; }
+
         public Step GetNextStep(CacheItem cacheItem, StepType currentStep)
         {
             return NextStepMap[cacheItem.FlowType][currentStep](cacheItem);
         }
-
-        protected Dictionary<FlowType, Dictionary<StepType, Func<CacheItem, Step>>> NextStepMap { get; private set; }
 
 
         private void InitMap()
@@ -37,6 +37,24 @@ namespace OwnIdSdk.NetCore3.Flow
                 },
                 {
                     StepType.Authorize, cacheItem => new Step
+                    {
+                        Type = StepType.Success,
+                        ActionType = ActionType.Finish,
+                        ChallengeType = cacheItem.ChallengeType
+                    }
+                }
+            };
+
+            var partialAuthorize = new Dictionary<StepType, Func<CacheItem, Step>>
+            {
+                {
+                    StepType.Starting, cacheItem =>
+                        new Step(StepType.InstantAuthorize, cacheItem.ChallengeType,
+                            new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
+                                "/partial")))
+                },
+                {
+                    StepType.InstantAuthorize, cacheItem => new Step
                     {
                         Type = StepType.Success,
                         ActionType = ActionType.Finish,
@@ -76,11 +94,12 @@ namespace OwnIdSdk.NetCore3.Flow
                     {
                         if (cacheItem.Status == CacheItemStatus.Approved)
                             return new Step(StepType.Link, cacheItem.ChallengeType,
-                                new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType)));
-                        
+                                new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context,
+                                    cacheItem.ChallengeType)));
+
                         return new Step
                         {
-                            Type = StepType.Declined, 
+                            Type = StepType.Declined,
                             ChallengeType = cacheItem.ChallengeType,
                             ActionType = ActionType.Finish
                         };
@@ -127,11 +146,12 @@ namespace OwnIdSdk.NetCore3.Flow
                     {
                         if (cacheItem.Status == CacheItemStatus.Approved)
                             return new Step(StepType.Recover, cacheItem.ChallengeType,
-                                new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType)));
-                        
+                                new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context,
+                                    cacheItem.ChallengeType)));
+
                         return new Step
                         {
-                            Type = StepType.Declined, 
+                            Type = StepType.Declined,
                             ChallengeType = cacheItem.ChallengeType,
                             ActionType = ActionType.Finish
                         };
@@ -150,6 +170,7 @@ namespace OwnIdSdk.NetCore3.Flow
             NextStepMap = new Dictionary<FlowType, Dictionary<StepType, Func<CacheItem, Step>>>
             {
                 {FlowType.Authorize, authorize},
+                {FlowType.PartialAuthorize, partialAuthorize},
                 {FlowType.Link, linkWithoutPin},
                 {FlowType.LinkWithPin, linkWithPin},
                 {FlowType.Recover, recoverWithoutPin},

@@ -69,6 +69,11 @@ namespace OwnIdSdk.NetCore3.Store
         public string SecurityCode { get; set; }
 
         /// <summary>
+        ///     Stores public key for partial auth flow
+        /// </summary>
+        public string PublicKey { get; set; }
+
+        /// <summary>
         ///     Indicates if cache item can be used in middle of register / login process
         /// </summary>
         public bool IsValidForLoginRegister => !HasFinalState &&
@@ -107,7 +112,8 @@ namespace OwnIdSdk.NetCore3.Store
                 Context = Context,
                 Payload = Payload,
                 ConcurrentId = ConcurrentId,
-                SecurityCode = SecurityCode
+                SecurityCode = SecurityCode,
+                PublicKey = PublicKey
             };
         }
     }

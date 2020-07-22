@@ -34,6 +34,10 @@ namespace OwnIdSdk.NetCore3.Configuration
             if (options.CacheExpirationTimeout == 0)
                 return ValidateOptionsResult.Fail(
                     $"{nameof(options.CacheExpirationTimeout)} can not be equal to 0");
+            
+            if (options.JwtExpirationTimeout == 0)
+                return ValidateOptionsResult.Fail(
+                    $"{nameof(options.JwtExpirationTimeout)} can not be equal to 0"); 
 
             return options.ProfileConfiguration.Validate();
         }

@@ -9,6 +9,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
     public class GigyaIntegrationFeature : IFeatureConfiguration
     {
         private readonly GigyaConfiguration _configuration;
+        private Action<IServiceCollection> _setupServicesAction;
 
         public GigyaIntegrationFeature()
         {
@@ -18,7 +19,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
         public void ApplyServices(IServiceCollection services)
         {
             services.TryAddSingleton(_configuration);
-            services.TryAddTransient<GigyaRestApiClient>();
+            _setupServicesAction?.Invoke(services);
         }
 
         public IFeatureConfiguration FillEmptyWithOptional()
@@ -35,9 +36,11 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                     $"{nameof(_configuration.ApiKey)}, {nameof(_configuration.SecretKey)} and {nameof(_configuration.DataCenter)} should be provided");
         }
 
-        public GigyaIntegrationFeature WithConfig(Action<GigyaConfiguration> configAction)
+        public GigyaIntegrationFeature WithConfig<TProfile>(Action<GigyaConfiguration> configAction)
+            where TProfile : class, IGigyaUserProfile
         {
             configAction(_configuration);
+            _setupServicesAction = collection => collection.TryAddSingleton<GigyaRestApiClient<TProfile>>();
             return this;
         }
     }

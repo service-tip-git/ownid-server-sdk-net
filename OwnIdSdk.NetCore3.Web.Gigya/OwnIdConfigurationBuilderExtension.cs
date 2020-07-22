@@ -6,7 +6,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
     public static class OwnIdConfigurationBuilderExtension
     {
         /// <summary>
-        ///     Enables GIGYA authorization process with <see cref="GigyaUserHandler" /> and <see cref="GigyaUserProfile" />
+        ///     Enables GIGYA authorization process with <see cref="GigyaUserHandler{TProfile}" /> and provided profile model
         /// </summary>
         /// <param name="builder">builder</param>
         /// <param name="dataCenter">
@@ -17,13 +17,14 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
         /// <param name="secret">Gigya Secret key</param>
         /// <param name="userKey">Gigya User key (optional)</param>
         /// <param name="loginType">Login result. Cookie session or JWT ID Token</param>
-        public static void UseGigya(this IExtendableConfigurationBuilder builder, string dataCenter, string apiKey,
-            string secret, string userKey = null, GigyaLoginType loginType = GigyaLoginType.Session)
+        /// <typeparam name="TProfile">User profile model</typeparam>
+        public static void UseGigya<TProfile>(this IExtendableConfigurationBuilder builder, string dataCenter, string apiKey,
+            string secret, string userKey = null, GigyaLoginType loginType = GigyaLoginType.Session) where TProfile : class, IGigyaUserProfile
         {
             builder.Services.AddHttpClient();
             var gigyaFeature = new GigyaIntegrationFeature();
-            
-            gigyaFeature.WithConfig(x =>
+
+            gigyaFeature.WithConfig<TProfile>(x =>
             {
                 x.DataCenter = dataCenter;
                 x.ApiKey = apiKey;
@@ -31,11 +32,21 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 x.UserKey = userKey;
                 x.LoginType = loginType;
             });
-            
+
             builder.AddOrUpdateFeature(gigyaFeature);
-            builder.UseUserHandlerWithCustomProfile<GigyaUserProfile, GigyaUserHandler>();
-            builder.UseAccountLinking<GigyaUserProfile, GigyaAccountLinkHandler>();
-            builder.UseAccountRecovery<GigyaAccountRecoveryHandler>();
+            builder.UseUserHandlerWithCustomProfile<GigyaUserProfile, GigyaUserHandler<GigyaUserProfile>>();
+            builder.UseAccountLinking<GigyaUserProfile, GigyaAccountLinkHandler<GigyaUserProfile>>();
+            builder.UseAccountRecovery<GigyaAccountRecoveryHandler<GigyaUserProfile>>();
+        }
+
+        /// <inheritdoc cref="UseGigya{TProfile}"/>
+        /// <summary>
+        ///     Enables GIGYA authorization process with <see cref="GigyaUserHandler{GigyaGigyaUserProfile}" /> and <see cref="GigyaUserProfile" />
+        /// </summary>
+        public static void UseGigya(this IExtendableConfigurationBuilder builder, string dataCenter, string apiKey,
+            string secret, string userKey = null, GigyaLoginType loginType = GigyaLoginType.Session)
+        {
+            UseGigya<GigyaUserProfile>(builder, dataCenter, apiKey, secret, userKey, loginType);
         }
     }
 }

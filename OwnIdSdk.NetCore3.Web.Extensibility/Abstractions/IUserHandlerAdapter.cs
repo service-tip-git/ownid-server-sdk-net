@@ -10,5 +10,7 @@ namespace OwnIdSdk.NetCore3.Web.Extensibility.Abstractions
         Task UpdateProfileAsync(IFormContext context);
 
         Task<LoginResult<object>> OnSuccessLoginAsync(string did);
+        
+        Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey);
     }
 }
