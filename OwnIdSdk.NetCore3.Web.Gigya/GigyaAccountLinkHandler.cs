@@ -1,20 +1,19 @@
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using OwnIdSdk.NetCore3.Configuration;
-using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Extensibility.Configuration;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Web.Gigya.ApiClient;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
-using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Jwt;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya
 {
-    public class GigyaAccountLinkHandler<TProfile> : IAccountLinkHandler<TProfile> where TProfile : class, IGigyaUserProfile
+    public class GigyaAccountLinkHandler<TProfile> : IAccountLinkHandler<TProfile>
+        where TProfile : class, IGigyaUserProfile
     {
         private const string ApiKeyPayloadKey = "apiKey";
         private readonly GigyaConfiguration _configuration;
@@ -32,9 +31,9 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             _ownIdConfiguration = ownIdConfiguration;
         }
 
-        public async Task<string> GetCurrentUserIdAsync(HttpRequest request)
+        public async Task<string> GetCurrentUserIdAsync(string payload)
         {
-            var jwt = (await JsonSerializer.DeserializeAsync<LinkChallengeData>(request.Body))?.Data?.Jwt;
+            var jwt = JsonSerializer.Deserialize<JwtContainer>(payload)?.Jwt;
 
             if (string.IsNullOrEmpty(jwt))
                 throw new Exception("No JWT was found in HttpRequest");
@@ -72,7 +71,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             if (!token.Payload.ContainsKey(ApiKeyPayloadKey) ||
                 (string) token.Payload[ApiKeyPayloadKey] != _configuration.ApiKey)
-                throw new Exception($"Jwt was created for different apiKey");
+                throw new Exception("Jwt was created for different apiKey");
 
             return token.Subject;
         }
@@ -84,7 +83,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             if (accountInfo.ErrorCode != 0)
                 throw new Exception(
                     $"Gigya.getAccountInfo error -> {accountInfo.GetFailureMessage()}");
-            
+
             return accountInfo.Profile;
         }
 
@@ -93,19 +92,15 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             var accountInfo = await _restApiClient.GetUserInfoByUid(context.DID);
 
             if (accountInfo.ErrorCode != 0)
-            {
                 throw new Exception(
                     $"Gigya.getAccountInfo error -> {accountInfo.GetFailureMessage()}");
-            }
 
             if (accountInfo.Data.Connections.Count >= _ownIdConfiguration.MaximumNumberOfConnectedDevices)
-            {
                 throw new Exception(
                     $"Gigya.OnLink error -> maximum number ({_ownIdConfiguration.MaximumNumberOfConnectedDevices}) of linked devices reached");
-            }
 
             // add new public key to 
-            accountInfo.Data.Connections.Add(new OwnIdConnection() {PublicKey = context.PublicKey});
+            accountInfo.Data.Connections.Add(new OwnIdConnection {PublicKey = context.PublicKey});
 
             var setAccountMessage =
                 await _restApiClient.SetAccountInfo(context.DID, context.Profile, accountInfo.Data);

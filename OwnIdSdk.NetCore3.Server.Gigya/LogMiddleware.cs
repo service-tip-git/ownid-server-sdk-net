@@ -1,20 +1,20 @@
 using System;
 using System.IO;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using OwnIdSdk.NetCore3.Web;
+using OwnIdSdk.NetCore3.Extensions;
 using Serilog.Context;
 using Serilog.Core.Enrichers;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace OwnIdSdk.NetCore3.Server.Gigya
 {
     public class LogMiddleware
     {
-        private readonly RequestDelegate _next;
         private readonly ILogger<LogRequestMiddleware> _logger;
+        private readonly RequestDelegate _next;
 
         public LogMiddleware(RequestDelegate next, ILogger<LogRequestMiddleware> logger)
         {
@@ -26,8 +26,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
         {
             using var reader = new StreamReader(context.Request.Body);
             var bodyString = await reader.ReadToEndAsync();
-            
-            if(string.IsNullOrEmpty(bodyString))
+
+            if (string.IsNullOrEmpty(bodyString))
                 return;
 
             using (LogContext.Push(new PropertyEnricher("source", "webapp")))
@@ -40,23 +40,21 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 }
 
                 using (_logger.BeginScope("context: {context}", logMessage.Context))
+                {
                     _logger.LogWithData(logLevel, logMessage.Message, logMessage.Data);
+                }
             }
         }
     }
 
     public class LogMessage
     {
-        [JsonPropertyName("message")]
-        public string Message { get; set; }
-        
-        [JsonPropertyName("data")]
-        public object Data { get; set; }
-        
-        [JsonPropertyName("logLevel")]
-        public string LogLevel { get; set; }
-        
-        [JsonPropertyName("context")]
-        public string Context { get; set; }
+        [JsonPropertyName("message")] public string Message { get; set; }
+
+        [JsonPropertyName("data")] public object Data { get; set; }
+
+        [JsonPropertyName("logLevel")] public string LogLevel { get; set; }
+
+        [JsonPropertyName("context")] public string Context { get; set; }
     }
 }

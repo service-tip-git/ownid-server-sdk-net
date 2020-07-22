@@ -56,5 +56,4 @@
         <DependentUpon>OwnIdSdkDefault.ru.resx</DependentUpon>
       </Compile>
     </ItemGroup>
-
 </Project>

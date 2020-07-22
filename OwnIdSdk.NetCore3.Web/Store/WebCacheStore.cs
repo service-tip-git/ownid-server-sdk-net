@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
+using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Store;
 
 namespace OwnIdSdk.NetCore3.Web.Store

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Options;
 using OwnIdSdk.NetCore3.Attributes;
+using OwnIdSdk.NetCore3.Extensibility.Configuration;
+using OwnIdSdk.NetCore3.Extensibility.Configuration.Profile;
 using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
 
 namespace OwnIdSdk.NetCore3.Configuration.Profile

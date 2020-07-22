@@ -2,7 +2,7 @@ using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using OwnIdSdk.NetCore3.Store;
+using OwnIdSdk.NetCore3.Extensibility.Cache;
 using StackExchange.Redis;
 
 namespace OwnIdSdk.NetCore3.Redis

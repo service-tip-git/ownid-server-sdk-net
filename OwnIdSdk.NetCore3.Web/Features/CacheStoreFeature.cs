@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Store;
-using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Web.Extensibility;
 using OwnIdSdk.NetCore3.Web.Store;
 
 namespace OwnIdSdk.NetCore3.Web.Features

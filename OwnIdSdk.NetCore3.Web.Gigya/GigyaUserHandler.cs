@@ -4,8 +4,9 @@ using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Web.Extensibility;
-using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 using OwnIdSdk.NetCore3.Web.Gigya.ApiClient;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
 

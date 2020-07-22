@@ -3,14 +3,14 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using OwnIdSdk.NetCore3.Web;
+using OwnIdSdk.NetCore3.Extensions;
 
 namespace OwnIdSdk.NetCore3.Server.Gigya
 {
     public class LogRequestMiddleware
     {
-        private readonly RequestDelegate _next;
         private readonly ILogger<LogRequestMiddleware> _logger;
+        private readonly RequestDelegate _next;
 
         public LogRequestMiddleware(RequestDelegate next, ILogger<LogRequestMiddleware> logger)
         {
@@ -30,12 +30,12 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             await using (var respStream = new MemoryStream())
             {
                 var originalRespStream = context.Response.Body;
-                
+
                 try
                 {
                     context.Response.Body = respStream;
                     var body = string.Empty;
-                    
+
                     if (context.Request.Body.CanRead)
                     {
                         context.Request.EnableBuffering();
@@ -47,11 +47,12 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                     {
                         method = context.Request.Method,
                         scheme = context.Request.Scheme,
-                        url = $"{context.Request.Scheme}{context.Request.Host}{context.Request.Path.ToString()}{context.Request.QueryString.ToString()}",
+                        url =
+                            $"{context.Request.Scheme}{context.Request.Host}{context.Request.Path.ToString()}{context.Request.QueryString.ToString()}",
                         body
                     };
 
-                    _logger.LogWithData(LogLevel.Debug,"Request log", data);
+                    _logger.LogWithData(LogLevel.Debug, "Request log", data);
                 }
                 catch (Exception e)
                 {
@@ -81,13 +82,13 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
                     await respStream.CopyToAsync(originalRespStream);
                     context.Response.Body = originalRespStream;
-                    
+
                     var data = new
                     {
                         body
                     };
 
-                    _logger.LogWithData(LogLevel.Debug,"Response  log", data);
+                    _logger.LogWithData(LogLevel.Debug, "Response  log", data);
                 }
                 catch (Exception e)
                 {

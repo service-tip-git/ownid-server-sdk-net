@@ -1,51 +1,41 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using OwnIdSdk.NetCore3.Configuration;
-using OwnIdSdk.NetCore3.Contracts.Jwt;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Flow;
-using OwnIdSdk.NetCore3.Store;
-using OwnIdSdk.NetCore3.Web.Exceptions;
-using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
-using OwnIdSdk.NetCore3.Web.FlowEntries.RequestHandling;
+using OwnIdSdk.NetCore3.Flow.Commands;
+using OwnIdSdk.NetCore3.Flow.Interfaces;
+using OwnIdSdk.NetCore3.Web.Attributes;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares.Link
 {
+    [Obsolete]
     [RequestDescriptor(BaseRequestFields.Context | BaseRequestFields.RequestToken | BaseRequestFields.ResponseToken)]
     public class GetAccountLinkDataMiddleware : BaseMiddleware
     {
-        private readonly FlowController _flowController;
-        private readonly IAccountLinkHandlerAdapter _linkHandlerAdapter;
+        private readonly IFlowRunner _flowRunner;
 
-        public GetAccountLinkDataMiddleware(RequestDelegate next, IAccountLinkHandlerAdapter linkHandlerAdapter,
-            IOwnIdCoreConfiguration coreConfiguration,
-            ICacheStore cacheStore, ILocalizationService localizationService,
-            FlowController flowController,
-            ILogger<GetAccountLinkDataMiddleware> logger) : base(next, coreConfiguration,
-            cacheStore, localizationService, logger)
+        public GetAccountLinkDataMiddleware(RequestDelegate next, IFlowRunner flowRunner,
+            ILogger<GetAccountLinkDataMiddleware> logger) : base(next, logger)
         {
-            _linkHandlerAdapter = linkHandlerAdapter;
-            _flowController = flowController;
+            _flowRunner = flowRunner;
         }
 
         protected override async Task Execute(HttpContext httpContext)
         {
-            var cacheItem = await GetRequestRelatedCacheItemAsync();
+            var result = await _flowRunner.RunAsync(new CommandInput
+            {
+                Context = RequestIdentity.Context,
+                RequestToken = RequestIdentity.RequestToken,
+                ResponseToken = RequestIdentity.RequestToken,
+                CultureInfo = GetRequestCulture(httpContext)
+            }, StepType.ApprovePin);
+            
+             // result = await _getLinkProfileCommand.ExecuteAsync(RequestIdentity.Context, StepType.Link, false,
+             //    GetRequestCulture(httpContext));
 
-            if (!cacheItem.IsValidForLink)
-                throw new RequestValidationException(
-                    "Cache item should be not Finished with Link challenge type. " +
-                    $"Actual Status={cacheItem.Status.ToString()} ChallengeType={cacheItem.ChallengeType}");
-
-            var culture = GetRequestCulture(httpContext);
-
-            var profile = await _linkHandlerAdapter.GetUserProfileAsync(cacheItem.DID);
-
-            var jwt = OwnIdProvider.GenerateProfileWithConfigDataJwt(RequestIdentity.Context,
-                _flowController.GetNextStep(cacheItem, StepType.Starting), cacheItem.DID,
-                profile, culture.Name);
-
-            await Json(httpContext, new JwtContainer(jwt), StatusCodes.Status200OK);
+            await Json(httpContext, result, StatusCodes.Status200OK);
         }
     }
 }

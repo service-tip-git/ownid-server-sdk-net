@@ -5,8 +5,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Cryptography;
+using OwnIdSdk.NetCore3.Extensibility.Configuration;
+using OwnIdSdk.NetCore3.Extensibility.Providers;
 using OwnIdSdk.NetCore3.Flow;
-using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Flow.Commands;
+using OwnIdSdk.NetCore3.Flow.Commands.Approval;
+using OwnIdSdk.NetCore3.Flow.Commands.Authorize;
+using OwnIdSdk.NetCore3.Flow.Commands.Link;
+using OwnIdSdk.NetCore3.Flow.Commands.Recovery;
+using OwnIdSdk.NetCore3.Flow.Interfaces;
+using OwnIdSdk.NetCore3.Services;
+using OwnIdSdk.NetCore3.Web.Extensibility;
 
 namespace OwnIdSdk.NetCore3.Web.Features
 {
@@ -43,8 +52,29 @@ namespace OwnIdSdk.NetCore3.Web.Features
         {
             services.TryAddSingleton(x => (IOwnIdCoreConfiguration) _configuration);
             
+            services.TryAddSingleton<IJwtService, JwtService>();
+            services.TryAddSingleton<IJwtComposer, JwtComposer>();
+            services.TryAddSingleton<ICacheItemService, CacheItemService>();
             services.TryAddSingleton<IUrlProvider, UrlProvider>();
-            services.TryAddSingleton<FlowController>();
+            services.TryAddSingleton<IIdentitiesProvider, GuidIdentitiesProvider>();
+            
+            services.TryAddSingleton<CreateFlowCommand>();
+            services.TryAddSingleton<GetSecurityCheckCommand>();
+            services.TryAddSingleton<GetStatusCommand>();
+            services.TryAddSingleton<StartFlowFlowCommand>();
+            services.TryAddSingleton<ApproveActionCommand>();
+            services.TryAddSingleton<GetApprovalStatusCommand>();
+            services.TryAddSingleton<GetAuthProfileCommand>();
+            services.TryAddSingleton<GetPartialInfoCommand>();
+            services.TryAddSingleton<SavePartialProfileCommand>();
+            services.TryAddSingleton<SaveProfileCommand>();
+            services.TryAddSingleton<GetLinkProfileCommand>();
+            services.TryAddSingleton<SaveAccountLinkCommand>();
+            services.TryAddSingleton<RecoverAccountCommand>();
+            services.TryAddSingleton<SaveAccountPublicKeyCommand>();
+            
+            services.TryAddSingleton<IFlowController, FlowController>();
+            services.TryAddSingleton<IFlowRunner, FlowRunner>();
         }
 
         public IFeatureConfiguration FillEmptyWithOptional()

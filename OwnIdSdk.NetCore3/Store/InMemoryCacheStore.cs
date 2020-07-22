@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using OwnIdSdk.NetCore3.Extensibility.Cache;
 
 namespace OwnIdSdk.NetCore3.Store
 {

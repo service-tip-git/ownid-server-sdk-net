@@ -3,7 +3,8 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Localization;
-using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Extensibility.Services;
+using OwnIdSdk.NetCore3.Web.Extensibility;
 using OwnIdSdk.NetCore3.Web.Resources;
 
 namespace OwnIdSdk.NetCore3.Web.Features
