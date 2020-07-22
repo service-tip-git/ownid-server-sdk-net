@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
-using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using OwnIdSdk.NetCore3.Configuration;
@@ -54,6 +53,9 @@ namespace OwnIdSdk.NetCore3.Web.Features
 
             if (_configuration.CacheExpirationTimeout == default)
                 _configuration.CacheExpirationTimeout = (uint) TimeSpan.FromMinutes(10).TotalMilliseconds;
+            
+            if (_configuration.JwtExpirationTimeout == default)
+                _configuration.JwtExpirationTimeout = (uint) TimeSpan.FromMinutes(60).TotalMilliseconds;
 
             if (_configuration.PollingInterval == default)
                 _configuration.PollingInterval = 2000;

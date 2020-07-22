@@ -23,13 +23,14 @@ namespace OwnIdSdk.NetCore3
             return GetBaseActionUrl(context, "start");
         }
 
-        public Uri GetChallengeUrl(string context, ChallengeType challengeType)
+        //prefix param is workaround for partial flow
+        public Uri GetChallengeUrl(string context, ChallengeType challengeType, string prefix = null)
         {
             var action = challengeType switch
             {
                 ChallengeType.Link => "link",
                 ChallengeType.Recover => "recover",
-                _ => "challenge"
+                _ => $"challenge{prefix}"
             };
 
             return GetBaseActionUrl(context, action);

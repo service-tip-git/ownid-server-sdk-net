@@ -72,8 +72,12 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                     "Cache item should be not Finished with Login or Register challenge type. " +
                     $"Actual Status={cacheItem.Status.ToString()} ChallengeType={cacheItem.ChallengeType}");
 
-            var jwt = OwnIdProvider.GenerateProfileConfigJwt(RequestIdentity.Context,
-                _flowController.GetNextStep(cacheItem, StepType.Starting), locale, true);
+            var step = _flowController.GetNextStep(cacheItem, StepType.Starting);
+
+            var jwt = cacheItem.FlowType == FlowType.Authorize
+                ? OwnIdProvider.GenerateProfileConfigJwt(RequestIdentity.Context, step
+                    , locale, true)
+                : OwnIdProvider.GeneratePartialDidStep(cacheItem.Context, step, locale);
 
             return (jwt, OwnIdProvider.GetJwtHash(jwt));
         }
@@ -92,7 +96,6 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 var pin = await OwnIdProvider.SetSecurityCode(cacheItem.Context);
                 var pinStepJwt = OwnIdProvider.GeneratePinStepJwt(cacheItem.Context, step, pin, locale);
                 return (pinStepJwt, OwnIdProvider.GetJwtHash(pinStepJwt));
-                ;
             }
 
             var profile = await _linkHandlerAdapter.GetUserProfileAsync(cacheItem.DID);

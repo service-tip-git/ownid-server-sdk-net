@@ -30,6 +30,8 @@ namespace OwnIdSdk.NetCore3.Web
                 builder => builder.UseMiddleware<StartFlowMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/challenge",
                 builder => builder.UseMiddleware<SaveProfileMiddleware>());
+            routeBuilder.MapMiddlewarePost("ownid/{context}/challenge/partial",
+                builder => builder.UseMiddleware<SavePartialProfileMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/status",
                 builder => builder.UseMiddleware<GetChallengeStatusMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/approve",

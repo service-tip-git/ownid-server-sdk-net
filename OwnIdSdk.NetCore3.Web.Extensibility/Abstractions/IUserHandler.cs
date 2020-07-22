@@ -29,5 +29,7 @@ namespace OwnIdSdk.NetCore3.Web.Extensibility.Abstractions
         /// <param name="did">User unique identifier</param>
         /// <returns></returns>
         Task<LoginResult<object>> OnSuccessLoginAsync(string did);
+        
+        Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey);
     }
 }

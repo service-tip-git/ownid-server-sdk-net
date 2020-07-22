@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using OwnIdSdk.NetCore3.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 
-namespace OwnIdSdk.NetCore3.Web.FlowEntries
+namespace OwnIdSdk.NetCore3.Web.FlowEntries.Adapters
 {
     public class AccountLinkHandlerAdapter<TProfile> : IAccountLinkHandlerAdapter where TProfile : class
     {

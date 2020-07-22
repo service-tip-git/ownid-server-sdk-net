@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 using OwnIdSdk.NetCore3.Web.FlowEntries;
+using OwnIdSdk.NetCore3.Web.FlowEntries.Adapters;
 
 namespace OwnIdSdk.NetCore3.Web.Features
 {

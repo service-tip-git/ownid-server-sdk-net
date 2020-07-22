@@ -11,14 +11,14 @@ using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya
 {
-    public class GigyaUserHandler : IUserHandler<GigyaUserProfile>
+    public class GigyaUserHandler<TProfile> : IUserHandler<TProfile> where TProfile : class, IGigyaUserProfile
     {
         private readonly GigyaConfiguration _configuration;
-        private readonly ILogger<GigyaUserHandler> _logger;
-        private readonly GigyaRestApiClient _restApiClient;
+        private readonly ILogger<GigyaUserHandler<TProfile>> _logger;
+        private readonly GigyaRestApiClient<TProfile> _restApiClient;
 
-        public GigyaUserHandler(GigyaRestApiClient restApiClient, GigyaConfiguration configuration,
-            ILogger<GigyaUserHandler> logger)
+        public GigyaUserHandler(GigyaRestApiClient<TProfile> restApiClient, GigyaConfiguration configuration,
+            ILogger<GigyaUserHandler<TProfile>> logger)
         {
             _restApiClient = restApiClient;
             _configuration = configuration;
@@ -32,67 +32,50 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 var loginResponse = await _restApiClient.NotifyLogin(did, "browser");
 
                 if (loginResponse.SessionInfo == null || loginResponse.ErrorCode != 0)
-                    return new LoginResult<object>
-                    {
-                        HttpCode = (int) HttpStatusCode.Unauthorized,
-                        Data = new
-                        {
-                            status = false,
-                            errorMessage = $"Gigya: {loginResponse.GetFailureMessage()}"
-                        }
-                    };
+                    return new LoginResult<object>($"Gigya: {loginResponse.GetFailureMessage()}");
 
-                return new LoginResult<object>
+                return new LoginResult<object>(new
                 {
-                    HttpCode = (int) HttpStatusCode.OK,
-                    Data = new
-                    {
-                        status = true,
-                        sessionInfo = loginResponse.SessionInfo,
-                        identities = loginResponse.Identities.FirstOrDefault()
-                    }
-                };
+                    sessionInfo = loginResponse.SessionInfo,
+                    identities = loginResponse.Identities.FirstOrDefault()
+                });
             }
 
             var jwtResponse = await _restApiClient.GetJwt(did);
 
             if (jwtResponse.IdToken == null || jwtResponse.ErrorCode != 0)
-                return new LoginResult<object>
-                {
-                    HttpCode = (int) HttpStatusCode.Unauthorized,
-                    Data = new
-                    {
-                        status = false,
-                        errorMessage = $"Gigya: {jwtResponse.GetFailureMessage()}"
-                    }
-                };
+                return new LoginResult<object>($"Gigya: {jwtResponse.GetFailureMessage()}");
 
-            return new LoginResult<object>
+            
+            return new LoginResult<object>(new
             {
-                HttpCode = (int) HttpStatusCode.Unauthorized,
-                Data = new
-                {
-                    status = true,
-                    Data = new
-                    {
-                        status = true,
-                        idToken = jwtResponse.IdToken
-                    }
-                }
-            };
+                idToken = jwtResponse.IdToken
+            });
         }
 
-        public async Task UpdateProfileAsync(IUserProfileFormContext<GigyaUserProfile> context)
+        public async Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)
+        {
+            var did = await _restApiClient.SearchForDid(publicKey);
+            
+            if(string.IsNullOrEmpty(did))
+                return new LoginResult<object>($"Can not find user in Gigya search result with provided public key");
+            
+            return await OnSuccessLoginAsync(did);
+        }
+
+        public async Task UpdateProfileAsync(IUserProfileFormContext<TProfile> context)
         {
             var getAccountMessage = await _restApiClient.GetUserInfoByUid(context.DID);
 
             if (getAccountMessage.ErrorCode == 0)
             {
-                if (getAccountMessage.Data == null || !getAccountMessage.Data.PubKeys.Any())
+                if (getAccountMessage.Data == null || !getAccountMessage.Data.Connections.Any())
                     throw new Exception($"Found gigya user uid={context.DID} without pubKey");
-                
-                if (!getAccountMessage.Data.PubKeys.Contains(context.PublicKey))
+
+                if (getAccountMessage.Data.Connections.All(x => x.PublicKey != context.PublicKey))
+                {
                     throw new Exception("Public key doesn't match any of gigya user keys");
+                }
 
                 var setAccountResponse = await _restApiClient.SetAccountInfo(context.DID, context.Profile);
 
@@ -141,7 +124,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
                 if (removeUserResult.ErrorCode != 0)
                     throw new Exception(
-                        $"Gigya.deleteAccount with uid={context.DID} error -> {loginResponse.GetFailureMessage()}");
+                        $"Gigya.deleteAccount with uid={context.DID} error -> {removeUserResult.GetFailureMessage()}");
 
                 context.SetError(x => x.Email, setAccountMessage.ErrorMessage);
                 return;
@@ -152,7 +135,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 _logger.LogError($"did: {context.DID}{Environment.NewLine}" +
                                  $"Gigya.setAccountInfo (profile) for NEW user error -> {setAccountMessage.GetFailureMessage()}");
 
-                context.SetGeneralError($"{setAccountMessage.ErrorCode}: {setAccountMessage.ErrorMessage}");
+                context.SetGeneralError(setAccountMessage.GetFailureMessage());
             }
         }
     }

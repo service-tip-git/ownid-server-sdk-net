@@ -17,8 +17,9 @@ namespace OwnIdSdk.NetCore3
         /// </summary>
         /// <param name="context">Process unique identifier</param>
         /// <param name="challengeType">Type of challenge</param>
+        /// <param name="prefix">Is workaround parameter for partial implementation</param>
         /// <returns>Well-formatted url to use for specific challenge communication</returns>
-        Uri GetChallengeUrl(string context, ChallengeType challengeType);
+        Uri GetChallengeUrl(string context, ChallengeType challengeType, string prefix = null);
 
         /// <summary>
         ///     Generates url for checking Own ID process approval status

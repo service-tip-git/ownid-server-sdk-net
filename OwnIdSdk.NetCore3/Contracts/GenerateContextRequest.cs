@@ -20,6 +20,12 @@ namespace OwnIdSdk.NetCore3.Contracts
         public bool IsQr { get; set; }
 
         /// <summary>
+        ///     Partial flor flag
+        /// </summary>
+        [JsonPropertyName("partial")]
+        public bool IsPartial { get; set; }
+
+        /// <summary>
         ///     Payload specific for particular implementation
         /// </summary>
         [JsonPropertyName("data")]

@@ -12,6 +12,7 @@ namespace OwnIdSdk.NetCore3.Flow
         Success,
 
         Authorize,
+        InstantAuthorize,
         Link,
         Recover
     }

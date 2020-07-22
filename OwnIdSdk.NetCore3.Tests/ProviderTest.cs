@@ -152,8 +152,8 @@ namespace OwnIdSdk.NetCore3.Tests
                 await _ownIdProvider.PopFinishedAuthFlowSessionAsync(ExistingContextWithoutDID,
                     _existingItemWithoutDID.Nonce);
             Assert.NotNull(result);
-            Assert.NotEqual(CacheItemStatus.Finished, result.Value.Status);
-            Assert.Null(result.Value.DID);
+            Assert.NotEqual(CacheItemStatus.Finished, result.Status);
+            Assert.Null(result.DID);
         }
 
         [Fact]
@@ -163,8 +163,8 @@ namespace OwnIdSdk.NetCore3.Tests
                 await _ownIdProvider.PopFinishedAuthFlowSessionAsync(ExistingContextWithDID,
                     _existingItemWithDID.Nonce);
             Assert.NotNull(result);
-            Assert.Equal(CacheItemStatus.Finished, result.Value.Status);
-            Assert.Equal(_existingItemWithDID.DID, result.Value.DID);
+            Assert.Equal(CacheItemStatus.Finished, result.Status);
+            Assert.Equal(_existingItemWithDID.DID, result.DID);
         }
     }
 }

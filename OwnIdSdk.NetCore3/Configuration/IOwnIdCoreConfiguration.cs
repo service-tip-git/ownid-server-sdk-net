@@ -93,18 +93,24 @@ namespace OwnIdSdk.NetCore3.Configuration
         /// <summary>
         ///     Marks if OwnIdSdk is using for development cases
         /// </summary>
-        bool IsDevEnvironment { get; set; }
-        
+        public bool IsDevEnvironment { get; set; }
+
         /// <summary>
-        ///     Cache timeout expiration in milliseconds 
+        ///     Cache timeout expiration in milliseconds
         /// </summary>
         /// <remarks>Default value is 10 minutes</remarks>
-        uint CacheExpirationTimeout { get; set; }
-        
+        public uint CacheExpirationTimeout { get; set; }
+
         /// <summary>
         ///     Maximum number of connected devices
         /// </summary>
         /// <remarks>Default value is 5</remarks>
-        uint MaximumNumberOfConnectedDevices { get; set; }
+        public uint MaximumNumberOfConnectedDevices { get; set; }
+
+        /// <summary>
+        ///     Jwt expiration timeout in milliseconds
+        /// </summary>
+        /// <remarks>Default value is 60 minutes</remarks>
+        public uint JwtExpirationTimeout { get; set; }
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Text.Json.Serialization;
 using OwnIdSdk.NetCore3.Store;
 
@@ -10,17 +9,19 @@ namespace OwnIdSdk.NetCore3.Contracts
     public class GetStatusResponse
     {
         /// <summary>
-        /// Status
+        ///     Status
         /// </summary>
-        [JsonPropertyName("status")] 
+        [JsonPropertyName("status")]
         public CacheItemStatus Status { get; set; }
+
         /// <summary>
-        /// Context
+        ///     Context
         /// </summary>
         [JsonPropertyName("context")]
         public string Context { get; set; }
+
         /// <summary>
-        /// Custom payload
+        ///     Custom payload
         /// </summary>
         [JsonPropertyName("payload")]
         public object Payload { get; set; }

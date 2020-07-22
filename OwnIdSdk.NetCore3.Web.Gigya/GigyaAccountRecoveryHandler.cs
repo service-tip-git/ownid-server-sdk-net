@@ -14,11 +14,11 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
     /// <summary>
     /// Gigya specific implementation of <see cref="IAccountRecoveryHandler"/>
     /// </summary>
-    public class GigyaAccountRecoveryHandler : IAccountRecoveryHandler
+    public class GigyaAccountRecoveryHandler<TProfile> : IAccountRecoveryHandler where TProfile : class, IGigyaUserProfile
     {
-        private readonly GigyaRestApiClient _apiClient;
+        private readonly GigyaRestApiClient<TProfile> _apiClient;
 
-        public GigyaAccountRecoveryHandler(GigyaRestApiClient apiClient)
+        public GigyaAccountRecoveryHandler(GigyaRestApiClient<TProfile> apiClient)
         {
             _apiClient = apiClient;
         }
@@ -42,24 +42,16 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                     $"Gigya.getAccountInfo error -> {accountInfo.GetFailureMessage()}");
             }
 
-            //
-            // TODO: use reflection to fill fields
-            //
             return new AccountRecoveryResult
             {
                 DID = resetPasswordResponse.UID,
-                Profile = new GigyaUserProfile
-                {
-                    Email = accountInfo.Profile.GetValueOrDefault("email"),
-                    FirstName = accountInfo.Profile.GetValueOrDefault("firstName"),
-                    LastName = accountInfo.Profile.GetValueOrDefault("lastName")
-                }
+                Profile = accountInfo.Profile
             };
         }
 
         public async Task OnRecoverAsync(UserProfileData userData)
         {
-            var responseMessage = await _apiClient.SetAccountInfo(userData.DID, data: new AccountData(userData.PublicKey));
+            var responseMessage = await _apiClient.SetAccountInfo<TProfile>(userData.DID, data: new AccountData(userData.PublicKey));
 
             if (responseMessage.ErrorCode != 0)
             {
