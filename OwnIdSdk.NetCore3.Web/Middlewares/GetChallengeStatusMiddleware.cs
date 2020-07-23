@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Flow.Commands;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
@@ -23,7 +24,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             List<GetStatusRequest> request;
             try
             {
-                request = await JsonSerializer.DeserializeAsync<List<GetStatusRequest>>(context.Request.Body);
+                request = await OwnIdSerializer.DeserializeAsync<List<GetStatusRequest>>(context.Request.Body);
             }
             catch
             {

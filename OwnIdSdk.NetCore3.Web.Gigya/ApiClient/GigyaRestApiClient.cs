@@ -148,7 +148,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.search"),
                 new FormUrlEncodedContent(parameters));
 
-            var result = await JsonSerializer.DeserializeAsync<UidResponse>(
+            var result = await OwnIdSerializer.DeserializeAsync<UidResponse>(
                 await responseMessage.Content.ReadAsStreamAsync());
 
             var user = result.Results?.FirstOrDefault();

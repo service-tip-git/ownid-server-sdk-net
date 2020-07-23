@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Web.Gigya.ApiClient;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
 
@@ -84,15 +85,8 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
                 if (setAccountResponse.ErrorCode > 0)
                 {
-                    var exProfileSerializedFields = JsonSerializer.Serialize(context.Profile, new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                        IgnoreNullValues = true
-                    });
-
                     _logger.LogError(
                         $"did: {context.DID}{Environment.NewLine}" +
-                        $"profile: {exProfileSerializedFields}{Environment.NewLine}" +
                         $"Gigya.setAccountInfo for EXISTING user error -> {setAccountResponse.GetFailureMessage()}");
 
                     context.SetGeneralError($"{setAccountResponse.ErrorCode}: {setAccountResponse.ErrorMessage}");

@@ -103,7 +103,7 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
             {
                 Label = displayAttr?.Label ?? memberInfo.Name,
                 Placeholder = displayAttr?.Placeholder ?? string.Empty,
-                Key = JsonNamingPolicy.CamelCase.ConvertName(memberInfo.Name),
+                Key = memberInfo.Name,
                 Type = (typeAttr?.FieldType ?? ProfileFieldType.Text).ToString().ToLowerInvariant(),
                 Validators = new List<ProfileValidationRuleMetadata>()
             };

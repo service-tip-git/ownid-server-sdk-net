@@ -36,7 +36,9 @@ namespace OwnIdSdk.NetCore3.Cryptography
             if (!tokenHandler.CanReadToken(jwt)) throw new Exception("invalid jwt");
 
             var token = tokenHandler.ReadJwtToken(jwt);
-            var data = OwnIdSerializer.Deserialize<TData>(token.Payload["data"].ToString());
+            var options = OwnIdSerializer.GetDefaultProperties();
+            options.PropertyNamingPolicy = null;
+            var data = OwnIdSerializer.Deserialize<TData>(token.Payload["data"].ToString(), options);
             
             using var sr = new StringReader(data.PublicKey);
             var rsaSecurityKey = new RsaSecurityKey(RsaHelper.LoadKeys(sr));
