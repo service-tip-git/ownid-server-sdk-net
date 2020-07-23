@@ -126,7 +126,28 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 _logger.LogError($"did: {context.DID}{Environment.NewLine}" +
                                  $"Gigya.setAccountInfo (profile) for NEW user error -> {setAccountMessage.GetFailureMessage()}");
 
-                context.SetGeneralError(setAccountMessage.GetFailureMessage());
+                if (setAccountMessage.ValidationErrors != null && setAccountMessage.ValidationErrors.Any())
+                {
+                    foreach (var validationError in setAccountMessage.ValidationErrors)
+                    {
+                        //
+                        // TODO: find better way to map field name to profile property
+                        //
+                        switch (validationError.FieldName)
+                        {
+                            case "profile.email":
+                                context.SetError(x => x.Email, validationError.Message);
+                                break;
+                            default:
+                                context.SetGeneralError(validationError.Message);
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    context.SetGeneralError(setAccountMessage.UserFriendlyFailureMessage);
+                }
             }
         }
     }

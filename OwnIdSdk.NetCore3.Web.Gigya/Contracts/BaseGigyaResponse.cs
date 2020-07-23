@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+using System.Collections.Generic;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts
 {
@@ -12,9 +12,17 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts
 
         public string CallId { get; set; }
 
+        public List<GigyaValidationError> ValidationErrors { get; set; }
+
         public string GetFailureMessage()
         {
             return $"(CallId={CallId}) {ErrorCode} : {ErrorMessage} ({ErrorDetails})";
         }
+
+        /// <summary>
+        ///     Get user friendly failure message (without error code and callId)
+        /// </summary>
+        /// <returns>User friendly failure message (without error code and callId)</returns>
+        public string UserFriendlyFailureMessage => $"{ErrorMessage}: {ErrorDetails}";
     }
 }
