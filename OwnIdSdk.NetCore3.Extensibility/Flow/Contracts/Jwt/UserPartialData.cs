@@ -8,6 +8,12 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt
     public class UserPartialData : ISignedData
     {
         /// <summary>
+        ///     User unique identifier
+        /// </summary>
+        [JsonPropertyName("did")]
+        public string DID { get; set; }
+
+        /// <summary>
         ///     User public key generated for current organization / website
         /// </summary>
         /// <remarks>
@@ -15,11 +21,5 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt
         /// </remarks>
         [JsonPropertyName("pubKey")]
         public string PublicKey { get; set; }
-        
-        /// <summary>
-        ///     User unique identifier
-        /// </summary>
-        [JsonPropertyName("did")]
-        public string DID { get; set; }
     }
 }

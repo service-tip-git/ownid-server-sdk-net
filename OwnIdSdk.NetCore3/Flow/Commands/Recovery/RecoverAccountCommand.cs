@@ -5,6 +5,7 @@ using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
+using OwnIdSdk.NetCore3.Flow.Steps;
 
 namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
 {
@@ -15,7 +16,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
         private readonly IJwtComposer _jwtComposer;
         private readonly bool _needRequesterInfo;
 
-        public RecoverAccountCommand(IJwtComposer jwtComposer, IFlowController flowController, 
+        public RecoverAccountCommand(IJwtComposer jwtComposer, IFlowController flowController,
             IAccountRecoveryHandler accountRecoveryHandler = null, bool needRequesterInfo = true)
         {
             _jwtComposer = jwtComposer;

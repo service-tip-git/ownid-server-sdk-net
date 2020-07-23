@@ -7,7 +7,10 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
     /// </summary>
     /// <remarks>
     ///     Implement this interface to enable Account link feature.
-    ///     Use <c>IServiceCollection.AddOwnId(builder => { builder.UseUserHandlerWithCustomProfile<![CDATA[<MyHandler>]]>(); })</c>
+    ///     Use
+    ///     <c>
+    ///         IServiceCollection.AddOwnId(builder => { builder.UseUserHandlerWithCustomProfile<![CDATA[<MyHandler>]]>(); })
+    ///     </c>
     ///     for this purpose
     /// </remarks>
     /// <typeparam name="TProfile">User Profile</typeparam>

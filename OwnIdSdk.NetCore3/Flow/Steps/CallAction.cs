@@ -1,7 +1,7 @@
 using System;
 using System.Net.Http;
 
-namespace OwnIdSdk.NetCore3.Flow
+namespace OwnIdSdk.NetCore3.Flow.Steps
 {
     /// <summary>
     ///     Defines settings for HTTP-based call action

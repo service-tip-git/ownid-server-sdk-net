@@ -19,7 +19,10 @@ namespace OwnIdSdk.NetCore3.Flow.Steps
             _frontBehaviorGenerator = frontBehaviorGenerator;
         }
 
-        public FrontendBehavior GenerateFrontendBehavior(CacheItem item) => _frontBehaviorGenerator(item);
+        public FrontendBehavior GenerateFrontendBehavior(CacheItem item)
+        {
+            return _frontBehaviorGenerator(item);
+        }
 
         public Type GetRelatedCommandType()
         {

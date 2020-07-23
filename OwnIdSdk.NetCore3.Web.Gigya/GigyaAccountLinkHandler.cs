@@ -3,10 +3,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
-using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
+using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Web.Gigya.ApiClient;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
 
@@ -33,7 +33,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
         public async Task<string> GetCurrentUserIdAsync(string payload)
         {
-            var jwt = JsonSerializer.Deserialize<JwtContainer>(payload)?.Jwt;
+            var jwt = OwnIdSerializer.Deserialize<JwtContainer>(payload)?.Jwt;
 
             if (string.IsNullOrEmpty(jwt))
                 throw new Exception("No JWT was found in HttpRequest");

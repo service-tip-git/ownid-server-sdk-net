@@ -47,9 +47,9 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts
 
     public class OwnIdConnection
     {
-        [JsonPropertyName("pubKey")] 
+        [JsonPropertyName("pubKey")]
         public string PublicKey { get; set; }
-        
+
         // hsh is correct, gigya can not find field hash
         [JsonPropertyName("keyHsh")]
         public string Hash { get; set; }

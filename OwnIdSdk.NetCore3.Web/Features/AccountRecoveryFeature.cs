@@ -23,14 +23,11 @@ namespace OwnIdSdk.NetCore3.Web.Features
         public void Validate()
         {
         }
-        
+
         public AccountRecoveryFeature UseAccountRecovery<THandler>()
             where THandler : class, IAccountRecoveryHandler
         {
-            _applyServicesAction = services =>
-            {
-                services.TryAddTransient<IAccountRecoveryHandler, THandler>();
-            };
+            _applyServicesAction = services => { services.TryAddTransient<IAccountRecoveryHandler, THandler>(); };
 
             return this;
         }

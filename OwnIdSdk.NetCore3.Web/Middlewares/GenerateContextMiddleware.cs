@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Flow.Commands;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
@@ -20,11 +21,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
         protected override async Task Execute(HttpContext httpContext)
         {
-            var request = await JsonSerializer.DeserializeAsync<GenerateContextRequest>(httpContext.Request.Body,
-                new JsonSerializerOptions
-                {
-                    Converters = {new JsonStringEnumConverter()}
-                });
+            var request = await OwnIdSerializer.DeserializeAsync<GenerateContextRequest>(httpContext.Request.Body);
 
             var result = await _createFlowCommand.ExecuteAsync(request);
             await Json(httpContext, result, StatusCodes.Status200OK, false);

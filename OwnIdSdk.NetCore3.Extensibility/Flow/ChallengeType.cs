@@ -8,6 +8,6 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow
         Register,
         Login,
         Link,
-        Recover,
+        Recover
     }
 }

@@ -3,26 +3,28 @@ using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
+using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Extensibility.Services;
-using OwnIdSdk.NetCore3.Flow;
-using OwnIdSdk.NetCore3.Flow.Adapters;
 
-namespace OwnIdSdk.NetCore3.Web.FlowEntries.Adapters
+namespace OwnIdSdk.NetCore3.Flow.Adapters
 {
     public class UserHandlerAdapter<TProfile> : IUserHandlerAdapter where TProfile : class
     {
         private readonly IUserHandler<TProfile> _adaptee;
+        private readonly JsonSerializerOptions _serializerOptions;
 
         public UserHandlerAdapter(IUserHandler<TProfile> adaptee)
         {
             _adaptee = adaptee;
+            _serializerOptions = OwnIdSerializer.GetDefaultProperties();
+            _serializerOptions.PropertyNamingPolicy = null;
         }
 
         public IFormContext CreateUserDefinedContext(UserProfileData profileData,
             ILocalizationService localizationService)
         {
             return new UserProfileFormContext<TProfile>(profileData.DID, profileData.PublicKey,
-                JsonSerializer.Deserialize<TProfile>(profileData.Profile.GetRawText()), localizationService);
+                OwnIdSerializer.Deserialize<TProfile>(profileData.Profile.GetRawText(), _serializerOptions), localizationService);
         }
 
         public async Task UpdateProfileAsync(IFormContext context)

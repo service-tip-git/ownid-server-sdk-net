@@ -10,12 +10,11 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts
         /// <summary>
         ///     Context
         /// </summary>
-        [JsonPropertyName("context")]
         public string Context { get; set; }
+
         /// <summary>
         ///     Nonce
         /// </summary>
-        [JsonPropertyName("nonce")]
         public string Nonce { get; set; }
     }
 }

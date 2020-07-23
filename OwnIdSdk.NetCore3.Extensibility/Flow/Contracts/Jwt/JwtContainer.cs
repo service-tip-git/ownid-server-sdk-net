@@ -10,13 +10,12 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt
         public JwtContainer()
         {
         }
-        
+
         public JwtContainer(string jwt)
         {
             Jwt = jwt;
         }
-        
-        [JsonPropertyName("jwt")] 
+
         public string Jwt { get; set; }
     }
 }

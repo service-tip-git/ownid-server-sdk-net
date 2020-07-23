@@ -76,8 +76,7 @@ namespace OwnIdSdk.NetCore3.Flow
             if (propInfo == null)
                 throw new ArgumentException($"Expression '{exp}' refers to a field, not a property.");
 
-            if (type != propInfo.ReflectedType &&
-                !type.IsSubclassOf(propInfo.ReflectedType))
+            if (!(propInfo.ReflectedType?.IsAssignableFrom(type) ?? false))
                 throw new ArgumentException($"Expression '{exp}' refers to a property that is not from type {type}.");
 
             var localizedErrorMessage = _localizationService.GetLocalizedString(errorText, true);

@@ -17,6 +17,14 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt
         public string DID { get; set; }
 
         /// <summary>
+        ///     Json formatted requested profile fields with
+        ///     <see cref="IProfileConfiguration" />
+        /// </summary>
+        [JsonPropertyName("profile")]
+        public JsonElement Profile { get; set; }
+        
+
+        /// <summary>
         ///     User public key generated for current organization / website
         /// </summary>
         /// <remarks>
@@ -24,12 +32,5 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt
         /// </remarks>
         [JsonPropertyName("pubKey")]
         public string PublicKey { get; set; }
-
-        /// <summary>
-        ///     Json formatted requested profile fields with
-        ///     <see cref="IProfileConfiguration" />
-        /// </summary>
-        [JsonPropertyName("profile")]
-        public JsonElement Profile { get; set; }
     }
 }

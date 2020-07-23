@@ -68,9 +68,9 @@ namespace OwnIdSdk.NetCore3.Configuration
         public bool IsDevEnvironment { get; set; }
 
         public uint CacheExpirationTimeout { get; set; }
-        
+
         public uint MaximumNumberOfConnectedDevices { get; set; }
-        
+
         public uint JwtExpirationTimeout { get; set; }
 
         /// <summary>

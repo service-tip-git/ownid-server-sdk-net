@@ -14,13 +14,11 @@ namespace OwnIdSdk.NetCore3.Extensibility.Configuration.Profile
         /// <summary>
         ///     Label text without localization
         /// </summary>
-        [JsonPropertyName("label")]
         public string Label { get; set; }
 
         /// <summary>
         ///     Profile Field html form key
         /// </summary>
-        [JsonPropertyName("key")]
         public string Key { get; set; }
 
         /// <summary>
@@ -32,13 +30,11 @@ namespace OwnIdSdk.NetCore3.Extensibility.Configuration.Profile
         /// <summary>
         ///     Input placeholder
         /// </summary>
-        [JsonPropertyName("placeholder")]
         public string Placeholder { get; set; }
 
         /// <summary>
         ///     List of validators to set on OwinId app side
         /// </summary>
-        [JsonPropertyName("validators")]
         public List<ProfileValidationRuleMetadata> Validators { get; set; }
     }
 }

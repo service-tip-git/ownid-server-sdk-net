@@ -210,8 +210,8 @@ namespace OwnIdSdk.NetCore3.Services
         public async Task<CacheItem> GetCacheItemByContextAsync(string context)
         {
             var item = (await _cacheStore.GetAsync(context))?.Clone() as CacheItem;
-            
-            if(item == null)
+
+            if (item == null)
                 throw new InternalLogicException($"No cache item was found with context={context}");
 
             return item;

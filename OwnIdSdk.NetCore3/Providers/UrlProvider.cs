@@ -1,6 +1,5 @@
 using System;
 using System.Web;
-using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Providers;
@@ -42,7 +41,7 @@ namespace OwnIdSdk.NetCore3
         {
             return GetBaseActionUrl(context, "approval-status");
         }
-        
+
         public Uri GetWebAppWithCallbackUrl(Uri subUrl)
         {
             var deepLink = new UriBuilder(_coreConfiguration.OwnIdApplicationUrl);

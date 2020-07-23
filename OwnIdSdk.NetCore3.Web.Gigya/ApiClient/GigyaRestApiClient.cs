@@ -4,12 +4,12 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
+using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Accounts;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Login;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.UpdateProfile;
-using OwnIdSdk.NetCore3.Web.Gigya.Json;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
 {
@@ -46,9 +46,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
             if (data != null)
             {
                 foreach (var connection in data.Connections.Where(connection => string.IsNullOrEmpty(connection.Hash)))
-                {
                     connection.Hash = connection.PublicKey.GetSha256();
-                }
 
                 parameters.AddParameter("data", data);
             }
@@ -57,7 +55,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.setAccountInfo"),
                 new FormUrlEncodedContent(parameters));
 
-            var setAccountResponse = await JsonSerializer.DeserializeAsync<BaseGigyaResponse>(
+            var setAccountResponse = await OwnIdSerializer.DeserializeAsync<BaseGigyaResponse>(
                 await setAccountDataMessage.Content
                     .ReadAsStreamAsync());
 
@@ -77,7 +75,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.notifyLogin"),
                 new FormUrlEncodedContent(parameters));
 
-            return await JsonSerializer.DeserializeAsync<LoginResponse>(
+            return await OwnIdSerializer.DeserializeAsync<LoginResponse>(
                 await responseMessage.Content.ReadAsStreamAsync());
         }
 
@@ -99,7 +97,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
             var responseMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getJWT"),
                 new FormUrlEncodedContent(parameters));
-            return await JsonSerializer.DeserializeAsync<GetJwtResponse>(
+            return await OwnIdSerializer.DeserializeAsync<GetJwtResponse>(
                 await responseMessage.Content.ReadAsStreamAsync());
         }
 
@@ -125,7 +123,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.resetPassword"),
                 new FormUrlEncodedContent(parameters));
 
-            return await JsonSerializer.DeserializeAsync<ResetPasswordResponse>(
+            return await OwnIdSerializer.DeserializeAsync<ResetPasswordResponse>(
                 await responseMessage.Content.ReadAsStreamAsync());
         }
 
@@ -138,7 +136,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.deleteAccount"),
                 new FormUrlEncodedContent(parameters));
 
-            return await JsonSerializer.DeserializeAsync<BaseGigyaResponse>(
+            return await OwnIdSerializer.DeserializeAsync<BaseGigyaResponse>(
                 await responseMessage.Content.ReadAsStreamAsync());
         }
 
@@ -150,7 +148,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.search"),
                 new FormUrlEncodedContent(parameters));
 
-            var result = await JsonSerializer.DeserializeAsync<UidResponse>(
+            var result = await OwnIdSerializer.DeserializeAsync<UidResponse>(
                 await responseMessage.Content.ReadAsStreamAsync());
 
             var user = result.Results?.FirstOrDefault();
@@ -174,18 +172,9 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getAccountInfo"),
                 new FormUrlEncodedContent(parameters));
 
-            var serializerOptions = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy  = JsonNamingPolicy.CamelCase
-            };
-            serializerOptions.Converters.Add(new AutoPrimitiveToStringConverter());
-            
-            Console.WriteLine(await getAccountMessage.Content
-                .ReadAsStringAsync());
-
             return
-                await JsonSerializer.DeserializeAsync<GetAccountInfoResponse<TProfile>>(await getAccountMessage.Content
-                    .ReadAsStreamAsync(), serializerOptions);
+                await OwnIdSerializer.DeserializeAsync<GetAccountInfoResponse<TProfile>>(await getAccountMessage.Content
+                    .ReadAsStreamAsync());
         }
     }
 }

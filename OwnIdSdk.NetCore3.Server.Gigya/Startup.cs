@@ -76,10 +76,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         x.CacheExpirationTimeout = ownIdSection.GetValue("cache_expiration",
                             (uint) TimeSpan.FromMinutes(10).TotalMilliseconds);
                         if (ownIdSection.Key.Contains("maximum_number_of_connected_devices"))
-                        {
                             x.MaximumNumberOfConnectedDevices =
                                 ownIdSection.GetValue<uint>("maximum_number_of_connected_devices");
-                        }
 
                         //for development cases
                         x.IsDevEnvironment = Configuration.GetValue("OwnIdDevelopmentMode", false);
@@ -118,7 +116,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             var routeBuilder = new RouteBuilder(app);
             routeBuilder.MapMiddlewarePost("log",
                 builder => builder.UseMiddleware<LogMiddleware>());
-            routeBuilder.MapMiddlewarePost("not-ownid/register", builder => builder.UseMiddleware<ExternalRegisterMiddleware>());
+            routeBuilder.MapMiddlewarePost("not-ownid/register",
+                builder => builder.UseMiddleware<ExternalRegisterMiddleware>());
             app.UseRouter(routeBuilder.Build());
 
             app.UseOwnId();

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Flow.Commands.Approval;
 using OwnIdSdk.NetCore3.Web.Attributes;
 
@@ -21,7 +22,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Approval
 
         protected override async Task Execute(HttpContext httpContext)
         {
-            var request = await JsonSerializer.DeserializeAsync<ApproveActionRequest>(httpContext.Request.Body);
+            var request = await OwnIdSerializer.DeserializeAsync<ApproveActionRequest>(httpContext.Request.Body);
 
             await _approveActionCommand.ExecuteAsync(request);
             OkNoContent(httpContext.Response);

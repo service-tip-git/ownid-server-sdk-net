@@ -25,25 +25,21 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts
         /// <summary>
         ///     Url for qr or link that leads to OwnId app
         /// </summary>
-        [JsonPropertyName("url")]
         public string Url { get; }
 
         /// <summary>
         ///     Context identifier
         /// </summary>
-        [JsonPropertyName("context")]
         public string Context { get; }
 
         /// <summary>
         ///     Generated nonce
         /// </summary>
-        [JsonPropertyName("nonce")]
         public string Nonce { get; }
-        
+
         /// <summary>
         ///     Expiration
         /// </summary>
-        [JsonPropertyName("expiration")]
         public uint Expiration { get; set; }
     }
 }

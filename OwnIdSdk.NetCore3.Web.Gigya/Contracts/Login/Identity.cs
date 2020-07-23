@@ -4,34 +4,25 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts.Login
 {
     public class Identity
     {
-        [JsonPropertyName("provider")]
         public string Provider { get; set; }
-        
+
         [JsonPropertyName("providerUID")]
         public string ProviderUID { get; set; }
-        
-        [JsonPropertyName("email")]
+
         public string Email { get; set; }
-        
-        [JsonPropertyName("nickname")]
+
         public string NickName { get; set; }
-        
-        [JsonPropertyName("firstName")]
+
         public string FirstName { get; set; }
-        
-        [JsonPropertyName("lastName")]
+
         public string LastName { get; set; }
-        
-        [JsonPropertyName("lastUpdated")]
-        public string LastUpdate { get; set; }
-        
-        [JsonPropertyName("allowsLogin")]
+
+        public string LastUpdated { get; set; }
+
         public bool AllowsLogin { get; set; }
-        
-        [JsonPropertyName("isLoginIdentity")]
-        public bool IsLogIdentity { get; set; }
-        
-        [JsonPropertyName("isExpiredSession")]
+
+        public bool IsLoginIdentity { get; set; }
+
         public bool IsExpiredSession { get; set; }
     }
 }

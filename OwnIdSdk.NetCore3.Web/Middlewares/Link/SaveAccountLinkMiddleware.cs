@@ -5,8 +5,8 @@ using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Flow;
 using OwnIdSdk.NetCore3.Flow.Commands;
-using OwnIdSdk.NetCore3.Flow.Commands.Link;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
+using OwnIdSdk.NetCore3.Flow.Steps;
 using OwnIdSdk.NetCore3.Web.Attributes;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares.Link
@@ -33,7 +33,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Link
                 CultureInfo = GetRequestCulture(httpContext),
                 Data = jwtContainer
             }, StepType.Link);
-            
+
             await Json(httpContext, result, StatusCodes.Status200OK);
         }
     }

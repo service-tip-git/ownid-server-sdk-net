@@ -1,4 +1,4 @@
-namespace OwnIdSdk.NetCore3.Flow
+namespace OwnIdSdk.NetCore3.Flow.Steps
 {
     /// <summary>
     ///     Step type to show in Web App
