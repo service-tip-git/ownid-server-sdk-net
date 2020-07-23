@@ -5,6 +5,7 @@ using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Flow.Adapters;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
+using OwnIdSdk.NetCore3.Flow.Steps;
 
 namespace OwnIdSdk.NetCore3.Flow.Commands.Link
 {

@@ -6,11 +6,11 @@ namespace OwnIdSdk.NetCore3.Web.Attributes
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class RequestDescriptorAttribute : Attribute
     {
-        public BaseRequestFields Fields { get; }
-        
         public RequestDescriptorAttribute(BaseRequestFields fields = BaseRequestFields.None)
         {
             Fields = fields;
         }
+
+        public BaseRequestFields Fields { get; }
     }
 }

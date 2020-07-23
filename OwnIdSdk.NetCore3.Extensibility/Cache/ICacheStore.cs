@@ -12,7 +12,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
         ///     Adds or updates <see cref="CacheItem" /> by keys
         /// </summary>
         /// <param name="key">Unique identifier. Context</param>
-        /// <param name="data"><see cref="CacheItem"/> to store</param>
+        /// <param name="data"><see cref="CacheItem" /> to store</param>
         /// <param name="expiration">expiration</param>
         void Set(string key, CacheItem data, TimeSpan expiration);
 
@@ -20,9 +20,9 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
         ///     Adds or updates <see cref="CacheItem" /> by keys
         /// </summary>
         /// <param name="key">Unique identifier. Context</param>
-        /// <param name="data"><see cref="CacheItem"/> to store</param>
+        /// <param name="data"><see cref="CacheItem" /> to store</param>
         /// <param name="expiration">expiration</param>
-        /// <remarks>Async version of <see cref="Set"/></remarks>
+        /// <remarks>Async version of <see cref="Set" /></remarks>
         Task SetAsync(string key, CacheItem data, TimeSpan expiration);
 
         /// <summary>

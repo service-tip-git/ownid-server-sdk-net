@@ -7,7 +7,7 @@ using System.Text;
 namespace OwnIdSdk.NetCore3.Cryptography
 {
     /// <summary>
-    /// Extends <see cref="RSA"/> mechanism for basic operations used in OwnIdSdk
+    ///     Extends <see cref="RSA" /> mechanism for basic operations used in OwnIdSdk
     /// </summary>
     public static class RsaHelper
     {

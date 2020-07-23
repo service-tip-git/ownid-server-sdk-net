@@ -11,19 +11,16 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts
         /// <summary>
         ///     Status
         /// </summary>
-        [JsonPropertyName("status")]
         public CacheItemStatus Status { get; set; }
 
         /// <summary>
         ///     Context
         /// </summary>
-        [JsonPropertyName("context")]
         public string Context { get; set; }
 
         /// <summary>
         ///     Custom payload
         /// </summary>
-        [JsonPropertyName("payload")]
         public object Payload { get; set; }
     }
 }

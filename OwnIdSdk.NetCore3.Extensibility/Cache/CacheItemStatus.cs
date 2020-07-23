@@ -29,7 +29,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
         ///     Action declined by user
         /// </summary>
         Declined = 5,
-        
+
         /// <summary>
         ///     Process is finished
         /// </summary>

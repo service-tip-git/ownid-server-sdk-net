@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 using Microsoft.IdentityModel.Tokens;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
+using OwnIdSdk.NetCore3.Extensibility.Json;
 
 namespace OwnIdSdk.NetCore3.Cryptography
 {
@@ -35,10 +36,8 @@ namespace OwnIdSdk.NetCore3.Cryptography
             if (!tokenHandler.CanReadToken(jwt)) throw new Exception("invalid jwt");
 
             var token = tokenHandler.ReadJwtToken(jwt);
-            var serializerOptions = new JsonSerializerOptions();
-            serializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-            var data = JsonSerializer.Deserialize<TData>(token.Payload["data"].ToString(), serializerOptions);
-            // TODO: add type of challenge
+            var data = OwnIdSerializer.Deserialize<TData>(token.Payload["data"].ToString());
+            
             using var sr = new StringReader(data.PublicKey);
             var rsaSecurityKey = new RsaSecurityKey(RsaHelper.LoadKeys(sr));
 

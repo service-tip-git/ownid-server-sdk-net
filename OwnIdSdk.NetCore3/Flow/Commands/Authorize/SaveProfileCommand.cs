@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
@@ -8,6 +7,7 @@ using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Extensibility.Services;
 using OwnIdSdk.NetCore3.Flow.Adapters;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
+using OwnIdSdk.NetCore3.Flow.Steps;
 using OwnIdSdk.NetCore3.Services;
 
 namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize

@@ -8,7 +8,6 @@ using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
-using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web.Extensibility;
 using OwnIdSdk.NetCore3.Web.Features;
 
@@ -145,7 +144,7 @@ namespace OwnIdSdk.NetCore3.Web.Configuration
         {
             WithFeature<CacheStoreFeature>(x => x.UseStoreInMemoryStore());
         }
-        
+
         /// <summary>
         ///     Defines usage of Default ASP.NET Core Web Cache Store
         /// </summary>

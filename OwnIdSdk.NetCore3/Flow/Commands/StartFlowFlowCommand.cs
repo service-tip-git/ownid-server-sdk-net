@@ -12,6 +12,7 @@ using OwnIdSdk.NetCore3.Flow.Commands.Authorize;
 using OwnIdSdk.NetCore3.Flow.Commands.Link;
 using OwnIdSdk.NetCore3.Flow.Commands.Recovery;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
+using OwnIdSdk.NetCore3.Flow.Steps;
 using OwnIdSdk.NetCore3.Services;
 
 namespace OwnIdSdk.NetCore3.Flow.Commands
@@ -51,7 +52,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
 
             if (cacheItem.HasFinalState)
                 throw new CommandValidationException("Flow is already finished");
-            
+
             BaseFlowCommand command;
 
             switch (cacheItem.FlowType)

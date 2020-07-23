@@ -1,14 +1,15 @@
-using System;
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
+using OwnIdSdk.NetCore3.Flow.Steps;
 
 namespace OwnIdSdk.NetCore3.Flow.Commands
 {
     public abstract class BaseFlowCommand
     {
-        public async Task<ICommandResult> ExecuteAsync(ICommandInput input, CacheItem relatedItem, StepType currentStepType)
+        public async Task<ICommandResult> ExecuteAsync(ICommandInput input, CacheItem relatedItem,
+            StepType currentStepType)
         {
             Validate();
             // ValidateCacheItemTokens(relatedItem, input);
@@ -17,7 +18,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
 
         protected abstract void Validate();
 
-        protected abstract Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem, StepType currentStepType);
+        protected abstract Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
+            StepType currentStepType);
 
         protected void ValidateCacheItemTokens(CacheItem item, ICommandInput commandInput)
         {

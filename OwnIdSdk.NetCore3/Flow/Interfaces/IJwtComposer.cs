@@ -26,7 +26,8 @@ namespace OwnIdSdk.NetCore3.Flow.Interfaces
         /// <param name="locale">Optional. Content locale</param>
         /// <param name="includeRequester">Optional. Default = false. True if should add requester info to jwt</param>
         /// <returns>Base64 encoded string that contains JWT with hash</returns>
-        string GenerateProfileConfigJwt(string context, FrontendBehavior nextFrontendBehavior, string did, string locale = null,
+        string GenerateProfileConfigJwt(string context, FrontendBehavior nextFrontendBehavior, string did,
+            string locale = null,
             bool includeRequester = false);
 
         /// <summary>
@@ -41,7 +42,8 @@ namespace OwnIdSdk.NetCore3.Flow.Interfaces
             string locale = null);
 
         string GenerateFinalStepJwt(string context, FrontendBehavior nextFrontendBehavior, string locale = null);
-        
-        string GeneratePartialDidStep(string context, FrontendBehavior nextFrontendBehavior, string did, string locale = null);
+
+        string GeneratePartialDidStep(string context, FrontendBehavior nextFrontendBehavior, string did,
+            string locale = null);
     }
 }

@@ -9,16 +9,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using OwnIdSdk.NetCore3.Configuration;
-using OwnIdSdk.NetCore3.Extensibility.Cache;
-using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
-using OwnIdSdk.NetCore3.Extensibility.Services;
+using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Extensions;
-using OwnIdSdk.NetCore3.Flow;
-using OwnIdSdk.NetCore3.Store;
 using OwnIdSdk.NetCore3.Web.Attributes;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
@@ -58,10 +53,10 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         }
 
         protected abstract Task Execute(HttpContext httpContext);
-        
+
         protected async Task<JwtContainer> GetRequestJwtContainerAsync(HttpContext httpContext)
         {
-            var jwtContainer = await JsonSerializer.DeserializeAsync<JwtContainer>(httpContext.Request.Body);
+            var jwtContainer = await OwnIdSerializer.DeserializeAsync<JwtContainer>(httpContext.Request.Body);
 
             if (string.IsNullOrEmpty(jwtContainer?.Jwt))
                 throw new CommandValidationException("No JWT was found in request");
@@ -163,7 +158,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 context.Response.Headers.Add("Content-Language", culture.ToString());
             }
 
-            await context.Response.WriteAsync(JsonSerializer.Serialize<object>(responseBody));
+            await context.Response.WriteAsync(OwnIdSerializer.Serialize(responseBody));
         }
 
         protected void BadRequest(HttpResponse response)

@@ -10,7 +10,6 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts
         /// <summary>
         ///     Lowercased challenge type <see cref="ChallengeType" />
         /// </summary>
-        [JsonPropertyName("type")]
         public ChallengeType Type { get; set; }
 
         /// <summary>

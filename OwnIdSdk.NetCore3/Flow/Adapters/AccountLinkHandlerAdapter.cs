@@ -1,12 +1,10 @@
-using System.Text.Json;
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
+using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Extensibility.Services;
-using OwnIdSdk.NetCore3.Flow;
-using OwnIdSdk.NetCore3.Flow.Adapters;
 
-namespace OwnIdSdk.NetCore3.Web.FlowEntries.Adapters
+namespace OwnIdSdk.NetCore3.Flow.Adapters
 {
     public class AccountLinkHandlerAdapter<TProfile> : IAccountLinkHandlerAdapter where TProfile : class
     {
@@ -21,7 +19,7 @@ namespace OwnIdSdk.NetCore3.Web.FlowEntries.Adapters
             ILocalizationService localizationService)
         {
             return new UserProfileFormContext<TProfile>(profileData.DID, profileData.PublicKey,
-                JsonSerializer.Deserialize<TProfile>(profileData.Profile.GetRawText()), localizationService);
+                OwnIdSerializer.Deserialize<TProfile>(profileData.Profile.GetRawText()), localizationService);
         }
 
         public async Task<string> GetCurrentUserIdAsync(string payload)

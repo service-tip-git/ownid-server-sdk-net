@@ -1,12 +1,10 @@
 using System;
 using System.Linq;
-using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
-using OwnIdSdk.NetCore3.Web.Extensibility;
 using OwnIdSdk.NetCore3.Web.Gigya.ApiClient;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
 
@@ -47,7 +45,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             if (jwtResponse.IdToken == null || jwtResponse.ErrorCode != 0)
                 return new LoginResult<object>($"Gigya: {jwtResponse.GetFailureMessage()}");
 
-            
+
             return new LoginResult<object>(new
             {
                 idToken = jwtResponse.IdToken
@@ -57,10 +55,10 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
         public async Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)
         {
             var did = await _restApiClient.SearchForDid(publicKey);
-            
-            if(string.IsNullOrEmpty(did))
-                return new LoginResult<object>($"Can not find user in Gigya search result with provided public key");
-            
+
+            if (string.IsNullOrEmpty(did))
+                return new LoginResult<object>("Can not find user in Gigya search result with provided public key");
+
             return await OnSuccessLoginAsync(did);
         }
 
@@ -74,9 +72,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                     throw new Exception($"Found gigya user uid={context.DID} without pubKey");
 
                 if (getAccountMessage.Data.Connections.All(x => x.PublicKey != context.PublicKey))
-                {
                     throw new Exception("Public key doesn't match any of gigya user keys");
-                }
 
                 var setAccountResponse = await _restApiClient.SetAccountInfo(context.DID, context.Profile);
 

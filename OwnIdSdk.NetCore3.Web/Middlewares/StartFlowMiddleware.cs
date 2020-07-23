@@ -2,10 +2,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
-using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Flow;
 using OwnIdSdk.NetCore3.Flow.Commands;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
+using OwnIdSdk.NetCore3.Flow.Steps;
 using OwnIdSdk.NetCore3.Web.Attributes;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares

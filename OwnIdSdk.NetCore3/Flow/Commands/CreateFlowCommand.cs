@@ -27,7 +27,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             _linkHandlerAdapter = linkHandlerAdapter;
             _expiration = coreConfiguration.CacheExpirationTimeout;
         }
-        
+
         public async Task<GetChallengeLinkResponse> ExecuteAsync(GenerateContextRequest request)
         {
             var challengeContext = _identitiesProvider.GenerateContext();

@@ -39,20 +39,12 @@ namespace OwnIdSdk.NetCore3.Web
             var configuration = app.ApplicationServices.GetService<OwnIdConfiguration>();
 
             if (configuration.HasFeature<AccountLinkFeature>())
-            {
                 routeBuilder.MapMiddlewarePost("ownid/{context}/link",
                     builder => builder.UseMiddleware<SaveAccountLinkMiddleware>());
-                // routeBuilder.MapMiddlewareGet("ownid/{context}/link",
-                //     builder => builder.UseMiddleware<GetAccountLinkDataMiddleware>());
-            }
 
             if (configuration.HasFeature<AccountRecoveryFeature>())
-            {
-                // routeBuilder.MapMiddlewareGet("ownid/{context}/recover",
-                //     builder => builder.UseMiddleware<RecoverAccountMiddleware>());
                 routeBuilder.MapMiddlewarePost("ownid/{context}/recover",
                     builder => builder.UseMiddleware<SaveAccountPublicKeyMiddleware>());
-            }
 
             app.UseRouter(routeBuilder.Build());
         }

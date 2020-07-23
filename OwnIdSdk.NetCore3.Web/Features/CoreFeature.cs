@@ -28,36 +28,16 @@ namespace OwnIdSdk.NetCore3.Web.Features
             _configuration = new OwnIdCoreConfiguration();
         }
 
-        public CoreFeature WithConfiguration(Action<IOwnIdCoreConfiguration> setupAction)
-        {
-            setupAction(_configuration);
-            return this;
-        }
-
-        public CoreFeature WithKeys(string publicKeyPath, string privateKeyPath)
-        {
-            using var publicKeyReader = File.OpenText(publicKeyPath);
-            using var privateKeyReader = File.OpenText(privateKeyPath);
-            _configuration.JwtSignCredentials = RsaHelper.LoadKeys(publicKeyReader, privateKeyReader);
-            return this;
-        }
-        
-        public CoreFeature WithKeys(RSA rsa)
-        {
-            _configuration.JwtSignCredentials = rsa;
-            return this;
-        }
-        
         public void ApplyServices(IServiceCollection services)
         {
             services.TryAddSingleton(x => (IOwnIdCoreConfiguration) _configuration);
-            
+
             services.TryAddSingleton<IJwtService, JwtService>();
             services.TryAddSingleton<IJwtComposer, JwtComposer>();
             services.TryAddSingleton<ICacheItemService, CacheItemService>();
             services.TryAddSingleton<IUrlProvider, UrlProvider>();
             services.TryAddSingleton<IIdentitiesProvider, GuidIdentitiesProvider>();
-            
+
             services.TryAddSingleton<CreateFlowCommand>();
             services.TryAddSingleton<GetSecurityCheckCommand>();
             services.TryAddSingleton<GetStatusCommand>();
@@ -72,7 +52,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
             services.TryAddSingleton<SaveAccountLinkCommand>();
             services.TryAddSingleton<RecoverAccountCommand>();
             services.TryAddSingleton<SaveAccountPublicKeyCommand>();
-            
+
             services.TryAddSingleton<IFlowController, FlowController>();
             services.TryAddSingleton<IFlowRunner, FlowRunner>();
         }
@@ -83,7 +63,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
 
             if (_configuration.CacheExpirationTimeout == default)
                 _configuration.CacheExpirationTimeout = (uint) TimeSpan.FromMinutes(10).TotalMilliseconds;
-            
+
             if (_configuration.JwtExpirationTimeout == default)
                 _configuration.JwtExpirationTimeout = (uint) TimeSpan.FromMinutes(60).TotalMilliseconds;
 
@@ -104,6 +84,26 @@ namespace OwnIdSdk.NetCore3.Web.Features
 
             if (result.Failed)
                 throw new InvalidOperationException(result.FailureMessage);
+        }
+
+        public CoreFeature WithConfiguration(Action<IOwnIdCoreConfiguration> setupAction)
+        {
+            setupAction(_configuration);
+            return this;
+        }
+
+        public CoreFeature WithKeys(string publicKeyPath, string privateKeyPath)
+        {
+            using var publicKeyReader = File.OpenText(publicKeyPath);
+            using var privateKeyReader = File.OpenText(privateKeyPath);
+            _configuration.JwtSignCredentials = RsaHelper.LoadKeys(publicKeyReader, privateKeyReader);
+            return this;
+        }
+
+        public CoreFeature WithKeys(RSA rsa)
+        {
+            _configuration.JwtSignCredentials = rsa;
+            return this;
         }
     }
 }

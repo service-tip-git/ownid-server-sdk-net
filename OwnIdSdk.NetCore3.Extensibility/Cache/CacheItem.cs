@@ -76,8 +76,8 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
         ///     Indicates if cache item can be used in middle of register / login process
         /// </summary>
         public bool IsValidForAuthorize => !HasFinalState &&
-                                               (ChallengeType == ChallengeType.Register ||
-                                                ChallengeType == ChallengeType.Login);
+                                           (ChallengeType == ChallengeType.Register ||
+                                            ChallengeType == ChallengeType.Login);
 
         /// <summary>
         ///     Indicates if cache item can be used in middle of link process

@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OwnIdSdk.NetCore3.Web.Gigya.Json
+namespace OwnIdSdk.NetCore3.Extensibility.Json
 {
     public class AutoPrimitiveToStringConverter : JsonConverter<string>
     {

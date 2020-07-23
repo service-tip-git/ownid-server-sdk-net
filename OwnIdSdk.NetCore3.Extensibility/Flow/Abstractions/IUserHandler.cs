@@ -8,7 +8,10 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
     /// </summary>
     /// <remarks>
     ///     Implement this interface to manually integrate into challenge process with custom User Profile model.
-    ///     Use <c>IServiceCollection.AddOwnId(builder => { builder.UseUserHandlerWithCustomProfile<![CDATA[<MyHandler>]]>(); })</c>
+    ///     Use
+    ///     <c>
+    ///         IServiceCollection.AddOwnId(builder => { builder.UseUserHandlerWithCustomProfile<![CDATA[<MyHandler>]]>(); })
+    ///     </c>
     ///     for this purpose
     /// </remarks>
     /// <typeparam name="TProfile">User Profile</typeparam>
@@ -30,7 +33,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         /// <param name="did">User unique identifier</param>
         /// <returns></returns>
         Task<LoginResult<object>> OnSuccessLoginAsync(string did);
-        
+
         Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey);
     }
 }

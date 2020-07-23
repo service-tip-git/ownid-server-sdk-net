@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts.UpdateProfile
@@ -7,9 +6,9 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts.UpdateProfile
     {
         [JsonPropertyName("UID")]
         public string DID { get; set; }
-        
+
         public AccountData Data { get; set; }
-        
+
         public TProfile Profile { get; set; }
     }
 }

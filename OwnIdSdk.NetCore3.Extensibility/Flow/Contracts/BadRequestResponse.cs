@@ -12,7 +12,6 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts
         /// <summary>
         ///     General, non-field-specific localized error texts
         /// </summary>
-        [JsonPropertyName("generalErrors")]
         public IEnumerable<string> GeneralErrors { get; set; }
 
         /// <summary>
@@ -22,7 +21,6 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts
         ///     Key should contain <see cref="ProfileFieldMetadata.Key" />
         ///     Value should contain already localized error texts with localized field label inside if needed
         /// </remarks>
-        [JsonPropertyName("fieldErrors")]
         public IDictionary<string, IList<string>> FieldErrors { get; set; }
     }
 }
