@@ -109,22 +109,16 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             var setAccountMessage =
                 await _restApiClient.SetAccountInfo(context.DID, context.Profile, new AccountData(context.PublicKey));
 
-            if (setAccountMessage.ErrorCode == 403043)
+            if (setAccountMessage.ErrorCode > 0)
             {
+                _logger.LogError($"did: {context.DID}{Environment.NewLine}" +
+                                 $"Gigya.setAccountInfo (profile) for NEW user error -> {setAccountMessage.GetFailureMessage()}");
+                
                 var removeUserResult = await _restApiClient.DeleteAccountAsync(context.DID);
 
                 if (removeUserResult.ErrorCode != 0)
                     throw new Exception(
                         $"Gigya.deleteAccount with uid={context.DID} error -> {removeUserResult.GetFailureMessage()}");
-
-                context.SetError(x => x.Email, setAccountMessage.ErrorMessage);
-                return;
-            }
-
-            if (setAccountMessage.ErrorCode > 0)
-            {
-                _logger.LogError($"did: {context.DID}{Environment.NewLine}" +
-                                 $"Gigya.setAccountInfo (profile) for NEW user error -> {setAccountMessage.GetFailureMessage()}");
 
                 if (setAccountMessage.ValidationErrors != null && setAccountMessage.ValidationErrors.Any())
                 {
