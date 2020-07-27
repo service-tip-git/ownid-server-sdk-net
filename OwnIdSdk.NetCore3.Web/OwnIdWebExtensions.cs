@@ -2,11 +2,8 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using OwnIdSdk.NetCore3.Web.Configuration;
-using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
 using OwnIdSdk.NetCore3.Web.Features;
-using OwnIdSdk.NetCore3.Web.FlowEntries;
 using OwnIdSdk.NetCore3.Web.Middlewares;
 using OwnIdSdk.NetCore3.Web.Middlewares.Approval;
 using OwnIdSdk.NetCore3.Web.Middlewares.Authorize;
@@ -30,6 +27,8 @@ namespace OwnIdSdk.NetCore3.Web
                 builder => builder.UseMiddleware<StartFlowMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/challenge",
                 builder => builder.UseMiddleware<SaveProfileMiddleware>());
+            routeBuilder.MapMiddlewarePost("ownid/{context}/challenge/partial",
+                builder => builder.UseMiddleware<SavePartialProfileMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/status",
                 builder => builder.UseMiddleware<GetChallengeStatusMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/approve",
@@ -40,20 +39,12 @@ namespace OwnIdSdk.NetCore3.Web
             var configuration = app.ApplicationServices.GetService<OwnIdConfiguration>();
 
             if (configuration.HasFeature<AccountLinkFeature>())
-            {
                 routeBuilder.MapMiddlewarePost("ownid/{context}/link",
                     builder => builder.UseMiddleware<SaveAccountLinkMiddleware>());
-                routeBuilder.MapMiddlewareGet("ownid/{context}/link",
-                    builder => builder.UseMiddleware<GetAccountLinkDataMiddleware>());
-            }
 
             if (configuration.HasFeature<AccountRecoveryFeature>())
-            {
-                routeBuilder.MapMiddlewareGet("ownid/{context}/recover",
-                    builder => builder.UseMiddleware<RecoverAccountMiddleware>());
                 routeBuilder.MapMiddlewarePost("ownid/{context}/recover",
                     builder => builder.UseMiddleware<SaveAccountPublicKeyMiddleware>());
-            }
 
             app.UseRouter(routeBuilder.Build());
         }

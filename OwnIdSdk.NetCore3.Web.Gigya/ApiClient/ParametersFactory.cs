@@ -1,19 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using OwnIdSdk.NetCore3.Extensibility.Json;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
 {
     internal static class ParametersFactory
     {
-        private static readonly Lazy<JsonSerializerOptions> DefaultSerializerOptions = new Lazy<JsonSerializerOptions>(
-            () =>
-                new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    IgnoreNullValues = true
-                });
-
         /// <summary>
         ///     Create initial parameters collection with populated auth parameters
         /// </summary>
@@ -49,7 +42,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
             , string key
             , string value)
         {
-            if (!String.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty(value))
                 nameValueCollection.Add(new KeyValuePair<string, string>(key, value));
 
             return nameValueCollection;
@@ -61,7 +54,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
             , T value)
         {
             nameValueCollection.Add(
-                new KeyValuePair<string, string>(key, JsonSerializer.Serialize(value, DefaultSerializerOptions.Value)));
+                new KeyValuePair<string, string>(key, OwnIdSerializer.Serialize(value)));
 
             return nameValueCollection;
         }

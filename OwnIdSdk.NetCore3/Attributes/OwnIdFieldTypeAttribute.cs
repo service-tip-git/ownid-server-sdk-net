@@ -1,6 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using OwnIdSdk.NetCore3.Configuration.Profile;
+using OwnIdSdk.NetCore3.Extensibility.Configuration.Profile;
 
 namespace OwnIdSdk.NetCore3.Attributes
 {
@@ -18,7 +18,7 @@ namespace OwnIdSdk.NetCore3.Attributes
         /// </summary>
         /// <param name="profileFieldType">
         ///     Value for <see cref="FieldType" />. Determines property format with
-        ///     <see cref="OwnIdSdk.NetCore3.Configuration.Profile.ProfileFieldType" />
+        ///     <see cref="ProfileFieldType" />
         /// </param>
         public OwnIdFieldTypeAttribute(ProfileFieldType profileFieldType = ProfileFieldType.Text) : base(
             Constants.DefaultInvalidFormatErrorMessage)
@@ -27,7 +27,7 @@ namespace OwnIdSdk.NetCore3.Attributes
         }
 
         /// <summary>
-        ///     Determines property format with <see cref="OwnIdSdk.NetCore3.Configuration.Profile.ProfileFieldType" />
+        ///     Determines property format with <see cref="ProfileFieldType" />
         /// </summary>
         public ProfileFieldType FieldType { get; }
 

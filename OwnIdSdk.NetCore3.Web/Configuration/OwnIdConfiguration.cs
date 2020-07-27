@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using OwnIdSdk.NetCore3.Web.Extensibility.Abstractions;
+using OwnIdSdk.NetCore3.Web.Extensibility;
 using OwnIdSdk.NetCore3.Web.Features;
 
 namespace OwnIdSdk.NetCore3.Web.Configuration
@@ -36,16 +36,16 @@ namespace OwnIdSdk.NetCore3.Web.Configuration
         }
 
         /// <summary>
-        /// Check if feature has been added
+        ///     Check if feature has been added
         /// </summary>
         /// <typeparam name="TFeature">type of feature to check</typeparam>
-        /// <returns>true if feature with <typeparamref name="TFeature"/> has been added, otherwise false</returns>
+        /// <returns>true if feature with <typeparamref name="TFeature" /> has been added, otherwise false</returns>
         public bool HasFeature<TFeature>()
             where TFeature : class, IFeatureConfiguration
         {
             return _features.ContainsKey(typeof(TFeature));
         }
-        
+
         /// <summary>
         ///     Tries to set (adds or updates) feature with <typeparamref name="TFeature" />
         /// </summary>

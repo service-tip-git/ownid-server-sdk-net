@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Localization;
+using OwnIdSdk.NetCore3.Extensibility.Services;
 
 namespace OwnIdSdk.NetCore3.Web
 {

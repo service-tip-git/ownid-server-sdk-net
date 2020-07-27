@@ -1,6 +1,8 @@
 using System;
 using System.Security.Cryptography;
 using OwnIdSdk.NetCore3.Configuration.Profile;
+using OwnIdSdk.NetCore3.Extensibility.Configuration;
+using OwnIdSdk.NetCore3.Extensibility.Configuration.Profile;
 
 namespace OwnIdSdk.NetCore3.Configuration
 {
@@ -66,8 +68,10 @@ namespace OwnIdSdk.NetCore3.Configuration
         public bool IsDevEnvironment { get; set; }
 
         public uint CacheExpirationTimeout { get; set; }
-        
+
         public uint MaximumNumberOfConnectedDevices { get; set; }
+
+        public uint JwtExpirationTimeout { get; set; }
 
         /// <summary>
         ///     Sets <see cref="ProfileConfiguration" /> based on <typeparamref name="TProfile" />

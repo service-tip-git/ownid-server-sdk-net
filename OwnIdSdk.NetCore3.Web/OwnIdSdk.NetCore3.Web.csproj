@@ -57,4 +57,10 @@
       </Compile>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="translation_v2.json" />
+      <None Remove="Resources\strings.json" />
+      <None Remove="Resources\strings_es.json" />
+      <None Remove="Resources\strings_ru.json" />
+    </ItemGroup>
 </Project>

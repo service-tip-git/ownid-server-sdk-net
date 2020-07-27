@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using OwnIdSdk.NetCore3.Attributes;
+using OwnIdSdk.NetCore3.Extensibility.Configuration.Profile;
 
 namespace OwnIdSdk.NetCore3.Configuration.Profile
 {

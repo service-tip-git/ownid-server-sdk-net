@@ -1,19 +1,19 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using OwnIdSdk.NetCore3.Store;
+using OwnIdSdk.NetCore3.Extensibility.Cache;
 
 namespace OwnIdSdk.NetCore3.Web.Store
 {
-    public class WebCacheStore : ICacheStore        
+    public class WebCacheStore : ICacheStore
     {
-        private IMemoryCache Cache { get; }
-
         public WebCacheStore(IMemoryCache cache)
         {
             Cache = cache;
         }
-        
+
+        private IMemoryCache Cache { get; }
+
         public void Set(string key, CacheItem data, TimeSpan expiration)
         {
             Cache.Set(key, data, expiration);

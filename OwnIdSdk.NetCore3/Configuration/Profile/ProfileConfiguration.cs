@@ -3,34 +3,36 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using Microsoft.Extensions.Options;
 using OwnIdSdk.NetCore3.Attributes;
-using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
+using OwnIdSdk.NetCore3.Extensibility.Configuration.Profile;
 
 namespace OwnIdSdk.NetCore3.Configuration.Profile
 {
-    /// <inheritdoc cref="IProfileConfiguration"/>
+    /// <inheritdoc cref="IProfileConfiguration" />
     /// <summary>Implements mechanism of User Profile serialization and validation</summary>
     public class ProfileConfiguration : IProfileConfiguration
     {
         /// <summary>
-        /// Localized field label placeholder
+        ///     Localized field label placeholder
         /// </summary>
         private const string FieldNamePlaceholder = "{0}";
-        
-        /// <summary>
-        /// Supported validation attributes map for OwnId application usage
-        /// </summary>
-        private static readonly Dictionary<Type, ProfileValidatorDescription> DataAnnotationAttrsMap = new Dictionary<Type, ProfileValidatorDescription>
-        {
-            {typeof(RequiredAttribute), new ProfileValidatorDescription("required", "Field {0} is required")}
-            // add here MaxLength, MinLength, Regex
-        };
 
         /// <summary>
-        /// Initializes instance of <see cref="ProfileConfiguration"/>
+        ///     Supported validation attributes map for OwnId application usage
         /// </summary>
-        /// <param name="profileType">Sets value to <see cref="ProfileModelType"/></param>
+        private static readonly Dictionary<Type, ProfileValidatorDescription> DataAnnotationAttrsMap =
+            new Dictionary<Type, ProfileValidatorDescription>
+            {
+                {typeof(RequiredAttribute), new ProfileValidatorDescription("required", "Field {0} is required")}
+                // add here MaxLength, MinLength, Regex
+            };
+
+        /// <summary>
+        ///     Initializes instance of <see cref="ProfileConfiguration" />
+        /// </summary>
+        /// <param name="profileType">Sets value to <see cref="ProfileModelType" /></param>
         public ProfileConfiguration(Type profileType)
         {
             ProfileModelType = profileType;
@@ -109,7 +111,7 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
             foreach (var type in DataAnnotationAttrsMap.Keys)
             {
                 var validator = GetFieldValidator(type, memberInfo);
-                
+
                 if (validator != null)
                     fieldData.Validators.Add(validator);
             }
@@ -123,7 +125,7 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
                     NeedsInternalLocalization = string.IsNullOrEmpty(typeAttr.ErrorMessageResourceName) &&
                                                 typeAttr.ErrorMessageResourceType == null
                 };
-                
+
                 fieldData.Validators.Add(validator);
             }
 
@@ -138,7 +140,7 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
             if (memberInfo.GetCustomAttributes(type).FirstOrDefault() is ValidationAttribute attribute)
             {
                 var validatorDescription = DataAnnotationAttrsMap[type];
-                
+
                 var validator = new ProfileValidationRuleMetadata
                 {
                     Type = validatorDescription.ClientSideTypeNaming
@@ -152,13 +154,11 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
                 else
                 {
                     if (string.IsNullOrEmpty(attribute.ErrorMessage))
-                    {
                         attribute.ErrorMessage = validatorDescription.DefaultErrorMessage;
-                    }
 
                     validator.NeedsInternalLocalization = true;
                 }
-                
+
                 validator.GetErrorMessageKey = () => attribute.FormatErrorMessage(FieldNamePlaceholder);
 
                 return validator;

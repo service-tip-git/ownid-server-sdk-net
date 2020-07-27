@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using OwnIdSdk.NetCore3.Attributes;
 using OwnIdSdk.NetCore3.Configuration.Profile;
+using OwnIdSdk.NetCore3.Extensibility.Configuration.Profile;
 using Xunit;
 
 namespace OwnIdSdk.NetCore3.Tests.Configuration

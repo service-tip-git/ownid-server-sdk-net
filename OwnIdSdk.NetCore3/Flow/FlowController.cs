@@ -1,14 +1,21 @@
-using System;
 using System.Collections.Generic;
-using OwnIdSdk.NetCore3.Configuration;
-using OwnIdSdk.NetCore3.Store;
+using OwnIdSdk.NetCore3.Extensibility.Cache;
+using OwnIdSdk.NetCore3.Extensibility.Configuration;
+using OwnIdSdk.NetCore3.Extensibility.Flow;
+using OwnIdSdk.NetCore3.Extensibility.Providers;
+using OwnIdSdk.NetCore3.Flow.Commands;
+using OwnIdSdk.NetCore3.Flow.Commands.Approval;
+using OwnIdSdk.NetCore3.Flow.Commands.Authorize;
+using OwnIdSdk.NetCore3.Flow.Commands.Link;
+using OwnIdSdk.NetCore3.Flow.Commands.Recovery;
+using OwnIdSdk.NetCore3.Flow.Interfaces;
+using OwnIdSdk.NetCore3.Flow.Steps;
 
 namespace OwnIdSdk.NetCore3.Flow
 {
-    public class FlowController
+    public class FlowController : IFlowController
     {
         private readonly IOwnIdCoreConfiguration _coreConfiguration;
-
         private readonly IUrlProvider _urlProvider;
 
         public FlowController(IUrlProvider urlProvider, IOwnIdCoreConfiguration coreConfiguration)
@@ -18,138 +25,167 @@ namespace OwnIdSdk.NetCore3.Flow
             InitMap();
         }
 
-        public Step GetNextStep(CacheItem cacheItem, StepType currentStep)
+        private Dictionary<FlowType, Dictionary<StepType, IStep>> StepMap { get; set; }
+
+        public FrontendBehavior GetExpectedFrontendBehavior(CacheItem cacheItem, StepType currentStep)
         {
-            return NextStepMap[cacheItem.FlowType][currentStep](cacheItem);
+            return StepMap[cacheItem.FlowType][currentStep].GenerateFrontendBehavior(cacheItem);
         }
 
-        protected Dictionary<FlowType, Dictionary<StepType, Func<CacheItem, Step>>> NextStepMap { get; private set; }
-
+        public IStep GetStep(FlowType flowType, StepType currentStep)
+        {
+            return StepMap[flowType][currentStep];
+        }
 
         private void InitMap()
         {
-            var authorize = new Dictionary<StepType, Func<CacheItem, Step>>
+            var authorize = new Dictionary<StepType, IStep>
             {
                 {
                     StepType.Starting,
-                    cacheItem => new Step(StepType.Authorize, cacheItem.ChallengeType,
-                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType)))
+                    new Step<StartFlowFlowCommand>(cacheItem => new FrontendBehavior(StepType.Authorize,
+                        cacheItem.ChallengeType,
+                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType))))
                 },
                 {
-                    StepType.Authorize, cacheItem => new Step
+                    StepType.Authorize, new Step<SaveProfileCommand>(cacheItem => new FrontendBehavior
                     {
                         Type = StepType.Success,
                         ActionType = ActionType.Finish,
                         ChallengeType = cacheItem.ChallengeType
-                    }
+                    })
                 }
             };
 
-            var linkWithoutPin = new Dictionary<StepType, Func<CacheItem, Step>>
+            var partialAuthorize = new Dictionary<StepType, IStep>
             {
                 {
-                    StepType.Starting,
-                    cacheItem => new Step(StepType.Link, cacheItem.ChallengeType,
-                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType)))
+                    StepType.Starting, new Step<StartFlowFlowCommand>(cacheItem =>
+                        new FrontendBehavior(StepType.InstantAuthorize, cacheItem.ChallengeType,
+                            new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
+                                "/partial"))))
                 },
                 {
-                    StepType.Link, cacheItem => new Step
+                    StepType.InstantAuthorize, new Step<SavePartialProfileCommand>(cacheItem => new FrontendBehavior
                     {
                         Type = StepType.Success,
                         ActionType = ActionType.Finish,
                         ChallengeType = cacheItem.ChallengeType
-                    }
+                    })
                 }
             };
 
-            var linkWithPin = new Dictionary<StepType, Func<CacheItem, Step>>
+            var linkWithoutPin = new Dictionary<StepType, IStep>
+            {
+                {
+                    StepType.Starting, new Step<StartFlowFlowCommand>(cacheItem => new FrontendBehavior(StepType.Link,
+                        cacheItem.ChallengeType,
+                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType))))
+                },
+                {
+                    StepType.Link, new Step<SaveAccountLinkCommand>(cacheItem => new FrontendBehavior
+                    {
+                        Type = StepType.Success,
+                        ActionType = ActionType.Finish,
+                        ChallengeType = cacheItem.ChallengeType
+                    })
+                }
+            };
+
+            var linkWithPin = new Dictionary<StepType, IStep>
             {
                 {
                     StepType.Starting,
-                    cacheItem => new Step(StepType.ApprovePin, cacheItem.ChallengeType,
+                    new Step<StartFlowFlowCommand>(cacheItem => new FrontendBehavior(StepType.ApprovePin,
+                        cacheItem.ChallengeType,
                         new PollingAction(_urlProvider.GetSecurityApprovalStatusUrl(cacheItem.Context),
-                            _coreConfiguration.PollingInterval))
+                            _coreConfiguration.PollingInterval)))
                 },
                 {
                     StepType.ApprovePin,
-                    cacheItem =>
+                    new Step<GetApprovalStatusCommand>(cacheItem =>
                     {
                         if (cacheItem.Status == CacheItemStatus.Approved)
-                            return new Step(StepType.Link, cacheItem.ChallengeType,
-                                new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType)));
-                        
-                        return new Step
+                            return new FrontendBehavior(StepType.Link, cacheItem.ChallengeType,
+                                new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context,
+                                    cacheItem.ChallengeType)));
+
+                        return new FrontendBehavior
                         {
-                            Type = StepType.Declined, 
+                            Type = StepType.Declined,
                             ChallengeType = cacheItem.ChallengeType,
                             ActionType = ActionType.Finish
                         };
-                    }
+                    })
                 },
                 {
-                    StepType.Link, cacheItem => new Step
+                    StepType.Link, new Step<SaveAccountLinkCommand>(cacheItem => new FrontendBehavior
                     {
                         Type = StepType.Success,
                         ChallengeType = cacheItem.ChallengeType,
                         ActionType = ActionType.Finish
-                    }
+                    })
                 }
             };
 
-            var recoverWithoutPin = new Dictionary<StepType, Func<CacheItem, Step>>
+            var recoverWithoutPin = new Dictionary<StepType, IStep>
             {
                 {
                     StepType.Starting,
-                    cacheItem => new Step(StepType.Recover, cacheItem.ChallengeType,
-                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType)))
+                    new Step<StartFlowFlowCommand>(cacheItem => new FrontendBehavior(StepType.Recover,
+                        cacheItem.ChallengeType,
+                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType))))
                 },
                 {
-                    StepType.Recover, cacheItem => new Step
+                    StepType.Recover, new Step<SaveAccountPublicKeyCommand>(cacheItem => new FrontendBehavior
                     {
                         Type = StepType.Success,
                         ActionType = ActionType.Finish,
                         ChallengeType = cacheItem.ChallengeType
-                    }
+                    })
                 }
             };
 
-            var recoverWitPin = new Dictionary<StepType, Func<CacheItem, Step>>
+            var recoverWitPin = new Dictionary<StepType, IStep>
             {
                 {
                     StepType.Starting,
-                    cacheItem => new Step(StepType.ApprovePin, cacheItem.ChallengeType,
+                    new Step<StartFlowFlowCommand>(cacheItem => new FrontendBehavior(StepType.ApprovePin,
+                        cacheItem.ChallengeType,
                         new PollingAction(_urlProvider.GetSecurityApprovalStatusUrl(cacheItem.Context),
-                            _coreConfiguration.PollingInterval))
+                            _coreConfiguration.PollingInterval)))
                 },
                 {
                     StepType.ApprovePin,
-                    cacheItem =>
+                    new Step<GetApprovalStatusCommand>(cacheItem =>
                     {
                         if (cacheItem.Status == CacheItemStatus.Approved)
-                            return new Step(StepType.Recover, cacheItem.ChallengeType,
-                                new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType)));
-                        
-                        return new Step
+                            return new FrontendBehavior(StepType.Recover, cacheItem.ChallengeType,
+                                new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context,
+                                    cacheItem.ChallengeType)));
+
+                        return new FrontendBehavior
                         {
-                            Type = StepType.Declined, 
+                            Type = StepType.Declined,
                             ChallengeType = cacheItem.ChallengeType,
                             ActionType = ActionType.Finish
                         };
-                    }
+                    })
                 },
                 {
-                    StepType.Recover, cacheItem => new Step
+                    StepType.Recover, new Step<SaveAccountPublicKeyCommand>(cacheItem => new FrontendBehavior
                     {
                         Type = StepType.Success,
                         ActionType = ActionType.Finish,
                         ChallengeType = cacheItem.ChallengeType
-                    }
+                    })
                 }
             };
 
-            NextStepMap = new Dictionary<FlowType, Dictionary<StepType, Func<CacheItem, Step>>>
+            StepMap = new Dictionary<FlowType, Dictionary<StepType, IStep>>
             {
                 {FlowType.Authorize, authorize},
+                {FlowType.PartialAuthorize, partialAuthorize},
                 {FlowType.Link, linkWithoutPin},
                 {FlowType.LinkWithPin, linkWithPin},
                 {FlowType.Recover, recoverWithoutPin},

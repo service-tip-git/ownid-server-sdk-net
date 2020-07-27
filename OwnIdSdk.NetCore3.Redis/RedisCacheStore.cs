@@ -2,7 +2,8 @@ using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using OwnIdSdk.NetCore3.Store;
+using OwnIdSdk.NetCore3.Extensibility.Cache;
+using OwnIdSdk.NetCore3.Extensibility.Json;
 using StackExchange.Redis;
 
 namespace OwnIdSdk.NetCore3.Redis
@@ -26,11 +27,7 @@ namespace OwnIdSdk.NetCore3.Redis
 
         public void Set(string key, CacheItem data, TimeSpan expiration)
         {
-            var serializedData = JsonSerializer.Serialize(data, new JsonSerializerOptions
-            {
-                IgnoreReadOnlyProperties = true,
-                IgnoreNullValues = true
-            });
+            var serializedData = OwnIdSerializer.Serialize(data);
 
             bool isSuccess;
 
@@ -45,11 +42,7 @@ namespace OwnIdSdk.NetCore3.Redis
 
         public async Task SetAsync(string key, CacheItem data, TimeSpan expiration)
         {
-            var serializedData = JsonSerializer.Serialize(data, new JsonSerializerOptions
-            {
-                IgnoreReadOnlyProperties = true,
-                IgnoreNullValues = true
-            });
+            var serializedData = OwnIdSerializer.Serialize(data);
 
             bool isSuccess;
 
@@ -69,13 +62,7 @@ namespace OwnIdSdk.NetCore3.Redis
             if (item.IsNullOrEmpty)
                 return null;
 
-            var data = JsonSerializer.Deserialize<CacheItem>(item.ToString(), new JsonSerializerOptions
-            {
-                IgnoreReadOnlyProperties = true,
-                IgnoreNullValues = true
-            });
-
-            return data;
+            return OwnIdSerializer.Deserialize<CacheItem>(item.ToString());
         }
 
         public async Task<CacheItem> GetAsync(string key)
@@ -85,13 +72,7 @@ namespace OwnIdSdk.NetCore3.Redis
             if (item.IsNullOrEmpty)
                 return null;
 
-            var data = JsonSerializer.Deserialize<CacheItem>(item.ToString(), new JsonSerializerOptions
-            {
-                IgnoreReadOnlyProperties = true,
-                IgnoreNullValues = true
-            });
-
-            return data;
+            return OwnIdSerializer.Deserialize<CacheItem>(item.ToString());;
         }
 
         public void Remove(string key)
