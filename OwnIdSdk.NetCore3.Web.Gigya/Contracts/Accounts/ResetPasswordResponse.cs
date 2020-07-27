@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts.Accounts
 {
     public class ResetPasswordResponse : BaseGigyaResponse
@@ -7,6 +9,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts.Accounts
         ///     This field is only returned when the password is changed, not in calls that send an email or return a secret
         ///     question.
         /// </summary>
+        [JsonPropertyName("UID")]
         public string UID { get; set; }
     }
 }
