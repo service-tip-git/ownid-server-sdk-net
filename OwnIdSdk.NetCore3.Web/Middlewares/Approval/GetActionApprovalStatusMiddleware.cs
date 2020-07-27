@@ -2,7 +2,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
-using OwnIdSdk.NetCore3.Flow;
 using OwnIdSdk.NetCore3.Flow.Commands;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Flow.Steps;
@@ -23,13 +22,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Approval
 
         protected override async Task Execute(HttpContext httpContext)
         {
-            var result = await _flowRunner.RunAsync(new CommandInput
-            {
-                Context = RequestIdentity.Context,
-                RequestToken = RequestIdentity.RequestToken,
-                ResponseToken = RequestIdentity.RequestToken,
-                CultureInfo = GetRequestCulture(httpContext)
-            }, StepType.ApprovePin);
+            var result = await _flowRunner.RunAsync(new CommandInput(RequestIdentity, GetRequestCulture(httpContext)),
+                StepType.ApprovePin);
 
             await Json(httpContext, result, StatusCodes.Status200OK);
         }

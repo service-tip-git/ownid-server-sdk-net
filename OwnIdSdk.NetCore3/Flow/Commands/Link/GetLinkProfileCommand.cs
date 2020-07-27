@@ -25,19 +25,20 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Link
             _needRequesterInfo = needRequesterInfo;
         }
 
-        protected override void Validate()
+        protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
-            // TODO
+            if(_linkHandlerAdapter == null)
+                throw new InternalLogicException("Missing Link feature");
+            
+            if (!relatedItem.IsValidForLink)
+                throw new CommandValidationException(
+                    "Cache item should be not Finished with Link challenge type. " +
+                    $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType}");
         }
 
         protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
-            if (!relatedItem.IsValidForLink)
-                throw new CommandValidationException(
-                    "Cache item should be not Finished with Link challenge type. " +
-                    $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType}");
-
             var step = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
 
             var profile = await _linkHandlerAdapter.GetUserProfileAsync(relatedItem.DID);

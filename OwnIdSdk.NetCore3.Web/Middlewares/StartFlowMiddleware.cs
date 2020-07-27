@@ -23,12 +23,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
         protected override async Task Execute(HttpContext httpContext)
         {
-            var result = await _flowRunner.RunAsync(new CommandInput
-            {
-                Context = RequestIdentity.Context,
-                RequestToken = RequestIdentity.RequestToken,
-                CultureInfo = GetRequestCulture(httpContext)
-            }, StepType.Starting);
+            var result = await _flowRunner.RunAsync(new CommandInput(RequestIdentity, GetRequestCulture(httpContext)),
+                StepType.Starting);
 
             await Json(httpContext, result, StatusCodes.Status200OK);
         }

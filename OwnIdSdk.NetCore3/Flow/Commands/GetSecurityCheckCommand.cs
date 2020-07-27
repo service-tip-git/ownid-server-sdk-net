@@ -23,19 +23,17 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             _flowController = flowController;
         }
 
-        protected override void Validate()
-        {
-            // TODO
-        }
-
-        protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType)
+        protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
             if (!relatedItem.HasFinalState)
                 throw new CommandValidationException(
                     "Cache item should be not have final state" +
                     $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType}");
+        }
 
+        protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
+            StepType currentStepType)
+        {
             var step = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
 
             var pin = await _cacheItemService.SetSecurityCode(relatedItem.Context);

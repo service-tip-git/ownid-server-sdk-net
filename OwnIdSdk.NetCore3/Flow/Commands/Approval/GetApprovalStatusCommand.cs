@@ -29,7 +29,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Approval
             _recoveryHandler = recoveryHandler;
         }
 
-        protected override void Validate()
+        protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
             // TODO:
         }

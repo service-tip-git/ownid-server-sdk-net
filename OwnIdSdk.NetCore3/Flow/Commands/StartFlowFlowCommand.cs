@@ -40,22 +40,18 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             _recoveryHandler = recoveryHandler;
         }
 
-        protected override void Validate()
+        protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
-            // TODO: add flag related validation
+            if (relatedItem.HasFinalState)
+                throw new CommandValidationException("Flow is already finished");
         }
 
         protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
-            var cacheItem = await _cacheItemService.GetCacheItemByContextAsync(input.Context);
-
-            if (cacheItem.HasFinalState)
-                throw new CommandValidationException("Flow is already finished");
-
             BaseFlowCommand command;
 
-            switch (cacheItem.FlowType)
+            switch (relatedItem.FlowType)
             {
                 case FlowType.Authorize:
                     command = new GetAuthProfileCommand(_jwtComposer, _flowController, _identitiesProvider);
@@ -74,15 +70,15 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                     command = new GetSecurityCheckCommand(_cacheItemService, _jwtComposer, _flowController);
                     break;
                 default:
-                    throw new InternalLogicException($"Not supported FlowType {cacheItem.FlowType}");
+                    throw new InternalLogicException($"Not supported FlowType {relatedItem.FlowType}");
             }
 
-            var commandResult = await command.ExecuteAsync(input, relatedItem, currentStepType);
+            var commandResult = await command.ExecuteAsync(input, relatedItem, currentStepType, false);
 
             if (!(commandResult is JwtContainer jwtContainer))
                 throw new InternalLogicException("Incorrect command result type");
 
-            await _cacheItemService.SetSecurityTokensAsync(cacheItem.Context, input.RequestToken,
+            await _cacheItemService.SetSecurityTokensAsync(relatedItem.Context, input.RequestToken,
                 _jwtService.GetJwtHash(jwtContainer.Jwt).GetUrlEncodeString());
 
             return commandResult;

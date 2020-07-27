@@ -33,19 +33,17 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Link
             _localizationService = localizationService;
         }
 
-        protected override void Validate()
-        {
-            // TODO
-        }
-
-        protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType)
+        protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
             if (!relatedItem.IsValidForLink)
                 throw new CommandValidationException(
                     "Cache item should be not Finished with Link challenge type. " +
                     $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType}");
+        }
 
+        protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
+            StepType currentStepType)
+        {
             if (!(input is CommandInput<JwtContainer> requestJwt))
                 throw new InternalLogicException($"Incorrect input type for {nameof(SaveAccountLinkCommand)}");
 

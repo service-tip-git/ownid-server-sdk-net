@@ -33,21 +33,17 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
             _localizationService = localizationService;
         }
 
-        protected override void Validate()
+        protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
-            //TODO
+            if (!relatedItem.IsValidForAuthorize)
+                throw new CommandValidationException(
+                    "Cache item should be not be Finished with Login or Register challenge type. " +
+                    $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType}");
         }
 
         protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
-            var cacheItem = await _cacheItemService.GetCacheItemByContextAsync(input.Context);
-
-            if (!cacheItem.IsValidForAuthorize)
-                throw new CommandValidationException(
-                    "Cache item should be not be Finished with Login or Register challenge type. " +
-                    $"Actual Status={cacheItem.Status.ToString()} ChallengeType={cacheItem.ChallengeType}");
-
             if (!(input is CommandInput<JwtContainer> requestJwt))
                 throw new InternalLogicException($"Incorrect input type for {nameof(SaveProfileCommand)}");
 
@@ -66,8 +62,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                 throw new BusinessValidationException(formContext);
 
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, userData.DID);
-            var jwt = _jwtComposer.GenerateFinalStepJwt(cacheItem.Context,
-                _flowController.GetExpectedFrontendBehavior(cacheItem, StepType.Authorize), input.CultureInfo?.Name);
+            var jwt = _jwtComposer.GenerateFinalStepJwt(relatedItem.Context,
+                _flowController.GetExpectedFrontendBehavior(relatedItem, StepType.Authorize), input.CultureInfo?.Name);
 
             return new JwtContainer(jwt);
         }

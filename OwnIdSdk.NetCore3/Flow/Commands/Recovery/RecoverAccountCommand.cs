@@ -25,22 +25,20 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
             _needRequesterInfo = needRequesterInfo;
         }
 
-        protected override void Validate()
+        protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
-            // TODO
-
             if (_accountRecoveryHandler == null)
                 throw new InternalLogicException("Missing Recovery feature");
+            
+            if (!relatedItem.IsValidForRecover)
+                throw new CommandValidationException(
+                    "Cache item should be not Finished with Link challenge type. " +
+                    $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType}");
         }
 
         protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
-            if (!relatedItem.IsValidForRecover)
-                throw new CommandValidationException(
-                    "Cache item should be not Finished with Link challenge type. " +
-                    $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType}");
-
             // Recover access and get user profile
             var recoverResult = await _accountRecoveryHandler.RecoverAsync(relatedItem.Payload);
 

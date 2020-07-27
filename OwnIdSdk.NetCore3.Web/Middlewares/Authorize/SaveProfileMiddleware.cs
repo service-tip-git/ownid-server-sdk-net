@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
-using OwnIdSdk.NetCore3.Flow;
 using OwnIdSdk.NetCore3.Flow.Commands;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Flow.Steps;
@@ -26,14 +25,9 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Authorize
         protected override async Task Execute(HttpContext httpContext)
         {
             var jwtContainer = await GetRequestJwtContainerAsync(httpContext);
-            var result = await _flowRunner.RunAsync(new CommandInput<JwtContainer>
-            {
-                Context = RequestIdentity.Context,
-                RequestToken = RequestIdentity.RequestToken,
-                ResponseToken = RequestIdentity.RequestToken,
-                CultureInfo = GetRequestCulture(httpContext),
-                Data = jwtContainer
-            }, StepType.Authorize);
+            var result = await _flowRunner.RunAsync(
+                new CommandInput<JwtContainer>(RequestIdentity, GetRequestCulture(httpContext), jwtContainer),
+                StepType.Authorize);
 
             await Json(httpContext, result, StatusCodes.Status200OK);
         }

@@ -26,19 +26,17 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
             _flowController = flowController;
         }
 
-        protected override void Validate()
-        {
-            // TODO 
-        }
-
-        protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType)
+        protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
             if (!relatedItem.IsValidForAuthorize)
                 throw new CommandValidationException(
                     "Cache item should be not be Finished with PARTIAL Login or Register challenge type. " +
                     $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType.ToString()}");
+        }
 
+        protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
+            StepType currentStepType)
+        {
             if (!(input is CommandInput<JwtContainer> requestJwt))
                 throw new InternalLogicException($"Incorrect input type for {nameof(SavePartialProfileCommand)}");
 

@@ -23,19 +23,17 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
             _identitiesProvider = identitiesProvider;
         }
 
-        protected override void Validate()
-        {
-            // TODO
-        }
-
-        protected override Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType)
+        protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
             if (!relatedItem.IsValidForAuthorize)
                 throw new CommandValidationException(
                     "Cache item should be not Finished with Login or Register challenge type. " +
                     $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType}");
+        }
 
+        protected override Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
+            StepType currentStepType)
+        {
             var jwt = _jwtComposer.GeneratePartialDidStep(relatedItem.Context,
                 _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
                 _identitiesProvider.GenerateUserId(),
