@@ -10,6 +10,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts
 
     public class UidContainer
     {
+        [JsonPropertyName("UID")]
         public string UID { get; set; }
 
         public AccountData Data { get; set; }
