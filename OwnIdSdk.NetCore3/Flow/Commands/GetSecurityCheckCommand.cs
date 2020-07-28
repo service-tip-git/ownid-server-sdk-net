@@ -25,7 +25,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
-            if (!relatedItem.HasFinalState)
+            if (relatedItem.HasFinalState)
                 throw new CommandValidationException(
                     "Cache item should be not have final state" +
                     $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType}");
