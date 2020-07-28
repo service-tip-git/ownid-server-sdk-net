@@ -60,10 +60,12 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             };
 
             if (cacheItem.SecurityCode != null && cacheItem.Status == CacheItemStatus.WaitingForApproval)
-                // TODO: refactor
+                // TODO: refactor to entity
                 result.Payload = new
                 {
-                    pin = cacheItem.SecurityCode
+                    data = new {
+                        pin = cacheItem.SecurityCode
+                    }
                 };
 
             if (cacheItem.Status == CacheItemStatus.Finished)
