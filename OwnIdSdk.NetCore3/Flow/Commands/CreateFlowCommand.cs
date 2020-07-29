@@ -62,10 +62,9 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 did,
                 payload);
 
-            return new GetChallengeLinkResponse(challengeContext
-                , _urlProvider.GetWebAppWithCallbackUrl(_urlProvider.GetStartFlowUrl(challengeContext)).ToString()
-                , nonce
-                , _expiration);
+            return new GetChallengeLinkResponse(challengeContext,
+                _urlProvider.GetWebAppWithCallbackUrl(_urlProvider.GetStartFlowUrl(challengeContext)).ToString(), nonce,
+                _expiration);
         }
     }
 }

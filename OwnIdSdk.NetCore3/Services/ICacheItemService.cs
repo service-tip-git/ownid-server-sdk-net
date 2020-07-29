@@ -37,7 +37,7 @@ namespace OwnIdSdk.NetCore3.Services
         /// <param name="context"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        Task<string> SetSecurityCode(string context);
+        Task<string> SetSecurityCodeAsync(string context);
 
         /// <summary>
         ///     Sets approval result
