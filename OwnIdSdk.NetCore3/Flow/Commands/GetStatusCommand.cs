@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
@@ -79,13 +82,20 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                     if (cacheItem.ChallengeType == ChallengeType.Login)
                         result.Payload = await _userHandlerAdapter.OnSuccessLoginByPublicKeyAsync(cacheItem.PublicKey);
                     else
+                    {
+                        using var sha256 = new SHA256Managed();
+                        var hash = Convert.ToBase64String(
+                            sha256.ComputeHash(Encoding.UTF8.GetBytes(cacheItem.PublicKey)));
+
                         result.Payload = new
                         {
                             data = new
                             {
-                                publicKey = cacheItem.PublicKey
+                                publicKey = cacheItem.PublicKey,
+                                hash = hash
                             }
                         };
+                    }
                 }
             }
 
