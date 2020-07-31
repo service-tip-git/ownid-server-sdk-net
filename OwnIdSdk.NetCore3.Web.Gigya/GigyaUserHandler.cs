@@ -62,6 +62,12 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             return await OnSuccessLoginAsync(did);
         }
 
+        public async Task<bool> CheckUserExists(string did)
+        {
+            var getAccountMessage = await _restApiClient.GetUserInfoByUid(did);
+            return getAccountMessage.ErrorCode == 0;
+        }
+
         public async Task UpdateProfileAsync(IUserProfileFormContext<TProfile> context)
         {
             var getAccountMessage = await _restApiClient.GetUserInfoByUid(context.DID);

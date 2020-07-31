@@ -38,6 +38,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
             services.TryAddSingleton<IUrlProvider, UrlProvider>();
             services.TryAddSingleton<IIdentitiesProvider, GuidIdentitiesProvider>();
 
+            // TODO: add interface to find all commands by it with reflection and inject
             services.TryAddSingleton<CreateFlowCommand>();
             services.TryAddSingleton<GetSecurityCheckCommand>();
             services.TryAddSingleton<GetStatusCommand>();

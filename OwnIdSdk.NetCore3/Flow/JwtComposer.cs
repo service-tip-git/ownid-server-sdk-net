@@ -220,7 +220,8 @@ namespace OwnIdSdk.NetCore3.Flow
                     .JwtSignCredentials),
                 name = Localize(_ownIdCoreConfiguration.Name),
                 icon = _ownIdCoreConfiguration.Icon,
-                description = Localize(_ownIdCoreConfiguration.Description)
+                description = Localize(_ownIdCoreConfiguration.Description),
+                overwriteFileds = _ownIdCoreConfiguration.OverwriteFields
             });
         }
 

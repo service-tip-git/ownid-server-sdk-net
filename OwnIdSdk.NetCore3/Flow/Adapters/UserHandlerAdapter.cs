@@ -24,12 +24,17 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
             ILocalizationService localizationService)
         {
             return new UserProfileFormContext<TProfile>(profileData.DID, profileData.PublicKey,
-                OwnIdSerializer.Deserialize<TProfile>(profileData.Profile.GetRawText(), _serializerOptions), localizationService);
+                OwnIdSerializer.Deserialize<TProfile>(profileData.Profile?.GetRawText(), _serializerOptions), localizationService);
         }
 
         public async Task UpdateProfileAsync(IFormContext context)
         {
             await _adaptee.UpdateProfileAsync(context as UserProfileFormContext<TProfile>);
+        }
+
+        public async Task<bool> CheckUserExists(string did)
+        {
+            return await _adaptee.CheckUserExists(did);
         }
 
         public async Task<LoginResult<object>> OnSuccessLoginAsync(string did)

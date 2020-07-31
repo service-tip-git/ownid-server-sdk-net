@@ -72,6 +72,8 @@ namespace OwnIdSdk.NetCore3.Configuration
         public uint MaximumNumberOfConnectedDevices { get; set; }
 
         public uint JwtExpirationTimeout { get; set; }
+        
+        public bool OverwriteFields { get; set; }
 
         /// <summary>
         ///     Sets <see cref="ProfileConfiguration" /> based on <typeparamref name="TProfile" />

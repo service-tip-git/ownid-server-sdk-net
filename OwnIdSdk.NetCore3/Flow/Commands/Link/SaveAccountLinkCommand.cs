@@ -1,6 +1,8 @@
+using System.Text.Json;
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
+using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
@@ -20,10 +22,11 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Link
         private readonly IJwtService _jwtService;
         private readonly IAccountLinkHandlerAdapter _linkHandlerAdapter;
         private readonly ILocalizationService _localizationService;
+        private readonly IOwnIdCoreConfiguration _coreConfiguration;
 
         public SaveAccountLinkCommand(ICacheItemService cacheItemService, IJwtService jwtService,
             IJwtComposer jwtComposer, IFlowController flowController, IAccountLinkHandlerAdapter linkHandlerAdapter,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService, IOwnIdCoreConfiguration coreConfiguration)
         {
             _cacheItemService = cacheItemService;
             _jwtService = jwtService;
@@ -31,6 +34,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Link
             _flowController = flowController;
             _linkHandlerAdapter = linkHandlerAdapter;
             _localizationService = localizationService;
+            _coreConfiguration = coreConfiguration;
         }
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
@@ -49,14 +53,21 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Link
 
             var userData = _jwtService.GetDataFromJwt<UserProfileData>(requestJwt.Data.Jwt).Data;
 
-            //preventing data substitution
+            // preventing data substitution
             userData.DID = relatedItem.DID;
 
+            if (!_coreConfiguration.OverwriteFields)
+                userData.Profile = null;
+            
             var formContext = _linkHandlerAdapter.CreateUserDefinedContext(userData, _localizationService);
-            formContext.Validate();
 
-            if (formContext.HasErrors)
-                throw new BusinessValidationException(formContext);
+            if (_coreConfiguration.OverwriteFields)
+            {
+                formContext.Validate();
+
+                if (formContext.HasErrors)
+                    throw new BusinessValidationException(formContext);
+            }
 
             await _linkHandlerAdapter.OnLink(formContext);
 

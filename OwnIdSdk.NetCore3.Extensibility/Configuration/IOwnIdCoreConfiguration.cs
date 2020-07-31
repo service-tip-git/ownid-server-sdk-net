@@ -112,5 +112,13 @@ namespace OwnIdSdk.NetCore3.Extensibility.Configuration
         /// </summary>
         /// <remarks>Default value is 60 minutes</remarks>
         public uint JwtExpirationTimeout { get; set; }
+
+        /// <summary>
+        ///     Indicates if profile fields will be overwritten also during login, recovery, link requests.
+        /// </summary>
+        /// <remarks>
+        ///     Default: False - fields will be set only during a register requests.
+        /// </remarks>
+        public bool OverwriteFields { get; set; }
     }
 }

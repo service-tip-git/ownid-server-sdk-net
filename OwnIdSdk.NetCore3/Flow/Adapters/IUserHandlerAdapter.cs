@@ -12,6 +12,8 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
 
         Task UpdateProfileAsync(IFormContext context);
 
+        Task<bool> CheckUserExists(string did);
+
         Task<LoginResult<object>> OnSuccessLoginAsync(string did);
 
         Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey);

@@ -21,7 +21,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt
         ///     <see cref="IProfileConfiguration" />
         /// </summary>
         [JsonPropertyName("profile")]
-        public JsonElement Profile { get; set; }
+        public JsonElement? Profile { get; set; }
         
 
         /// <summary>

@@ -22,8 +22,12 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
         public IFormContext CreateUserDefinedContext(UserProfileData profileData,
             ILocalizationService localizationService)
         {
-            return new UserProfileFormContext<TProfile>(profileData.DID, profileData.PublicKey,
-                OwnIdSerializer.Deserialize<TProfile>(profileData.Profile.GetRawText(), _serializerOptions), localizationService);
+            TProfile profile = default;
+            
+            if (profileData.Profile.HasValue)
+                profile = OwnIdSerializer.Deserialize<TProfile>(profileData.Profile?.GetRawText(), _serializerOptions);
+            
+            return new UserProfileFormContext<TProfile>(profileData.DID, profileData.PublicKey, profile, localizationService);
         }
 
         public async Task<string> GetCurrentUserIdAsync(string payload)
