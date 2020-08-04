@@ -21,4 +21,5 @@
   <data name="Nickname" xml:space="preserve">Ник</data>
   <data name="Field {0} is required" xml:space="preserve">Поле {0} обязательно для заполнения</data>
   <data name="Field {0} has incorrect format" xml:space="preserve">Поле {0} имеет неправильный формат</data>
+  <data name="The field {0} must be a string or array type with a maximum length of &apos;{1}&apos;" xml:space="preserve">Поле {0} должно быть строкой или массивом с максимальной длинной '{1}'</data>
 </root>

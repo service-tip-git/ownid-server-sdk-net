@@ -80,5 +80,11 @@ namespace OwnIdSdk.NetCore3.Web.Resources {
                 return ResourceManager.GetString("Field {0} has incorrect format", resourceCulture);
             }
         }
+        
+        internal static string The_field__0__must_be_a_string_or_array_type_with_a_maximum_length_of___1__ {
+            get {
+                return ResourceManager.GetString("The field {0} must be a string or array type with a maximum length of \'{1}\'", resourceCulture);
+            }
+        }
     }
 }

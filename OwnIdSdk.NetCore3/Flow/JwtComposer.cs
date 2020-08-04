@@ -180,20 +180,22 @@ namespace OwnIdSdk.NetCore3.Flow
                     // TODO : PROFILE
                     "requestedFields", _ownIdCoreConfiguration.ProfileConfiguration.ProfileFieldMetadata.Select(x =>
                     {
-                        var label = Localize(x.Label, true);
+                        var label = Localize(x.Label);
 
                         return new
                         {
                             type = x.Type,
                             key = x.Key,
                             label,
-                            placeholder = Localize(x.Placeholder, true),
+                            placeholder = Localize(x.Placeholder),
                             validators = x.Validators.Select(v => new
                             {
                                 type = v.Type,
-                                errorMessage = string.Format(v.NeedsInternalLocalization
-                                    ? Localize(v.GetErrorMessageKey(), true)
-                                    : v.GetErrorMessageKey(), label)
+                                errorMessage = 
+                                    v.NeedsInternalLocalization
+                                        ? v.FormatErrorMessage(label, Localize(v.ErrorKey))  
+                                        : v.FormatErrorMessage(label),
+                                parameters = v.Parameters
                             })
                         };
                     })
@@ -225,7 +227,7 @@ namespace OwnIdSdk.NetCore3.Flow
             });
         }
 
-        private string Localize(string key, bool defaultAsAlternative = false)
+        private string Localize(string key)
         {
             return _localizationService?.GetLocalizedString(key) ?? key;
         }

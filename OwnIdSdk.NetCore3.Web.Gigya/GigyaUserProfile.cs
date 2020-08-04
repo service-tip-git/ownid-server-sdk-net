@@ -9,12 +9,15 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
         [OwnIdField(Constants.DefaultEmailLabel, Constants.DefaultEmailLabel)]
         [OwnIdFieldType(ProfileFieldType.Email)]
         [Required]
+        [MaxLength(50)]
         public string Email { get; set; }
         
         [OwnIdField(Constants.DefaultFirstNameLabel, Constants.DefaultFirstNameLabel)]
+        [MaxLength(50)]
         public string FirstName { get; set; }
 
         [OwnIdField(Constants.DefaultLastNameLabel, Constants.DefaultLastNameLabel)]
+        [MaxLength(50)]
         public string LastName { get; set; }
     }
 }

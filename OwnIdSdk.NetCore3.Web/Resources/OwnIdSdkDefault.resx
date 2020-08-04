@@ -21,4 +21,5 @@
   <data name="Nickname" xml:space="preserve">Nickname</data>
   <data name="Field {0} is required" xml:space="preserve">Field {0} is required</data>
   <data name="Field {0} has incorrect format" xml:space="preserve">Field {0} has incorrect format</data>
+  <data name="The field {0} must be a string or array type with a maximum length of &apos;{1}&apos;" xml:space="preserve">The field {0} must be a string or array type with a maximum length of '{1}'</data>
 </root>

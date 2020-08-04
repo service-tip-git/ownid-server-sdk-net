@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using System.Text.Json;
 using Microsoft.Extensions.Options;
 using OwnIdSdk.NetCore3.Attributes;
 using OwnIdSdk.NetCore3.Extensibility.Configuration.Profile;
+using OwnIdSdk.NetCore3.Extensions;
 
 namespace OwnIdSdk.NetCore3.Configuration.Profile
 {
@@ -25,9 +25,21 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
         private static readonly Dictionary<Type, ProfileValidatorDescription> DataAnnotationAttrsMap =
             new Dictionary<Type, ProfileValidatorDescription>
             {
-                {typeof(RequiredAttribute), new ProfileValidatorDescription("required", "Field {0} is required")}
-                // add here MaxLength, MinLength, Regex
+                {
+                    typeof(RequiredAttribute), new ProfileValidatorDescription("required", "Field {0} is required")
+                },
+                {
+                    typeof(MaxLengthAttribute), new ProfileValidatorDescription("maxlength",
+                        "The field {0} must be a string or array type with a maximum length of '{1}'")
+                },
+                // add here MinLength, Regex etc.
             };
+
+        /// <summary>
+        ///     <see cref="ValidationAttribute"/> properties which must be excluded from <see cref="ProfileValidationRuleMetadata"/>
+        /// </summary>
+        private static readonly IList<string> BaseValidationAttributeProperties =
+            typeof(ValidationAttribute).GetProperties().Select(x => x.Name).ToList();
 
         /// <summary>
         ///     Initializes instance of <see cref="ProfileConfiguration" />
@@ -85,13 +97,8 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
 
         public void BuildMetadata()
         {
-            var props = ProfileModelType.GetProperties();
-
-            var metadata = new List<ProfileFieldMetadata>();
-
-            foreach (var prop in props) metadata.Add(GetField(prop));
-
-            ProfileFieldMetadata = metadata;
+            ProfileFieldMetadata = ProfileModelType
+                .GetProperties().Select(GetField).ToList();
         }
 
         private ProfileFieldMetadata GetField(MemberInfo memberInfo)
@@ -118,12 +125,13 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
 
             if (typeAttr != null && typeAttr.FieldType != ProfileFieldType.Text)
             {
-                var validator = new ProfileValidationRuleMetadata
+                var validator = new ProfileValidationRuleMetadata(typeAttr)
                 {
                     Type = fieldData.Type,
-                    GetErrorMessageKey = () => typeAttr.FormatErrorMessage(FieldNamePlaceholder),
-                    NeedsInternalLocalization = string.IsNullOrEmpty(typeAttr.ErrorMessageResourceName) &&
-                                                typeAttr.ErrorMessageResourceType == null
+                    ErrorKey = Constants.DefaultInvalidFormatErrorMessage,
+                    NeedsInternalLocalization =
+                        string.IsNullOrEmpty(typeAttr.ErrorMessageResourceName)
+                        || typeAttr.ErrorMessageResourceType == null
                 };
 
                 fieldData.Validators.Add(validator);
@@ -132,39 +140,39 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
             return fieldData;
         }
 
-        private ProfileValidationRuleMetadata GetFieldValidator(Type type, MemberInfo memberInfo)
+        private ProfileValidationRuleMetadata GetFieldValidator(Type validatorType, MemberInfo memberInfo)
         {
-            if (!type.IsSubclassOf(typeof(ValidationAttribute)))
+            if (!(memberInfo.GetCustomAttributes(validatorType).FirstOrDefault() is ValidationAttribute
+                validationAttribute))
                 return null;
 
-            if (memberInfo.GetCustomAttributes(type).FirstOrDefault() is ValidationAttribute attribute)
+            var validatorDescription = DataAnnotationAttrsMap[validatorType];
+
+            var validator = new ProfileValidationRuleMetadata(validationAttribute)
             {
-                var validatorDescription = DataAnnotationAttrsMap[type];
+                Type = validatorDescription.ClientSideTypeNaming,
+                NeedsInternalLocalization =
+                    string.IsNullOrEmpty(validationAttribute.ErrorMessageResourceName)
+                    || validationAttribute.ErrorMessageResourceType == null
+            };
 
-                var validator = new ProfileValidationRuleMetadata
-                {
-                    Type = validatorDescription.ClientSideTypeNaming
-                };
+            if (validator.NeedsInternalLocalization)
+                validationAttribute.ErrorMessage = validatorDescription.DefaultErrorMessage;
+            
+            validator.ErrorKey = validationAttribute.ErrorMessage;
+                
 
-                if (!string.IsNullOrEmpty(attribute.ErrorMessageResourceName) &&
-                    attribute.ErrorMessageResourceType != null)
-                {
-                    validator.NeedsInternalLocalization = false;
-                }
-                else
-                {
-                    if (string.IsNullOrEmpty(attribute.ErrorMessage))
-                        attribute.ErrorMessage = validatorDescription.DefaultErrorMessage;
+            foreach (var prop in validatorType.GetProperties())
+            {
+                if (BaseValidationAttributeProperties.Contains(prop.Name))
+                    continue;
 
-                    validator.NeedsInternalLocalization = true;
-                }
-
-                validator.GetErrorMessageKey = () => attribute.FormatErrorMessage(FieldNamePlaceholder);
-
-                return validator;
+                var propValue = prop.GetValue(validationAttribute, null);
+                if (propValue != null)
+                    validator.Parameters.Add(prop.Name.ToCamelCase(), propValue.ToString());
             }
 
-            return null;
+            return validator;
         }
     }
 }
