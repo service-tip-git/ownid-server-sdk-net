@@ -40,9 +40,6 @@ namespace OwnIdSdk.NetCore3.Flow
 
         public IReadOnlyDictionary<string, IList<string>> FieldErrors => _fieldErrors;
 
-        public bool HasErrors => GeneralErrors.Any() ||
-                                 FieldErrors.Any(x => x.Value.Any());
-
         public void Validate()
         {
             var results = new List<ValidationResult>();

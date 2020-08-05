@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Threading.Tasks;
+using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
@@ -24,7 +25,13 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
             ILocalizationService localizationService)
         {
             return new UserProfileFormContext<TProfile>(profileData.DID, profileData.PublicKey,
-                OwnIdSerializer.Deserialize<TProfile>(profileData.Profile?.GetRawText(), _serializerOptions), localizationService);
+                OwnIdSerializer.Deserialize<TProfile>(profileData.Profile?.GetRawText(), _serializerOptions),
+                localizationService);
+        }
+
+        public async Task CreateProfileAsync(IFormContext context)
+        {
+            await _adaptee.CreateProfileAsync(context as UserProfileFormContext<TProfile>);
         }
 
         public async Task UpdateProfileAsync(IFormContext context)
@@ -32,9 +39,9 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
             await _adaptee.UpdateProfileAsync(context as UserProfileFormContext<TProfile>);
         }
 
-        public async Task<bool> CheckUserExists(string did)
+        public async Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey)
         {
-            return await _adaptee.CheckUserExists(did);
+            return await _adaptee.CheckUserIdentitiesAsync(did, publicKey);
         }
 
         public async Task<LoginResult<object>> OnSuccessLoginAsync(string did)

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using OwnIdSdk.NetCore3.Extensibility.Services;
 
 namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
@@ -18,7 +19,8 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         /// <summary>
         ///     Indicates if there is any error (general or field)
         /// </summary>
-        bool HasErrors { get; }
+        bool HasErrors => GeneralErrors.Any() ||
+                                 FieldErrors.Any(x => x.Value.Any());
 
         /// <summary>
         ///     Executes validation with current context

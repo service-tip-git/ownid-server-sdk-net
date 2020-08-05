@@ -23,7 +23,7 @@ spec:
             - containerPort: 5002
           env:
             - name: OWNID__WEB_APP_URL
-              value: https://sign.staging.ownid.com/sign
+              value: https://sign.staging.ownid.com
             - name: OWNID__CALLBACK_URL
               value: https://client.staging.ownid.com/netcore3
             - name: OWNID__DID
@@ -84,7 +84,7 @@ spec:
             - containerPort: 5002
           env:
             - name: OWNID__WEB_APP_URL
-              value: https://sign.staging.ownid.com/sign
+              value: https://sign.staging.ownid.com
             - name: OWNID__CALLBACK_URL
               value: https://client2-server.staging.ownid.com
             - name: OWNID__DID
@@ -176,7 +176,7 @@ spec:
             - containerPort: 5002
           env:
             - name: OWNID__WEB_APP_URL
-              value: https://sign.staging.ownid.com/sign
+              value: https://sign.staging.ownid.com
             - name: OWNID__CALLBACK_URL
               value: https://demo.ownid.com/netcore3
             - name: OWNID__DID
@@ -298,7 +298,7 @@ spec:
             - containerPort: 5002
           env:
             - name: OWNID__WEB_APP_URL
-              value: https://sign.staging.ownid.com/sign
+              value: https://sign.staging.ownid.com
             - name: OWNID__CALLBACK_URL
               value: https://nestle-server.staging.ownid.com
             - name: OWNID__DID

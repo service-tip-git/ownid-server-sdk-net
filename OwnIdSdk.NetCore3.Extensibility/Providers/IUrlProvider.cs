@@ -33,6 +33,12 @@ namespace OwnIdSdk.NetCore3.Extensibility.Providers
         /// </summary>
         /// <param name="subUrl">Nested url that will be used as callback</param>
         /// <returns>Well-formatted url for Web App with callback option</returns>
-        Uri GetWebAppWithCallbackUrl(Uri subUrl);
+        Uri GetWebAppSignWithCallbackUrl(Uri subUrl);
+
+        /// <summary>
+        /// Generates url to Web App connections
+        /// </summary>
+        /// <returns>Well-formatted url for Web App connections</returns>
+        Uri GetWebAppConnectionsUrl();
     }
 }

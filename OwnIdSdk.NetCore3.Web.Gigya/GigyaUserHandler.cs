@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Web.Gigya.ApiClient;
@@ -62,49 +62,34 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             return await OnSuccessLoginAsync(did);
         }
 
-        public async Task<bool> CheckUserExists(string did)
+        public async Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey)
         {
             var getAccountMessage = await _restApiClient.GetUserInfoByUid(did);
-            return getAccountMessage.ErrorCode == 0;
-        }
 
-        public async Task UpdateProfileAsync(IUserProfileFormContext<TProfile> context)
-        {
-            var getAccountMessage = await _restApiClient.GetUserInfoByUid(context.DID);
+            if (getAccountMessage.ErrorCode == 403005)
+                return IdentitiesCheckResult.UserNotFound;
+            
+            if(getAccountMessage.ErrorCode != 0)
+                throw new Exception(
+                    $"Gigya.notifyLogin error -> {getAccountMessage.GetFailureMessage()}");
 
-            if (getAccountMessage.ErrorCode == 0)
+            if (getAccountMessage.Data == null || !getAccountMessage.Data.Connections.Any())
             {
-                if (getAccountMessage.Data == null || !getAccountMessage.Data.Connections.Any())
-                    throw new Exception($"Found gigya user uid={context.DID} without pubKey");
-
-                if (getAccountMessage.Data.Connections.All(x => x.PublicKey != context.PublicKey))
-                    throw new Exception("Public key doesn't match any of gigya user keys");
-
-                var setAccountResponse = await _restApiClient.SetAccountInfo(context.DID, context.Profile);
-
-                if (setAccountResponse.ErrorCode == 403043)
-                {
-                    context.SetError(x => x.Email, setAccountResponse.ErrorMessage);
-                    return;
-                }
-
-                if (setAccountResponse.ErrorCode > 0)
-                {
-                    _logger.LogError(
-                        $"did: {context.DID}{Environment.NewLine}" +
-                        $"Gigya.setAccountInfo for EXISTING user error -> {setAccountResponse.GetFailureMessage()}");
-
-                    context.SetGeneralError($"{setAccountResponse.ErrorCode}: {setAccountResponse.ErrorMessage}");
-                }
-
-                return;
+                _logger.LogError($"Found gigya user uid={did} without pubKey");
+                return IdentitiesCheckResult.WrongPublicKey;
             }
 
-            // new user
-            if (getAccountMessage.ErrorCode != 403005)
-                throw new Exception(
-                    $"Gigya.getAccountInfo error -> {getAccountMessage.GetFailureMessage()}");
+            if (getAccountMessage.Data.Connections.All(x => x.PublicKey != publicKey))
+            {
+                _logger.LogError("Public key doesn't match any of gigya user keys");
+                return IdentitiesCheckResult.WrongPublicKey;
+            }
 
+            return IdentitiesCheckResult.UserExists;
+        }
+
+        public async Task CreateProfileAsync(IUserProfileFormContext<TProfile> context)
+        {
             var loginResponse = await _restApiClient.NotifyLogin(context.DID);
 
             if (loginResponse.ErrorCode != 0)
@@ -125,28 +110,47 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                     throw new Exception(
                         $"Gigya.deleteAccount with uid={context.DID} error -> {removeUserResult.GetFailureMessage()}");
 
-                if (setAccountMessage.ValidationErrors != null && setAccountMessage.ValidationErrors.Any())
+                SetErrorsToContext(context, setAccountMessage);
+            }
+        }
+
+        public async Task UpdateProfileAsync(IUserProfileFormContext<TProfile> context)
+        {
+            var setAccountResponse = await _restApiClient.SetAccountInfo(context.DID, context.Profile);
+
+            if (setAccountResponse.ErrorCode > 0)
+            {
+                _logger.LogError(
+                    $"did: {context.DID}{Environment.NewLine}" +
+                    $"Gigya.setAccountInfo for EXISTING user error -> {setAccountResponse.GetFailureMessage()}");
+
+                SetErrorsToContext(context, setAccountResponse);
+            }
+        }
+
+        private static void SetErrorsToContext(IUserProfileFormContext<TProfile> context, BaseGigyaResponse response)
+        {
+            if (response.ValidationErrors != null && response.ValidationErrors.Any())
+            {
+                foreach (var validationError in response.ValidationErrors)
                 {
-                    foreach (var validationError in setAccountMessage.ValidationErrors)
+                    //
+                    // TODO: find better way to map field name to profile property
+                    //
+                    switch (validationError.FieldName)
                     {
-                        //
-                        // TODO: find better way to map field name to profile property
-                        //
-                        switch (validationError.FieldName)
-                        {
-                            case "profile.email":
-                                context.SetError(x => x.Email, validationError.Message);
-                                break;
-                            default:
-                                context.SetGeneralError(validationError.Message);
-                                break;
-                        }
+                        case "profile.email":
+                            context.SetError(x => x.Email, validationError.Message);
+                            break;
+                        default:
+                            context.SetGeneralError(validationError.Message);
+                            break;
                     }
                 }
-                else
-                {
-                    context.SetGeneralError(setAccountMessage.UserFriendlyFailureMessage);
-                }
+            }
+            else
+            {
+                context.SetGeneralError(response.UserFriendlyFailureMessage);
             }
         }
     }

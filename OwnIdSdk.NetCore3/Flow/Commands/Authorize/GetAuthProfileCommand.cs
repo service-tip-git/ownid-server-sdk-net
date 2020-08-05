@@ -22,7 +22,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
             _flowController = flowController;
             _identitiesProvider = identitiesProvider;
         }
-        
+
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
             if (!relatedItem.IsValidForAuthorize)

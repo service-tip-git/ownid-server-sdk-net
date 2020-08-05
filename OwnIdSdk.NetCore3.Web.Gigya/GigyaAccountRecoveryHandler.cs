@@ -1,5 +1,4 @@
 using System;
-using System.Text.Json;
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.AccountRecovery;
@@ -34,15 +33,9 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 throw new Exception(
                     $"Gigya.resetPassword error -> {resetPasswordResponse.GetFailureMessage()}");
 
-            var accountInfo = await _apiClient.GetUserInfoByUid(resetPasswordResponse.UID);
-            if (accountInfo.ErrorCode != 0)
-                throw new Exception(
-                    $"Gigya.getAccountInfo error -> {accountInfo.GetFailureMessage()}");
-
             return new AccountRecoveryResult
             {
-                DID = resetPasswordResponse.UID,
-                Profile = accountInfo.Profile
+                DID = resetPasswordResponse.UID
             };
         }
 

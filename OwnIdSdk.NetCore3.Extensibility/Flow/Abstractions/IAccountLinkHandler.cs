@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Link;
 
 namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
 {
@@ -7,19 +8,11 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
     /// </summary>
     /// <remarks>
     ///     Implement this interface to enable Account link feature.
-    ///     Use
-    ///     <c>
-    ///         IServiceCollection.AddOwnId(builder => { builder.UseUserHandlerWithCustomProfile<![CDATA[<MyHandler>]]>(); })
-    ///     </c>
-    ///     for this purpose
     /// </remarks>
-    /// <typeparam name="TProfile">User Profile</typeparam>
-    public interface IAccountLinkHandler<TProfile> where TProfile : class
+    public interface IAccountLinkHandler
     {
-        Task<string> GetCurrentUserIdAsync(string payload);
+        Task<LinkState> GetCurrentUserLinkStateAsync(string payload);
 
-        Task<TProfile> GetUserProfileAsync(string did);
-
-        Task OnLink(IUserProfileFormContext<TProfile> context);
+        Task OnLink(string did, string publicKey);
     }
 }

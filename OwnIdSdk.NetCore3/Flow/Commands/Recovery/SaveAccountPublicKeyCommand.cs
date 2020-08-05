@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
@@ -16,14 +15,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
     public class SaveAccountPublicKeyCommand : BaseFlowCommand
     {
         private readonly ICacheItemService _cacheItemService;
+        private readonly IOwnIdCoreConfiguration _coreConfiguration;
         private readonly IFlowController _flowController;
         private readonly IJwtComposer _jwtComposer;
         private readonly IJwtService _jwtService;
         private readonly IAccountRecoveryHandler _recoveryHandler;
-        private readonly IOwnIdCoreConfiguration _coreConfiguration;
 
         public SaveAccountPublicKeyCommand(ICacheItemService cacheItemService, IJwtService jwtService,
-            IJwtComposer jwtComposer, IFlowController flowController, IAccountRecoveryHandler recoveryHandler, 
+            IJwtComposer jwtComposer, IFlowController flowController, IAccountRecoveryHandler recoveryHandler,
             IOwnIdCoreConfiguration coreConfiguration)
         {
             _cacheItemService = cacheItemService;

@@ -4,7 +4,7 @@ using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Providers;
 
-namespace OwnIdSdk.NetCore3
+namespace OwnIdSdk.NetCore3.Providers
 {
     /// <summary>
     ///     Generates urls to maintain Own ID process
@@ -42,13 +42,18 @@ namespace OwnIdSdk.NetCore3
             return GetBaseActionUrl(context, "approval-status");
         }
 
-        public Uri GetWebAppWithCallbackUrl(Uri subUrl)
+        public Uri GetWebAppSignWithCallbackUrl(Uri subUrl)
         {
-            var deepLink = new UriBuilder(_coreConfiguration.OwnIdApplicationUrl);
+            var deepLink = new UriBuilder(new Uri(_coreConfiguration.OwnIdApplicationUrl, "sign"));
             var query = HttpUtility.ParseQueryString(deepLink.Query);
             query["q"] = $"{subUrl.Authority}{subUrl.PathAndQuery}";
             deepLink.Query = query.ToString() ?? string.Empty;
             return deepLink.Uri;
+        }
+
+        public Uri GetWebAppConnectionsUrl()
+        {
+            return new Uri(_coreConfiguration.OwnIdApplicationUrl, "account");
         }
 
         private Uri GetBaseActionUrl(string context, string action)

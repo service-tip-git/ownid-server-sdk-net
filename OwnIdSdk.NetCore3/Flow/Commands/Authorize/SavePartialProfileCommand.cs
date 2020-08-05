@@ -40,7 +40,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
             if (!(input is CommandInput<JwtContainer> requestJwt))
                 throw new InternalLogicException($"Incorrect input type for {nameof(SavePartialProfileCommand)}");
 
-            var userData = _jwtService.GetDataFromJwt<UserPartialData>(requestJwt.Data.Jwt).Data;
+            var userData = _jwtService.GetDataFromJwt<UserIdentitiesData>(requestJwt.Data.Jwt).Data;
 
             if (string.IsNullOrEmpty(userData.PublicKey))
                 throw new CommandValidationException("No public key was provided for partial flow");

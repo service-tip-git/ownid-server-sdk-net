@@ -29,7 +29,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
         {
             if (_accountRecoveryHandler == null)
                 throw new InternalLogicException("Missing Recovery feature");
-            
+
             if (!relatedItem.IsValidForRecover)
                 throw new CommandValidationException(
                     "Cache item should be not Finished with Link challenge type. " +
@@ -39,13 +39,12 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
         protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
-            // Recover access and get user profile
+            // Recover access
             var recoverResult = await _accountRecoveryHandler.RecoverAsync(relatedItem.Payload);
 
-            var jwt = _jwtComposer.GenerateProfileWithConfigDataJwt(relatedItem.Context,
+            var jwt = _jwtComposer.GenerateBaseStep(relatedItem.Context,
                 _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
-                recoverResult.DID,
-                recoverResult.Profile, input.CultureInfo?.Name, _needRequesterInfo);
+                recoverResult.DID, input.CultureInfo?.Name, _needRequesterInfo);
             return new JwtContainer(jwt);
         }
     }

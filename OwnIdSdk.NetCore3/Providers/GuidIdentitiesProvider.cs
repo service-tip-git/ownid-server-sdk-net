@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using OwnIdSdk.NetCore3.Extensibility.Providers;
 using OwnIdSdk.NetCore3.Extensions;
 
-namespace OwnIdSdk.NetCore3
+namespace OwnIdSdk.NetCore3.Providers
 {
     /// <summary>
     ///     Provides Unique Identities based on GUID

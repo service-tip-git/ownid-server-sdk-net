@@ -34,10 +34,10 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
         protected override Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
-            var jwt = _jwtComposer.GeneratePartialDidStep(relatedItem.Context,
+            var jwt = _jwtComposer.GenerateBaseStep(relatedItem.Context,
                 _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
                 _identitiesProvider.GenerateUserId(),
-                input.CultureInfo?.Name);
+                input.CultureInfo?.Name, true);
 
             return Task.FromResult(new JwtContainer(jwt) as ICommandResult);
         }

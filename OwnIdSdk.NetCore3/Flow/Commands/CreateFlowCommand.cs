@@ -2,9 +2,9 @@ using System;
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Providers;
-using OwnIdSdk.NetCore3.Flow.Adapters;
 using OwnIdSdk.NetCore3.Services;
 
 namespace OwnIdSdk.NetCore3.Flow.Commands
@@ -12,20 +12,20 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
     public class CreateFlowCommand
     {
         private readonly ICacheItemService _cacheItemService;
-        private readonly uint _expiration;
         private readonly IIdentitiesProvider _identitiesProvider;
-        private readonly IAccountLinkHandlerAdapter _linkHandlerAdapter;
+        private readonly IOwnIdCoreConfiguration _coreConfiguration;
+        private readonly IAccountLinkHandler _linkHandler;
         private readonly IUrlProvider _urlProvider;
 
         public CreateFlowCommand(ICacheItemService cacheItemService, IUrlProvider urlProvider,
             IIdentitiesProvider identitiesProvider, IOwnIdCoreConfiguration coreConfiguration,
-            IAccountLinkHandlerAdapter linkHandlerAdapter = null)
+            IAccountLinkHandler linkHandler = null)
         {
             _cacheItemService = cacheItemService;
             _urlProvider = urlProvider;
             _identitiesProvider = identitiesProvider;
-            _linkHandlerAdapter = linkHandlerAdapter;
-            _expiration = coreConfiguration.CacheExpirationTimeout;
+            _coreConfiguration = coreConfiguration;
+            _linkHandler = linkHandler;
         }
 
         public async Task<GetChallengeLinkResponse> ExecuteAsync(GenerateContextRequest request)
@@ -44,10 +44,16 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                     flowType = !request.IsPartial ? FlowType.Authorize : FlowType.PartialAuthorize;
                     break;
                 case ChallengeType.Link:
-                    if (_linkHandlerAdapter == null)
+                    if (_linkHandler == null)
                         throw new NotSupportedException("Account Link feature was not enabled but was invoked");
 
-                    did = await _linkHandlerAdapter.GetCurrentUserIdAsync(request.Payload.ToString());
+                    var state = await _linkHandler.GetCurrentUserLinkStateAsync(request.Payload.ToString());
+
+                    if (state.ConnectedDevicesCount >= _coreConfiguration.MaximumNumberOfConnectedDevices)
+                        return new GetChallengeLinkResponse(default, _urlProvider.GetWebAppConnectionsUrl().ToString(),
+                            default, default);
+
+                    did = state.DID;
                     flowType = request.IsQr ? FlowType.LinkWithPin : FlowType.Link;
                     break;
                 case ChallengeType.Recover:
@@ -59,12 +65,11 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             }
 
             await _cacheItemService.CreateAuthFlowSessionItemAsync(challengeContext, nonce, request.Type, flowType,
-                did,
-                payload);
+                did, payload);
 
             return new GetChallengeLinkResponse(challengeContext,
-                _urlProvider.GetWebAppWithCallbackUrl(_urlProvider.GetStartFlowUrl(challengeContext)).ToString(), nonce,
-                _expiration);
+                _urlProvider.GetWebAppSignWithCallbackUrl(_urlProvider.GetStartFlowUrl(challengeContext)).ToString(), 
+                nonce, _coreConfiguration.CacheExpirationTimeout);
         }
     }
 }

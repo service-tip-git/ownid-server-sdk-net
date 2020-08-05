@@ -5,20 +5,6 @@ namespace OwnIdSdk.NetCore3.Flow.Interfaces
     public interface IJwtComposer
     {
         /// <summary>
-        ///     Generates JWT with configuration and user profile for account linking process
-        /// </summary>
-        /// <param name="context">Challenge Unique identifier</param>
-        /// <param name="nextFrontendBehavior">Next flow step description</param>
-        /// <param name="did">User unique identity</param>
-        /// <param name="profile">User profile</param>
-        /// <param name="locale">Optional. Content locale</param>
-        /// <param name="includeRequester">Optional. Default = false. True if should add requester info to jwt</param>
-        /// <returns>Base64 encoded string that contains JWT</returns>
-        string GenerateProfileWithConfigDataJwt(string context, FrontendBehavior nextFrontendBehavior, string did,
-            object profile,
-            string locale = null, bool includeRequester = false);
-
-        /// <summary>
         ///     Creates JWT challenge with requested information by OwnId app
         /// </summary>
         /// <param name="context">Challenge Unique identifier</param>
@@ -27,8 +13,7 @@ namespace OwnIdSdk.NetCore3.Flow.Interfaces
         /// <param name="includeRequester">Optional. Default = false. True if should add requester info to jwt</param>
         /// <returns>Base64 encoded string that contains JWT with hash</returns>
         string GenerateProfileConfigJwt(string context, FrontendBehavior nextFrontendBehavior, string did,
-            string locale = null,
-            bool includeRequester = false);
+            string locale = null, bool includeRequester = false);
 
         /// <summary>
         ///     Generates JWT for pin step
@@ -43,7 +28,7 @@ namespace OwnIdSdk.NetCore3.Flow.Interfaces
 
         string GenerateFinalStepJwt(string context, FrontendBehavior nextFrontendBehavior, string locale = null);
 
-        string GeneratePartialDidStep(string context, FrontendBehavior nextFrontendBehavior, string did,
-            string locale = null);
+        string GenerateBaseStep(string context, FrontendBehavior nextFrontendBehavior, string did,
+            string locale = null, bool includeRequester = false);
     }
 }

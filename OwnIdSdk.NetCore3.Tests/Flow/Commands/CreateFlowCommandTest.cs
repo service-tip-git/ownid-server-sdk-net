@@ -4,9 +4,9 @@ using FluentAssertions;
 using Moq;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Providers;
-using OwnIdSdk.NetCore3.Flow.Adapters;
 using OwnIdSdk.NetCore3.Flow.Commands;
 using OwnIdSdk.NetCore3.Services;
 using OwnIdSdk.NetCore3.Tests.TestUtils;
@@ -33,7 +33,7 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
             var urlProvider = fixture.Freeze<IUrlProvider>();
             var identitiesProvider = fixture.Freeze<IIdentitiesProvider>();
             var configuration = fixture.Freeze<IOwnIdCoreConfiguration>();
-            var linkAdapter = fixture.Freeze<Mock<IAccountLinkHandlerAdapter>>();
+            var linkAdapter = fixture.Freeze<Mock<IAccountLinkHandler>>();
 
             var command = new CreateFlowCommand(cacheService.Object, urlProvider, identitiesProvider,
                 configuration, linkAdapter.Object);
@@ -55,15 +55,15 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
             if (challengeType == ChallengeType.Link)
             {
                 var capturedPayload = payload;
-                linkAdapter.Verify(x=>x.GetCurrentUserIdAsync(capturedPayload), Times.Once);
-                did = await linkAdapter.Object.GetCurrentUserIdAsync(payload);
+                linkAdapter.Verify(x=>x.GetCurrentUserLinkStateAsync(capturedPayload), Times.Once);
+                did = (await linkAdapter.Object.GetCurrentUserLinkStateAsync(payload)).DID;
                 payload = null;
             }
 
             cacheService.Verify(x=>x.CreateAuthFlowSessionItemAsync(context, nonce, challengeType, expectedFlowType, did, payload), Times.Once);
 
             var expected = new GetChallengeLinkResponse(context,
-                urlProvider.GetWebAppWithCallbackUrl(urlProvider.GetStartFlowUrl(context)).ToString(), nonce,
+                urlProvider.GetWebAppSignWithCallbackUrl(urlProvider.GetStartFlowUrl(context)).ToString(), nonce,
                 expiration);
 
             actual.Should().BeEquivalentTo(expected);

@@ -4,7 +4,7 @@ WORKDIR /app
 EXPOSE 5002
 
 ENV ALLOWEDHOSTS="localhost"
-ENV OWNID__WEB_APP_URL="http://sign.dev.ownid.com/sign"
+ENV OWNID__WEB_APP_URL="http://sign.dev.ownid.com"
 ENV OWNID__CALLBACK_URL="http://localhost:5002"
 ENV OWNID__PUB_KEY="./keys/jwtRS256.key.pub"
 ENV OWNID__PRIVATE_KEY="./keys/jwtRS256.key"

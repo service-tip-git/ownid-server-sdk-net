@@ -2,7 +2,6 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
-using OwnIdSdk.NetCore3.Flow.Adapters;
 using OwnIdSdk.NetCore3.Web.Extensibility;
 
 namespace OwnIdSdk.NetCore3.Web.Features
@@ -25,14 +24,9 @@ namespace OwnIdSdk.NetCore3.Web.Features
         {
         }
 
-        public AccountLinkFeature UseAccountLinking<TProfile, THandler>()
-            where THandler : class, IAccountLinkHandler<TProfile> where TProfile : class
+        public AccountLinkFeature UseAccountLinking<THandler>() where THandler : class, IAccountLinkHandler
         {
-            _applyServicesAction = services =>
-            {
-                services.TryAddTransient<IAccountLinkHandler<TProfile>, THandler>();
-                services.TryAddTransient<IAccountLinkHandlerAdapter, AccountLinkHandlerAdapter<TProfile>>();
-            };
+            _applyServicesAction = services => { services.TryAddTransient<IAccountLinkHandler, THandler>(); };
 
             return this;
         }

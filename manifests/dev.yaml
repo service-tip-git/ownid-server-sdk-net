@@ -23,7 +23,7 @@ spec:
             - containerPort: 5002
           env:
             - name: OWNID__WEB_APP_URL
-              value: https://sign.dev.ownid.com/sign
+              value: https://sign.dev.ownid.com
             - name: OWNID__CALLBACK_URL
               value: https://client.dev.ownid.com/netcore3
             - name: OWNID__DID
@@ -84,7 +84,7 @@ spec:
             - containerPort: 5002
           env:
             - name: OWNID__WEB_APP_URL
-              value: https://sign.dev.ownid.com/sign
+              value: https://sign.dev.ownid.com
             - name: OWNID__CALLBACK_URL
               value: https://client2-server.dev.ownid.com
             - name: OWNID__DID
@@ -176,7 +176,7 @@ spec:
             - containerPort: 5002
           env:
             - name: OWNID__WEB_APP_URL
-              value: https://sign.dev.ownid.com/sign
+              value: https://sign.dev.ownid.com
             - name: OWNID__CALLBACK_URL
               value: https://demo.dev.ownid.com/netcore3
             - name: OWNID__DID

@@ -41,10 +41,9 @@ namespace OwnIdSdk.NetCore3.Web.Configuration
         /// </summary>
         public IServiceCollection Services { get; }
 
-        public void UseAccountLinking<TProfile, THandler>() where TProfile : class
-            where THandler : class, IAccountLinkHandler<TProfile>
+        public void UseAccountLinking<THandler>() where THandler : class, IAccountLinkHandler
         {
-            WithFeature<AccountLinkFeature>(x => x.UseAccountLinking<TProfile, THandler>());
+            WithFeature<AccountLinkFeature>(x => x.UseAccountLinking<THandler>());
         }
 
         public void UseAccountRecovery<THandler>()
