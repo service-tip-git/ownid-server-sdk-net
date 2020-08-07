@@ -12,17 +12,17 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
         [OwnIdField(Constants.DefaultEmailLabel, Constants.DefaultEmailLabel)]
         [OwnIdFieldType(ProfileFieldType.Email)]
         [Required]
-        [MaxLength(50)]
+        [MaxLength(200)]
         public string Email { get; set; }
 
         [OwnIdField(Constants.DefaultFirstNameLabel, Constants.DefaultFirstNameLabel)]
         [Required]
-        [MaxLength(50)]
+        [MaxLength(200)]
         public string FirstName { get; set; }
 
         [OwnIdField(Constants.DefaultLastNameLabel, Constants.DefaultLastNameLabel)]
         [Required]
-        [MaxLength(50)]
+        [MaxLength(200)]
         public string LastName { get; set; }
     }
 }
