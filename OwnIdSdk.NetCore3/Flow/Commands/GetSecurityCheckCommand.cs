@@ -36,7 +36,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
         {
             var step = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
 
-            var pin = await _cacheItemService.SetSecurityCode(relatedItem.Context);
+            var pin = await _cacheItemService.SetSecurityCodeAsync(relatedItem.Context);
             var jwt = _jwtComposer.GeneratePinStepJwt(relatedItem.Context, step, pin, input.CultureInfo?.Name);
 
             return new JwtContainer(jwt);

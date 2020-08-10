@@ -12,7 +12,7 @@ namespace OwnIdSdk.NetCore3.Extensions
         internal static string ToShortString(this Guid guid)
         {
             var base64Guid = Convert.ToBase64String(guid.ToByteArray());
-            base64Guid = base64Guid.Replace('+', '-').Replace('/', '_');
+            base64Guid = base64Guid.GetUrlEncodeString();
             return base64Guid.Substring(0, base64Guid.Length - 2);
         }
 
@@ -22,7 +22,7 @@ namespace OwnIdSdk.NetCore3.Extensions
         /// <remarks>Extension method</remarks>
         internal static Guid FromShortStringToGuid(this string str)
         {
-            str = str.Replace('_', '/').Replace('-', '+');
+            str = str.GetUrlDecodeString();
             var byteArray = Convert.FromBase64String(str + "==");
             return new Guid(byteArray);
         }

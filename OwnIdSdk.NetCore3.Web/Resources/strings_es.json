@@ -5,6 +5,7 @@
     "Last Name": "Apellido",
     "Nickname": "Apodo",
     "Field {0} is required": "El campo {0} es obligatorio",
-    "Field {0} has incorrect format": "El campo {0} tiene un formato incorrecto"
+    "Field {0} has incorrect format": "El campo {0} tiene un formato incorrecto"б
+    "The field {0} must be a string or array type with a maximum length of '{1}'": "The field {0} must be a string or array type with a maximum length of '{1}'"
   }
 }

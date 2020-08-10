@@ -36,7 +36,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             builder.AddOrUpdateFeature(gigyaFeature);
             builder.UseUserHandlerWithCustomProfile<GigyaUserProfile, GigyaUserHandler<GigyaUserProfile>>();
-            builder.UseAccountLinking<GigyaUserProfile, GigyaAccountLinkHandler<GigyaUserProfile>>();
+            builder.UseAccountLinking<GigyaAccountLinkHandler<GigyaUserProfile>>();
             builder.UseAccountRecovery<GigyaAccountRecoveryHandler<GigyaUserProfile>>();
         }
 

@@ -14,6 +14,7 @@ using OwnIdSdk.NetCore3.Flow.Commands.Authorize;
 using OwnIdSdk.NetCore3.Flow.Commands.Link;
 using OwnIdSdk.NetCore3.Flow.Commands.Recovery;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
+using OwnIdSdk.NetCore3.Providers;
 using OwnIdSdk.NetCore3.Services;
 using OwnIdSdk.NetCore3.Web.Extensibility;
 
@@ -38,6 +39,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
             services.TryAddSingleton<IUrlProvider, UrlProvider>();
             services.TryAddSingleton<IIdentitiesProvider, GuidIdentitiesProvider>();
 
+            // TODO: add interface to find all commands by it with reflection and inject
             services.TryAddSingleton<CreateFlowCommand>();
             services.TryAddSingleton<GetSecurityCheckCommand>();
             services.TryAddSingleton<GetStatusCommand>();
@@ -48,7 +50,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
             services.TryAddSingleton<GetPartialInfoCommand>();
             services.TryAddSingleton<SavePartialProfileCommand>();
             services.TryAddSingleton<SaveProfileCommand>();
-            services.TryAddSingleton<GetLinkProfileCommand>();
+            services.TryAddSingleton<GetLinkConfigCommand>();
             services.TryAddSingleton<SaveAccountLinkCommand>();
             services.TryAddSingleton<RecoverAccountCommand>();
             services.TryAddSingleton<SaveAccountPublicKeyCommand>();
@@ -71,7 +73,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
                 _configuration.PollingInterval = 2000;
 
             if (_configuration.MaximumNumberOfConnectedDevices == default)
-                _configuration.MaximumNumberOfConnectedDevices = 5;
+                _configuration.MaximumNumberOfConnectedDevices = 1;
 
             return this;
         }

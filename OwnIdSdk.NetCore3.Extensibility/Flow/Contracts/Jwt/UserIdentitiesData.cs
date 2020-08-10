@@ -5,7 +5,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt
     /// <summary>
     ///     User partial data container
     /// </summary>
-    public class UserPartialData : ISignedData
+    public class UserIdentitiesData : ISignedData
     {
         /// <summary>
         ///     User unique identifier

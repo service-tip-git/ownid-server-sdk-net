@@ -5,6 +5,7 @@
     "Last Name": "Фамилия",
     "Nickname": "Ник",
     "Field {0} is required": "Поле {0} обязательно для заполнения",
-    "Field {0} has incorrect format": "Поле {0} имеет неправильный формат"
+    "Field {0} has incorrect format": "Поле {0} имеет неправильный формат",
+    "The field {0} must be a string or array type with a maximum length of '{1}'": "The field {0} must be a string or array type with a maximum length of '{1}'"
   }
 }

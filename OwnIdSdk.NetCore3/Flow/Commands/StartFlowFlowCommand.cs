@@ -7,7 +7,6 @@ using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Extensibility.Providers;
 using OwnIdSdk.NetCore3.Extensions;
-using OwnIdSdk.NetCore3.Flow.Adapters;
 using OwnIdSdk.NetCore3.Flow.Commands.Authorize;
 using OwnIdSdk.NetCore3.Flow.Commands.Link;
 using OwnIdSdk.NetCore3.Flow.Commands.Recovery;
@@ -19,24 +18,24 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
 {
     public class StartFlowFlowCommand : BaseFlowCommand
     {
+        private readonly IAccountLinkHandler _accountLinkHandler;
         private readonly ICacheItemService _cacheItemService;
         private readonly IFlowController _flowController;
         private readonly IIdentitiesProvider _identitiesProvider;
         private readonly IJwtComposer _jwtComposer;
         private readonly IJwtService _jwtService;
-        private readonly IAccountLinkHandlerAdapter _linkHandlerAdapter;
         private readonly IAccountRecoveryHandler _recoveryHandler;
 
         public StartFlowFlowCommand(ICacheItemService cacheItemService, IJwtService jwtService,
             IJwtComposer jwtComposer, IFlowController flowController, IIdentitiesProvider identitiesProvider,
-            IAccountLinkHandlerAdapter linkHandlerAdapter = null, IAccountRecoveryHandler recoveryHandler = null)
+            IAccountLinkHandler linkHandler = null, IAccountRecoveryHandler recoveryHandler = null)
         {
             _cacheItemService = cacheItemService;
             _jwtService = jwtService;
             _jwtComposer = jwtComposer;
             _flowController = flowController;
             _identitiesProvider = identitiesProvider;
-            _linkHandlerAdapter = linkHandlerAdapter;
+            _accountLinkHandler = linkHandler;
             _recoveryHandler = recoveryHandler;
         }
 
@@ -60,7 +59,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                     command = new GetPartialInfoCommand(_jwtComposer, _flowController, _identitiesProvider);
                     break;
                 case FlowType.Link:
-                    command = new GetLinkProfileCommand(_jwtComposer, _flowController, _linkHandlerAdapter);
+                    command = new GetLinkConfigCommand(_jwtComposer, _flowController, _accountLinkHandler);
                     break;
                 case FlowType.Recover:
                     command = new RecoverAccountCommand(_jwtComposer, _flowController, _recoveryHandler);

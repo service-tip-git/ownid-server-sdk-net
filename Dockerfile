@@ -4,7 +4,7 @@ WORKDIR /app
 EXPOSE 5002
 
 ENV ALLOWEDHOSTS="localhost"
-ENV OWNID__WEB_APP_URL="http://sign.dev.ownid.com/sign"
+ENV OWNID__WEB_APP_URL="http://sign.dev.ownid.com"
 ENV OWNID__CALLBACK_URL="http://localhost:5002"
 ENV OWNID__PUB_KEY="./keys/jwtRS256.key.pub"
 ENV OWNID__PRIVATE_KEY="./keys/jwtRS256.key"
@@ -32,8 +32,9 @@ RUN dotnet restore ./OwnIdSdk.NetCore3.Server.Gigya/OwnIdSdk.NetCore3.Server.Gig
 RUN dotnet publish ./OwnIdSdk.NetCore3.Server.Gigya/OwnIdSdk.NetCore3.Server.Gigya.csproj -c Release -o out
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1.6-focal
 WORKDIR /app
+#RUN apt-get update && apt-get install -y && apt-get upgrade -y
 COPY --from=build-env /app/out .
 ENTRYPOINT ["dotnet", "OwnIdSdk.NetCore3.Server.Gigya.dll"]
 

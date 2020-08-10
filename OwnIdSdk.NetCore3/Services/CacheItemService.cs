@@ -74,7 +74,7 @@ namespace OwnIdSdk.NetCore3.Services
         /// <param name="context"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task<string> SetSecurityCode(string context)
+        public async Task<string> SetSecurityCodeAsync(string context)
         {
             var random = new Random();
             var pin = random.Next(0, 9999).ToString("D4");

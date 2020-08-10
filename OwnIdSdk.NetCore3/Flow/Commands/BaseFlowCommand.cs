@@ -13,10 +13,10 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             StepType currentStepType, bool requiresTokensValidation = true)
         {
             BasicValidation(input, relatedItem);
-            
-            if(requiresTokensValidation) 
+
+            if (requiresTokensValidation)
                 ValidateCacheItemTokens(relatedItem, input);
-            
+
             Validate(input, relatedItem);
 
             return await ExecuteInternal(input, relatedItem, currentStepType);
@@ -37,13 +37,13 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 throw new CommandValidationException(
                     $"{nameof(commandInput.ResponseToken)} doesn't match. Expected={item.ResponseToken} Actual={commandInput.ResponseToken}");
         }
-        
+
         private static void BasicValidation(ICommandInput input, CacheItem relatedItem)
         {
-            if(input == null)
+            if (input == null)
                 throw new ArgumentException($"{nameof(input)} param can not be null");
-            
-            if(relatedItem == null)
+
+            if (relatedItem == null)
                 throw new ArgumentException($"{nameof(relatedItem)} param can not be null");
         }
     }

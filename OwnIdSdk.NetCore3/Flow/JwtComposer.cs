@@ -30,46 +30,16 @@ namespace OwnIdSdk.NetCore3.Flow
         }
 
         /// <summary>
-        ///     Generates JWT with configuration and user profile for account linking process
-        /// </summary>
-        /// <param name="context">Challenge Unique identifier</param>
-        /// <param name="nextFrontendBehavior">Next flow step description</param>
-        /// <param name="did">User unique identity</param>
-        /// <param name="profile">User profile</param>
-        /// <param name="locale">Optional. Content locale</param>
-        /// <param name="includeRequester">Optional. Default = false. True if should add requester info to jwt</param>
-        /// <returns>Base64 encoded string that contains JWT</returns>
-        public string GenerateProfileWithConfigDataJwt(string context, FrontendBehavior nextFrontendBehavior,
-            string did,
-            object profile,
-            string locale = null, bool includeRequester = false)
-        {
-            var data = GetFieldsConfigDictionary(did).Union(GetProfileDataDictionary(profile))
-                .ToDictionary(x => x.Key, x => x.Value);
-
-            if (includeRequester)
-            {
-                var (key, value) = GetRequester();
-                data[key] = value;
-            }
-
-            var fields = GetBaseFlowFieldsDictionary(context, nextFrontendBehavior, data,
-                locale);
-
-            return _jwtService.GenerateDataJwt(fields);
-        }
-
-        /// <summary>
         ///     Creates JWT challenge with requested information by OwnId app
         /// </summary>
         /// <param name="context">Challenge Unique identifier</param>
         /// <param name="nextFrontendBehavior">Next flow step description</param>
+        /// <param name="did">User unique identifier</param>
         /// <param name="locale">Optional. Content locale</param>
         /// <param name="includeRequester">Optional. Default = false. True if should add requester info to jwt</param>
         /// <returns>Base64 encoded string that contains JWT with hash</returns>
         public string GenerateProfileConfigJwt(string context, FrontendBehavior nextFrontendBehavior, string did,
-            string locale = null,
-            bool includeRequester = false)
+            string locale = null, bool includeRequester = false)
         {
             var data = GetFieldsConfigDictionary(did);
 
@@ -114,21 +84,27 @@ namespace OwnIdSdk.NetCore3.Flow
             return _jwtService.GenerateDataJwt(fields);
         }
 
-        public string GeneratePartialDidStep(string context, FrontendBehavior nextFrontendBehavior, string did,
-            string locale = null)
+        public string GenerateBaseStep(string context, FrontendBehavior nextFrontendBehavior, string did,
+            string locale = null, bool includeRequester = false)
         {
             var (didKey, didValue) = GetDid(did);
-            var (reqKey, reqValue) = GetRequester();
+
+            var data = new Dictionary<string, object>
+            {
+                {didKey, didValue}, 
+                {"requestedFields", new object[0]}
+            };
+
+            if (includeRequester)
+            {
+                var (reqKey, reqValue) = GetRequester();
+                data.Add(reqKey, reqValue);
+            }
+            
             var fields = GetBaseFlowFieldsDictionary(context, nextFrontendBehavior,
-                new Dictionary<string, object>
-                    {{didKey, didValue}, {reqKey, reqValue}, {"requestedFields", new object[0]}}, locale);
+                data, locale);
 
             return _jwtService.GenerateDataJwt(fields);
-        }
-
-        private Dictionary<string, object> GetProfileDataDictionary(object profile)
-        {
-            return new Dictionary<string, object> {{"profile", profile}};
         }
 
         private Dictionary<string, object> GetBaseFlowFieldsDictionary(string context,
@@ -180,20 +156,22 @@ namespace OwnIdSdk.NetCore3.Flow
                     // TODO : PROFILE
                     "requestedFields", _ownIdCoreConfiguration.ProfileConfiguration.ProfileFieldMetadata.Select(x =>
                     {
-                        var label = Localize(x.Label, true);
+                        var label = Localize(x.Label);
 
                         return new
                         {
                             type = x.Type,
                             key = x.Key,
                             label,
-                            placeholder = Localize(x.Placeholder, true),
+                            placeholder = Localize(x.Placeholder),
                             validators = x.Validators.Select(v => new
                             {
                                 type = v.Type,
-                                errorMessage = string.Format(v.NeedsInternalLocalization
-                                    ? Localize(v.GetErrorMessageKey(), true)
-                                    : v.GetErrorMessageKey(), label)
+                                errorMessage = 
+                                    v.NeedsInternalLocalization
+                                        ? v.FormatErrorMessage(label, Localize(v.ErrorKey))  
+                                        : v.FormatErrorMessage(label),
+                                parameters = v.Parameters
                             })
                         };
                     })
@@ -220,11 +198,12 @@ namespace OwnIdSdk.NetCore3.Flow
                     .JwtSignCredentials),
                 name = Localize(_ownIdCoreConfiguration.Name),
                 icon = _ownIdCoreConfiguration.Icon,
-                description = Localize(_ownIdCoreConfiguration.Description)
+                description = Localize(_ownIdCoreConfiguration.Description),
+                overwriteFields = _ownIdCoreConfiguration.OverwriteFields
             });
         }
 
-        private string Localize(string key, bool defaultAsAlternative = false)
+        private string Localize(string key)
         {
             return _localizationService?.GetLocalizedString(key) ?? key;
         }

@@ -5,11 +5,11 @@ using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Approval;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
-using OwnIdSdk.NetCore3.Flow.Adapters;
 using OwnIdSdk.NetCore3.Flow.Commands.Link;
 using OwnIdSdk.NetCore3.Flow.Commands.Recovery;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Flow.Steps;
+using OwnIdSdk.NetCore3.Services;
 
 namespace OwnIdSdk.NetCore3.Flow.Commands.Approval
 {
@@ -17,11 +17,11 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Approval
     {
         private readonly IFlowController _flowController;
         private readonly IJwtComposer _jwtComposer;
-        private readonly IAccountLinkHandlerAdapter _linkHandlerAdapter;
+        private readonly IAccountLinkHandler _linkHandlerAdapter;
         private readonly IAccountRecoveryHandler _recoveryHandler;
 
         public GetApprovalStatusCommand(IJwtComposer jwtComposer, IFlowController flowController,
-            IAccountLinkHandlerAdapter linkHandlerAdapter, IAccountRecoveryHandler recoveryHandler)
+            IAccountLinkHandler linkHandlerAdapter, IAccountRecoveryHandler recoveryHandler)
         {
             _jwtComposer = jwtComposer;
             _flowController = flowController;
@@ -46,7 +46,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Approval
                 switch (relatedItem.FlowType)
                 {
                     case FlowType.LinkWithPin:
-                        command = new GetLinkProfileCommand(_jwtComposer, _flowController, _linkHandlerAdapter, false);
+                        command = new GetLinkConfigCommand(_jwtComposer, _flowController, _linkHandlerAdapter, false);
                         break;
                     case FlowType.RecoverWithPin:
                         command = new RecoverAccountCommand(_jwtComposer, _flowController, _recoveryHandler, false);

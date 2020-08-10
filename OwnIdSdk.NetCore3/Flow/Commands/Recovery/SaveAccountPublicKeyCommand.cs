@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
+using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
@@ -14,19 +15,22 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
     public class SaveAccountPublicKeyCommand : BaseFlowCommand
     {
         private readonly ICacheItemService _cacheItemService;
+        private readonly IOwnIdCoreConfiguration _coreConfiguration;
         private readonly IFlowController _flowController;
         private readonly IJwtComposer _jwtComposer;
         private readonly IJwtService _jwtService;
         private readonly IAccountRecoveryHandler _recoveryHandler;
 
         public SaveAccountPublicKeyCommand(ICacheItemService cacheItemService, IJwtService jwtService,
-            IJwtComposer jwtComposer, IFlowController flowController, IAccountRecoveryHandler recoveryHandler)
+            IJwtComposer jwtComposer, IFlowController flowController, IAccountRecoveryHandler recoveryHandler,
+            IOwnIdCoreConfiguration coreConfiguration)
         {
             _cacheItemService = cacheItemService;
             _jwtService = jwtService;
             _jwtComposer = jwtComposer;
             _flowController = flowController;
             _recoveryHandler = recoveryHandler;
+            _coreConfiguration = coreConfiguration;
         }
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
@@ -44,6 +48,9 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
                 throw new InternalLogicException($"Incorrect input type for {nameof(SaveAccountPublicKeyCommand)}");
 
             var userData = _jwtService.GetDataFromJwt<UserProfileData>(requestJwt.Data.Jwt).Data;
+
+            if (!_coreConfiguration.OverwriteFields)
+                userData.Profile = null;
 
             await _recoveryHandler.OnRecoverAsync(userData);
 

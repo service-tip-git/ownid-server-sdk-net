@@ -26,7 +26,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
 
         public async Task<GetAccountInfoResponse<TProfile>> GetUserInfoByUid(string uid)
         {
-            return await GetUserProfile(uid);
+            return await GetUserProfile(uid);    
         }
 
         public async Task<GetAccountInfoResponse<TProfile>> GetUserInfoByToken(string regToken)
