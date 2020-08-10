@@ -264,11 +264,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ownid-server-netcore3-demo-gigya-service
+  name: ownid-server-netcore3-demo-gigya-2-service
   namespace: staging
 spec:
   selector:
-    app: ownid-server-netcore3-demo-gigya
+    app: ownid-server-netcore3-demo-gigya-2
   ports:
     - port: 5005
       targetPort: 5002
