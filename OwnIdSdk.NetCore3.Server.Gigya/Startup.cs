@@ -82,6 +82,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         //for development cases
                         x.IsDevEnvironment = Configuration.GetValue("OwnIdDevelopmentMode", false);
                         x.OwnIdApplicationUrl = new Uri(ownIdSection["web_app_url"] ?? "https://sign.ownid.com");
+                        x.OverwriteFields = ownIdSection.GetValue<bool>("overwrite_fields");
                     });
                 });
 

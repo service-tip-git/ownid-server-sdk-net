@@ -95,6 +95,8 @@ spec:
               value: Dev Client 2 NetCore3 environment
             - name: OWNID__ICON
               value: data:image/x-icon;base64,AAABAAEAEBAQAAAAAAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAACAAACAgAAAAACAAIAAgAAAgIAAwMDAAICAgAD/AAAAAP8AAP//AAAAAP8A/wD/AAD//wD///8AiIiIiIiIiIiIiIiIiIiIiIj//3iIiI94j4iP//eI+HiP9/+Pj/f4+IeHiH+If//4j3f3iPeI+PiPh4j3eH+I+I//////+If4iH+I+I94j3iPh/j4j4h/iIf4f/ePiPiIiP+H93+PiIiPf/iI94+IiI/4+IiP+IiIiIiIiIiIiIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+            - name: OWNID__OVERWRITE_FIELDS
+              value: 'true'
             - name: OWNID__CACHE_TYPE
               value: redis
             - name: OWNID__CACHE_CONFIG
