@@ -32,7 +32,7 @@ RUN dotnet restore ./OwnIdSdk.NetCore3.Server.Gigya/OwnIdSdk.NetCore3.Server.Gig
 RUN dotnet publish ./OwnIdSdk.NetCore3.Server.Gigya/OwnIdSdk.NetCore3.Server.Gigya.csproj -c Release -o out
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1.6-focal
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1.7-alpine3.12
 WORKDIR /app
 #RUN apt-get update && apt-get install -y && apt-get upgrade -y
 COPY --from=build-env /app/out .
