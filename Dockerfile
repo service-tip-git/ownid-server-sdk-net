@@ -22,8 +22,6 @@ WORKDIR /app
 #RUN apt-get update && apt-get install -y && apt-get upgrade -y
 COPY --from=build-env /app/out .
 
-RUN apk update && apk add --upgrade busybox
-
 
 ENV ALLOWEDHOSTS="localhost"
 ENV OWNID__WEB_APP_URL="https://sign.dev.ownid.com"
