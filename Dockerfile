@@ -19,11 +19,10 @@ RUN dotnet publish ./OwnIdSdk.NetCore3.Server.Gigya/OwnIdSdk.NetCore3.Server.Gig
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-alpine
 WORKDIR /app
-#RUN apt-get update && apt-get install -y && apt-get upgrade -y
 COPY --from=build-env /app/out .
 
 
-ENV ALLOWEDHOSTS="localhost"
+#ENV ALLOWEDHOSTS="localhost"
 ENV OWNID__WEB_APP_URL="https://sign.dev.ownid.com"
 ENV OWNID__CALLBACK_URL="https://localhost:5002"
 ENV OWNID__PUB_KEY="./keys/jwtRS256.key.pub"
