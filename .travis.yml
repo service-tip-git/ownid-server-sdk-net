@@ -29,7 +29,7 @@ services:
 
 script:
   - dotnet restore
-  - dotnet test /p:CollectCoverage=true /p:Threshold=20
+  # - dotnet test /p:CollectCoverage=true /p:Threshold=20
   - docker build -t ownid-server-netcore3-gigya:latest . --network=host
 
 before_deploy:
