@@ -24,4 +24,4 @@ docker push $REPOSITORY_URI:$IMAGE_TAG
 echo Updating image in Cluster deployment
 kubectl apply -f manifests/$ENV.yaml
 
-kubectl -n=$ENV set image deployment/ownid-server-netcore3-nestle-deployment ownid-server-netcore3-nestle=$REPOSITORY_URI:$IMAGE_TAG --record
+kubectl -n=$ENV set image deployment/nestle-hipster-deployment nestle-hipster=$REPOSITORY_URI:$IMAGE_TAG --record
