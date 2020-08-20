@@ -121,7 +121,7 @@ namespace OwnIdSdk.NetCore3.Services
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
 
-        public async Task SetPublicKeyAsync(string context, string publicKey)
+        public async Task SetPublicKeyAsync(string context, string publicKey, uint? fido2Counter = null, string fido2UserId = null, string fido2CredentialId = null)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
@@ -132,7 +132,7 @@ namespace OwnIdSdk.NetCore3.Services
                 throw new ArgumentException(
                     $"Can not set public key for FlowType != PartialAuthorize for context '{context}'");
 
-            if (cacheItem.Status != CacheItemStatus.Started)
+            if (cacheItem.Status != CacheItemStatus.Initiated && cacheItem.Status != CacheItemStatus.Started)
                 throw new ArgumentException(
                     $"Incorrect status={cacheItem.Status.ToString()} for setting public key for context '{context}'");
 
@@ -141,6 +141,10 @@ namespace OwnIdSdk.NetCore3.Services
                     $"Can not update actual challenge type from {cacheItem.ChallengeType.ToString()} for setting public key for context '{context}'");
 
             cacheItem.PublicKey = publicKey;
+            cacheItem.Fido2SignatureCounter = fido2Counter;
+            cacheItem.Fido2UserId = fido2UserId;
+            cacheItem.Fido2CredentialId = fido2CredentialId;
+            
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
 

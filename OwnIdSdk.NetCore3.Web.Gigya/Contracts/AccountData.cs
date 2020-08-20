@@ -53,5 +53,20 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts
         // hsh is correct, gigya can not find field hash
         [JsonPropertyName("keyHsh")]
         public string Hash { get; set; }
+
+        /// <summary>
+        ///     Fido2 user id
+        /// </summary>
+        public string Fido2UserId { get; set; }
+
+        /// <summary>
+        ///     Fido2 signature counter
+        /// </summary>
+        public uint? Fido2SignatureCounter { get; set; }
+        
+        /// <summary>
+        ///     Fido2 credential id
+        /// </summary>
+        public string Fido2CredentialId { get; set; }
     }
 }

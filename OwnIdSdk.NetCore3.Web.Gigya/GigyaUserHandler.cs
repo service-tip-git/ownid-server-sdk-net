@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
 using OwnIdSdk.NetCore3.Web.Gigya.ApiClient;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
 
@@ -62,14 +63,36 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             return await OnSuccessLoginAsync(did);
         }
 
+        public async Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2UserId, uint fido2SignCounter)
+        {
+            var user = await _restApiClient.SearchByFido2UserId(fido2UserId);
+            if (user == null)
+                return new LoginResult<object>("Can not find user in Gigya with provided fido2 user id");
+
+            var connectionToUpdate = user.Data.Connections.First(x => x.Fido2UserId == fido2UserId);
+
+            // Update signature counter
+            connectionToUpdate.Fido2SignatureCounter = fido2SignCounter;
+
+            var setAccountResponse = await _restApiClient.SetAccountInfo(user.UID, (TProfile) null, user.Data);
+            if (setAccountResponse.ErrorCode > 0)
+            {
+                throw new Exception(
+                    $"did: {user.UID}{Environment.NewLine}" +
+                    $"Gigya.setAccountInfo for EXISTING user error -> {setAccountResponse.GetFailureMessage()}");
+            }
+
+            return await OnSuccessLoginAsync(user.UID);
+        }
+
         public async Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey)
         {
             var getAccountMessage = await _restApiClient.GetUserInfoByUid(did);
 
             if (getAccountMessage.ErrorCode == 403005)
                 return IdentitiesCheckResult.UserNotFound;
-            
-            if(getAccountMessage.ErrorCode != 0)
+
+            if (getAccountMessage.ErrorCode != 0)
                 throw new Exception(
                     $"Gigya.notifyLogin error -> {getAccountMessage.GetFailureMessage()}");
 
@@ -88,6 +111,25 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             return IdentitiesCheckResult.UserExists;
         }
 
+        public async Task<Fido2Info> FindFido2Info(string fido2UserId)
+        {
+            var user = await _restApiClient.SearchByFido2UserId(fido2UserId);
+            if (user == null)
+                return null;
+
+            var connection = user.Data.Connections.First(c => c.Fido2UserId == fido2UserId);
+
+            if (connection.Fido2SignatureCounter == null)
+                throw new Exception($"connection with fido2 user id '{fido2UserId}' doesn't have signature count");
+
+            return new Fido2Info
+            {
+                PublickKey = connection.PublicKey,
+                SignatureCounter = connection.Fido2SignatureCounter.Value,
+                CredentialId = connection.Fido2CredentialId
+            };
+        }
+
         public async Task CreateProfileAsync(IUserProfileFormContext<TProfile> context)
         {
             var loginResponse = await _restApiClient.NotifyLogin(context.DID);
@@ -103,7 +145,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             {
                 _logger.LogError($"did: {context.DID}{Environment.NewLine}" +
                                  $"Gigya.setAccountInfo (profile) for NEW user error -> {setAccountMessage.GetFailureMessage()}");
-                
+
                 var removeUserResult = await _restApiClient.DeleteAccountAsync(context.DID);
 
                 if (removeUserResult.ErrorCode != 0)

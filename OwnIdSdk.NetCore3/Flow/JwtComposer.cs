@@ -91,7 +91,7 @@ namespace OwnIdSdk.NetCore3.Flow
 
             var data = new Dictionary<string, object>
             {
-                {didKey, didValue}, 
+                {didKey, didValue},
                 {"requestedFields", new object[0]}
             };
 
@@ -100,16 +100,14 @@ namespace OwnIdSdk.NetCore3.Flow
                 var (reqKey, reqValue) = GetRequester();
                 data.Add(reqKey, reqValue);
             }
-            
-            var fields = GetBaseFlowFieldsDictionary(context, nextFrontendBehavior,
-                data, locale);
+
+            var fields = GetBaseFlowFieldsDictionary(context, nextFrontendBehavior, data, locale);
 
             return _jwtService.GenerateDataJwt(fields);
         }
 
         private Dictionary<string, object> GetBaseFlowFieldsDictionary(string context,
-            FrontendBehavior nextFrontendBehavior,
-            object data = null, string locale = null)
+            FrontendBehavior nextFrontendBehavior, object data = null, string locale = null)
         {
             var stepType = nextFrontendBehavior.Type.ToString();
             var actionType = nextFrontendBehavior.ActionType.ToString();
@@ -167,9 +165,9 @@ namespace OwnIdSdk.NetCore3.Flow
                             validators = x.Validators.Select(v => new
                             {
                                 type = v.Type,
-                                errorMessage = 
+                                errorMessage =
                                     v.NeedsInternalLocalization
-                                        ? v.FormatErrorMessage(label, Localize(v.ErrorKey))  
+                                        ? v.FormatErrorMessage(label, Localize(v.ErrorKey))
                                         : v.FormatErrorMessage(label),
                                 parameters = v.Parameters
                             })

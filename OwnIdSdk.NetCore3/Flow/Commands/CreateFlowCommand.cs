@@ -67,9 +67,19 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             await _cacheItemService.CreateAuthFlowSessionItemAsync(challengeContext, nonce, request.Type, flowType,
                 did, payload);
 
-            return new GetChallengeLinkResponse(challengeContext,
-                _urlProvider.GetWebAppSignWithCallbackUrl(_urlProvider.GetStartFlowUrl(challengeContext)).ToString(), 
-                nonce, _coreConfiguration.CacheExpirationTimeout);
+            var startFlowUrl = _urlProvider.GetStartFlowUrl(challengeContext);
+            var destinationUrl = _urlProvider.GetWebAppSignWithCallbackUrl(startFlowUrl);
+
+            if (flowType == FlowType.PartialAuthorize && _coreConfiguration.Fido2.Enabled)
+            {
+                destinationUrl = _urlProvider.GetFido2Url(destinationUrl, request.Type);
+            }
+
+            return new GetChallengeLinkResponse(
+                challengeContext,
+                destinationUrl.ToString(), 
+                nonce, 
+                _coreConfiguration.CacheExpirationTimeout);
         }
     }
 }

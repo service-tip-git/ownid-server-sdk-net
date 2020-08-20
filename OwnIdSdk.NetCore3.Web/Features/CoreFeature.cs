@@ -11,6 +11,7 @@ using OwnIdSdk.NetCore3.Flow;
 using OwnIdSdk.NetCore3.Flow.Commands;
 using OwnIdSdk.NetCore3.Flow.Commands.Approval;
 using OwnIdSdk.NetCore3.Flow.Commands.Authorize;
+using OwnIdSdk.NetCore3.Flow.Commands.Fido2;
 using OwnIdSdk.NetCore3.Flow.Commands.Link;
 using OwnIdSdk.NetCore3.Flow.Commands.Recovery;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
@@ -57,6 +58,17 @@ namespace OwnIdSdk.NetCore3.Web.Features
 
             services.TryAddSingleton<IFlowController, FlowController>();
             services.TryAddSingleton<IFlowRunner, FlowRunner>();
+
+            if (_configuration.Fido2.Enabled)
+            {
+                services.TryAddSingleton<Fido2RegisterCommand>();
+                services.TryAddSingleton<Fido2LoginCommand>();
+                services.AddFido2(fido2Config =>
+                {
+                    var str = _configuration.Fido2.Origin.ToString().TrimEnd(new[] {'/'}).Trim();
+                    fido2Config.Origin = str;
+                });
+            }
         }
 
         public IFeatureConfiguration FillEmptyWithOptional()

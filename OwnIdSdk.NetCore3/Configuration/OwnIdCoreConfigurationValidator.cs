@@ -12,17 +12,13 @@ namespace OwnIdSdk.NetCore3.Configuration
     {
         public ValidateOptionsResult Validate(string name, OwnIdCoreConfiguration options)
         {
-            var callbackResult =
-                ValidateUri(nameof(options.CallbackUrl), options.CallbackUrl, options.IsDevEnvironment);
+            if (!IsUriValid(nameof(options.CallbackUrl), options.CallbackUrl, options.IsDevEnvironment,
+                out var callBackUrlValidationError))
+                return ValidateOptionsResult.Fail(callBackUrlValidationError);
 
-            if (callbackResult != ValidateOptionsResult.Success)
-                return callbackResult;
-
-            var ownIdApplicationUriResult = ValidateUri(nameof(options.OwnIdApplicationUrl),
-                options.OwnIdApplicationUrl, options.IsDevEnvironment);
-
-            if (ownIdApplicationUriResult != ValidateOptionsResult.Success)
-                return ownIdApplicationUriResult;
+            if (!IsUriValid(nameof(options.OwnIdApplicationUrl), options.OwnIdApplicationUrl, options.IsDevEnvironment,
+                out var ownIdAppUrlValidationError))
+                return ValidateOptionsResult.Fail(ownIdAppUrlValidationError);
 
             if (options.JwtSignCredentials == default)
                 return ValidateOptionsResult.Fail($"{nameof(options.JwtSignCredentials)} are required");
@@ -39,27 +35,60 @@ namespace OwnIdSdk.NetCore3.Configuration
                 return ValidateOptionsResult.Fail(
                     $"{nameof(options.JwtExpirationTimeout)} can not be equal to 0");
 
+            // Validate Fido2Url
+            if (options.Fido2.Enabled
+                && !IsUriValid(nameof(options.Fido2.PasswordlessPageUrl), options.Fido2.PasswordlessPageUrl, options.IsDevEnvironment,
+                    out var fido2ValidationError))
+            {
+                return ValidateOptionsResult.Fail(fido2ValidationError);
+            }
+
+            // Validate Fido2Origin
+            if (options.Fido2.Enabled
+                && !IsUriValid(nameof(options.Fido2.Origin), options.Fido2.Origin, options.IsDevEnvironment,
+                    out var fido2OriginValidationError))
+            {
+                return ValidateOptionsResult.Fail(fido2OriginValidationError);
+            }
+
             return options.ProfileConfiguration.Validate();
         }
 
-        private ValidateOptionsResult ValidateUri(string name, Uri value, bool isDevEnvironment)
+        private bool IsUriValid(string name, Uri value, bool isDevEnvironment, out string error)
         {
+            error = null;
+
             if (value == default)
-                return ValidateOptionsResult.Fail($"{name} is required");
+            {
+                error = $"{name} is required";
+                return false;
+            }
 
             if (!value.IsWellFormedOriginalString())
-                return ValidateOptionsResult.Fail($"{name} is not valid url");
+            {
+                error = $"{name} is not valid url";
+                return false;
+            }
 
             if (!isDevEnvironment && value.Scheme != "https")
-                return ValidateOptionsResult.Fail($"{name}: https is required for production use");
+            {
+                error = $"{name}: https is required for production use";
+                return false;
+            }
 
             if (isDevEnvironment && value.Scheme != "https" && value.Scheme != "http")
-                return ValidateOptionsResult.Fail($"{name}: https or http are supported only");
+            {
+                error = $"{name}: https or http are supported only";
+                return false;
+            }
 
             if ((bool) value.Query?.Any())
-                return ValidateOptionsResult.Fail($"{name} should not contain query params");
+            {
+                error = $"{name} should not contain query params";
+                return false;
+            }
 
-            return ValidateOptionsResult.Success;
+            return true;
         }
     }
 }

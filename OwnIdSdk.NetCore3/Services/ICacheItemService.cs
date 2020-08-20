@@ -49,7 +49,7 @@ namespace OwnIdSdk.NetCore3.Services
         /// <exception cref="ArgumentException">Cache item has incorrect status to set resolution</exception>
         Task SetApprovalResolutionAsync(string context, string nonce, bool isApproved);
 
-        Task SetPublicKeyAsync(string context, string publicKey);
+        Task SetPublicKeyAsync(string context, string publicKey, uint? fido2Counter = null, string fido2UserId = null, string fido2CredentialId = null);
 
         /// <summary>
         ///     Try to find auth flow session item by <paramref name="context" /> in <see cref="ICacheStore" /> mark it as finish

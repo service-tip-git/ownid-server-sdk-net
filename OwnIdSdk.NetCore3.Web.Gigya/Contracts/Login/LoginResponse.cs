@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts.Login
 {

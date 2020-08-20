@@ -6,6 +6,7 @@ using OwnIdSdk.NetCore3.Extensibility.Providers;
 using OwnIdSdk.NetCore3.Flow.Commands;
 using OwnIdSdk.NetCore3.Flow.Commands.Approval;
 using OwnIdSdk.NetCore3.Flow.Commands.Authorize;
+using OwnIdSdk.NetCore3.Flow.Commands.Fido2;
 using OwnIdSdk.NetCore3.Flow.Commands.Link;
 using OwnIdSdk.NetCore3.Flow.Commands.Recovery;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
@@ -60,15 +61,35 @@ namespace OwnIdSdk.NetCore3.Flow
             var partialAuthorize = new Dictionary<StepType, IStep>
             {
                 {
-                    StepType.Starting, new Step<StartFlowFlowCommand>(cacheItem =>
+                    StepType.Starting,
+                    new Step<StartFlowFlowCommand>(cacheItem =>
                         new FrontendBehavior(StepType.InstantAuthorize, cacheItem.ChallengeType,
                             new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
                                 "/partial"))))
                 },
                 {
-                    StepType.InstantAuthorize, new Step<SavePartialProfileCommand>(cacheItem => new FrontendBehavior
+                    StepType.InstantAuthorize,
+                    new Step<SavePartialProfileCommand>(cacheItem => new FrontendBehavior
                     {
                         Type = StepType.Success,
+                        ActionType = ActionType.Finish,
+                        ChallengeType = cacheItem.ChallengeType
+                    })
+                },
+                {
+                    StepType.Fido2Register,
+                    new Step<Fido2RegisterCommand>(cacheItem => new FrontendBehavior
+                    {
+                        Type = StepType.Fido2Success,
+                        ActionType = ActionType.Finish,
+                        ChallengeType = cacheItem.ChallengeType
+                    })
+                },
+                {
+                    StepType.Fido2Login,
+                    new Step<Fido2LoginCommand>(cacheItem => new FrontendBehavior
+                    {
+                        Type = StepType.Fido2Success,
                         ActionType = ActionType.Finish,
                         ChallengeType = cacheItem.ChallengeType
                     })

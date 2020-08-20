@@ -72,8 +72,11 @@ namespace OwnIdSdk.NetCore3.Configuration
         public uint MaximumNumberOfConnectedDevices { get; set; }
 
         public uint JwtExpirationTimeout { get; set; }
-        
+
         public bool OverwriteFields { get; set; }
+
+        public IFido2Configuration Fido2 { get; } = new Fido2Configuration();
+
 
         /// <summary>
         ///     Sets <see cref="ProfileConfiguration" /> based on <typeparamref name="TProfile" />

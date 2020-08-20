@@ -59,7 +59,6 @@ namespace OwnIdSdk.NetCore3.Web
             Action<OwnIdConfigurationBuilder> configureAction = null)
         {
             var builder = new OwnIdConfigurationBuilder(services);
-
             builder.UseInMemoryCacheStore();
             configureAction?.Invoke(builder);
             builder.Configuration.Validate();

@@ -51,6 +51,24 @@ namespace OwnIdSdk.NetCore3.Providers
             return deepLink.Uri;
         }
 
+        public Uri GetFido2Url(Uri subUrl, ChallengeType requestType)
+        {
+            var deepLink = new UriBuilder(_coreConfiguration.Fido2.PasswordlessPageUrl);
+            var query = HttpUtility.ParseQueryString(deepLink.Query);
+            switch (requestType)
+            {
+                case ChallengeType.Register:
+                    query["t"] = "r";
+                    break;
+                case ChallengeType.Login:
+                    query["t"] = "l";
+                    break;
+            }
+            query["q"] = $"{subUrl.Authority}{subUrl.PathAndQuery}";
+            deepLink.Query = query.ToString() ?? string.Empty;
+            return deepLink.Uri;
+        }
+
         public Uri GetWebAppConnectionsUrl()
         {
             return new Uri(_coreConfiguration.OwnIdApplicationUrl, "account");

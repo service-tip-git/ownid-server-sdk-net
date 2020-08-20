@@ -72,29 +72,53 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                     }
                 };
 
-            if (cacheItem.Status == CacheItemStatus.Finished)
+            if (cacheItem.Status != CacheItemStatus.Finished) 
+                return result;
+            
+            if (cacheItem.PublicKey == null)
             {
-                if (cacheItem.PublicKey == null)
+                result.Payload = await _userHandlerAdapter.OnSuccessLoginAsync(cacheItem.DID);
+            }
+            else
+            {
+                if (cacheItem.ChallengeType == ChallengeType.Login)
                 {
-                    result.Payload = await _userHandlerAdapter.OnSuccessLoginAsync(cacheItem.DID);
-                }
-                else
-                {
-                    if (cacheItem.ChallengeType == ChallengeType.Login)
+                    if (!string.IsNullOrWhiteSpace(cacheItem.Fido2UserId) && cacheItem.Fido2SignatureCounter.HasValue)
+                    {
+                        result.Payload = await _userHandlerAdapter.OnSuccessLoginByFido2Async(cacheItem.Fido2UserId, cacheItem.Fido2SignatureCounter.Value);
+                    }
+                    else
                     {
                         result.Payload = await _userHandlerAdapter.OnSuccessLoginByPublicKeyAsync(cacheItem.PublicKey);
                     }
-                    else
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(cacheItem.Fido2UserId))
                     {
                         using var sha256 = new SHA256Managed();
                         var hash = Convert.ToBase64String(
                             sha256.ComputeHash(Encoding.UTF8.GetBytes(cacheItem.PublicKey)));
-
+                            
                         result.Payload = new
                         {
                             data = new
                             {
-                                publicKey = cacheItem.PublicKey, hash
+                                pubKey = cacheItem.PublicKey, 
+                                keyHsh = hash,
+                            }
+                        };
+                    }
+                    else
+                    {
+                        result.Payload = new
+                        {
+                            data = new
+                            {
+                                pubKey = cacheItem.PublicKey, 
+                                fido2UserId = cacheItem.Fido2UserId,
+                                fido2SignatureCounter = cacheItem.Fido2SignatureCounter,
+                                fido2CredentialId = cacheItem.Fido2CredentialId
                             }
                         };
                     }
