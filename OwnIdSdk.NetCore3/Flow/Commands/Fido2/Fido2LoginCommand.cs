@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Fido2NetLib;
 using Fido2NetLib.Objects;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
+using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
@@ -22,6 +23,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         private readonly ICacheItemService _cacheItemService;
         private readonly IJwtComposer _jwtComposer;
         private readonly IFlowController _flowController;
+        private readonly IOwnIdCoreConfiguration _configuration;
 
 
         public Fido2LoginCommand(
@@ -29,13 +31,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             IUserHandlerAdapter userHandlerAdapter,
             ICacheItemService cacheItemService,
             IJwtComposer jwtComposer,
-            IFlowController flowController)
+            IFlowController flowController, IOwnIdCoreConfiguration configuration)
         {
             _fido2 = fido2;
             _userHandlerAdapter = userHandlerAdapter;
             _cacheItemService = cacheItemService;
             _jwtComposer = jwtComposer;
             _flowController = flowController;
+            _configuration = configuration;
         }
 
 
@@ -58,7 +61,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             var options = new AssertionOptions
             {
                 Challenge = Encoding.ASCII.GetBytes(relatedItem.Context),
-                RpId = "localhost",
+                RpId = _configuration.Fido2.RelyingPartyId,
             };
 
             var fidoResponse = new AuthenticatorAssertionRawResponse
