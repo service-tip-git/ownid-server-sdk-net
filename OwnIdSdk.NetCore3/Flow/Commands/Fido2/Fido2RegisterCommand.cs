@@ -24,14 +24,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         private readonly IOwnIdCoreConfiguration _configuration;
         private readonly IAccountLinkHandler _linkHandler;
         private readonly IAccountRecoveryHandler _recoveryHandler;
-        
+
         public Fido2RegisterCommand(
             IFido2 fido2,
             ICacheItemService cacheItemService,
             IJwtComposer jwtComposer,
             IFlowController flowController,
             IOwnIdCoreConfiguration configuration,
-            IAccountLinkHandler linkHandler, 
+            IAccountLinkHandler linkHandler,
             IAccountRecoveryHandler recoveryHandler)
         {
             _fido2 = fido2;
@@ -102,6 +102,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                     await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, request.Data.Info.UserId);
                     break;
                 case FlowType.Link:
+                case FlowType.LinkWithPin:
                     await _linkHandler.OnLinkAsync(
                         relatedItem.DID,
                         publicKey,
@@ -113,6 +114,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                     await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, relatedItem.DID);
                     break;
                 case FlowType.Recover:
+                case FlowType.RecoverWithPin:
                     var recoverResult = await _recoveryHandler.RecoverAsync(relatedItem.Payload);
                     await _recoveryHandler.OnRecoverAsync(
                         recoverResult.DID,
@@ -120,7 +122,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                         request.Data.Info.UserId,
                         Base64Url.Encode(result.Result.CredentialId),
                         result.Result.Counter);
-                    
+
                     await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, relatedItem.DID);
                     break;
             }
