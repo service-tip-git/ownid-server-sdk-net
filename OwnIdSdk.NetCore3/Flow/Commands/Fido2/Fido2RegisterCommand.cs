@@ -123,7 +123,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                         Base64Url.Encode(result.Result.CredentialId),
                         result.Result.Counter);
 
-                    await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, relatedItem.DID);
+                    await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, recoverResult.DID);
                     break;
             }
 
