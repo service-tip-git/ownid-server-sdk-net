@@ -78,7 +78,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             if (setAccountResponse.ErrorCode > 0)
             {
                 throw new Exception(
-                    $"did: {user.UID}{Environment.NewLine}" +
+                    $"did: {user.UID} " +
                     $"Gigya.setAccountInfo for EXISTING user error -> {setAccountResponse.GetFailureMessage()}");
             }
 
@@ -143,7 +143,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             if (setAccountMessage.ErrorCode > 0)
             {
-                _logger.LogError($"did: {context.DID}{Environment.NewLine}" +
+                _logger.LogError($"did: {context.DID} " +
                                  $"Gigya.setAccountInfo (profile) for NEW user error -> {setAccountMessage.GetFailureMessage()}");
 
                 var removeUserResult = await _restApiClient.DeleteAccountAsync(context.DID);
@@ -163,7 +163,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             if (setAccountResponse.ErrorCode > 0)
             {
                 _logger.LogError(
-                    $"did: {context.DID}{Environment.NewLine}" +
+                    $"did: {context.DID} " +
                     $"Gigya.setAccountInfo for EXISTING user error -> {setAccountResponse.GetFailureMessage()}");
 
                 SetErrorsToContext(context, setAccountResponse);

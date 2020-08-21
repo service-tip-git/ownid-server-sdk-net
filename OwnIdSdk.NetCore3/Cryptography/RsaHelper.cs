@@ -77,7 +77,6 @@ namespace OwnIdSdk.NetCore3.Cryptography
 
             if (index <= 0 || !EndsWith(line, HeaderSeparator) || line.Length - index != 5)
                 throw new FormatException($"No defining wrappers found '{EndString}'");
-            ;
 
             var type = line.Substring(0, index);
 
