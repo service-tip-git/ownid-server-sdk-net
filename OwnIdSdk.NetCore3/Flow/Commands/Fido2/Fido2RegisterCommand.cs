@@ -6,6 +6,7 @@ using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
@@ -21,19 +22,25 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         private readonly IJwtComposer _jwtComposer;
         private readonly IFlowController _flowController;
         private readonly IOwnIdCoreConfiguration _configuration;
-
+        private readonly IAccountLinkHandler _linkHandler;
+        private readonly IAccountRecoveryHandler _recoveryHandler;
+        
         public Fido2RegisterCommand(
             IFido2 fido2,
             ICacheItemService cacheItemService,
             IJwtComposer jwtComposer,
             IFlowController flowController,
-            IOwnIdCoreConfiguration configuration)
+            IOwnIdCoreConfiguration configuration,
+            IAccountLinkHandler linkHandler, 
+            IAccountRecoveryHandler recoveryHandler)
         {
             _fido2 = fido2;
             _cacheItemService = cacheItemService;
             _jwtComposer = jwtComposer;
             _flowController = flowController;
             _configuration = configuration;
+            _linkHandler = linkHandler;
+            _recoveryHandler = recoveryHandler;
         }
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
@@ -81,15 +88,42 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 
             var publicKey = Base64Url.Encode(result.Result.PublicKey);
 
-            await _cacheItemService.SetPublicKeyAsync(
-                relatedItem.Context,
-                publicKey,
-                result.Result.Counter,
-                request.Data.Info.UserId,
-                Base64Url.Encode(result.Result.CredentialId)
-            );
+            switch (relatedItem.FlowType)
+            {
+                case FlowType.PartialAuthorize:
+                    await _cacheItemService.SetPublicKeyAsync(
+                        relatedItem.Context,
+                        publicKey,
+                        result.Result.Counter,
+                        request.Data.Info.UserId,
+                        Base64Url.Encode(result.Result.CredentialId)
+                    );
 
-            await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, request.Data.Info.UserId);
+                    await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, request.Data.Info.UserId);
+                    break;
+                case FlowType.Link:
+                    await _linkHandler.OnLinkAsync(
+                        relatedItem.DID,
+                        publicKey,
+                        request.Data.Info.UserId,
+                        Base64Url.Encode(result.Result.CredentialId),
+                        result.Result.Counter
+                    );
+
+                    await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, relatedItem.DID);
+                    break;
+                case FlowType.Recover:
+                    var recoverResult = await _recoveryHandler.RecoverAsync(relatedItem.Payload);
+                    await _recoveryHandler.OnRecoverAsync(
+                        recoverResult.DID,
+                        publicKey,
+                        request.Data.Info.UserId,
+                        Base64Url.Encode(result.Result.CredentialId),
+                        result.Result.Counter);
+                    
+                    await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, relatedItem.DID);
+                    break;
+            }
 
             var jwt = _jwtComposer.GenerateBaseStep(
                 relatedItem.Context,

@@ -110,6 +110,15 @@ namespace OwnIdSdk.NetCore3.Flow
                         ActionType = ActionType.Finish,
                         ChallengeType = cacheItem.ChallengeType
                     })
+                },
+                {
+                    StepType.Fido2Register,
+                    new Step<Fido2RegisterCommand>(cacheItem => new FrontendBehavior
+                    {
+                        Type = StepType.Fido2Success,
+                        ActionType = ActionType.Finish,
+                        ChallengeType = cacheItem.ChallengeType
+                    })
                 }
             };
 
@@ -161,6 +170,15 @@ namespace OwnIdSdk.NetCore3.Flow
                     StepType.Recover, new Step<SaveAccountPublicKeyCommand>(cacheItem => new FrontendBehavior
                     {
                         Type = StepType.Success,
+                        ActionType = ActionType.Finish,
+                        ChallengeType = cacheItem.ChallengeType
+                    })
+                },
+                {
+                    StepType.Fido2Register,
+                    new Step<Fido2RegisterCommand>(cacheItem => new FrontendBehavior
+                    {
+                        Type = StepType.Fido2Success,
                         ActionType = ActionType.Finish,
                         ChallengeType = cacheItem.ChallengeType
                     })

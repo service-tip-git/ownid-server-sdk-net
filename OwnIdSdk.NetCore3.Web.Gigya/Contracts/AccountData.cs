@@ -24,9 +24,22 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts
         ///     Constructor
         /// </summary>
         /// <param name="pubKey">public key</param>
-        public AccountData(string pubKey)
+        /// <param name="fido2UserId">FIDO2 user id</param>
+        /// <param name="fido2CredentialId">FIDO2 credential id</param>
+        /// <param name="fido2SignatureCounter">FIDO2 signature counter</param>
+        public AccountData(string pubKey, string fido2UserId = null, string fido2CredentialId = null,
+            uint? fido2SignatureCounter = null)
         {
-            Connections = new List<OwnIdConnection>(1) {new OwnIdConnection {PublicKey = pubKey}};
+            Connections = new List<OwnIdConnection>(1)
+            {
+                new OwnIdConnection
+                {
+                    PublicKey = pubKey,
+                    Fido2UserId = fido2UserId,
+                    Fido2SignatureCounter = fido2SignatureCounter,
+                    Fido2CredentialId = fido2CredentialId
+                }
+            };
         }
 
         /// <summary>
@@ -63,7 +76,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts
         ///     Fido2 signature counter
         /// </summary>
         public uint? Fido2SignatureCounter { get; set; }
-        
+
         /// <summary>
         ///     Fido2 credential id
         /// </summary>

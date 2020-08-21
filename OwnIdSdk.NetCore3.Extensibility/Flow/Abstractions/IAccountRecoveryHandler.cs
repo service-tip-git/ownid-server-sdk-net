@@ -22,10 +22,10 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         /// <summary>
         ///     Operation to be run after successful account recover
         /// </summary>
-        /// <param name="userData">user data</param>
         /// <returns>
-        ///     A task that represents the asynchronous operation.
+        ///     A task that represents the asynchronous recover operation.
         /// </returns>
-        Task OnRecoverAsync(UserProfileData userData);
+        Task OnRecoverAsync(string did, string publicKey, string fido2UserId = null, string fido2CredentialId = null,
+            uint? fido2SignatureCounter = null);
     }
 }

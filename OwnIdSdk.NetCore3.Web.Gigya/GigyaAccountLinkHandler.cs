@@ -71,7 +71,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 throw new Exception("Jwt was created for different apiKey");
 
             var did = token.Subject;
-            
+
             var accountInfo = await _restApiClient.GetUserInfoByUid(did);
 
             if (accountInfo.ErrorCode != 0)
@@ -80,8 +80,9 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             return new LinkState(did, (uint) accountInfo.Data.Connections.Count);
         }
-        
-        public async Task OnLink(string did, string publicKey)
+
+        public async Task OnLinkAsync(string did, string publicKey, string fido2UserId = null,
+            string fido2CredentialId = null, uint? fido2SignatureCounter = null)
         {
             var accountInfo = await _restApiClient.GetUserInfoByUid(did);
 
@@ -93,8 +94,14 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 throw new Exception(
                     $"Gigya.OnLink error -> maximum number ({_ownIdConfiguration.MaximumNumberOfConnectedDevices}) of linked devices reached");
 
-            // add new public key to 
-            accountInfo.Data.Connections.Add(new OwnIdConnection {PublicKey = publicKey});
+            // add new public key to connection 
+            accountInfo.Data.Connections.Add(new OwnIdConnection
+            {
+                PublicKey = publicKey,
+                Fido2UserId = fido2UserId,
+                Fido2SignatureCounter = fido2SignatureCounter,
+                Fido2CredentialId = fido2CredentialId
+            });
 
             var setAccountMessage =
                 await _restApiClient.SetAccountInfo<TProfile>(did, data: accountInfo.Data);

@@ -57,6 +57,8 @@ namespace OwnIdSdk.NetCore3.Providers
             var query = HttpUtility.ParseQueryString(deepLink.Query);
             switch (requestType)
             {
+                case ChallengeType.Link:
+                case ChallengeType.Recover:
                 case ChallengeType.Register:
                     query["t"] = "r";
                     break;
@@ -64,6 +66,7 @@ namespace OwnIdSdk.NetCore3.Providers
                     query["t"] = "l";
                     break;
             }
+
             query["q"] = $"{subUrl.Authority}{subUrl.PathAndQuery}";
             deepLink.Query = query.ToString() ?? string.Empty;
             return deepLink.Uri;

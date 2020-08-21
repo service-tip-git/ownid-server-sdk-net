@@ -52,7 +52,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
             if (!_coreConfiguration.OverwriteFields)
                 userData.Profile = null;
 
-            await _recoveryHandler.OnRecoverAsync(userData);
+            await _recoveryHandler.OnRecoverAsync(userData.DID, userData.PublicKey);
 
             await _cacheItemService.FinishAuthFlowSessionAsync(input.Context, userData.DID);
 
