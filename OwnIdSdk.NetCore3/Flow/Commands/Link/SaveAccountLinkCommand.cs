@@ -51,7 +51,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Link
             // preventing data substitution
             userData.DID = relatedItem.DID;
 
-            await _linkHandler.OnLink(userData.DID, userData.PublicKey);
+            await _linkHandler.OnLinkAsync(userData.DID, userData.PublicKey);
 
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, userData.DID);
             var jwt = _jwtComposer.GenerateFinalStepJwt(relatedItem.Context,

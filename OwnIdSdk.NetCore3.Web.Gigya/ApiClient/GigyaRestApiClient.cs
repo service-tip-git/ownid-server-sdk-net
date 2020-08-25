@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using OwnIdSdk.NetCore3.Extensibility.Json;
@@ -157,6 +156,25 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
                 return null;
 
             return user.UID;
+        }
+        
+        public async Task<UidContainer> SearchByFido2UserId(string fido2UserId)
+        {
+            var parameters = ParametersFactory.CreateAuthParameters(_configuration).AddParameter("query",
+                $"SELECT UID, data.ownIdConnections FROM accounts WHERE data.ownIdConnections.fido2UserId = \"{fido2UserId}\" LIMIT 1");
+            var responseMessage = await _httpClient.PostAsync(
+                new Uri($"https://accounts.{_configuration.DataCenter}/accounts.search"),
+                new FormUrlEncodedContent(parameters));
+
+            var result = await OwnIdSerializer.DeserializeAsync<UidResponse>(
+                await responseMessage.Content.ReadAsStreamAsync());
+
+            var user = result.Results?.FirstOrDefault();
+
+            if (result.ErrorCode != 0 || (user?.Data?.Connections?.All(x => x.Fido2UserId != fido2UserId) ?? true))
+                return null;
+            
+            return user;
         }
 
         private async Task<GetAccountInfoResponse<TProfile>> GetUserProfile(string uid = null, string regToken = null)

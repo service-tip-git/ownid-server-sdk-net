@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt
 {
     /// <summary>

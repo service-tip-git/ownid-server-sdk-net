@@ -18,6 +18,7 @@ branches:
   only:
   - master
   - develop
+  - alpha-rti
 
 dist: bionic
 language: csharp
@@ -29,7 +30,6 @@ services:
 script:
   - dotnet restore
   # - dotnet test /p:CollectCoverage=true /p:Threshold=20
-  - dotnet build
   - docker build -t ownid-server-netcore3-gigya:latest . --network=host
 
 before_deploy:
@@ -57,3 +57,8 @@ deploy:
   skip_cleanup: true
   on:
     branch: master
+- provider: script
+  script: sh scripts/alpha-deploy.sh $REPOSITORY_URI_STAGING $IMAGE_TAG alpha
+  skip_cleanup: true
+  on:
+    branch: alpha-rti

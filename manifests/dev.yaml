@@ -254,6 +254,20 @@ spec:
               value: redis
             - name: OWNID__CACHE_CONFIG
               value: ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:6379
+            - name: OWNID__FIDO2_ENABLED
+              value: 'true'
+            - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
+              value: https://demo2.dev.ownid.com/passwordless
+            - name: OWNID__FIDO2_RELYING_PARTY_ID
+              value: demo2.dev.ownid.com
+            - name: OWNID__FIDO2_RELYING_PARTY_NAME
+              value: OwnID
+            - name: OWNID__FIDO2_USER_DISPLAY_NAME
+              value: Passwordless
+            - name: OWNID__FIDO2_USER_NAME
+              value: Passwordless              
+            - name: OWNID__FIDO2_ORIGIN
+              value: https://demo2.dev.ownid.com
             - name: GIGYA__SECRET
               value: 0Hg/R8a/riSbbPiACeQZNFvg3c7s0f9uMx+BKaliaU8=
             - name: GIGYA__API_KEY

@@ -14,6 +14,10 @@ namespace OwnIdSdk.NetCore3.Flow.Steps
         Authorize,
         InstantAuthorize,
         Link,
-        Recover
+        Recover,
+        
+        Fido2Register,
+        Fido2Login,
+        Fido2Success,
     }
 }
