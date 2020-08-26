@@ -110,9 +110,15 @@ namespace OwnIdSdk.NetCore3.Web.Features
         {
             using var publicKeyReader = File.OpenText(publicKeyPath);
             using var privateKeyReader = File.OpenText(privateKeyPath);
-            _configuration.JwtSignCredentials = RsaHelper.LoadKeys(publicKeyReader, privateKeyReader);
+            WithKeys(publicKeyReader, privateKeyReader);
             return this;
         }
+        
+        public CoreFeature WithKeys(TextReader publicKeyReader, TextReader privateKeyReader)
+        {
+            _configuration.JwtSignCredentials = RsaHelper.LoadKeys(publicKeyReader, privateKeyReader);
+            return this;
+        } 
 
         public CoreFeature WithKeys(RSA rsa)
         {
