@@ -39,49 +39,51 @@ spec:
             - name: OWNID__CACHE_CONFIG
               valueFrom:
                 secretKeyRef:
-                  name: alpha-secrets
+                  name: credential-secrets
                   key: redis_config
             - name: OWNID__PUB_KEY
               valueFrom:
                 secretKeyRef:
-                  name: alpha-secrets
+                  name: credential-secrets
                   key: nestle_pub_key
             - name: OWNID__PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: alpha-secrets
+                  name: credential-secrets
                   key: nestle_private_key
+            - name: GIGYA__DATA_CENTER
+              value: us1.gigya.com
             - name: GIGYA__SECRET
               valueFrom:
                 secretKeyRef:
-                  name: alpha-secrets
+                  name: credential-secrets
                   key: nestle_gigya_secret
             - name: GIGYA__API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: alpha-secrets
+                  name: credential-secrets
                   key: nestle_gigya_api_key
             - name: GIGYA__USER_KEY
               valueFrom:
               secretKeyRef:
-                name: alpha-secrets
+                name: credential-secrets
                 key: nestle_gigya_user_key
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
             - name: ELASTICCONFIGURATION__URI
               valueFrom:
                 secretKeyRef:
-                  name: alpha-secrets
+                  name: credential-secrets
                   key: elastic_uri
             - name: ELASTICCONFIGURATION__USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: alpha-secrets
+                  name: credential-secrets
                   key: elastic_username
             - name: ELASTICCONFIGURATION__PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: alpha-secrets
+                  name: credential-secrets
                   key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: alpha
