@@ -45,9 +45,9 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
             return await _adaptee.CheckUserIdentitiesAsync(did, publicKey);
         }
 
-        public async Task<LoginResult<object>> OnSuccessLoginAsync(string did)
+        public async Task<LoginResult<object>> OnSuccessLoginAsync(string did, string publicKey)
         {
-            return await _adaptee.OnSuccessLoginAsync(did);
+            return await _adaptee.OnSuccessLoginAsync(did, publicKey);
         }
 
         public async Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)

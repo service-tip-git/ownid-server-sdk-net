@@ -84,7 +84,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                     throw new BusinessValidationException(formContext);
             }
             
-            await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, userData.DID);
+            await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, userData.DID, userData.PublicKey);
             var jwt = _jwtComposer.GenerateFinalStepJwt(relatedItem.Context,
                 _flowController.GetExpectedFrontendBehavior(relatedItem, StepType.Authorize), input.CultureInfo?.Name);
 

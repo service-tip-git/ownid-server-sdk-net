@@ -41,7 +41,8 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         ///     <see cref="LoginResult{T}" /> will be sent to OwnId UI SDK and passed to provided in configuration callback
         /// </summary>
         /// <param name="did">User unique identifier</param>
-        Task<LoginResult<object>> OnSuccessLoginAsync(string did);
+        /// <param name="publicKey">User public key</param>
+        Task<LoginResult<object>> OnSuccessLoginAsync(string did, string publicKey);
 
         /// <summary>
         ///     Will be called whenever a user waits for authorization credentials on success login. Data passed to

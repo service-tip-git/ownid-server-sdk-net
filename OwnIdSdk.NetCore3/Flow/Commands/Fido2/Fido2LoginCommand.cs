@@ -93,10 +93,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                     return Task.FromResult(credIdValidationResult);
                 });
 
-            await _cacheItemService.SetPublicKeyAsync(relatedItem.Context, storedFido2Info.PublickKey,
-                result.Counter, request.Data.Info.UserId);
+            await _cacheItemService.SetFido2DataAsync(relatedItem.Context, 
+                storedFido2Info.PublickKey, 
+                result.Counter, 
+                request.Data.Info.UserId);
 
-            await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, request.Data.Info.UserId);
+            await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, 
+                request.Data.Info.UserId, 
+                storedFido2Info.PublickKey);
 
             var jwt = _jwtComposer.GenerateBaseStep(
                 relatedItem.Context, 

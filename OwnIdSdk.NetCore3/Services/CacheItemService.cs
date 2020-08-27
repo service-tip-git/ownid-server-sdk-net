@@ -121,7 +121,7 @@ namespace OwnIdSdk.NetCore3.Services
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
 
-        public async Task SetPublicKeyAsync(string context, string publicKey, uint? fido2Counter = null, string fido2UserId = null, string fido2CredentialId = null)
+        public async Task SetFido2DataAsync(string context, string publicKey, uint? fido2Counter = null, string fido2UserId = null, string fido2CredentialId = null)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
@@ -153,13 +153,14 @@ namespace OwnIdSdk.NetCore3.Services
         /// </summary>
         /// <param name="context">Challenge unique identifier</param>
         /// <param name="did">User unique identifier</param>
+        /// <param name="publicKey">User public key</param>
         /// <exception cref="ArgumentException">
         ///     If no <see cref="CacheItem" /> was found with <paramref name="context" />
         /// </exception>
         /// <exception cref="ArgumentException">
         ///     If you try to finish session with different user DID
         /// </exception>
-        public async Task FinishAuthFlowSessionAsync(string context, string did)
+        public async Task FinishAuthFlowSessionAsync(string context, string did, string publicKey)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
@@ -174,6 +175,7 @@ namespace OwnIdSdk.NetCore3.Services
                     $"Cache item with context='{context}' has final status={cacheItem.Status.ToString()}");
 
             cacheItem.DID = did;
+            cacheItem.PublicKey = publicKey;
             cacheItem.Status = CacheItemStatus.Finished;
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }

@@ -91,15 +91,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             switch (relatedItem.FlowType)
             {
                 case FlowType.PartialAuthorize:
-                    await _cacheItemService.SetPublicKeyAsync(
-                        relatedItem.Context,
+                    await _cacheItemService.SetFido2DataAsync(relatedItem.Context,
                         publicKey,
                         result.Result.Counter,
                         request.Data.Info.UserId,
                         Base64Url.Encode(result.Result.CredentialId)
                     );
 
-                    await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, request.Data.Info.UserId);
+                    await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, request.Data.Info.UserId, publicKey);
                     break;
                 case FlowType.Link:
                 case FlowType.LinkWithPin:
@@ -111,7 +110,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                         result.Result.Counter
                     );
 
-                    await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, relatedItem.DID);
+                    await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, relatedItem.DID, publicKey);
                     break;
                 case FlowType.Recover:
                 case FlowType.RecoverWithPin:
@@ -123,7 +122,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                         Base64Url.Encode(result.Result.CredentialId),
                         result.Result.Counter);
 
-                    await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, recoverResult.DID);
+                    await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, recoverResult.DID, publicKey);
                     break;
             }
 

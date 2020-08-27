@@ -25,7 +25,22 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             _logger = logger;
         }
 
-        public async Task<LoginResult<object>> OnSuccessLoginAsync(string did)
+        public async Task<LoginResult<object>> OnSuccessLoginAsync(string did, string publicKey)
+        {
+            return await OnSuccessLoginByPublicKeyAsync(publicKey);
+        }
+
+        public async Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)
+        {
+            var did = await _restApiClient.SearchForDid(publicKey);
+
+            if (string.IsNullOrEmpty(did))
+                return new LoginResult<object>("Can not find user in Gigya search result with provided public key");
+
+            return await OnSuccessLoginInternalAsync(did);
+        }
+
+        private async Task<LoginResult<object>> OnSuccessLoginInternalAsync(string did)
         {
             if (_configuration.LoginType == GigyaLoginType.Session)
             {
@@ -45,22 +60,11 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             if (jwtResponse.IdToken == null || jwtResponse.ErrorCode != 0)
                 return new LoginResult<object>($"Gigya: {jwtResponse.GetFailureMessage()}");
-
-
+            
             return new LoginResult<object>(new
             {
                 idToken = jwtResponse.IdToken
             });
-        }
-
-        public async Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)
-        {
-            var did = await _restApiClient.SearchForDid(publicKey);
-
-            if (string.IsNullOrEmpty(did))
-                return new LoginResult<object>("Can not find user in Gigya search result with provided public key");
-
-            return await OnSuccessLoginAsync(did);
         }
 
         public async Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2UserId, uint fido2SignCounter)
@@ -82,7 +86,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                     $"Gigya.setAccountInfo for EXISTING user error -> {setAccountResponse.GetFailureMessage()}");
             }
 
-            return await OnSuccessLoginAsync(user.UID);
+            return await OnSuccessLoginInternalAsync(user.UID);
         }
 
         public async Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey)

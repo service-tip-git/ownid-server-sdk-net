@@ -75,9 +75,9 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             if (cacheItem.Status != CacheItemStatus.Finished) 
                 return result;
             
-            if (cacheItem.PublicKey == null)
+            if (cacheItem.FlowType == FlowType.Authorize)
             {
-                result.Payload = await _userHandlerAdapter.OnSuccessLoginAsync(cacheItem.DID);
+                result.Payload = await _userHandlerAdapter.OnSuccessLoginAsync(cacheItem.DID, cacheItem.PublicKey);
             }
             else
             {
