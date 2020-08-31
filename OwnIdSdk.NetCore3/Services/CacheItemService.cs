@@ -121,30 +121,33 @@ namespace OwnIdSdk.NetCore3.Services
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
 
-        public async Task SetFido2DataAsync(string context, string publicKey, uint? fido2Counter = null, string fido2UserId = null, string fido2CredentialId = null)
+        public async Task SetFido2DataAsync(string context, string publicKey, uint? fido2Counter, string fido2UserId,
+            string fido2CredentialId)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
             if (cacheItem == null || cacheItem.Context != context)
                 throw new ArgumentException($"Can not find any item with context '{context}'");
 
-            if (cacheItem.FlowType != FlowType.PartialAuthorize)
+            if (cacheItem.FlowType != FlowType.Fido2PartialLogin
+                && cacheItem.FlowType != FlowType.Fido2PartialRegister
+                && cacheItem.FlowType != FlowType.Fido2LinkWithPin
+                && cacheItem.FlowType != FlowType.Fido2RecoverWithPin
+            )
+            {
                 throw new ArgumentException(
-                    $"Can not set public key for FlowType != PartialAuthorize for context '{context}'");
+                    $"Can not set Fido2 information for the flow not related to Fido2. Current flow: {cacheItem.FlowType} Context: '{context}'");
+            }
 
             if (cacheItem.Status != CacheItemStatus.Initiated && cacheItem.Status != CacheItemStatus.Started)
                 throw new ArgumentException(
                     $"Incorrect status={cacheItem.Status.ToString()} for setting public key for context '{context}'");
 
-            if (cacheItem.ChallengeType != ChallengeType.Register && cacheItem.ChallengeType != ChallengeType.Login)
-                throw new ArgumentException(
-                    $"Can not update actual challenge type from {cacheItem.ChallengeType.ToString()} for setting public key for context '{context}'");
-
             cacheItem.PublicKey = publicKey;
             cacheItem.Fido2SignatureCounter = fido2Counter;
             cacheItem.Fido2UserId = fido2UserId;
             cacheItem.Fido2CredentialId = fido2CredentialId;
-            
+
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
 
@@ -221,6 +224,18 @@ namespace OwnIdSdk.NetCore3.Services
                 throw new InternalLogicException($"No cache item was found with context={context}");
 
             return item;
+        }
+
+        public async Task UpdateFlowAsync(string context, FlowType flowType)
+        {
+            var cacheItem = await _cacheStore.GetAsync(context);
+
+            if (cacheItem == null || cacheItem.Context != context)
+                throw new ArgumentException($"Can not find any item with context '{context}'");
+
+            cacheItem.FlowType = flowType;
+
+            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
     }
 }

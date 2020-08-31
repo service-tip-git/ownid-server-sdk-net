@@ -72,9 +72,9 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                     }
                 };
 
-            if (cacheItem.Status != CacheItemStatus.Finished) 
+            if (cacheItem.Status != CacheItemStatus.Finished)
                 return result;
-            
+
             if (cacheItem.FlowType == FlowType.Authorize)
             {
                 result.Payload = await _userHandlerAdapter.OnSuccessLoginAsync(cacheItem.DID, cacheItem.PublicKey);
@@ -83,28 +83,29 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             {
                 if (cacheItem.ChallengeType == ChallengeType.Login)
                 {
-                    if (!string.IsNullOrWhiteSpace(cacheItem.Fido2UserId) && cacheItem.Fido2SignatureCounter.HasValue)
+                    if (!string.IsNullOrWhiteSpace(cacheItem.Fido2CredentialId) && cacheItem.Fido2SignatureCounter.HasValue)
                     {
-                        result.Payload = await _userHandlerAdapter.OnSuccessLoginByFido2Async(cacheItem.Fido2UserId, cacheItem.Fido2SignatureCounter.Value);
+                        result.Payload = await _userHandlerAdapter.OnSuccessLoginByFido2Async(cacheItem.Fido2CredentialId,
+                            cacheItem.Fido2SignatureCounter.Value);
                     }
                     else
                     {
                         result.Payload = await _userHandlerAdapter.OnSuccessLoginByPublicKeyAsync(cacheItem.PublicKey);
                     }
                 }
-                else
+                else if (cacheItem.ChallengeType == ChallengeType.Register)
                 {
                     if (string.IsNullOrWhiteSpace(cacheItem.Fido2UserId))
                     {
                         using var sha256 = new SHA256Managed();
                         var hash = Convert.ToBase64String(
                             sha256.ComputeHash(Encoding.UTF8.GetBytes(cacheItem.PublicKey)));
-                            
+
                         result.Payload = new
                         {
                             data = new
                             {
-                                pubKey = cacheItem.PublicKey, 
+                                pubKey = cacheItem.PublicKey,
                                 keyHsh = hash,
                             }
                         };
@@ -115,13 +116,24 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                         {
                             data = new
                             {
-                                pubKey = cacheItem.PublicKey, 
+                                pubKey = cacheItem.PublicKey,
                                 fido2UserId = cacheItem.Fido2UserId,
                                 fido2SignatureCounter = cacheItem.Fido2SignatureCounter,
                                 fido2CredentialId = cacheItem.Fido2CredentialId
                             }
                         };
                     }
+                }
+                //
+                // TODO: fix needed at web-ui-sdk to avoid error in console if data is undefined
+                //
+                else if (cacheItem.ChallengeType == ChallengeType.Recover
+                         || cacheItem.ChallengeType == ChallengeType.Link)
+                {
+                    result.Payload = new
+                    {
+                        data = new { }
+                    };
                 }
             }
 

@@ -24,6 +24,6 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
 
         Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2UserId, uint fido2SignCounter);
 
-        Task<Fido2Info> FindFido2Info(string fido2UserId);
+        Task<Fido2Info> FindFido2Info(string fido2CredentialId);
     }
 }

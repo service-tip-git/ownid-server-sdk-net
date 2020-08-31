@@ -60,20 +60,21 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             if (jwtResponse.IdToken == null || jwtResponse.ErrorCode != 0)
                 return new LoginResult<object>($"Gigya: {jwtResponse.GetFailureMessage()}");
-            
+
             return new LoginResult<object>(new
             {
                 idToken = jwtResponse.IdToken
             });
         }
 
-        public async Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2UserId, uint fido2SignCounter)
+        public async Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId,
+            uint fido2SignCounter)
         {
-            var user = await _restApiClient.SearchByFido2UserId(fido2UserId);
+            var user = await _restApiClient.SearchByFido2CredentialId(fido2CredentialId);
             if (user == null)
                 return new LoginResult<object>("Can not find user in Gigya with provided fido2 user id");
 
-            var connectionToUpdate = user.Data.Connections.First(x => x.Fido2UserId == fido2UserId);
+            var connectionToUpdate = user.Data.Connections.First(x => x.Fido2CredentialId == fido2CredentialId);
 
             // Update signature counter
             connectionToUpdate.Fido2SignatureCounter = fido2SignCounter;
@@ -115,22 +116,24 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             return IdentitiesCheckResult.UserExists;
         }
 
-        public async Task<Fido2Info> FindFido2Info(string fido2UserId)
+        public async Task<Fido2Info> FindFido2Info(string fido2CredentialId)
         {
-            var user = await _restApiClient.SearchByFido2UserId(fido2UserId);
+            var user = await _restApiClient.SearchByFido2CredentialId(fido2CredentialId);
             if (user == null)
                 return null;
 
-            var connection = user.Data.Connections.First(c => c.Fido2UserId == fido2UserId);
+            var connection = user.Data.Connections.First(c => c.Fido2CredentialId == fido2CredentialId);
 
             if (connection.Fido2SignatureCounter == null)
-                throw new Exception($"connection with fido2 user id '{fido2UserId}' doesn't have signature count");
+                throw new Exception(
+                    $"connection with fido2 credential id '{fido2CredentialId}' doesn't have signature count");
 
             return new Fido2Info
             {
-                PublickKey = connection.PublicKey,
+                PublicKey = connection.PublicKey,
                 SignatureCounter = connection.Fido2SignatureCounter.Value,
-                CredentialId = connection.Fido2CredentialId
+                CredentialId = connection.Fido2CredentialId,
+                UserId = connection.Fido2UserId
             };
         }
 

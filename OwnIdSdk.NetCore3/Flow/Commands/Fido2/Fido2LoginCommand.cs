@@ -9,6 +9,7 @@ using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
+using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Flow.Adapters;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Flow.Steps;
@@ -24,7 +25,6 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         private readonly IJwtComposer _jwtComposer;
         private readonly IFlowController _flowController;
         private readonly IOwnIdCoreConfiguration _configuration;
-
 
         public Fido2LoginCommand(
             IFido2 fido2,
@@ -44,18 +44,23 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
+            if (!(input is CommandInput<string>))
+                throw new InternalLogicException($"Incorrect input type for {nameof(Fido2LoginCommand)}");
         }
 
         protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
-            if (!(input is CommandInput<Fido2LoginRequest> request))
-                throw new InternalLogicException($"Incorrect input type for {nameof(Fido2LoginCommand)}");
+            var requestInput = input as CommandInput<string>;
+            var request = OwnIdSerializer.Deserialize<Fido2LoginRequest>(requestInput.Data);
 
-            var storedFido2Info = await _userHandlerAdapter.FindFido2Info(request.Data.Info.UserId);
+            request.Info = request.Info;
+
+            var storedFido2Info = await _userHandlerAdapter.FindFido2Info(request.Info.CredentialId);
             if (storedFido2Info == null)
             {
-                throw new InternalLogicException($"Can't find user with fido2 key '{request.Data.Info.UserId}'");
+                throw new InternalLogicException(
+                    $"Can't find user with fido2 CredentialId. (Context: '{relatedItem.Context}')");
             }
 
             var options = new AssertionOptions
@@ -67,14 +72,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             var fidoResponse = new AuthenticatorAssertionRawResponse
             {
                 Extensions = new AuthenticationExtensionsClientOutputs(),
-                Id = Base64Url.Decode(request.Data.Info.CredentialId),
-                RawId = Base64Url.Decode(request.Data.Info.CredentialId),
+                Id = Base64Url.Decode(request.Info.CredentialId),
+                RawId = Base64Url.Decode(request.Info.CredentialId),
                 Response = new AuthenticatorAssertionRawResponse.AssertionResponse
                 {
-                    AuthenticatorData = Base64Url.Decode(request.Data.Info.AuthenticatorData),
-                    ClientDataJson = Base64Url.Decode(request.Data.Info.ClientDataJSON),
-                    Signature = Base64Url.Decode(request.Data.Info.Signature),
-                    UserHandle = Base64Url.Decode(request.Data.Info.UserId)
+                    AuthenticatorData = Base64Url.Decode(request.Info.AuthenticatorData),
+                    ClientDataJson = Base64Url.Decode(request.Info.ClientDataJSON),
+                    Signature = Base64Url.Decode(request.Info.Signature),
+                    UserHandle = Base64Url.Decode(request.Info.UserId)
                 },
                 Type = PublicKeyCredentialType.PublicKey
             };
@@ -82,7 +87,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             var result = await _fido2.MakeAssertionAsync(
                 fidoResponse,
                 options,
-                Base64Url.Decode(storedFido2Info.PublickKey),
+                Base64Url.Decode(storedFido2Info.PublicKey),
                 storedFido2Info.SignatureCounter,
                 (args) =>
                 {
@@ -93,19 +98,20 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                     return Task.FromResult(credIdValidationResult);
                 });
 
-            await _cacheItemService.SetFido2DataAsync(relatedItem.Context, 
-                storedFido2Info.PublickKey, 
-                result.Counter, 
-                request.Data.Info.UserId);
+            await _cacheItemService.SetFido2DataAsync(relatedItem.Context,
+                storedFido2Info.PublicKey,
+                result.Counter,
+                request.Info.UserId,
+                request.Info.CredentialId);
 
-            await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, 
-                request.Data.Info.UserId, 
-                storedFido2Info.PublickKey);
+            await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context,
+                request.Info.UserId,
+                storedFido2Info.PublicKey);
 
             var jwt = _jwtComposer.GenerateBaseStep(
-                relatedItem.Context, 
-                _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType), 
-                request.Data.Info.UserId, 
+                relatedItem.Context,
+                _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                request.Info.UserId,
                 input.CultureInfo?.Name,
                 true);
 

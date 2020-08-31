@@ -48,7 +48,7 @@ namespace OwnIdSdk.NetCore3.Services
         /// <exception cref="ArgumentException">Cache item has incorrect status to set resolution</exception>
         Task SetApprovalResolutionAsync(string context, string nonce, bool isApproved);
 
-        Task SetFido2DataAsync(string context, string publicKey, uint? fido2Counter = null, string fido2UserId = null, string fido2CredentialId = null);
+        Task SetFido2DataAsync(string context, string publicKey, uint? fido2Counter, string fido2UserId, string fido2CredentialId);
 
         /// <summary>
         ///     Try to find auth flow session item by <paramref name="context" /> in <see cref="ICacheStore" /> mark it as finish
@@ -81,5 +81,12 @@ namespace OwnIdSdk.NetCore3.Services
         /// <param name="context">Challenge unique identifier</param>
         /// <returns><see cref="CacheItem" /> or null</returns>
         Task<CacheItem> GetCacheItemByContextAsync(string context);
+
+        /// <summary>
+        ///     Update context flow
+        /// </summary>
+        /// <param name="context">context to update</param>
+        /// <param name="flowType">new <see cref="FlowType"/></param>
+        Task UpdateFlowAsync(string context, FlowType flowType);
     }
 }

@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.AccountRecovery;
-using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 
 namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
 {
