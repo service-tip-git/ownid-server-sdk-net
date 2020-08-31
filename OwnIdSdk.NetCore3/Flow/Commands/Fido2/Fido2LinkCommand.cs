@@ -30,7 +30,6 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             await _linkHandler.OnLinkAsync(
                 relatedItem.DID,
                 publicKey,
-                RegisterRequest.UserId,
                 credentialId,
                 signatureCounter
             );

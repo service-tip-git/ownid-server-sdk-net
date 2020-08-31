@@ -20,7 +20,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         {
             await base.ProcessFido2RegisterResponseAsync(relatedItem, publicKey, signatureCounter, credentialId);
 
-            await CacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, RegisterRequest.UserId, publicKey);
+            await CacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, NewUserId, publicKey);
         }
     }
 }

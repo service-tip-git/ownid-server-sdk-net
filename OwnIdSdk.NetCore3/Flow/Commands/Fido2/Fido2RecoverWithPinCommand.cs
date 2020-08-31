@@ -15,7 +15,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         private readonly ICacheItemService _cacheItemService;
         private readonly IJwtComposer _jwtComposer;
         private readonly IFlowController _flowController;
-        
+
         public Fido2RecoverWithPinCommand(
             IAccountRecoveryHandler recoveryHandler,
             ICacheItemService cacheItemService,
@@ -40,7 +40,6 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             await _recoveryHandler.OnRecoverAsync(
                 recoverResult.DID,
                 relatedItem.PublicKey,
-                relatedItem.Fido2UserId,
                 relatedItem.Fido2CredentialId,
                 relatedItem.Fido2SignatureCounter);
 
@@ -51,7 +50,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             var jwt = _jwtComposer.GenerateBaseStep(
                 relatedItem.Context,
                 _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
-                relatedItem.Fido2UserId,
+                recoverResult.DID,
                 input.CultureInfo?.Name,
                 true);
 

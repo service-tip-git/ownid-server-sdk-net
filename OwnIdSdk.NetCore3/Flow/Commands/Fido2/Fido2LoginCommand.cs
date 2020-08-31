@@ -101,7 +101,6 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             await _cacheItemService.SetFido2DataAsync(relatedItem.Context,
                 storedFido2Info.PublicKey,
                 result.Counter,
-                request.Info.UserId,
                 request.Info.CredentialId);
 
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context,

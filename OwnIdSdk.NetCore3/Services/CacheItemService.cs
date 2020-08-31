@@ -121,7 +121,7 @@ namespace OwnIdSdk.NetCore3.Services
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
 
-        public async Task SetFido2DataAsync(string context, string publicKey, uint? fido2Counter, string fido2UserId,
+        public async Task SetFido2DataAsync(string context, string publicKey, uint fido2Counter,
             string fido2CredentialId)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
@@ -145,7 +145,6 @@ namespace OwnIdSdk.NetCore3.Services
 
             cacheItem.PublicKey = publicKey;
             cacheItem.Fido2SignatureCounter = fido2Counter;
-            cacheItem.Fido2UserId = fido2UserId;
             cacheItem.Fido2CredentialId = fido2CredentialId;
 
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);

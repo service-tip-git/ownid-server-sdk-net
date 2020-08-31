@@ -24,7 +24,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         /// <returns>
         ///     A task that represents the asynchronous recover operation.
         /// </returns>
-        Task OnRecoverAsync(string did, string publicKey, string fido2UserId = null, string fido2CredentialId = null,
+        Task OnRecoverAsync(string did, string publicKey, string fido2CredentialId = null,
             uint? fido2SignatureCounter = null);
     }
 }

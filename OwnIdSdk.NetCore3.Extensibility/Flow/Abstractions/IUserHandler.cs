@@ -55,9 +55,9 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         ///     Will be called whenever a user waits for authorization credentials on success login. Data passed to
         ///     <see cref="LoginResult{T}" /> will be sent to OwnId UI SDK and passed to provided in configuration callback
         /// </summary>
-        /// <param name="fido2UserId">fido2 user id</param>
+        /// <param name="fido2CredentialId">fido2 credential id</param>
         /// <param name="fido2SignCounter">fido2 sign counter</param>
-        Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2UserId, uint fido2SignCounter);
+        Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId, uint fido2SignCounter);
         
         /// <summary>
         /// Will be called to define if user with such did and public key exists.
@@ -71,12 +71,12 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         /// <summary>
         ///     Try find Fido2 public key by fido2 user id
         /// </summary>
-        /// <param name="fido2UserId">fido2 user id</param>
+        /// <param name="fido2CredentialId">fido2 credential id</param>
         /// <returns>
         ///     A task that represents the asynchronous find operation.
         ///     The task result contains fido2 information if user has been found,
         ///     otherwise null
         /// </returns>
-        Task<Fido2Info> FindFido2Info(string fido2UserId);
+        Task<Fido2Info> FindFido2Info(string fido2CredentialId);
     }
 }

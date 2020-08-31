@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using System.Threading.Tasks;
 using Fido2NetLib;
@@ -21,10 +22,9 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         private readonly IJwtComposer _jwtComposer;
         private readonly IFlowController _flowController;
         private readonly IOwnIdCoreConfiguration _configuration;
+        protected string NewUserId { get; } = Guid.NewGuid().ToString("N");
 
-        protected Fido2RegisterRequest.RegisterInfo RegisterRequest { get; private set; }
         protected ICacheItemService CacheItemService { get; }
-
 
         protected BaseFido2RegisterCommand(
             IFido2 fido2,
@@ -43,27 +43,29 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
-            if (!(input is CommandInput<string> requestInput))
+            if (!(input is CommandInput<string>))
                 throw new InternalLogicException($"Incorrect input type for {GetType().Name}");
-
-            var request = OwnIdSerializer.Deserialize<Fido2RegisterRequest>(requestInput.Data);
-
-            RegisterRequest = request.Info;
         }
 
 
         protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
+            var requestInput = input as CommandInput<string>;
+            var request = OwnIdSerializer.Deserialize<Fido2RegisterRequest>(requestInput.Data);
+            
+            if (request == null)
+                throw new InternalLogicException($"Incorrect Fido2 register request");
+
             var fido2Response = new AuthenticatorAttestationRawResponse
             {
-                Id = Base64Url.Decode(RegisterRequest.UserId),
-                RawId = Base64Url.Decode(RegisterRequest.UserId),
+                Id = Base64Url.Decode(NewUserId),
+                RawId = Base64Url.Decode(NewUserId),
                 Type = PublicKeyCredentialType.PublicKey,
                 Response = new AuthenticatorAttestationRawResponse.ResponseData
                 {
-                    AttestationObject = Base64Url.Decode(RegisterRequest.AttestationObject),
-                    ClientDataJson = Base64Url.Decode(RegisterRequest.ClientDataJSON)
+                    AttestationObject = Base64Url.Decode(request.Info.AttestationObject),
+                    ClientDataJson = Base64Url.Decode(request.Info.ClientDataJSON)
                 }
             };
 
@@ -78,7 +80,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 {
                     DisplayName = _configuration.Fido2.UserDisplayName,
                     Name = _configuration.Fido2.UserName,
-                    Id = Base64Url.Decode(RegisterRequest.UserId)
+                    Id = Base64Url.Decode(NewUserId)
                 }
             };
 
@@ -102,7 +104,6 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 relatedItem.Context,
                 publicKey,
                 signatureCounter,
-                RegisterRequest.UserId,
                 credentialId
             );
         }
@@ -113,7 +114,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             var jwt = _jwtComposer.GenerateBaseStep(
                 relatedItem.Context,
                 _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
-                RegisterRequest.UserId,
+                NewUserId,
                 input.CultureInfo?.Name,
                 true);
 

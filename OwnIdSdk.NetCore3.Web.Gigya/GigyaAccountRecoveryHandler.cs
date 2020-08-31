@@ -38,12 +38,12 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             };
         }
 
-        public async Task OnRecoverAsync(string did, string publicKey, string fido2UserId = null,
+        public async Task OnRecoverAsync(string did, string publicKey,
             string fido2CredentialId = null, uint? fido2SignatureCounter = null)
         {
             var responseMessage =
                 await _apiClient.SetAccountInfo<TProfile>(did,
-                    data: new AccountData(publicKey, fido2UserId, fido2CredentialId, fido2SignatureCounter));
+                    data: new AccountData(publicKey, fido2CredentialId, fido2SignatureCounter));
 
             if (responseMessage.ErrorCode != 0)
                 throw new Exception($"Gigya.setAccountInfo error -> {responseMessage.GetFailureMessage()}");

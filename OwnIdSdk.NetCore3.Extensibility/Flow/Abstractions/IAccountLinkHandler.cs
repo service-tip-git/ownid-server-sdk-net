@@ -13,7 +13,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
     {
         Task<LinkState> GetCurrentUserLinkStateAsync(string payload);
 
-        Task OnLinkAsync(string did, string publicKey, string fido2UserId = null, string fido2CredentialId = null,
+        Task OnLinkAsync(string did, string publicKey, string fido2CredentialId = null,
             uint? fido2SignatureCounter = null);
     }
 }

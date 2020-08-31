@@ -81,8 +81,8 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             return new LinkState(did, (uint) accountInfo.Data.Connections.Count);
         }
 
-        public async Task OnLinkAsync(string did, string publicKey, string fido2UserId = null,
-            string fido2CredentialId = null, uint? fido2SignatureCounter = null)
+        public async Task OnLinkAsync(string did, string publicKey, string fido2CredentialId = null,
+            uint? fido2SignatureCounter = null)
         {
             var accountInfo = await _restApiClient.GetUserInfoByUid(did);
 
@@ -98,7 +98,6 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             accountInfo.Data.Connections.Add(new OwnIdConnection
             {
                 PublicKey = publicKey,
-                Fido2UserId = fido2UserId,
                 Fido2SignatureCounter = fido2SignatureCounter,
                 Fido2CredentialId = fido2CredentialId
             });

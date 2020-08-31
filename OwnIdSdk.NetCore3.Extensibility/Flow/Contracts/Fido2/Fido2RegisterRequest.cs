@@ -9,7 +9,6 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2
         
         public class RegisterInfo
         {
-            public string UserId { get; set; }
             public string ClientDataJSON { get; set; }
             public string AttestationObject { get; set; }
         }

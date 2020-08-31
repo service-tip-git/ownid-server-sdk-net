@@ -32,7 +32,6 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             await _recoveryHandler.OnRecoverAsync(
                 recoverResult.DID,
                 publicKey,
-                RegisterRequest.UserId,
                 credentialId,
                 signatureCounter);
 

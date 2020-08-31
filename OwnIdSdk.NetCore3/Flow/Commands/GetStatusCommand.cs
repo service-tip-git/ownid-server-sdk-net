@@ -95,7 +95,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 }
                 else if (cacheItem.ChallengeType == ChallengeType.Register)
                 {
-                    if (string.IsNullOrWhiteSpace(cacheItem.Fido2UserId))
+                    if (string.IsNullOrWhiteSpace(cacheItem.Fido2CredentialId))
                     {
                         using var sha256 = new SHA256Managed();
                         var hash = Convert.ToBase64String(
@@ -117,7 +117,6 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                             data = new
                             {
                                 pubKey = cacheItem.PublicKey,
-                                fido2UserId = cacheItem.Fido2UserId,
                                 fido2SignatureCounter = cacheItem.Fido2SignatureCounter,
                                 fido2CredentialId = cacheItem.Fido2CredentialId
                             }

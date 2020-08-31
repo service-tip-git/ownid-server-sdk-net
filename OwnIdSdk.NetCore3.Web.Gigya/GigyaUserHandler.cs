@@ -132,8 +132,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             {
                 PublicKey = connection.PublicKey,
                 SignatureCounter = connection.Fido2SignatureCounter.Value,
-                CredentialId = connection.Fido2CredentialId,
-                UserId = connection.Fido2UserId
+                CredentialId = connection.Fido2CredentialId
             };
         }
 

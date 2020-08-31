@@ -40,7 +40,6 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             await _linkHandler.OnLinkAsync(
                 relatedItem.DID,
                 relatedItem.PublicKey,
-                relatedItem.Fido2UserId,
                 relatedItem.Fido2CredentialId,
                 relatedItem.Fido2SignatureCounter
             );
@@ -52,7 +51,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             var jwt = _jwtComposer.GenerateBaseStep(
                 relatedItem.Context,
                 _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
-                relatedItem.Fido2UserId,
+                relatedItem.DID,
                 input.CultureInfo?.Name,
                 true);
 
