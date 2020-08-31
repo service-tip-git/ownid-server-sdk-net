@@ -12,7 +12,6 @@ COPY ./OwnIdSdk.NetCore3.Web.Gigya ./OwnIdSdk.NetCore3.Web.Gigya
 COPY ./OwnIdSdk.NetCore3.Server.Gigya ./OwnIdSdk.NetCore3.Server.Gigya
 COPY ./OwnIdSdk.NetCore3.Redis ./OwnIdSdk.NetCore3.Redis
 
-
 RUN dotnet restore ./OwnIdSdk.NetCore3.Server.Gigya/OwnIdSdk.NetCore3.Server.Gigya.csproj
 RUN dotnet publish ./OwnIdSdk.NetCore3.Server.Gigya/OwnIdSdk.NetCore3.Server.Gigya.csproj -c Release -o out
 
