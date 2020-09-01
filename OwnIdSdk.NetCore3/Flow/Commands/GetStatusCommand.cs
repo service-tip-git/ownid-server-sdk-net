@@ -95,6 +95,12 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 }
                 else if (cacheItem.ChallengeType == ChallengeType.Register)
                 {
+                    if (await _userHandlerAdapter.IsUserExists(cacheItem.PublicKey))
+                    {
+                        result.Payload = new LoginResult<object>("User associated with this mobile device already exist");
+                        return result;
+                    }
+                    
                     if (string.IsNullOrWhiteSpace(cacheItem.Fido2CredentialId))
                     {
                         using var sha256 = new SHA256Managed();

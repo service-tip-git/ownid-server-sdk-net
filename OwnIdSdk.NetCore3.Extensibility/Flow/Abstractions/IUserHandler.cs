@@ -67,6 +67,17 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         /// <param name="publicKey">User public key</param>
         /// <returns>Check result <see cref="IdentitiesCheckResult"/></returns>
         Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey);
+
+        /// <summary>
+        ///     Check if user with provided public key already exists
+        /// </summary>
+        /// <param name="publicKey">public key</param>
+        /// <returns>
+        ///     A task that represents the asynchronous check operation.
+        ///     The task result contains true if user with provided public key exists,
+        ///     otherwise false
+        /// </returns>
+        Task<bool> IsUserExists(string publicKey);
         
         /// <summary>
         ///     Try find Fido2 public key by fido2 user id

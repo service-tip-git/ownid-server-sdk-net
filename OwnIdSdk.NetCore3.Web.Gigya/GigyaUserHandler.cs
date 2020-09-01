@@ -116,6 +116,12 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             return IdentitiesCheckResult.UserExists;
         }
 
+        public async Task<bool> IsUserExists(string publicKey)
+        {
+            var did = await _restApiClient.SearchForDid(publicKey);
+            return !string.IsNullOrWhiteSpace(did);
+        }
+
         public async Task<Fido2Info> FindFido2Info(string fido2CredentialId)
         {
             var user = await _restApiClient.SearchByFido2CredentialId(fido2CredentialId);
