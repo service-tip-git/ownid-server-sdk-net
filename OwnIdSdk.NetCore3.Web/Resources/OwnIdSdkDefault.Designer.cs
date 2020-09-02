@@ -86,5 +86,11 @@ namespace OwnIdSdk.NetCore3.Web.Resources {
                 return ResourceManager.GetString("The field {0} must be a string or array type with a maximum length of \'{1}\'", resourceCulture);
             }
         }
+        
+        internal static string Error_PhoneAlreadyConnected {
+            get {
+                return ResourceManager.GetString("Error_PhoneAlreadyConnected", resourceCulture);
+            }
+        }
     }
 }

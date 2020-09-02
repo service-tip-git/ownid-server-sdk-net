@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Services;
 using OwnIdSdk.NetCore3.Flow.Adapters;
 using OwnIdSdk.NetCore3.Services;
 
@@ -14,12 +15,15 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
     public class GetStatusCommand
     {
         private readonly ICacheItemService _cacheItemService;
+        private readonly ILocalizationService _localizationService;
         private readonly IUserHandlerAdapter _userHandlerAdapter;
 
-        public GetStatusCommand(IUserHandlerAdapter userHandlerAdapter, ICacheItemService cacheItemService)
+        public GetStatusCommand(IUserHandlerAdapter userHandlerAdapter, ICacheItemService cacheItemService,
+            ILocalizationService localizationService)
         {
             _userHandlerAdapter = userHandlerAdapter;
             _cacheItemService = cacheItemService;
+            _localizationService = localizationService;
         }
 
         public async Task<List<GetStatusResponse>> ExecuteAsync(List<GetStatusRequest> request)
@@ -81,27 +85,29 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             }
             else
             {
-                if (cacheItem.ChallengeType == ChallengeType.Login)
+                switch (cacheItem.ChallengeType)
                 {
-                    if (!string.IsNullOrWhiteSpace(cacheItem.Fido2CredentialId) && cacheItem.Fido2SignatureCounter.HasValue)
+                    case ChallengeType.Login
+                        when !string.IsNullOrWhiteSpace(cacheItem.Fido2CredentialId)
+                             && cacheItem.Fido2SignatureCounter.HasValue:
                     {
-                        result.Payload = await _userHandlerAdapter.OnSuccessLoginByFido2Async(cacheItem.Fido2CredentialId,
+                        result.Payload = await _userHandlerAdapter.OnSuccessLoginByFido2Async(
+                            cacheItem.Fido2CredentialId,
                             cacheItem.Fido2SignatureCounter.Value);
+                        break;
                     }
-                    else
-                    {
+                    case ChallengeType.Login:
                         result.Payload = await _userHandlerAdapter.OnSuccessLoginByPublicKeyAsync(cacheItem.PublicKey);
-                    }
-                }
-                else if (cacheItem.ChallengeType == ChallengeType.Register)
-                {
-                    if (await _userHandlerAdapter.IsUserExists(cacheItem.PublicKey))
+                        break;
+                    case ChallengeType.Register
+                        when await _userHandlerAdapter.IsUserExists(cacheItem.PublicKey):
                     {
-                        result.Payload = new LoginResult<object>("User associated with this mobile device already exist");
+                        var errorMessage = _localizationService.GetLocalizedString("Error_PhoneAlreadyConnected");
+                        result.Payload = new LoginResult<object>(errorMessage);
                         return result;
                     }
-                    
-                    if (string.IsNullOrWhiteSpace(cacheItem.Fido2CredentialId))
+                    case ChallengeType.Register
+                        when string.IsNullOrWhiteSpace(cacheItem.Fido2CredentialId):
                     {
                         using var sha256 = new SHA256Managed();
                         var hash = Convert.ToBase64String(
@@ -115,9 +121,9 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                                 keyHsh = hash,
                             }
                         };
+                        break;
                     }
-                    else
-                    {
+                    case ChallengeType.Register:
                         result.Payload = new
                         {
                             data = new
@@ -127,18 +133,17 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                                 fido2CredentialId = cacheItem.Fido2CredentialId
                             }
                         };
-                    }
-                }
-                //
-                // TODO: fix needed at web-ui-sdk to avoid error in console if data is undefined
-                //
-                else if (cacheItem.ChallengeType == ChallengeType.Recover
-                         || cacheItem.ChallengeType == ChallengeType.Link)
-                {
-                    result.Payload = new
-                    {
-                        data = new { }
-                    };
+                        break;
+                    //
+                    // TODO: fix needed at web-ui-sdk to avoid error in console if data is undefined
+                    //
+                    case ChallengeType.Recover:
+                    case ChallengeType.Link:
+                        result.Payload = new
+                        {
+                            data = new { }
+                        };
+                        break;
                 }
             }
 
