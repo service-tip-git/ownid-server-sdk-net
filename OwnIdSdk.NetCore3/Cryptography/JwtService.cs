@@ -37,7 +37,7 @@ namespace OwnIdSdk.NetCore3.Cryptography
             var options = OwnIdSerializer.GetDefaultProperties();
             options.PropertyNamingPolicy = null;
             var data = OwnIdSerializer.Deserialize<TData>(token.Payload["data"].ToString(), options);
-            
+
             using var sr = new StringReader(data.PublicKey);
             var rsaSecurityKey = new RsaSecurityKey(RsaHelper.LoadKeys(sr));
 
@@ -67,13 +67,13 @@ namespace OwnIdSdk.NetCore3.Cryptography
             return (token.Id, data);
         }
 
-        public string GenerateDataJwt(Dictionary<string, object> data)
+        public string GenerateDataJwt(Dictionary<string, object> data, DateTime? issuedAt)
         {
             var rsaSecurityKey = new RsaSecurityKey(_ownIdCoreConfiguration.JwtSignCredentials);
             var tokenHandler = new JwtSecurityTokenHandler();
 
-            //TODO: should be received from the user's phone
-            var issuedAt = DateTime.UtcNow.Add(TimeSpan.FromHours(-1));
+            issuedAt ??= DateTime.UtcNow.Add(TimeSpan.FromHours(-1));
+
             var notBefore = issuedAt;
             var expires = DateTime.UtcNow.Add(TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.JwtExpirationTimeout));
 

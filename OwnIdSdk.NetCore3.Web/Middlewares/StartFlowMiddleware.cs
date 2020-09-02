@@ -29,8 +29,9 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             using var requestBodyStreamReader = new StreamReader(httpContext.Request.Body);
             var requestBody = await requestBodyStreamReader.ReadToEndAsync();
 
-            var commandInput = new CommandInput<string>(RequestIdentity, GetRequestCulture(httpContext), requestBody);
-            
+            var commandInput = new CommandInput<string>(RequestIdentity, GetRequestCulture(httpContext), requestBody,
+                ClientDate);
+
             var commandResult = await _flowRunner.RunAsync(commandInput, StepType.Starting);
 
             await Json(httpContext, commandResult, StatusCodes.Status200OK);

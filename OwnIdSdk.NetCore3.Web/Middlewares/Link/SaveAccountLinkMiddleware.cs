@@ -25,7 +25,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Link
         {
             var jwtContainer = await GetRequestJwtContainerAsync(httpContext);
             var result = await _flowRunner.RunAsync(
-                new CommandInput<JwtContainer>(RequestIdentity, GetRequestCulture(httpContext), jwtContainer),
+                new CommandInput<JwtContainer>(RequestIdentity, GetRequestCulture(httpContext), jwtContainer, ClientDate),
                 StepType.Link);
 
             await Json(httpContext, result, StatusCodes.Status200OK);

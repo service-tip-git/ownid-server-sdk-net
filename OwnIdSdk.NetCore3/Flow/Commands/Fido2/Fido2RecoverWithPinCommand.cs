@@ -49,10 +49,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 
             var jwt = _jwtComposer.GenerateBaseStep(
                 relatedItem.Context,
-                _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
-                recoverResult.DID,
-                input.CultureInfo?.Name,
-                true);
+                input.ClientDate, _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                recoverResult.DID, input.CultureInfo?.Name, true);
 
             return new JwtContainer(jwt);
         }

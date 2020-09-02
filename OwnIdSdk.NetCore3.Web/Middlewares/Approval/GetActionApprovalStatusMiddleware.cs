@@ -22,7 +22,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Approval
 
         protected override async Task Execute(HttpContext httpContext)
         {
-            var result = await _flowRunner.RunAsync(new CommandInput(RequestIdentity, GetRequestCulture(httpContext)),
+            var result = await _flowRunner.RunAsync(
+                new CommandInput(RequestIdentity, GetRequestCulture(httpContext), ClientDate),
                 StepType.ApprovePin);
 
             await Json(httpContext, result, StatusCodes.Status200OK);

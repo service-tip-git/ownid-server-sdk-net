@@ -73,8 +73,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Approval
             else if (relatedItem.Status == CacheItemStatus.Declined)
             {
                 jwt = _jwtComposer.GenerateFinalStepJwt(relatedItem.Context,
-                    _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType), input.CultureInfo?.Name
-                );
+                    input.ClientDate, _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                    input.CultureInfo?.Name);
             }
 
             return new GetApprovalStatusResponse(jwt, relatedItem.Status);
