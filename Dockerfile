@@ -37,6 +37,7 @@ ENV ELASTICCONFIGURATION__ENABLED="false"
 ENV ASPNETCORE_ENVIRONMENT="dev"
 
 #RUN rm -rf /usr/bin/wget
+RUN apk -U upgrade
 RUN apk add --upgrade busybox
 RUN rm -f /var/cache/apk/*
 ENTRYPOINT ["dotnet", "OwnIdSdk.NetCore3.Server.Gigya.dll"]
