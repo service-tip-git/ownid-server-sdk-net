@@ -96,8 +96,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                             cacheItem.Fido2SignatureCounter.Value);
                         break;
                     }
-                    case ChallengeType.Login:
+                    case ChallengeType.Login
+                        when await _userHandlerAdapter.IsUserExists(cacheItem.PublicKey):
+                    {
                         result.Payload = await _userHandlerAdapter.OnSuccessLoginByPublicKeyAsync(cacheItem.PublicKey);
+                        break;
+                    }
+                    case ChallengeType.Login:
+                        result.Payload = SetPartialRegisterResult(cacheItem.PublicKey);
                         break;
                     case ChallengeType.Register
                         when await _userHandlerAdapter.IsUserExists(cacheItem.PublicKey):
@@ -109,18 +115,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                     case ChallengeType.Register
                         when string.IsNullOrWhiteSpace(cacheItem.Fido2CredentialId):
                     {
-                        using var sha256 = new SHA256Managed();
-                        var hash = Convert.ToBase64String(
-                            sha256.ComputeHash(Encoding.UTF8.GetBytes(cacheItem.PublicKey)));
-
-                        result.Payload = new
-                        {
-                            data = new
-                            {
-                                pubKey = cacheItem.PublicKey,
-                                keyHsh = hash,
-                            }
-                        };
+                        result.Payload = SetPartialRegisterResult(cacheItem.PublicKey);
                         break;
                     }
                     case ChallengeType.Register:
@@ -148,6 +143,22 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             }
 
             return result;
+        }
+
+        private object SetPartialRegisterResult(string publicKey)
+        {
+            using var sha256 = new SHA256Managed();
+            var hash = Convert.ToBase64String(
+                sha256.ComputeHash(Encoding.UTF8.GetBytes(publicKey)));
+            
+            return new
+            {
+                data = new
+                {
+                    pubKey = publicKey,
+                    keyHsh = hash,
+                }
+            };
         }
     }
 }
