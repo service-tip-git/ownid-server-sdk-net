@@ -36,6 +36,8 @@ ENV OWNID__CACHE_CONFIG="ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:637
 ENV ELASTICCONFIGURATION__ENABLED="false"
 ENV ASPNETCORE_ENVIRONMENT="dev"
 
+RUN rm -rf /usr/bin/wget
+
 ENTRYPOINT ["dotnet", "OwnIdSdk.NetCore3.Server.Gigya.dll"]
 
 # docker build -t ownid-server-netcore3-gigya:latest .
