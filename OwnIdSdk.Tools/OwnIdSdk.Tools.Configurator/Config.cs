@@ -33,6 +33,27 @@ namespace OwnIdSdk.Tools.Configurator
         
         [JsonPropertyName("did")]
         public string DID { get; set; }
+        
+        [JsonPropertyName("fido2_enabled")]
+        public bool Fido2Enabled { get; set; }
+        
+        [JsonPropertyName("fido2_origin")]
+        public string Fido2Origin { get; set; }
+        
+        [JsonPropertyName("fido2_passwordless_page_url")]
+        public string Fido2PasswordlessPageUrl { get; set; }
+        
+        [JsonPropertyName("fido2_relying_party_id")]
+        public string Fido2RelyingPartyId { get; set; }
+        
+        [JsonPropertyName("fido2_relying_party_name")]
+        public string Fido2RelyingPartyName { get; set; }
+        
+        [JsonPropertyName("fido2_user_display_name")]
+        public string Fido2UserDisplayName { get; set; }
+        
+        [JsonPropertyName("fido2_user_name")]
+        public string Fido2UserName { get; set; }
     }
 
     public class GigyaConfig
