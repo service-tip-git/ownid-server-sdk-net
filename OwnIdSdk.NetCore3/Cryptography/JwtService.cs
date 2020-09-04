@@ -72,12 +72,14 @@ namespace OwnIdSdk.NetCore3.Cryptography
             var rsaSecurityKey = new RsaSecurityKey(_ownIdCoreConfiguration.JwtSignCredentials);
             var tokenHandler = new JwtSecurityTokenHandler();
 
+            var expires = issuedAt?.Add(TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.JwtExpirationTimeout))
+                          ?? DateTime.UtcNow.Add(
+                              TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.JwtExpirationTimeout));
+
             issuedAt ??= DateTime.UtcNow.Add(TimeSpan.FromHours(-1));
 
-            var notBefore = issuedAt;
-            var expires = DateTime.UtcNow.Add(TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.JwtExpirationTimeout));
 
-            var payload = new JwtPayload(null, null, null, notBefore, expires, issuedAt);
+            var payload = new JwtPayload(null, null, null, notBefore: issuedAt, expires, issuedAt);
 
             foreach (var (key, value) in data) payload.Add(key, value);
 
