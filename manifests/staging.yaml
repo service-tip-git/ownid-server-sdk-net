@@ -490,19 +490,19 @@ spec:
               value: us1.gigya.com
             - name: GIGYA__SECRET
               valueFrom:
-              secretKeyRef:
-                name: credential-secrets
-                key: gigya_nestle_secret
+                secretKeyRef:
+                  name: credential-secrets
+                  key: gigya_nestle_secret
             - name: GIGYA__API_KEY
               valueFrom:
-              secretKeyRef:
-                name: credential-secrets
-                key: gigya_nestle_secret
+                secretKeyRef:
+                  name: credential-secrets
+                  key: gigya_nestle_secret
             - name: GIGYA__USER_KEY
               valueFrom:
-              secretKeyRef:
-                name: credential-secrets
-                key: gigya_nestle_user_key
+                secretKeyRef:
+                  name: credential-secrets
+                  key: gigya_nestle_user_key
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
             - name: ELASTICCONFIGURATION__URI
