@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
@@ -95,9 +96,24 @@ namespace OwnIdSdk.NetCore3.Web.Configuration
         /// </summary>
         /// <param name="publicKeyPath">Path to public key file</param>
         /// <param name="privateKeyPath">Path to private key file</param>
-        public void SetKeys([NotNull] string publicKeyPath, [NotNull] string privateKeyPath)
+        public void SetKeysFromFiles([NotNull] string publicKeyPath, [NotNull] string privateKeyPath)
         {
             WithFeature<CoreFeature>(x => x.WithKeys(publicKeyPath, privateKeyPath));
+        }
+
+        /// <summary>
+        ///     Sets RSA keys for JWT signing and site / organization identification from strings
+        /// </summary>
+        /// <param name="publicKey">Path to public key file</param>
+        /// <param name="privateKey">Path to private key file</param>
+        public void SetKeys([NotNull] string publicKey, [NotNull] string privateKey)
+        {
+            WithFeature<CoreFeature>(x =>
+            {
+                using var publicKeyReader = new StringReader(publicKey);
+                using var privateKeyReader = new StringReader(privateKey);
+                return x.WithKeys(publicKeyReader, privateKeyReader);
+            });
         }
 
         /// <summary>

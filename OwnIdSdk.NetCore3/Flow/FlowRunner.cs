@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Flow.Commands;
-using OwnIdSdk.NetCore3.Flow.Commands.Fido2;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Flow.Steps;
 using OwnIdSdk.NetCore3.Services;
@@ -32,11 +31,7 @@ namespace OwnIdSdk.NetCore3.Flow
             if (!(_serviceProvider.GetService(commandType) is BaseFlowCommand command))
                 throw new InternalLogicException("Can not inject command");
 
-            return await command.ExecuteAsync(input, item, currentStep,
-                commandType != typeof(StartFlowFlowCommand)
-                && commandType != typeof(Fido2RegisterCommand)
-                && commandType != typeof(Fido2LoginCommand)
-            );
+            return await command.ExecuteAsync(input, item, currentStep, commandType != typeof(StartFlowCommand));
         }
     }
 }

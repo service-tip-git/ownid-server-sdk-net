@@ -37,15 +37,54 @@ spec:
             - name: OWNID__CACHE_TYPE
               value: redis
             - name: OWNID__CACHE_CONFIG
-              value: ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:6379
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: redis_config
+            - name: OWNID__PUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: nestle_pub_key
+            - name: OWNID__PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: nestle_private_key
+            - name: GIGYA__DATA_CENTER
+              value: us1.gigya.com
             - name: GIGYA__SECRET
-              value: hGRrZWXcvTFhSDYHp/UHDPyMPnmS/brW
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: nestle_gigya_secret
             - name: GIGYA__API_KEY
-              value: 3_wK1v-4ifs4Ln7Gwbv9ezE0RDvTtqvssODDP7XSQCWU_c2fjv48fO0qQmKrlaoByC
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: nestle_gigya_api_key
             - name: GIGYA__USER_KEY
-              value: AJ1iGVCQOk4f
+              valueFrom:
+              secretKeyRef:
+                name: credential-secrets
+                key: nestle_gigya_user_key
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
+            - name: ELASTICCONFIGURATION__URI
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_uri
+            - name: ELASTICCONFIGURATION__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_username
+            - name: ELASTICCONFIGURATION__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: alpha
 ---

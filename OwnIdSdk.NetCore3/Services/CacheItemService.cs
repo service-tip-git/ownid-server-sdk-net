@@ -121,30 +121,32 @@ namespace OwnIdSdk.NetCore3.Services
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
 
-        public async Task SetPublicKeyAsync(string context, string publicKey, uint? fido2Counter = null, string fido2UserId = null, string fido2CredentialId = null)
+        public async Task SetFido2DataAsync(string context, string publicKey, uint fido2Counter,
+            string fido2CredentialId)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
             if (cacheItem == null || cacheItem.Context != context)
                 throw new ArgumentException($"Can not find any item with context '{context}'");
 
-            if (cacheItem.FlowType != FlowType.PartialAuthorize)
+            if (cacheItem.FlowType != FlowType.Fido2PartialLogin
+                && cacheItem.FlowType != FlowType.Fido2PartialRegister
+                && cacheItem.FlowType != FlowType.Fido2LinkWithPin
+                && cacheItem.FlowType != FlowType.Fido2RecoverWithPin
+            )
+            {
                 throw new ArgumentException(
-                    $"Can not set public key for FlowType != PartialAuthorize for context '{context}'");
+                    $"Can not set Fido2 information for the flow not related to Fido2. Current flow: {cacheItem.FlowType} Context: '{context}'");
+            }
 
             if (cacheItem.Status != CacheItemStatus.Initiated && cacheItem.Status != CacheItemStatus.Started)
                 throw new ArgumentException(
                     $"Incorrect status={cacheItem.Status.ToString()} for setting public key for context '{context}'");
 
-            if (cacheItem.ChallengeType != ChallengeType.Register && cacheItem.ChallengeType != ChallengeType.Login)
-                throw new ArgumentException(
-                    $"Can not update actual challenge type from {cacheItem.ChallengeType.ToString()} for setting public key for context '{context}'");
-
             cacheItem.PublicKey = publicKey;
             cacheItem.Fido2SignatureCounter = fido2Counter;
-            cacheItem.Fido2UserId = fido2UserId;
             cacheItem.Fido2CredentialId = fido2CredentialId;
-            
+
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
 
@@ -153,13 +155,14 @@ namespace OwnIdSdk.NetCore3.Services
         /// </summary>
         /// <param name="context">Challenge unique identifier</param>
         /// <param name="did">User unique identifier</param>
+        /// <param name="publicKey">User public key</param>
         /// <exception cref="ArgumentException">
         ///     If no <see cref="CacheItem" /> was found with <paramref name="context" />
         /// </exception>
         /// <exception cref="ArgumentException">
         ///     If you try to finish session with different user DID
         /// </exception>
-        public async Task FinishAuthFlowSessionAsync(string context, string did)
+        public async Task FinishAuthFlowSessionAsync(string context, string did, string publicKey)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
@@ -174,6 +177,7 @@ namespace OwnIdSdk.NetCore3.Services
                     $"Cache item with context='{context}' has final status={cacheItem.Status.ToString()}");
 
             cacheItem.DID = did;
+            cacheItem.PublicKey = publicKey;
             cacheItem.Status = CacheItemStatus.Finished;
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
@@ -219,6 +223,18 @@ namespace OwnIdSdk.NetCore3.Services
                 throw new InternalLogicException($"No cache item was found with context={context}");
 
             return item;
+        }
+
+        public async Task UpdateFlowAsync(string context, FlowType flowType)
+        {
+            var cacheItem = await _cacheStore.GetAsync(context);
+
+            if (cacheItem == null || cacheItem.Context != context)
+                throw new ArgumentException($"Can not find any item with context '{context}'");
+
+            cacheItem.FlowType = flowType;
+
+            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
     }
 }

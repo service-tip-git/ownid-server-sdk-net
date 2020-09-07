@@ -37,13 +37,49 @@ spec:
             - name: OWNID__CACHE_TYPE
               value: redis
             - name: OWNID__CACHE_CONFIG
-              value: ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:6379
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: redis_config
+            - name: OWNID__PUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client1_pub_key
+            - name: OWNID__PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client1_private_key
+            - name: GIGYA__DATA_CENTER
+              value: us1.gigya.com
             - name: GIGYA__SECRET
-              value: 0Hg/R8a/riSbbPiACeQZNFvg3c7s0f9uMx+BKaliaU8=
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client1_gigya_secret
             - name: GIGYA__API_KEY
-              value: 3_dEHMimJM2kxcz8gaoI1Sss9kohyJ6LP17qDYd2UIlUfNowsPglEUANJX7R812-uh
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client1_gigya_api_key
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
+            - name: ELASTICCONFIGURATION__URI
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_uri
+            - name: ELASTICCONFIGURATION__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_username
+            - name: ELASTICCONFIGURATION__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: staging
 ---
@@ -100,13 +136,49 @@ spec:
             - name: OWNID__CACHE_TYPE
               value: redis
             - name: OWNID__CACHE_CONFIG
-              value: ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:6379
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: redis_config
+            - name: OWNID__PUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client2_pub_key
+            - name: OWNID__PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client2_private_key
+            - name: GIGYA__DATA_CENTER
+              value: us1.gigya.com
             - name: GIGYA__SECRET
-              value: 0Hg/R8a/riSbbPiACeQZNFvg3c7s0f9uMx+BKaliaU8=
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client2_gigya_secret
             - name: GIGYA__API_KEY
-              value: 3_DS2fdSlSzClFXUfkKHaxJq9-Zknssg2UHamCntjp2jRcL74a_x5HbhDxvHZ6a4q2
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client2_gigya_api_key
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
+            - name: ELASTICCONFIGURATION__URI
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_uri
+            - name: ELASTICCONFIGURATION__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_username
+            - name: ELASTICCONFIGURATION__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: staging
 ---
@@ -192,13 +264,49 @@ spec:
             - name: OWNID__CACHE_TYPE
               value: redis
             - name: OWNID__CACHE_CONFIG
-              value: ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:6379
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: redis_config
+            - name: OWNID__PUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo_pub_key
+            - name: OWNID__PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo_private_key
+            - name: GIGYA__DATA_CENTER
+              value: us1.gigya.com
             - name: GIGYA__SECRET
-              value: 0Hg/R8a/riSbbPiACeQZNFvg3c7s0f9uMx+BKaliaU8=
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo_gigya_secret
             - name: GIGYA__API_KEY
-              value: 3_O4QE0Kk7QstG4VGDPED5omrr8mgbTuf_Gim8V_Y19YDP75m_msuGtNGQz89X0KWP
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo_gigya_api_key
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
+            - name: ELASTICCONFIGURATION__URI
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_uri
+            - name: ELASTICCONFIGURATION__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_username
+            - name: ELASTICCONFIGURATION__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: staging
 ---
@@ -253,7 +361,20 @@ spec:
             - name: OWNID__CACHE_TYPE
               value: redis
             - name: OWNID__CACHE_CONFIG
-              value: ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:6379
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: redis_config
+            - name: OWNID__PUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo2_pub_key
+            - name: OWNID__PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo2_private_key
             - name: OWNID__FIDO2_ENABLED
               value: 'true'
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
@@ -268,12 +389,35 @@ spec:
               value: Passwordless
             - name: OWNID__FIDO2_ORIGIN
               value: https://demo2.ownid.com
+            - name: GIGYA__DATA_CENTER
+              value: us1.gigya.com
             - name: GIGYA__SECRET
-              value: 0Hg/R8a/riSbbPiACeQZNFvg3c7s0f9uMx+BKaliaU8=
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo2_gigya_secret
             - name: GIGYA__API_KEY
-              value: 3_uQMbdn-ceccHKTdOmcCqrTDsGq3e7anDWcAxm2g4jFdE63dTpv1S8NCKy_sf_eEA
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo2_gigya_api_key
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
+            - name: ELASTICCONFIGURATION__URI
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_uri
+            - name: ELASTICCONFIGURATION__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_username
+            - name: ELASTICCONFIGURATION__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: staging
 ---
@@ -328,15 +472,54 @@ spec:
             - name: OWNID__CACHE_TYPE
               value: redis
             - name: OWNID__CACHE_CONFIG
-              value: ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:6379
+              valueFrom:
+                secretKeyRef:
+                  name: alpha-secrets
+                  key: redis_config
+            - name: OWNID__PUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: alpha-secrets
+                  key: nestle_pub_key
+            - name: OWNID__PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: alpha-secrets
+                  key: nestle_private_key
+            - name: GIGYA__DATA_CENTER
+              value: us1.gigya.com
             - name: GIGYA__SECRET
-              value: hGRrZWXcvTFhSDYHp/UHDPyMPnmS/brW
+              valueFrom:
+              secretKeyRef:
+                name: credential-secrets
+                key: gigya_nestle_secret
             - name: GIGYA__API_KEY
-              value: 3_wK1v-4ifs4Ln7Gwbv9ezE0RDvTtqvssODDP7XSQCWU_c2fjv48fO0qQmKrlaoByC
+              valueFrom:
+              secretKeyRef:
+                name: credential-secrets
+                key: gigya_nestle_secret
             - name: GIGYA__USER_KEY
-              value: AJ1iGVCQOk4f
+              valueFrom:
+              secretKeyRef:
+                name: credential-secrets
+                key: gigya_nestle_user_key
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
+            - name: ELASTICCONFIGURATION__URI
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_uri
+            - name: ELASTICCONFIGURATION__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_username
+            - name: ELASTICCONFIGURATION__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: staging
 ---

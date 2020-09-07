@@ -13,7 +13,6 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2
             public string AuthenticatorData { get; set; }
             public string ClientDataJSON { get; set; }
             public string Signature { get; set; }
-            public string UserId { get; set; }
         }
     }
 }

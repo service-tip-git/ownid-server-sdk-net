@@ -30,12 +30,30 @@ namespace OwnIdSdk.Tools.Configurator
             var icon = ReadValue("Icon (url or base64)", isRequired: true);
             var callbackUrl = ReadValue("Callback Url (net core SDK address)", "https://localhost:5002/ownid");
             var overwriteFields = ReadValue("Overwrite fields", "n", possibleValues: new []{"y", "n"});
+
+            var enableFido2 = ReadValue("Enable FIDO2?", "y", possibleValues: new[] {"y", "n"}) == "y";
+            string fido2passwordlessPageUrl = null,
+                fido2Origin = null,
+                fido2RelyingPartyId = null,
+                fido2RelyingPartyName = null,
+                fido2UserDisplayName = null,
+                fido2UserName = null;
             
-            var gigyaDataCenter = ReadValue("GIGYA - Data Center", "us1.gigya.com");
-            var gigyaApiKey = ReadValue("GIGYA - Api Key", isRequired: true);
-            var gigyaSecret = ReadValue("GIGYA - Secret");
-            var gigyaUserKey = ReadValue("GIGYA - User Key");
-            var loginType = ReadValue("GIGYA - login type", "session",
+            if (enableFido2)
+            {
+                fido2passwordlessPageUrl = ReadValue("FIDO2 -> Passwordless Page Url", isRequired: true);
+                fido2Origin = ReadValue("FIDO2 -> Origin", isRequired: true);
+                fido2RelyingPartyId = ReadValue("FIDO2 -> Relying Party Id");
+                fido2RelyingPartyName = ReadValue("FIDO2 -> Relying Party Name");
+                fido2UserDisplayName = ReadValue("FIDO2 -> User Display Name");
+                fido2UserName = ReadValue("FIDO2 -> User Name");
+            }
+            
+            var gigyaDataCenter = ReadValue("GIGYA -> Data Center", "us1.gigya.com");
+            var gigyaApiKey = ReadValue("GIGYA -> Api Key", isRequired: true);
+            var gigyaSecret = ReadValue("GIGYA -> Secret");
+            var gigyaUserKey = ReadValue("GIGYA -> User Key");
+            var loginType = ReadValue("GIGYA -> Login Type", "session",
                 possibleValues: new[] {"session", "idtoken"});
             
             
@@ -63,7 +81,14 @@ namespace OwnIdSdk.Tools.Configurator
                 PrivateKey = Path.Combine(keysPath, "key.private"),
                 PublicKey = Path.Combine(keysPath, "key.pub"),
                 RedisConnection = redisConnection,
-                DID = $"did:{name}:{Guid.NewGuid():N}"
+                DID = $"did:{name}:{Guid.NewGuid():N}",
+                Fido2Enabled = enableFido2,
+                Fido2PasswordlessPageUrl = fido2passwordlessPageUrl,
+                Fido2Origin = fido2Origin,
+                Fido2UserName = fido2UserName,
+                Fido2RelyingPartyId = fido2RelyingPartyId,
+                Fido2RelyingPartyName = fido2RelyingPartyName,
+                Fido2UserDisplayName = fido2UserDisplayName
             };
             
             File.Delete(config.PrivateKey);
@@ -87,6 +112,13 @@ namespace OwnIdSdk.Tools.Configurator
                 UserKey = gigyaUserKey
             };
 
+            var jsonConfig = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                IgnoreNullValues = true,
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+
             if (File.Exists(configFilePath))
             {
                 Console.WriteLine("Modifying config file...", Color.Gray);
@@ -106,12 +138,7 @@ namespace OwnIdSdk.Tools.Configurator
                 newConf.Add("gigya", gigyaConfig);
 
                 appConfigStream.SetLength(0);
-                await JsonSerializer.SerializeAsync(appConfigStream, newConf, new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    IgnoreNullValues = true,
-                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                });
+                await JsonSerializer.SerializeAsync(appConfigStream, newConf, jsonConfig);
             }
             else
             {
@@ -121,7 +148,7 @@ namespace OwnIdSdk.Tools.Configurator
                 {
                     ownid = config,
                     gigya = gigyaConfig
-                });
+                }, jsonConfig);
             }
 
             Console.WriteLine();

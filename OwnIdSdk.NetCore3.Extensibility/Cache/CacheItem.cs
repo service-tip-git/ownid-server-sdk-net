@@ -95,11 +95,6 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
         public bool HasFinalState => Status == CacheItemStatus.Finished || Status == CacheItemStatus.Declined;
 
         /// <summary>
-        ///     Fido2 user id
-        /// </summary>
-        public string Fido2UserId { get; set; }
-        
-        /// <summary>
         ///     Fido2 counter
         /// </summary>
         public uint? Fido2SignatureCounter { get; set; }
@@ -129,7 +124,6 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
                 SecurityCode = SecurityCode,
                 PublicKey = PublicKey,
                 Fido2SignatureCounter = Fido2SignatureCounter,
-                Fido2UserId = Fido2UserId,
                 Fido2CredentialId = Fido2CredentialId,
             };
         }

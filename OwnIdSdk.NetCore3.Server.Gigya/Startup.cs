@@ -151,10 +151,14 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 .Enrich.WithMachineName()
                 .WriteTo.Debug()
                 .WriteTo.Console();
-
+            
             if (elasticLoggingEnabled)
+            {
+                var version = Assembly.GetExecutingAssembly().GetName().Version;
                 logger.WriteTo.Elasticsearch(ConfigureElasticSink(elasticSection, environment))
-                    .Enrich.WithProperty("source", "net-core-3-sdk");
+                    .Enrich.WithProperty("source", "net-core-3-sdk")
+                    .Enrich.WithProperty("version", version);
+            }
 
             Log.Logger = logger.Enrich.WithProperty("environment", environment)
                 .ReadFrom.Configuration(Configuration)

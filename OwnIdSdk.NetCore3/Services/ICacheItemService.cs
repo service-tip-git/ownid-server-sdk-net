@@ -17,8 +17,7 @@ namespace OwnIdSdk.NetCore3.Services
         /// <param name="did">User unique identity, should be null for register or login</param>
         /// <param name="payload">payload</param>
         Task CreateAuthFlowSessionItemAsync(string context, string nonce, ChallengeType challengeType,
-            FlowType flowType,
-            string did = null, string payload = null);
+            FlowType flowType, string did = null, string payload = null);
 
         /// <summary>
         ///     Sets Web App request/response token to check with the next request
@@ -49,20 +48,21 @@ namespace OwnIdSdk.NetCore3.Services
         /// <exception cref="ArgumentException">Cache item has incorrect status to set resolution</exception>
         Task SetApprovalResolutionAsync(string context, string nonce, bool isApproved);
 
-        Task SetPublicKeyAsync(string context, string publicKey, uint? fido2Counter = null, string fido2UserId = null, string fido2CredentialId = null);
+        Task SetFido2DataAsync(string context, string publicKey, uint fido2Counter, string fido2CredentialId);
 
         /// <summary>
         ///     Try to find auth flow session item by <paramref name="context" /> in <see cref="ICacheStore" /> mark it as finish
         /// </summary>
         /// <param name="context">Challenge unique identifier</param>
         /// <param name="did">User unique identifier</param>
+        /// <param name="publicKey">User public key</param>
         /// <exception cref="ArgumentException">
         ///     If no <see cref="CacheItem" /> was found with <paramref name="context" />
         /// </exception>
         /// <exception cref="ArgumentException">
         ///     If you try to finish session with different user DID
         /// </exception>
-        Task FinishAuthFlowSessionAsync(string context, string did);
+        Task FinishAuthFlowSessionAsync(string context, string did, string publicKey);
 
         /// <summary>
         ///     Tries to find <see cref="CacheItem" /> by <paramref name="nonce" /> and <paramref name="context" /> in
@@ -73,9 +73,7 @@ namespace OwnIdSdk.NetCore3.Services
         /// <returns>
         ///     <see cref="CacheItemStatus" /> and <c>did</c> if <see cref="CacheItem" /> was found, otherwise null
         /// </returns>
-        Task<CacheItem> PopFinishedAuthFlowSessionAsync(
-            string context,
-            string nonce);
+        Task<CacheItem> PopFinishedAuthFlowSessionAsync(string context, string nonce);
 
         /// <summary>
         ///     Tries to find <see cref="CacheItem" /> by <paramref name="context" /> in <see cref="ICacheStore" />
@@ -83,5 +81,12 @@ namespace OwnIdSdk.NetCore3.Services
         /// <param name="context">Challenge unique identifier</param>
         /// <returns><see cref="CacheItem" /> or null</returns>
         Task<CacheItem> GetCacheItemByContextAsync(string context);
+
+        /// <summary>
+        ///     Update context flow
+        /// </summary>
+        /// <param name="context">context to update</param>
+        /// <param name="flowType">new <see cref="FlowType"/></param>
+        Task UpdateFlowAsync(string context, FlowType flowType);
     }
 }

@@ -25,7 +25,22 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             _logger = logger;
         }
 
-        public async Task<LoginResult<object>> OnSuccessLoginAsync(string did)
+        public async Task<LoginResult<object>> OnSuccessLoginAsync(string did, string publicKey)
+        {
+            return await OnSuccessLoginByPublicKeyAsync(publicKey);
+        }
+
+        public async Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)
+        {
+            var did = await _restApiClient.SearchForDid(publicKey);
+
+            if (string.IsNullOrEmpty(did))
+                return new LoginResult<object>("Can not find user in Gigya search result with provided public key");
+
+            return await OnSuccessLoginInternalAsync(did);
+        }
+
+        private async Task<LoginResult<object>> OnSuccessLoginInternalAsync(string did)
         {
             if (_configuration.LoginType == GigyaLoginType.Session)
             {
@@ -46,30 +61,20 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             if (jwtResponse.IdToken == null || jwtResponse.ErrorCode != 0)
                 return new LoginResult<object>($"Gigya: {jwtResponse.GetFailureMessage()}");
 
-
             return new LoginResult<object>(new
             {
                 idToken = jwtResponse.IdToken
             });
         }
 
-        public async Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)
+        public async Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId,
+            uint fido2SignCounter)
         {
-            var did = await _restApiClient.SearchForDid(publicKey);
-
-            if (string.IsNullOrEmpty(did))
-                return new LoginResult<object>("Can not find user in Gigya search result with provided public key");
-
-            return await OnSuccessLoginAsync(did);
-        }
-
-        public async Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2UserId, uint fido2SignCounter)
-        {
-            var user = await _restApiClient.SearchByFido2UserId(fido2UserId);
+            var user = await _restApiClient.SearchByFido2CredentialId(fido2CredentialId);
             if (user == null)
                 return new LoginResult<object>("Can not find user in Gigya with provided fido2 user id");
 
-            var connectionToUpdate = user.Data.Connections.First(x => x.Fido2UserId == fido2UserId);
+            var connectionToUpdate = user.Data.Connections.First(x => x.Fido2CredentialId == fido2CredentialId);
 
             // Update signature counter
             connectionToUpdate.Fido2SignatureCounter = fido2SignCounter;
@@ -82,7 +87,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                     $"Gigya.setAccountInfo for EXISTING user error -> {setAccountResponse.GetFailureMessage()}");
             }
 
-            return await OnSuccessLoginAsync(user.UID);
+            return await OnSuccessLoginInternalAsync(user.UID);
         }
 
         public async Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey)
@@ -111,20 +116,28 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             return IdentitiesCheckResult.UserExists;
         }
 
-        public async Task<Fido2Info> FindFido2Info(string fido2UserId)
+        public async Task<bool> IsUserExists(string publicKey)
         {
-            var user = await _restApiClient.SearchByFido2UserId(fido2UserId);
+            var did = await _restApiClient.SearchForDid(publicKey);
+            return !string.IsNullOrWhiteSpace(did);
+        }
+
+        public async Task<Fido2Info> FindFido2Info(string fido2CredentialId)
+        {
+            var user = await _restApiClient.SearchByFido2CredentialId(fido2CredentialId);
             if (user == null)
                 return null;
 
-            var connection = user.Data.Connections.First(c => c.Fido2UserId == fido2UserId);
+            var connection = user.Data.Connections.First(c => c.Fido2CredentialId == fido2CredentialId);
 
             if (connection.Fido2SignatureCounter == null)
-                throw new Exception($"connection with fido2 user id '{fido2UserId}' doesn't have signature count");
+                throw new Exception(
+                    $"connection with fido2 credential id '{fido2CredentialId}' doesn't have signature count");
 
             return new Fido2Info
             {
-                PublickKey = connection.PublicKey,
+                UserId = user.UID,
+                PublicKey = connection.PublicKey,
                 SignatureCounter = connection.Fido2SignatureCounter.Value,
                 CredentialId = connection.Fido2CredentialId
             };

@@ -18,12 +18,14 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
 
         Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey);
 
-        Task<LoginResult<object>> OnSuccessLoginAsync(string did);
+        Task<bool> IsUserExists(string publicKey);
+
+        Task<LoginResult<object>> OnSuccessLoginAsync(string did, string publicKey);
 
         Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey);
 
-        Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2UserId, uint fido2SignCounter);
+        Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId, uint fido2SignCounter);
 
-        Task<Fido2Info> FindFido2Info(string fido2UserId);
+        Task<Fido2Info> FindFido2Info(string fido2CredentialId);
     }
 }

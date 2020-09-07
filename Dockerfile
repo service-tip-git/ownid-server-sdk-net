@@ -12,7 +12,6 @@ COPY ./OwnIdSdk.NetCore3.Web.Gigya ./OwnIdSdk.NetCore3.Web.Gigya
 COPY ./OwnIdSdk.NetCore3.Server.Gigya ./OwnIdSdk.NetCore3.Server.Gigya
 COPY ./OwnIdSdk.NetCore3.Redis ./OwnIdSdk.NetCore3.Redis
 
-
 RUN dotnet restore ./OwnIdSdk.NetCore3.Server.Gigya/OwnIdSdk.NetCore3.Server.Gigya.csproj
 RUN dotnet publish ./OwnIdSdk.NetCore3.Server.Gigya/OwnIdSdk.NetCore3.Server.Gigya.csproj -c Release -o out
 
@@ -37,6 +36,10 @@ ENV OWNID__CACHE_CONFIG="ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:637
 ENV ELASTICCONFIGURATION__ENABLED="false"
 ENV ASPNETCORE_ENVIRONMENT="dev"
 
+#RUN rm -rf /usr/bin/wget
+RUN apk -U upgrade
+RUN apk add --upgrade busybox
+RUN rm -f /var/cache/apk/*
 ENTRYPOINT ["dotnet", "OwnIdSdk.NetCore3.Server.Gigya.dll"]
 
 # docker build -t ownid-server-netcore3-gigya:latest .

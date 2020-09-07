@@ -158,10 +158,10 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
             return user.UID;
         }
         
-        public async Task<UidContainer> SearchByFido2UserId(string fido2UserId)
+        public async Task<UidContainer> SearchByFido2CredentialId(string fido2CredentialId)
         {
             var parameters = ParametersFactory.CreateAuthParameters(_configuration).AddParameter("query",
-                $"SELECT UID, data.ownIdConnections FROM accounts WHERE data.ownIdConnections.fido2UserId = \"{fido2UserId}\" LIMIT 1");
+                $"SELECT UID, data.ownIdConnections FROM accounts WHERE data.ownIdConnections.fido2CredentialId = \"{fido2CredentialId}\" LIMIT 1");
             var responseMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.search"),
                 new FormUrlEncodedContent(parameters));
@@ -171,7 +171,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
 
             var user = result.Results?.FirstOrDefault();
 
-            if (result.ErrorCode != 0 || (user?.Data?.Connections?.All(x => x.Fido2UserId != fido2UserId) ?? true))
+            if (result.ErrorCode != 0 || (user?.Data?.Connections?.All(x => x.Fido2CredentialId != fido2CredentialId) ?? true))
                 return null;
             
             return user;

@@ -44,14 +44,14 @@ namespace OwnIdSdk.NetCore3.Web.Features
             services.TryAddSingleton<CreateFlowCommand>();
             services.TryAddSingleton<GetSecurityCheckCommand>();
             services.TryAddSingleton<GetStatusCommand>();
-            services.TryAddSingleton<StartFlowFlowCommand>();
+            services.TryAddSingleton<StartFlowCommand>();
             services.TryAddSingleton<ApproveActionCommand>();
             services.TryAddSingleton<GetApprovalStatusCommand>();
             services.TryAddSingleton<GetAuthProfileCommand>();
             services.TryAddSingleton<GetPartialInfoCommand>();
             services.TryAddSingleton<SavePartialProfileCommand>();
             services.TryAddSingleton<SaveProfileCommand>();
-            services.TryAddSingleton<GetLinkConfigCommand>();
+            services.TryAddSingleton<GetNextStepCommand>();
             services.TryAddSingleton<SaveAccountLinkCommand>();
             services.TryAddSingleton<RecoverAccountCommand>();
             services.TryAddSingleton<SaveAccountPublicKeyCommand>();
@@ -63,6 +63,15 @@ namespace OwnIdSdk.NetCore3.Web.Features
             {
                 services.TryAddSingleton<Fido2RegisterCommand>();
                 services.TryAddSingleton<Fido2LoginCommand>();
+                
+                services.TryAddSingleton<Fido2LinkCommand>();
+                services.TryAddSingleton<Fido2GetSecurityCheckCommand>();
+                services.TryAddSingleton<Fido2LinkWithPinCommand>();
+                
+                services.TryAddSingleton<Fido2RecoverCommand>();
+                services.TryAddSingleton<Fido2RecoverWithPinCommand>();
+                services.TryAddSingleton<Fido2RecoverWithPinCommand>();
+
                 services.AddFido2(fido2Config =>
                 {
                     var str = _configuration.Fido2.Origin.ToString().TrimEnd(new[] {'/'}).Trim();
@@ -110,9 +119,15 @@ namespace OwnIdSdk.NetCore3.Web.Features
         {
             using var publicKeyReader = File.OpenText(publicKeyPath);
             using var privateKeyReader = File.OpenText(privateKeyPath);
-            _configuration.JwtSignCredentials = RsaHelper.LoadKeys(publicKeyReader, privateKeyReader);
+            WithKeys(publicKeyReader, privateKeyReader);
             return this;
         }
+        
+        public CoreFeature WithKeys(TextReader publicKeyReader, TextReader privateKeyReader)
+        {
+            _configuration.JwtSignCredentials = RsaHelper.LoadKeys(publicKeyReader, privateKeyReader);
+            return this;
+        } 
 
         public CoreFeature WithKeys(RSA rsa)
         {
