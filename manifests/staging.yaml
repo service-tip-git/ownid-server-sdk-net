@@ -502,7 +502,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: credential-secrets
-                  key: gigya_nestle_user_key
+                  key: nestle_gigya_user_key
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
             - name: ELASTICCONFIGURATION__URI
