@@ -492,12 +492,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: credential-secrets
-                  key: gigya_nestle_secret
+                  key: nestle_gigya_secret
             - name: GIGYA__API_KEY
               valueFrom:
                 secretKeyRef:
                   name: credential-secrets
-                  key: gigya_nestle_secret
+                  key: nestle_gigya_api_key
             - name: GIGYA__USER_KEY
               valueFrom:
                 secretKeyRef:
