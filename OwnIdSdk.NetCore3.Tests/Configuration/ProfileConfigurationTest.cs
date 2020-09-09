@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using FluentAssertions;
 using OwnIdSdk.NetCore3.Attributes;
 using OwnIdSdk.NetCore3.Configuration.Profile;
 using OwnIdSdk.NetCore3.Extensibility.Configuration.Profile;
@@ -15,7 +16,7 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         public void Validate_Valid(Type type)
         {
             var config = new ProfileConfiguration(type);
-            Assert.True(config.Validate().Succeeded);
+            config.Validate().Succeeded.Should().BeTrue();
         }
 
         [Theory]
@@ -24,10 +25,11 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         [InlineData(typeof(TestProfileModelComplex))]
         [InlineData(typeof(TestProfileModelAbstract))]
         [InlineData(typeof(TestProfileModelGeneric<TestProfileModelValid>))]
+        [InlineData(typeof(TestProfile51Fields))]
         public void Validate_Invalid(Type type)
         {
             var config = new ProfileConfiguration(type);
-            Assert.True(config.Validate().Failed, $"{type.Name} check failed");
+            config.Validate().Failed.Should().BeTrue();
         }
 
         [Fact]
@@ -36,34 +38,35 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
             var config = new ProfileConfiguration(typeof(TestProfileModelAllAttr));
             config.BuildMetadata();
 
-            Assert.NotNull(config.ProfileModelType);
-            Assert.Equal(typeof(TestProfileModelAllAttr), config.ProfileModelType);
-            Assert.NotNull(config.ProfileFieldMetadata);
-            Assert.Equal(3, config.ProfileFieldMetadata.Count);
+            config.ProfileModelType.Should().NotBeNull();
+            config.ProfileModelType.Should().Be<TestProfileModelAllAttr>();
+            config.ProfileFieldMetadata.Should().NotBeNull();
+            config.ProfileFieldMetadata.Count.Should().Be(3);
 
             var age = config.ProfileFieldMetadata[0];
-            Assert.Equal("Age", age.Key);
-            Assert.Equal(string.Empty, age.Placeholder);
-            Assert.Equal("Age", age.Label);
-            Assert.Equal("number", age.Type);
-            Assert.Single(age.Validators);
-            Assert.Equal("number", age.Validators[0].Type);
+            age.Key.Should().Be("Age");
+            age.Placeholder.Should().Be(string.Empty);
+            age.Label.Should().Be("Age");
+            age.Type.Should().Be("number");
+            age.Validators.Should().ContainSingle();
+            age.Validators[0].Type.Should().Be("number");
 
             var email = config.ProfileFieldMetadata[1];
-            Assert.Equal("Email", email.Key);
-            Assert.Equal("My Email Placeholder", email.Placeholder);
-            Assert.Equal("My Email", email.Label);
-            Assert.Equal("email", email.Type);
-            Assert.Equal(2, email.Validators.Count);
-            Assert.Contains(email.Validators, x => x.Type == "required");
-            Assert.Contains(email.Validators, x => x.Type == "email");
+            email.Key.Should().Be("Email");
+            email.Placeholder.Should().Be("My Email Placeholder");
+
+            email.Label.Should().Be("My Email");
+            email.Type.Should().Be("email");
+            email.Validators.Count.Should().Be(2);
+            email.Validators.Should().Contain(x => x.Type == "required");
+            email.Validators.Should().Contain(x =>  x.Type == "email");
 
             var name = config.ProfileFieldMetadata[2];
-            Assert.Equal("Name", name.Key);
-            Assert.Equal(string.Empty, name.Placeholder);
-            Assert.Equal("Name", name.Label);
-            Assert.Equal("text", name.Type);
-            Assert.Empty(name.Validators);
+            name.Key.Should().Be("Name");
+            name.Placeholder.Should().Be(string.Empty);
+            name.Label.Should().Be("Name");
+            name.Type.Should().Be("text");
+            name.Validators.Should().BeEmpty();
         }
     }
 
@@ -74,6 +77,14 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         public string Email { get; set; }
 
         public string Name { get; set; }
+        
+        public int Num { get; set; }
+        
+        public MyStruct Test { get; set; }
+        
+        public struct MyStruct
+        {
+        }
     }
 
     public class TestProfileModelNoProps
@@ -118,5 +129,60 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         public string Email { get; set; }
 
         public string Name { get; set; }
+    }
+
+    public class TestProfile51Fields
+    {
+        public string Field1 { get; set; }
+        public string Field2 { get; set; }
+        public string Field3 { get; set; }
+        public string Field4 { get; set; }
+        public string Field5 { get; set; }
+        public string Field6 { get; set; }
+        public string Field7 { get; set; }
+        public string Field8 { get; set; }
+        public string Field9 { get; set; }
+        public string Field10 { get; set; }
+        public string Field11 { get; set; }
+        public string Field12 { get; set; }
+        public string Field13 { get; set; }
+        public string Field14 { get; set; }
+        public string Field15 { get; set; }
+        public string Field16 { get; set; }
+        public string Field17 { get; set; }
+        public string Field18 { get; set; }
+        public string Field19 { get; set; }
+        public string Field20 { get; set; }
+        public string Field21 { get; set; }
+        public string Field22 { get; set; }
+        public string Field23 { get; set; }
+        public string Field24 { get; set; }
+        public string Field25 { get; set; }
+        public string Field26 { get; set; }
+        public string Field27 { get; set; }
+        public string Field28 { get; set; }
+        public string Field29 { get; set; }
+        public string Field30 { get; set; }
+        public string Field31 { get; set; }
+        public string Field32 { get; set; }
+        public string Field33 { get; set; }
+        public string Field34 { get; set; }
+        public string Field35 { get; set; }
+        public string Field36 { get; set; }
+        public string Field37 { get; set; }
+        public string Field38 { get; set; }
+        public string Field39 { get; set; }
+        public string Field40 { get; set; }
+        public string Field41 { get; set; }
+        public string Field42 { get; set; }
+        public string Field43 { get; set; }
+        public string Field44 { get; set; }
+        public string Field45 { get; set; }
+        public string Field46 { get; set; }
+        public string Field47 { get; set; }
+        public string Field48 { get; set; }
+        public string Field49 { get; set; }
+        public string Field50 { get; set; }
+        public string Field51 { get; set; }
     }
 }

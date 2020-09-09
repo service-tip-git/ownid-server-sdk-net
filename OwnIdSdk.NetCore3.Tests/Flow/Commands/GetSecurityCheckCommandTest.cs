@@ -44,7 +44,7 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
 
             jwtComposer.Setup(x => x.GeneratePinStepJwt(It.IsAny<string>(), It.IsAny<DateTime?>(),
                 It.IsAny<FrontendBehavior>(), It.IsAny<string>(), It.IsAny<string>())).Returns(
-                new Func<string, FrontendBehavior, string, string, string>((c, f, p, l
+                new Func<string, DateTime, FrontendBehavior, string, string, string>((c, d, f, p, l
                 ) => expectedString));
 
             var command =
@@ -57,7 +57,7 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
 
             var security = await cacheItemService.Object.SetSecurityCodeAsync(input.Context);
 
-            jwtComposer.Verify(x => x.GeneratePinStepJwt(input.Context, null,
+            jwtComposer.Verify(x => x.GeneratePinStepJwt(input.Context, input.ClientDate,
                 flowController.Object.GetExpectedFrontendBehavior(relatedItem, currentStepType), security,
                 input.CultureInfo.Name));
             actual.Should().BeEquivalentTo(new JwtContainer(expectedString));
@@ -80,8 +80,9 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
 
             var command =
                 new GetSecurityCheckCommand(cacheItemService.Object, jwtComposer.Object, flowController.Object);
-            await Assert.ThrowsAsync<CommandValidationException>(() =>
-                command.ExecuteAsync(input, item, currentStepType));
+            await command.Invoking(x => x.ExecuteAsync(input, item, currentStepType)).Should()
+                .ThrowAsync<CommandValidationException>();
+
             cacheItemService.VerifyNoOtherCalls();
             jwtComposer.VerifyNoOtherCalls();
             flowController.VerifyNoOtherCalls();
@@ -101,8 +102,10 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
 
             var command =
                 new GetSecurityCheckCommand(cacheItemService.Object, jwtComposer.Object, flowController.Object);
-            await Assert.ThrowsAsync<CommandValidationException>(() =>
-                command.ExecuteAsync(input, item, currentStepType));
+
+            await command.Invoking(x => command.ExecuteAsync(input, item, currentStepType)).Should()
+                .ThrowAsync<CommandValidationException>();
+
             cacheItemService.VerifyNoOtherCalls();
             jwtComposer.VerifyNoOtherCalls();
             flowController.VerifyNoOtherCalls();

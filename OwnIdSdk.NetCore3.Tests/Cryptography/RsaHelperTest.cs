@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using FluentAssertions;
 using OwnIdSdk.NetCore3.Cryptography;
 using Xunit;
 
@@ -25,25 +26,31 @@ namespace OwnIdSdk.NetCore3.Tests.Cryptography
             var keyString = PublicKeyStartString + PublicBase64EncodedKey + PublicKeyEndString;
             using var publicKey = new StringReader(keyString);
             var rsa = RsaHelper.LoadKeys(publicKey);
-            Assert.Equal(RsaHelper.ExportPublicKeyToPkcsFormattedString(rsa), keyString);
+            RsaHelper.ExportPublicKeyToPkcsFormattedString(rsa).Should().Be(keyString);
         }
 
         [Fact]
         public void LoadKeys_CorruptedBase64_Exception()
         {
-            using var invalidPublicKey =
-                new StringReader(PublicKeyStartString +
-                                 PublicBase64EncodedKey.Substring(1, PublicBase64EncodedKey.Length - 1) +
-                                 PublicKeyEndString);
-            Assert.Throws<FormatException>(() => RsaHelper.LoadKeys(invalidPublicKey));
+            FluentActions.Invoking(() =>
+            {
+                using var invalidPublicKey =
+                    new StringReader(PublicKeyStartString +
+                                     PublicBase64EncodedKey.Substring(1, PublicBase64EncodedKey.Length - 1) +
+                                     PublicKeyEndString);
+                RsaHelper.LoadKeys(invalidPublicKey);
+            }).Should().Throw<FormatException>();
 
-            using var validPublicKey =
-                new StringReader(PublicKeyStartString + PublicBase64EncodedKey + PublicKeyEndString);
-            using var invalidPrivateKey = new StringReader(PrivateKeyStartString +
-                                                           PrivateBase64EncodedKey.Substring(1,
-                                                               PublicBase64EncodedKey.Length - 1) +
-                                                           PrivateKeyEndString);
-            Assert.Throws<FormatException>(() => RsaHelper.LoadKeys(validPublicKey, invalidPrivateKey));
+            FluentActions.Invoking(() =>
+            {
+                using var validPublicKey =
+                    new StringReader(PublicKeyStartString + PublicBase64EncodedKey + PublicKeyEndString);
+                using var invalidPrivateKey = new StringReader(PrivateKeyStartString +
+                                                               PrivateBase64EncodedKey.Substring(1,
+                                                                   PublicBase64EncodedKey.Length - 1) +
+                                                               PrivateKeyEndString);
+                RsaHelper.LoadKeys(validPublicKey, invalidPrivateKey);
+            }).Should().Throw<FormatException>();
         }
 
         [Fact]
@@ -51,8 +58,8 @@ namespace OwnIdSdk.NetCore3.Tests.Cryptography
         {
             using var publicKey = new StringReader(PublicKeyStartString + PublicBase64EncodedKey + PublicKeyEndString);
             var rsa = RsaHelper.LoadKeys(publicKey);
-            Assert.Equal(4096, rsa.KeySize);
-            Assert.Equal(PublicBase64EncodedKey, Convert.ToBase64String(rsa.ExportSubjectPublicKeyInfo()));
+            rsa.KeySize.Should().Be(4096);
+            PublicBase64EncodedKey.Should().Be(Convert.ToBase64String(rsa.ExportSubjectPublicKeyInfo()));
         }
 
         [Fact]
@@ -62,9 +69,9 @@ namespace OwnIdSdk.NetCore3.Tests.Cryptography
             using var privateKey =
                 new StringReader(PrivateKeyStartString + PrivateBase64EncodedKey + PrivateKeyEndString);
             var rsa = RsaHelper.LoadKeys(publicKey, privateKey);
-            Assert.Equal(4096, rsa.KeySize);
-            Assert.Equal(PublicBase64EncodedKey, Convert.ToBase64String(rsa.ExportSubjectPublicKeyInfo()));
-            Assert.Equal(PrivateBase64EncodedKey, Convert.ToBase64String(rsa.ExportRSAPrivateKey()));
+            rsa.KeySize.Should().Be(4096);
+            PublicBase64EncodedKey.Should().Be(Convert.ToBase64String(rsa.ExportSubjectPublicKeyInfo()));
+            PrivateBase64EncodedKey.Should().Be(Convert.ToBase64String(rsa.ExportRSAPrivateKey()));
         }
     }
 }

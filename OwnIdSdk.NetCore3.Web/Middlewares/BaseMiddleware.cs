@@ -101,7 +101,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 if (_fields.HasFlag(BaseRequestFields.ResponseToken))
                 {
                     if (httpContext.Request.Query.TryGetValue("rst", out var responseToken))
-                        RequestIdentity.ResponseToken = responseToken.ToString().GetUrlEncodeString();
+                        RequestIdentity.ResponseToken = responseToken.ToString().EncodeBase64String();
                     else
                         throw new CommandValidationException(
                             $"{nameof(RequestIdentity.ResponseToken)} is required. Path={httpContext.Request.Path.ToString()} Query={httpContext.Request.QueryString.ToString()}");

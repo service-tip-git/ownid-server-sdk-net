@@ -6,6 +6,7 @@ using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Link;
 using OwnIdSdk.NetCore3.Extensibility.Providers;
 using OwnIdSdk.NetCore3.Flow.Commands;
 using OwnIdSdk.NetCore3.Services;
@@ -17,15 +18,22 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
     public class CreateFlowCommandTest
     {
         [Theory]
-        [InlineData(ChallengeType.Register, false, false, null, FlowType.Authorize)]
-        [InlineData(ChallengeType.Register, false, true, null, FlowType.PartialAuthorize)]
-        [InlineData(ChallengeType.Login, false, false, null, FlowType.Authorize)]
-        [InlineData(ChallengeType.Login, false, true, null, FlowType.PartialAuthorize)]
-        [InlineData(ChallengeType.Recover, false, false, "test", FlowType.Recover)]
-        [InlineData(ChallengeType.Recover, true, false, "test", FlowType.RecoverWithPin)]
-        [InlineData(ChallengeType.Link, false, false, "test", FlowType.Link)]
-        [InlineData(ChallengeType.Link, true, false, "test", FlowType.LinkWithPin)]
-        public async Task ExecuteAsync_GeneralFlow(ChallengeType challengeType, bool isQr, bool isPartial, string payload, FlowType expectedFlowType)
+        [InlineData(ChallengeType.Register, false, false, null, false, FlowType.Authorize)]
+        [InlineData(ChallengeType.Register, false, true, null, false, FlowType.PartialAuthorize)]
+        [InlineData(ChallengeType.Register, false, true, null, true, FlowType.PartialAuthorize)]
+        [InlineData(ChallengeType.Login, false, false, null, false, FlowType.Authorize)]
+        [InlineData(ChallengeType.Login, false, true, null, false, FlowType.PartialAuthorize)]
+        [InlineData(ChallengeType.Login, false, true, null, true, FlowType.PartialAuthorize)]
+        [InlineData(ChallengeType.Recover, false, false, "test", false, FlowType.Recover)]
+        [InlineData(ChallengeType.Recover, false, false, "test", true, FlowType.Recover)]
+        [InlineData(ChallengeType.Recover, true, false, "test", false, FlowType.RecoverWithPin)]
+        [InlineData(ChallengeType.Recover, true, false, "test", true, FlowType.RecoverWithPin)]
+        [InlineData(ChallengeType.Link, false, false, "test", false, FlowType.Link)]
+        [InlineData(ChallengeType.Link, false, false, "test", true, FlowType.Link)]
+        [InlineData(ChallengeType.Link, true, false, "test", false, FlowType.LinkWithPin)]
+        [InlineData(ChallengeType.Link, true, false, "test", true, FlowType.LinkWithPin)]
+        public async Task ExecuteAsync_GeneralFlow(ChallengeType challengeType, bool isQr, bool isPartial,
+            string payload, bool fido2Enabled, FlowType expectedFlowType)
         {
             var fixture = new Fixture().SetOwnidSpecificSettings();
 
@@ -34,6 +42,13 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
             var identitiesProvider = fixture.Freeze<IIdentitiesProvider>();
             var configuration = fixture.Freeze<IOwnIdCoreConfiguration>();
             var linkAdapter = fixture.Freeze<Mock<IAccountLinkHandler>>();
+
+            configuration.Fido2.Enabled = fido2Enabled;
+            configuration.MaximumNumberOfConnectedDevices = 99;
+            
+            var did = fixture.Create<string>();
+            linkAdapter.Setup(x => x.GetCurrentUserLinkStateAsync(It.IsAny<string>()))
+                .ReturnsAsync(new LinkState(did, 1));
 
             var command = new CreateFlowCommand(cacheService.Object, urlProvider, identitiesProvider,
                 configuration, linkAdapter.Object);
@@ -49,22 +64,27 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
             var context = identitiesProvider.GenerateContext();
             var nonce = identitiesProvider.GenerateNonce();
             var expiration = configuration.CacheExpirationTimeout;
-            string did = null;
 
             //TODO: refactor implementation
             if (challengeType == ChallengeType.Link)
             {
                 var capturedPayload = payload;
-                linkAdapter.Verify(x=>x.GetCurrentUserLinkStateAsync(capturedPayload), Times.Once);
-                did = (await linkAdapter.Object.GetCurrentUserLinkStateAsync(payload)).DID;
+
+                linkAdapter.Verify(x => x.GetCurrentUserLinkStateAsync(capturedPayload), Times.Once);
                 payload = null;
             }
+            else
+                did = null;
 
-            cacheService.Verify(x=>x.CreateAuthFlowSessionItemAsync(context, nonce, challengeType, expectedFlowType, did, payload), Times.Once);
+            cacheService.Verify(x => x.CreateAuthFlowSessionItemAsync(context, nonce, challengeType, expectedFlowType, did, payload),
+                Times.Once);
 
-            var expected = new GetChallengeLinkResponse(context,
-                urlProvider.GetWebAppSignWithCallbackUrl(urlProvider.GetStartFlowUrl(context)).ToString(), nonce,
-                expiration);
+            var url = urlProvider.GetWebAppSignWithCallbackUrl(urlProvider.GetStartFlowUrl(context));
+
+            if (fido2Enabled)
+                url = urlProvider.GetFido2Url(url, challengeType);
+
+            var expected = new GetChallengeLinkResponse(context, url.ToString(), nonce, expiration);
 
             actual.Should().BeEquivalentTo(expected);
         }

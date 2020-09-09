@@ -20,8 +20,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Approval
         private readonly IJwtComposer _jwtComposer;
         private readonly IAccountRecoveryHandler _recoveryHandler;
         private readonly IServiceProvider _serviceProvider;
-
-
+        
         public GetApprovalStatusCommand(IJwtComposer jwtComposer, IFlowController flowController,
             IAccountRecoveryHandler recoveryHandler, IServiceProvider serviceProvider)
         {
@@ -72,8 +71,9 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Approval
             }
             else if (relatedItem.Status == CacheItemStatus.Declined)
             {
+                var a = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
                 jwt = _jwtComposer.GenerateFinalStepJwt(relatedItem.Context,
-                    input.ClientDate, _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                    input.ClientDate, a,
                     input.CultureInfo?.Name);
             }
 

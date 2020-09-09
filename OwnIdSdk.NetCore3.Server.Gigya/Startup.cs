@@ -171,7 +171,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             {
                 AutoRegisterTemplate = true,
                 IndexFormat =
-                    $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{(environment ?? "development").ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
+                    $"ownid-{(environment ?? "development").ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
                 ModifyConnectionSettings = x =>
                     x.BasicAuthentication(configuration["Username"], configuration["Password"]),
                 InlineFields = true,

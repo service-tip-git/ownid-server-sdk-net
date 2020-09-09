@@ -74,7 +74,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 throw new InternalLogicException("Incorrect command result type");
 
             await _cacheItemService.SetSecurityTokensAsync(relatedItem.Context, input.RequestToken,
-                _jwtService.GetJwtHash(jwtContainer.Jwt).GetUrlEncodeString());
+                _jwtService.GetJwtHash(jwtContainer.Jwt).EncodeBase64String());
 
             return commandResult;
         }
