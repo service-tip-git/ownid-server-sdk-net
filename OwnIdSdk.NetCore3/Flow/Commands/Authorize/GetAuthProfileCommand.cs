@@ -36,10 +36,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
         {
             var jwt = _jwtComposer.GenerateProfileConfigJwt(
                 relatedItem.Context,
-                _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
-                _identitiesProvider.GenerateUserId(),
-                input.CultureInfo?.Name,
-                true);
+                input.ClientDate, _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                _identitiesProvider.GenerateUserId(), input.CultureInfo?.Name, true);
 
             return Task.FromResult(new JwtContainer(jwt) as ICommandResult);
         }

@@ -26,7 +26,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Authorize
         {
             var jwtContainer = await GetRequestJwtContainerAsync(httpContext);
             var result = await _flowRunner.RunAsync(
-                new CommandInput<JwtContainer>(RequestIdentity, GetRequestCulture(httpContext), jwtContainer),
+                new CommandInput<JwtContainer>(RequestIdentity, GetRequestCulture(httpContext), jwtContainer, ClientDate),
                 StepType.InstantAuthorize);
 
             await Json(httpContext, result, StatusCodes.Status200OK);

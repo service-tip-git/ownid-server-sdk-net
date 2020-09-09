@@ -46,7 +46,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                 throw new CommandValidationException("No public key was provided for partial flow");
 
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, userData.DID, userData.PublicKey);
-            var jwt = _jwtComposer.GenerateFinalStepJwt(relatedItem.Context,
+            var jwt = _jwtComposer.GenerateFinalStepJwt(relatedItem.Context, input.ClientDate,
                 _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType), input.CultureInfo?.Name);
             return new JwtContainer(jwt);
         }

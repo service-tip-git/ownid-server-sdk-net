@@ -44,16 +44,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 relatedItem.Fido2SignatureCounter
             );
 
-            await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, 
+            await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context,
                 relatedItem.DID,
                 relatedItem.PublicKey);
 
             var jwt = _jwtComposer.GenerateBaseStep(
                 relatedItem.Context,
-                _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
-                relatedItem.DID,
-                input.CultureInfo?.Name,
-                true);
+                input.ClientDate, _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                relatedItem.DID, input.CultureInfo?.Name, true);
 
             return new JwtContainer(jwt);
         }

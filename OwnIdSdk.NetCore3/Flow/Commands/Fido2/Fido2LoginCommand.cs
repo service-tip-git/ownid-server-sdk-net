@@ -68,7 +68,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 Challenge = Encoding.ASCII.GetBytes(relatedItem.Context),
                 RpId = _configuration.Fido2.RelyingPartyId,
             };
-
+            
             var fidoResponse = new AuthenticatorAssertionRawResponse
             {
                 Extensions = new AuthenticationExtensionsClientOutputs(),
@@ -79,7 +79,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                     AuthenticatorData = Base64Url.Decode(request.Info.AuthenticatorData),
                     ClientDataJson = Base64Url.Decode(request.Info.ClientDataJSON),
                     Signature = Base64Url.Decode(request.Info.Signature),
-                    UserHandle = Base64Url.Decode(request.Info.UserId)
+                    UserHandle = Base64Url.Decode(storedFido2Info.UserId)
                 },
                 Type = PublicKeyCredentialType.PublicKey
             };
@@ -104,15 +104,13 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 request.Info.CredentialId);
 
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context,
-                request.Info.UserId,
+                storedFido2Info.UserId,
                 storedFido2Info.PublicKey);
 
             var jwt = _jwtComposer.GenerateBaseStep(
                 relatedItem.Context,
-                _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
-                request.Info.UserId,
-                input.CultureInfo?.Name,
-                true);
+                input.ClientDate, _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                storedFido2Info.UserId, input.CultureInfo?.Name, true);
 
             return new JwtContainer(jwt);
         }

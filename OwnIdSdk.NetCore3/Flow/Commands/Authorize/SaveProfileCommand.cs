@@ -55,21 +55,21 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
 
             var checkResult = await _userHandlerAdapter.CheckUserIdentitiesAsync(userData.DID, userData.PublicKey);
 
-            if(checkResult == IdentitiesCheckResult.WrongPublicKey)
+            if (checkResult == IdentitiesCheckResult.WrongPublicKey)
                 throw new CommandValidationException("Wrong public key");
 
             if (checkResult == IdentitiesCheckResult.UserNotFound || _coreConfiguration.OverwriteFields)
             {
                 if (!userData.Profile.HasValue || userData.Profile.Value.ValueKind != JsonValueKind.Object)
                     throw new CommandValidationException("Profile should be provided for user");
-                
+
                 var formContext = _userHandlerAdapter.CreateUserDefinedContext(userData, _localizationService);
 
                 formContext.Validate();
 
                 if (formContext.HasErrors)
                     throw new BusinessValidationException(formContext);
-                
+
                 switch (checkResult)
                 {
                     case IdentitiesCheckResult.UserNotFound:
@@ -83,10 +83,11 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                 if (formContext.HasErrors)
                     throw new BusinessValidationException(formContext);
             }
-            
+
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, userData.DID, userData.PublicKey);
             var jwt = _jwtComposer.GenerateFinalStepJwt(relatedItem.Context,
-                _flowController.GetExpectedFrontendBehavior(relatedItem, StepType.Authorize), input.CultureInfo?.Name);
+                input.ClientDate, _flowController.GetExpectedFrontendBehavior(relatedItem, StepType.Authorize),
+                input.CultureInfo?.Name);
 
             return new JwtContainer(jwt);
         }

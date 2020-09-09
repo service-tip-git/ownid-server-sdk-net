@@ -6,7 +6,7 @@ metadata:
   labels:
     app: ownid-server-netcore3-gigya
 spec:
-  revisionHistoryLimit: 2
+  revisionHistoryLimit: 1
   replicas: 2
   selector:
     matchLabels:
@@ -103,7 +103,7 @@ metadata:
   labels:
     app: ownid-server-netcore3-gigya-2
 spec:
-  revisionHistoryLimit: 2
+  revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
@@ -233,7 +233,7 @@ metadata:
   labels:
     app: ownid-server-netcore3-demo-gigya
 spec:
-  revisionHistoryLimit: 2
+  revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
@@ -330,7 +330,7 @@ metadata:
   labels:
     app: ownid-server-netcore3-demo-gigya-2
 spec:
-  revisionHistoryLimit: 2
+  revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:

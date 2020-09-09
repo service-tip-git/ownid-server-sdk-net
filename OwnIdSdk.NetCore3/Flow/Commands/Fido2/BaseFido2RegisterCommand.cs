@@ -53,7 +53,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         {
             var requestInput = input as CommandInput<string>;
             var request = OwnIdSerializer.Deserialize<Fido2RegisterRequest>(requestInput.Data);
-            
+
             if (request == null)
                 throw new InternalLogicException($"Incorrect Fido2 register request");
 
@@ -113,10 +113,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         {
             var jwt = _jwtComposer.GenerateBaseStep(
                 relatedItem.Context,
-                _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
-                NewUserId,
-                input.CultureInfo?.Name,
-                true);
+                input.ClientDate, _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                NewUserId, input.CultureInfo?.Name, true);
 
             return Task.FromResult((ICommandResult) new JwtContainer(jwt));
         }
