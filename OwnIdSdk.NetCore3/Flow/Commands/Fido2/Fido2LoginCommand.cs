@@ -59,8 +59,19 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             var storedFido2Info = await _userHandlerAdapter.FindFido2Info(request.Info.CredentialId);
             if (storedFido2Info == null)
             {
-                throw new InternalLogicException(
-                    $"Can't find user with fido2 CredentialId. (Context: '{relatedItem.Context}')");
+                // throw new InternalLogicException(
+                //     $"Can't find user with fido2 CredentialId. (Context: '{relatedItem.Context}')");
+                
+                await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context,
+                    request.Info.CredentialId,
+                    "toredFido2Info.PublicKey");
+
+                var jwt2 = _jwtComposer.GenerateBaseStep(
+                    relatedItem.Context,
+                    input.ClientDate, _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                    request.Info.CredentialId, input.CultureInfo?.Name, true);
+
+                return new JwtContainer(jwt2);
             }
 
             var options = new AssertionOptions

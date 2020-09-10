@@ -87,6 +87,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             {
                 switch (cacheItem.ChallengeType)
                 {
+                    case ChallengeType.Login 
+                        when cacheItem.FlowType == FlowType.Fido2PartialLogin 
+                             && string.IsNullOrWhiteSpace(cacheItem.Fido2CredentialId):
+                    {
+                        var errorMessage = _localizationService.GetLocalizedString("Error_UserNotFound");
+                        result.Payload = new LoginResult<object>(errorMessage);
+                        break;
+                    }
                     case ChallengeType.Login
                         when !string.IsNullOrWhiteSpace(cacheItem.Fido2CredentialId)
                              && cacheItem.Fido2SignatureCounter.HasValue:
