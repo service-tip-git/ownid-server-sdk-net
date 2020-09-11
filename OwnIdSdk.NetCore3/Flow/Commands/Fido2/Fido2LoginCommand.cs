@@ -55,12 +55,19 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             var request = OwnIdSerializer.Deserialize<Fido2LoginRequest>(requestInput.Data);
 
             request.Info = request.Info;
+            var frontendBehavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
 
             var storedFido2Info = await _userHandlerAdapter.FindFido2Info(request.Info.CredentialId);
             if (storedFido2Info == null)
             {
-                throw new InternalLogicException(
-                    $"Can't find user with fido2 CredentialId. (Context: '{relatedItem.Context}')");
+                // TODO: add fail finish method + handling
+                await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, request.Info.CredentialId,
+                    string.Empty);
+
+                var jwt2 = _jwtComposer.GenerateBaseStep(relatedItem.Context, input.ClientDate, frontendBehavior,
+                    request.Info.CredentialId, input.CultureInfo?.Name, true);
+
+                return new JwtContainer(jwt2);
             }
 
             var options = new AssertionOptions

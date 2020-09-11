@@ -22,4 +22,7 @@
   <data name="Field {0} is required" xml:space="preserve">El campo {0} es obligatorio</data>
   <data name="Field {0} has incorrect format" xml:space="preserve">El campo {0} tiene un formato incorrecto</data>
   <data name="The field {0} must be a string or array type with a maximum length of &apos;{1}&apos;" xml:space="preserve">The field {0} must be a string or array type with a maximum length of '{1}'</data>
+  <data name="Error_UserNotFound" xml:space="preserve">
+    <value>El usuario no fue encontrado</value>
+  </data>
 </root>
