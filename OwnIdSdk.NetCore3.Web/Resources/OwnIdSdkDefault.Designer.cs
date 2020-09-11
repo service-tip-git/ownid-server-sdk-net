@@ -92,5 +92,11 @@ namespace OwnIdSdk.NetCore3.Web.Resources {
                 return ResourceManager.GetString("Error_PhoneAlreadyConnected", resourceCulture);
             }
         }
+        
+        internal static string Error_UserNotFound {
+            get {
+                return ResourceManager.GetString("Error_UserNotFound", resourceCulture);
+            }
+        }
     }
 }

@@ -24,12 +24,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
         private readonly IServiceProvider _serviceProvider;
         private readonly IOwnIdCoreConfiguration _configuration;
 
-        public StartFlowCommand(
-            ICacheItemService cacheItemService,
-            IJwtService jwtService,
-            IServiceProvider serviceProvider,
-            IOwnIdCoreConfiguration configuration
-        )
+        public StartFlowCommand(ICacheItemService cacheItemService, IJwtService jwtService,
+            IServiceProvider serviceProvider, IOwnIdCoreConfiguration configuration)
         {
             _cacheItemService = cacheItemService;
             _jwtService = jwtService;
@@ -88,8 +84,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 && cacheItem.FlowType != FlowType.Link
                 && cacheItem.FlowType != FlowType.Recover
                 && cacheItem.FlowType != FlowType.LinkWithPin
-                && cacheItem.FlowType != FlowType.RecoverWithPin
-            )
+                && cacheItem.FlowType != FlowType.RecoverWithPin)
             {
                 return;
             }
