@@ -19,10 +19,15 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 {
     public abstract class BaseMiddleware
     {
+        private const string ClientDateParameterName = "t";
+        private const string ContextRouteName = "context";
+
         private readonly BaseRequestFields _fields;
 
         protected readonly ILogger Logger;
         protected readonly RequestDelegate Next;
+        protected DateTime ClientDate { get; private set; }
+
 
         protected BaseMiddleware(RequestDelegate next, ILogger logger)
         {
@@ -41,12 +46,18 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
         public async Task InvokeAsync(HttpContext httpContext)
         {
-            RequestIdentity = new RequestIdentity();
-            var routeData = httpContext.GetRouteData();
-
-            RequestIdentity.Context = routeData.Values["context"]?.ToString();
+            RequestIdentity = new RequestIdentity
+            {
+                Context = httpContext.GetRouteData().Values[ContextRouteName]?.ToString(),
+            };
 
             using var scope = Logger.BeginScope("context: {context}", RequestIdentity.Context);
+
+            ClientDate = httpContext.Request.Query[ClientDateParameterName].Count > 0
+                         && DateTime.TryParse(httpContext.Request.Query[ClientDateParameterName][0],
+                             out var clientDate)
+                ? clientDate.ToUniversalTime()
+                : DateTime.UtcNow;
 
             await InterceptErrors(InternalExecuteAsync, httpContext);
         }

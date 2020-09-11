@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Extensibility.Services;
@@ -44,14 +45,29 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
             return await _adaptee.CheckUserIdentitiesAsync(did, publicKey);
         }
 
-        public async Task<LoginResult<object>> OnSuccessLoginAsync(string did)
+        public Task<bool> IsUserExists(string publicKey)
         {
-            return await _adaptee.OnSuccessLoginAsync(did);
+            return _adaptee.IsUserExists(publicKey);
+        }
+
+        public async Task<LoginResult<object>> OnSuccessLoginAsync(string did, string publicKey)
+        {
+            return await _adaptee.OnSuccessLoginAsync(did, publicKey);
         }
 
         public async Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)
         {
             return await _adaptee.OnSuccessLoginByPublicKeyAsync(publicKey);
+        }
+
+        public Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId, uint fido2SignCounter)
+        {
+            return _adaptee.OnSuccessLoginByFido2Async(fido2CredentialId, fido2SignCounter);
+        }
+
+        public Task<Fido2Info> FindFido2Info(string fido2CredentialId)
+        {
+            return _adaptee.FindFido2Info(fido2CredentialId);
         }
     }
 }

@@ -31,7 +31,7 @@ namespace OwnIdSdk.NetCore3.Flow
             if (!(_serviceProvider.GetService(commandType) is BaseFlowCommand command))
                 throw new InternalLogicException("Can not inject command");
 
-            return await command.ExecuteAsync(input, item, currentStep, commandType != typeof(StartFlowFlowCommand));
+            return await command.ExecuteAsync(input, item, currentStep, commandType != typeof(StartFlowCommand));
         }
     }
 }

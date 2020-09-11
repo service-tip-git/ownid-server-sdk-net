@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
 
 namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
 {
@@ -40,7 +41,8 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         ///     <see cref="LoginResult{T}" /> will be sent to OwnId UI SDK and passed to provided in configuration callback
         /// </summary>
         /// <param name="did">User unique identifier</param>
-        Task<LoginResult<object>> OnSuccessLoginAsync(string did);
+        /// <param name="publicKey">User public key</param>
+        Task<LoginResult<object>> OnSuccessLoginAsync(string did, string publicKey);
 
         /// <summary>
         ///     Will be called whenever a user waits for authorization credentials on success login. Data passed to
@@ -48,6 +50,14 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         /// </summary>
         /// <param name="publicKey">User public key</param>
         Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey);
+
+        /// <summary>
+        ///     Will be called whenever a user waits for authorization credentials on success login. Data passed to
+        ///     <see cref="LoginResult{T}" /> will be sent to OwnId UI SDK and passed to provided in configuration callback
+        /// </summary>
+        /// <param name="fido2CredentialId">fido2 credential id</param>
+        /// <param name="fido2SignCounter">fido2 sign counter</param>
+        Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId, uint fido2SignCounter);
         
         /// <summary>
         /// Will be called to define if user with such did and public key exists.
@@ -57,5 +67,27 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         /// <param name="publicKey">User public key</param>
         /// <returns>Check result <see cref="IdentitiesCheckResult"/></returns>
         Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey);
+
+        /// <summary>
+        ///     Check if user with provided public key already exists
+        /// </summary>
+        /// <param name="publicKey">public key</param>
+        /// <returns>
+        ///     A task that represents the asynchronous check operation.
+        ///     The task result contains true if user with provided public key exists,
+        ///     otherwise false
+        /// </returns>
+        Task<bool> IsUserExists(string publicKey);
+        
+        /// <summary>
+        ///     Try find Fido2 public key by fido2 user id
+        /// </summary>
+        /// <param name="fido2CredentialId">fido2 credential id</param>
+        /// <returns>
+        ///     A task that represents the asynchronous find operation.
+        ///     The task result contains fido2 information if user has been found,
+        ///     otherwise null
+        /// </returns>
+        Task<Fido2Info> FindFido2Info(string fido2CredentialId);
     }
 }

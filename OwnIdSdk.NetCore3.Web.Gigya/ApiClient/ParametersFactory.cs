@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using OwnIdSdk.NetCore3.Extensibility.Json;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
@@ -38,9 +36,9 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
         }
 
         public static IList<KeyValuePair<string, string>> AddParameter(
-            this IList<KeyValuePair<string, string>> nameValueCollection
-            , string key
-            , string value)
+            this IList<KeyValuePair<string, string>> nameValueCollection,
+            string key,
+            string value)
         {
             if (!string.IsNullOrEmpty(value))
                 nameValueCollection.Add(new KeyValuePair<string, string>(key, value));
@@ -49,9 +47,9 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
         }
 
         public static IList<KeyValuePair<string, string>> AddParameter<T>(
-            this IList<KeyValuePair<string, string>> nameValueCollection
-            , string key
-            , T value)
+            this IList<KeyValuePair<string, string>> nameValueCollection,
+            string key,
+            T value)
         {
             nameValueCollection.Add(
                 new KeyValuePair<string, string>(key, OwnIdSerializer.Serialize(value)));

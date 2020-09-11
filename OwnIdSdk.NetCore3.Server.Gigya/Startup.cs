@@ -83,6 +83,22 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         x.IsDevEnvironment = Configuration.GetValue("OwnIdDevelopmentMode", false);
                         x.OwnIdApplicationUrl = new Uri(ownIdSection["web_app_url"] ?? "https://sign.ownid.com");
                         x.OverwriteFields = ownIdSection.GetValue<bool>("overwrite_fields");
+
+                        x.Fido2.Enabled = ownIdSection.GetValue("fido2_enabled", false);
+
+                        if (x.Fido2.Enabled)
+                        {
+                            if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_passwordless_page_url"]))
+                                x.Fido2.PasswordlessPageUrl = new Uri(ownIdSection["fido2_passwordless_page_url"]);
+
+                            x.Fido2.RelyingPartyId = ownIdSection["fido2_relying_party_id"];
+                            x.Fido2.RelyingPartyName = ownIdSection["fido2_relying_party_name"];
+                            x.Fido2.UserDisplayName = ownIdSection["fido2_user_display_name"];
+                            x.Fido2.UserName = ownIdSection["fido2_user_name"];
+                            
+                            if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
+                                x.Fido2.Origin = new Uri(ownIdSection["fido2_origin"]);
+                        }
                     });
                 });
 
@@ -135,10 +151,14 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 .Enrich.WithMachineName()
                 .WriteTo.Debug()
                 .WriteTo.Console();
-
+            
             if (elasticLoggingEnabled)
+            {
+                var version = Assembly.GetExecutingAssembly().GetName().Version;
                 logger.WriteTo.Elasticsearch(ConfigureElasticSink(elasticSection, environment))
-                    .Enrich.WithProperty("source", "net-core-3-sdk");
+                    .Enrich.WithProperty("source", "net-core-3-sdk")
+                    .Enrich.WithProperty("version", version);
+            }
 
             Log.Logger = logger.Enrich.WithProperty("environment", environment)
                 .ReadFrom.Configuration(Configuration)

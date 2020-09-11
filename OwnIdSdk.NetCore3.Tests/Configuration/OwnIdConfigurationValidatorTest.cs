@@ -77,7 +77,9 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
                 CallbackUrl = new Uri("https://localhost:12"),
                 DID = "did",
                 Name = "name",
-                JwtSignCredentials = _sign
+                JwtSignCredentials = _sign,
+                CacheExpirationTimeout = 600000,
+                JwtExpirationTimeout = 60000
             };
         }
 
@@ -87,6 +89,43 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
             var config = GetValidConfiguration();
             config.JwtSignCredentials = null;
             Assert.True(_validator.Validate(string.Empty, config).Failed);
+        }
+        
+        [Theory]
+        [InlineData(true, null, "{0} is required")]
+        [InlineData(true, @"c:\dir\file", "{0} is not valid url")]
+        [InlineData(false, "http://ownid.com", "{0}: https is required for production use")]
+        [InlineData(true, "ftp://ownid.com", "{0}: https or http are supported only")]
+        [InlineData(true, "http://ownid.com?param=val", "{0} should not contain query params")]
+        public void Validate_Invalid_Fido2Url(bool isDev, string fido2Url, string errorMessage)
+        { 
+            var config = GetValidConfiguration();
+            config.Fido2.Enabled = true;
+
+            config.IsDevEnvironment = isDev;
+            if (!string.IsNullOrEmpty(fido2Url))
+                config.Fido2.PasswordlessPageUrl = new Uri(fido2Url);
+
+            var result = _validator.Validate(string.Empty, config);
+            
+            Assert.True(result.Failed);
+            Assert.Equal( string.Format(errorMessage, nameof(config.Fido2.PasswordlessPageUrl)), result.FailureMessage);
+        }
+        
+        [Theory]
+        [InlineData(true, @"http://ownid.com")]
+        [InlineData(false, "https://ownid.com")]
+        public void Validate_Valid_Fido2Url(bool isDev, string fido2Url)
+        { 
+            var config = GetValidConfiguration();
+            config.Fido2.Enabled = true;
+
+            config.Fido2.PasswordlessPageUrl = new Uri(fido2Url);
+            config.IsDevEnvironment = isDev;
+
+            var result = _validator.Validate(string.Empty, config);
+            
+            Assert.True(result.Succeeded);
         }
     }
 }

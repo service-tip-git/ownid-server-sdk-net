@@ -15,11 +15,6 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
     public class ProfileConfiguration : IProfileConfiguration
     {
         /// <summary>
-        ///     Localized field label placeholder
-        /// </summary>
-        private const string FieldNamePlaceholder = "{0}";
-
-        /// <summary>
         ///     Supported validation attributes map for OwnId application usage
         /// </summary>
         private static readonly Dictionary<Type, ProfileValidatorDescription> DataAnnotationAttrsMap =
@@ -58,16 +53,16 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
         {
             if (!ProfileModelType.IsClass || ProfileModelType.IsAbstract || ProfileModelType.IsGenericType)
                 return ValidateOptionsResult.Fail(
-                    $"{nameof(ProfileModelType)} should be non-abstract, non-generic class");
+                    $"Profile model type '{ProfileModelType.FullName}' must be non-abstract, non-generic class");
 
             var props = ProfileModelType.GetProperties();
 
             if (props.Length == 0)
                 return ValidateOptionsResult.Fail(
-                    $"{nameof(ProfileModelType)} should contain at least one public property or field with read/write access");
+                    $"Profile model type '{ProfileModelType.FullName}' must contain at least one public property with read/write access");
 
-            var hasAtLeastOneWritableProp = false;
 
+            var propertiesCount = 0;
             foreach (var propertyInfo in props)
             {
                 if (propertyInfo.DeclaringType != null && (propertyInfo.PropertyType.IsPrimitive ||
@@ -77,7 +72,7 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
                     if (!propertyInfo.CanWrite)
                         Console.Out.WriteLine($"{propertyInfo.Name} has no setter method and will be skipped");
                     else
-                        hasAtLeastOneWritableProp = true;
+                        propertiesCount++;
 
                     continue;
                 }
@@ -88,9 +83,13 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
                 Console.Out.WriteLine($"{propertyInfo.Name} has unsupported type and will be skipped");
             }
 
-            if (!hasAtLeastOneWritableProp)
+            if (propertiesCount == 0)
                 return ValidateOptionsResult.Fail(
-                    $"{nameof(ProfileModelType)} should be have at least one property with setter");
+                    $"Profile model type '{ProfileModelType.FullName}' must have at least one property with setter");
+
+            if (propertiesCount > 50)
+                return ValidateOptionsResult.Fail(
+                    $"Profile model type '{ProfileModelType.FullName}' must contain no more than 50 public properties with read/write access. It contain {propertiesCount}");
 
             return ValidateOptionsResult.Success;
         }
@@ -158,9 +157,9 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
 
             if (validator.NeedsInternalLocalization)
                 validationAttribute.ErrorMessage = validatorDescription.DefaultErrorMessage;
-            
+
             validator.ErrorKey = validationAttribute.ErrorMessage;
-                
+
 
             foreach (var prop in validatorType.GetProperties())
             {

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -30,10 +29,12 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
             if (string.IsNullOrEmpty(bodyString))
                 return;
-
+            
+            var logMessage = OwnIdSerializer.Deserialize<LogMessage>(bodyString);
+            
             using (LogContext.Push(new PropertyEnricher("source", "webapp")))
+            using (LogContext.Push(new PropertyEnricher("version", logMessage.Version)))
             {
-                var logMessage = OwnIdSerializer.Deserialize<LogMessage>(bodyString);
                 if (!Enum.TryParse(logMessage.LogLevel, true, out LogLevel logLevel))
                 {
                     _logger.Log(LogLevel.Warning, "Log with unknown format {logJson}", bodyString);
@@ -61,5 +62,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
         [JsonPropertyName("context")]
         public string Context { get; set; }
+        
+        [JsonPropertyName("version")]
+        public string Version { get; set; }
     }
 }

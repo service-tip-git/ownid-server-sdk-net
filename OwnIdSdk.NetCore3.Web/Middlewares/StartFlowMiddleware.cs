@@ -1,8 +1,8 @@
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
-using OwnIdSdk.NetCore3.Flow;
 using OwnIdSdk.NetCore3.Flow.Commands;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Flow.Steps;
@@ -15,18 +15,26 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     {
         private readonly IFlowRunner _flowRunner;
 
-        public StartFlowMiddleware(RequestDelegate next, IFlowRunner flowRunner,
-            ILogger<StartFlowMiddleware> logger) : base(next, logger)
+        public StartFlowMiddleware(
+            RequestDelegate next,
+            IFlowRunner flowRunner,
+            ILogger<StartFlowMiddleware> logger
+        ) : base(next, logger)
         {
             _flowRunner = flowRunner;
         }
 
         protected override async Task Execute(HttpContext httpContext)
         {
-            var result = await _flowRunner.RunAsync(new CommandInput(RequestIdentity, GetRequestCulture(httpContext)),
-                StepType.Starting);
+            using var requestBodyStreamReader = new StreamReader(httpContext.Request.Body);
+            var requestBody = await requestBodyStreamReader.ReadToEndAsync();
 
-            await Json(httpContext, result, StatusCodes.Status200OK);
+            var commandInput = new CommandInput<string>(RequestIdentity, GetRequestCulture(httpContext), requestBody,
+                ClientDate);
+
+            var commandResult = await _flowRunner.RunAsync(commandInput, StepType.Starting);
+
+            await Json(httpContext, commandResult, StatusCodes.Status200OK);
         }
     }
 }

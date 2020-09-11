@@ -25,7 +25,7 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
             var cacheItemService = fixture.Create<Mock<ICacheItemService>>();
             var jwtComposer = fixture.Create<Mock<IJwtComposer>>();
             var flowController = fixture.Create<Mock<IFlowController>>();
-            
+
             var input = fixture.Create<ICommandInput>();
             var relatedItem = new CacheItem
             {
@@ -39,21 +39,27 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
                 Status = CacheItemStatus.Started,
                 DID = fixture.Create<string>()
             };
-            var currentStepType = StepType.Starting;
+            const StepType currentStepType = StepType.Starting;
             var expectedString = fixture.Create<string>();
 
-            jwtComposer.Setup(x => x.GeneratePinStepJwt(It.IsAny<string>(), It.IsAny<FrontendBehavior>(),
-                It.IsAny<string>(), It.IsAny<string>())).Returns(new Func<string, FrontendBehavior, string, string, string>((c, f, p, l
-            ) => expectedString));
+            jwtComposer.Setup(x => x.GeneratePinStepJwt(It.IsAny<string>(), It.IsAny<DateTime?>(),
+                It.IsAny<FrontendBehavior>(), It.IsAny<string>(), It.IsAny<string>())).Returns(
+                new Func<string, FrontendBehavior, string, string, string>((c, f, p, l
+                ) => expectedString));
 
             var command =
                 new GetSecurityCheckCommand(cacheItemService.Object, jwtComposer.Object, flowController.Object);
 
             var actual = await command.ExecuteAsync(input, relatedItem, currentStepType);
+
             flowController.Verify(x => x.GetExpectedFrontendBehavior(relatedItem, currentStepType));
             cacheItemService.Verify(x => x.SetSecurityCodeAsync(input.Context), Times.Once);
+
             var security = await cacheItemService.Object.SetSecurityCodeAsync(input.Context);
-            jwtComposer.Verify(x => x.GeneratePinStepJwt(input.Context, flowController.Object.GetExpectedFrontendBehavior(relatedItem, currentStepType), security, input.CultureInfo.Name));
+
+            jwtComposer.Verify(x => x.GeneratePinStepJwt(input.Context, null,
+                flowController.Object.GetExpectedFrontendBehavior(relatedItem, currentStepType), security,
+                input.CultureInfo.Name));
             actual.Should().BeEquivalentTo(new JwtContainer(expectedString));
         }
 
@@ -64,17 +70,18 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
             var cacheItemService = fixture.Create<Mock<ICacheItemService>>();
             var jwtComposer = fixture.Create<Mock<IJwtComposer>>();
             var flowController = fixture.Create<Mock<IFlowController>>();
-            
+
             var input = fixture.Create<ICommandInput>();
             var item = fixture.Create<CacheItem>();
             item.RequestToken = input.RequestToken;
             item.ResponseToken = input.ResponseToken;
             item.Status = CacheItemStatus.Finished;
             const StepType currentStepType = StepType.Starting;
-            
+
             var command =
                 new GetSecurityCheckCommand(cacheItemService.Object, jwtComposer.Object, flowController.Object);
-            await Assert.ThrowsAsync<CommandValidationException>(() => command.ExecuteAsync(input, item, currentStepType));
+            await Assert.ThrowsAsync<CommandValidationException>(() =>
+                command.ExecuteAsync(input, item, currentStepType));
             cacheItemService.VerifyNoOtherCalls();
             jwtComposer.VerifyNoOtherCalls();
             flowController.VerifyNoOtherCalls();
@@ -87,14 +94,15 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
             var cacheItemService = fixture.Create<Mock<ICacheItemService>>();
             var jwtComposer = fixture.Create<Mock<IJwtComposer>>();
             var flowController = fixture.Create<Mock<IFlowController>>();
-            
+
             var input = fixture.Create<ICommandInput>();
             var item = fixture.Create<CacheItem>();
             const StepType currentStepType = StepType.Starting;
-            
+
             var command =
                 new GetSecurityCheckCommand(cacheItemService.Object, jwtComposer.Object, flowController.Object);
-            await Assert.ThrowsAsync<CommandValidationException>(() => command.ExecuteAsync(input, item, currentStepType));
+            await Assert.ThrowsAsync<CommandValidationException>(() =>
+                command.ExecuteAsync(input, item, currentStepType));
             cacheItemService.VerifyNoOtherCalls();
             jwtComposer.VerifyNoOtherCalls();
             flowController.VerifyNoOtherCalls();

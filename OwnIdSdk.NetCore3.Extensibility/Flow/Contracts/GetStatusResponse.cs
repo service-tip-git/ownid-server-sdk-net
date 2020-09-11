@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 
 namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts

@@ -40,5 +40,13 @@ namespace OwnIdSdk.NetCore3.Extensibility.Providers
         /// </summary>
         /// <returns>Well-formatted url for Web App connections</returns>
         Uri GetWebAppConnectionsUrl();
+
+        /// <summary>
+        ///     Generate url with redirection to Fido2 path with nested callback url (to Web App)
+        /// </summary>
+        /// <param name="subUrl">Nested url</param>
+        /// <param name="requestType">request type (only <see cref="ChallengeType.Register"/> and <see cref="ChallengeType.Login"/> are supported</param>
+        /// <returns>Well-formatted url for Fido2 page with callback option</returns>
+        Uri GetFido2Url(Uri subUrl, ChallengeType requestType);
     }
 }

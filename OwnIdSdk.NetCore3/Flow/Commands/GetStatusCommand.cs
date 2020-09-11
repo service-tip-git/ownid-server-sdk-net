@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Services;
 using OwnIdSdk.NetCore3.Flow.Adapters;
 using OwnIdSdk.NetCore3.Services;
 
@@ -14,12 +15,15 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
     public class GetStatusCommand
     {
         private readonly ICacheItemService _cacheItemService;
+        private readonly ILocalizationService _localizationService;
         private readonly IUserHandlerAdapter _userHandlerAdapter;
 
-        public GetStatusCommand(IUserHandlerAdapter userHandlerAdapter, ICacheItemService cacheItemService)
+        public GetStatusCommand(IUserHandlerAdapter userHandlerAdapter, ICacheItemService cacheItemService,
+            ILocalizationService localizationService)
         {
             _userHandlerAdapter = userHandlerAdapter;
             _cacheItemService = cacheItemService;
+            _localizationService = localizationService;
         }
 
         public async Task<List<GetStatusResponse>> ExecuteAsync(List<GetStatusRequest> request)
@@ -72,36 +76,104 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                     }
                 };
 
-            if (cacheItem.Status == CacheItemStatus.Finished)
+            if (cacheItem.Status != CacheItemStatus.Finished)
+                return result;
+
+            if (cacheItem.FlowType == FlowType.Authorize)
             {
-                if (cacheItem.PublicKey == null)
+                result.Payload = await _userHandlerAdapter.OnSuccessLoginAsync(cacheItem.DID, cacheItem.PublicKey);
+            }
+            else
+            {
+                switch (cacheItem.ChallengeType)
                 {
-                    result.Payload = await _userHandlerAdapter.OnSuccessLoginAsync(cacheItem.DID);
-                }
-                else
-                {
-                    if (cacheItem.ChallengeType == ChallengeType.Login)
+                    case ChallengeType.Login 
+                        when cacheItem.FlowType == FlowType.Fido2PartialLogin 
+                             && string.IsNullOrWhiteSpace(cacheItem.Fido2CredentialId):
+                    {
+                        var errorMessage = _localizationService.GetLocalizedString("Error_UserNotFound");
+                        result.Payload = new LoginResult<object>(errorMessage);
+                        break;
+                    }
+                    case ChallengeType.Login
+                        when !string.IsNullOrWhiteSpace(cacheItem.Fido2CredentialId)
+                             && cacheItem.Fido2SignatureCounter.HasValue:
+                    {
+                        result.Payload = await _userHandlerAdapter.OnSuccessLoginByFido2Async(
+                            cacheItem.Fido2CredentialId,
+                            cacheItem.Fido2SignatureCounter.Value);
+                        break;
+                    }
+                    case ChallengeType.Login
+                        when await _userHandlerAdapter.IsUserExists(cacheItem.PublicKey):
                     {
                         result.Payload = await _userHandlerAdapter.OnSuccessLoginByPublicKeyAsync(cacheItem.PublicKey);
+                        break;
                     }
-                    else
+                    case ChallengeType.Login
+                        when cacheItem.FlowType == FlowType.PartialAuthorize:
                     {
-                        using var sha256 = new SHA256Managed();
-                        var hash = Convert.ToBase64String(
-                            sha256.ComputeHash(Encoding.UTF8.GetBytes(cacheItem.PublicKey)));
-
+                        var errorMessage = _localizationService.GetLocalizedString("Error_UserNotFound");
+                        result.Payload = new LoginResult<object>(errorMessage);
+                        break;
+                    }
+                    case ChallengeType.Login:
+                        result.Payload = SetPartialRegisterResult(cacheItem.PublicKey);
+                        break;
+                    case ChallengeType.Register
+                        when await _userHandlerAdapter.IsUserExists(cacheItem.PublicKey):
+                    {
+                        var errorMessage = _localizationService.GetLocalizedString("Error_PhoneAlreadyConnected");
+                        result.Payload = new LoginResult<object>(errorMessage);
+                        return result;
+                    }
+                    case ChallengeType.Register
+                        when string.IsNullOrWhiteSpace(cacheItem.Fido2CredentialId):
+                    {
+                        result.Payload = SetPartialRegisterResult(cacheItem.PublicKey);
+                        break;
+                    }
+                    case ChallengeType.Register:
                         result.Payload = new
                         {
                             data = new
                             {
-                                publicKey = cacheItem.PublicKey, hash
+                                pubKey = cacheItem.PublicKey,
+                                fido2SignatureCounter = cacheItem.Fido2SignatureCounter,
+                                fido2CredentialId = cacheItem.Fido2CredentialId
                             }
                         };
-                    }
+                        break;
+                    //
+                    // TODO: fix needed at web-ui-sdk to avoid error in console if data is undefined
+                    //
+                    case ChallengeType.Recover:
+                    case ChallengeType.Link:
+                        result.Payload = new
+                        {
+                            data = new { }
+                        };
+                        break;
                 }
             }
 
             return result;
+        }
+
+        private object SetPartialRegisterResult(string publicKey)
+        {
+            using var sha256 = new SHA256Managed();
+            var hash = Convert.ToBase64String(
+                sha256.ComputeHash(Encoding.UTF8.GetBytes(publicKey)));
+            
+            return new
+            {
+                data = new
+                {
+                    pubKey = publicKey,
+                    keyHsh = hash,
+                }
+            };
         }
     }
 }

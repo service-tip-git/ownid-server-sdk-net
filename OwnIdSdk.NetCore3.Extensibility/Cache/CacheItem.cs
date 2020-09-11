@@ -95,6 +95,16 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
         public bool HasFinalState => Status == CacheItemStatus.Finished || Status == CacheItemStatus.Declined;
 
         /// <summary>
+        ///     Fido2 counter
+        /// </summary>
+        public uint? Fido2SignatureCounter { get; set; }
+        
+        /// <summary>
+        ///     Fido2 credential id
+        /// </summary>
+        public string Fido2CredentialId { get; set; }
+
+        /// <summary>
         ///     Creates new instance of <see cref="CacheItem" /> based on <see cref="Nonce" /> and <see cref="DID" />
         /// </summary>
         public object Clone()
@@ -112,7 +122,9 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
                 Payload = Payload,
                 ConcurrentId = ConcurrentId,
                 SecurityCode = SecurityCode,
-                PublicKey = PublicKey
+                PublicKey = PublicKey,
+                Fido2SignatureCounter = Fido2SignatureCounter,
+                Fido2CredentialId = Fido2CredentialId,
             };
         }
     }

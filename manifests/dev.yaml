@@ -6,7 +6,7 @@ metadata:
   labels:
     app: ownid-server-netcore3-gigya
 spec:
-  revisionHistoryLimit: 2
+  revisionHistoryLimit: 1
   replicas: 2
   selector:
     matchLabels:
@@ -37,13 +37,49 @@ spec:
             - name: OWNID__CACHE_TYPE
               value: redis
             - name: OWNID__CACHE_CONFIG
-              value: ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:6379
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: redis_config
+            - name: OWNID__PUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client1_pub_key
+            - name: OWNID__PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client1_private_key
+            - name: GIGYA__DATA_CENTER
+              value: us1.gigya.com
             - name: GIGYA__SECRET
-              value: g157+kUR3kxvgIX4MneEWnVgBVzhQe4dXfoNe9ceSNA=
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client1_gigya_secret
             - name: GIGYA__API_KEY
-              value: 3_s5-gLs4aLp5FXluP8HXs7_JN40XWNlbvYWVCCkbNCqlhW6Sm5Z4tXGGsHcSJYD3W 
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client1_gigya_api_key
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
+            - name: ELASTICCONFIGURATION__URI
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_uri
+            - name: ELASTICCONFIGURATION__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_username
+            - name: ELASTICCONFIGURATION__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: dev
 ---
@@ -67,7 +103,7 @@ metadata:
   labels:
     app: ownid-server-netcore3-gigya-2
 spec:
-  revisionHistoryLimit: 2
+  revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
@@ -100,13 +136,49 @@ spec:
             - name: OWNID__CACHE_TYPE
               value: redis
             - name: OWNID__CACHE_CONFIG
-              value: ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:6379
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: redis_config
+            - name: OWNID__PUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client2_pub_key
+            - name: OWNID__PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client2_private_key
+            - name: GIGYA__DATA_CENTER
+              value: us1.gigya.com
             - name: GIGYA__SECRET
-              value: g157+kUR3kxvgIX4MneEWnVgBVzhQe4dXfoNe9ceSNA=
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client2_gigya_secret
             - name: GIGYA__API_KEY
-              value: 3_2a9se4yNIANdKO12w7Thbs9TKvylPuzZ3HKu4U_Ys6OhNE6aJKwyyGAPFslL0gJr
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: client2_gigya_api_key
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
+            - name: ELASTICCONFIGURATION__URI
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_uri
+            - name: ELASTICCONFIGURATION__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_username
+            - name: ELASTICCONFIGURATION__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: dev
 ---
@@ -161,7 +233,7 @@ metadata:
   labels:
     app: ownid-server-netcore3-demo-gigya
 spec:
-  revisionHistoryLimit: 2
+  revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
@@ -192,13 +264,49 @@ spec:
             - name: OWNID__CACHE_TYPE
               value: redis
             - name: OWNID__CACHE_CONFIG
-              value: ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:6379
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: redis_config
+            - name: OWNID__PUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo_pub_key
+            - name: OWNID__PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo_private_key
             - name: GIGYA__SECRET
-              value: 0Hg/R8a/riSbbPiACeQZNFvg3c7s0f9uMx+BKaliaU8=
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo_gigya_secret
+            - name: GIGYA__DATA_CENTER
+              value: us1.gigya.com
             - name: GIGYA__API_KEY
-              value: 3_hOdIVleWrXNvjArcZRwHJLiGA4e6Jrcwq7RfH5nL7ZUHyI_77z43_IQrJYxLbiq_
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo_gigya_api_key
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
+            - name: ELASTICCONFIGURATION__URI
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_uri
+            - name: ELASTICCONFIGURATION__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_username
+            - name: ELASTICCONFIGURATION__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: dev
 ---
@@ -222,7 +330,7 @@ metadata:
   labels:
     app: ownid-server-netcore3-demo-gigya-2
 spec:
-  revisionHistoryLimit: 2
+  revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:
@@ -253,13 +361,63 @@ spec:
             - name: OWNID__CACHE_TYPE
               value: redis
             - name: OWNID__CACHE_CONFIG
-              value: ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:6379
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: redis_config
+            - name: OWNID__PUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo2_pub_key
+            - name: OWNID__PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo2_private_key
+            - name: OWNID__FIDO2_ENABLED
+              value: 'true'
+            - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
+              value: https://demo2.dev.ownid.com/passwordless
+            - name: OWNID__FIDO2_RELYING_PARTY_ID
+              value: demo2.dev.ownid.com
+            - name: OWNID__FIDO2_RELYING_PARTY_NAME
+              value: OwnID
+            - name: OWNID__FIDO2_USER_DISPLAY_NAME
+              value: Passwordless
+            - name: OWNID__FIDO2_USER_NAME
+              value: Passwordless              
+            - name: OWNID__FIDO2_ORIGIN
+              value: https://demo2.dev.ownid.com
+            - name: GIGYA__DATA_CENTER
+              value: us1.gigya.com
             - name: GIGYA__SECRET
-              value: 0Hg/R8a/riSbbPiACeQZNFvg3c7s0f9uMx+BKaliaU8=
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo2_gigya_secret
             - name: GIGYA__API_KEY
-              value: 3_7_S7SAvBaZSfIIO9A-kLKFXVzjo3tPUMI0_5KNmAC6tdotjPx8MRy1lxtsfJpcT-
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: demo2_gigya_api_key
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
+            - name: ELASTICCONFIGURATION__URI
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_uri
+            - name: ELASTICCONFIGURATION__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_username
+            - name: ELASTICCONFIGURATION__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: credential-secrets
+                  key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: dev
 ---

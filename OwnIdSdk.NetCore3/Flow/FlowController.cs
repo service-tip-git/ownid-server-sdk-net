@@ -6,6 +6,7 @@ using OwnIdSdk.NetCore3.Extensibility.Providers;
 using OwnIdSdk.NetCore3.Flow.Commands;
 using OwnIdSdk.NetCore3.Flow.Commands.Approval;
 using OwnIdSdk.NetCore3.Flow.Commands.Authorize;
+using OwnIdSdk.NetCore3.Flow.Commands.Fido2;
 using OwnIdSdk.NetCore3.Flow.Commands.Link;
 using OwnIdSdk.NetCore3.Flow.Commands.Recovery;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
@@ -43,7 +44,7 @@ namespace OwnIdSdk.NetCore3.Flow
             {
                 {
                     StepType.Starting,
-                    new Step<StartFlowFlowCommand>(cacheItem => new FrontendBehavior(StepType.Authorize,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Authorize,
                         cacheItem.ChallengeType,
                         new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType))))
                 },
@@ -60,13 +61,15 @@ namespace OwnIdSdk.NetCore3.Flow
             var partialAuthorize = new Dictionary<StepType, IStep>
             {
                 {
-                    StepType.Starting, new Step<StartFlowFlowCommand>(cacheItem =>
+                    StepType.Starting,
+                    new Step<StartFlowCommand>(cacheItem =>
                         new FrontendBehavior(StepType.InstantAuthorize, cacheItem.ChallengeType,
                             new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
                                 "/partial"))))
                 },
                 {
-                    StepType.InstantAuthorize, new Step<SavePartialProfileCommand>(cacheItem => new FrontendBehavior
+                    StepType.InstantAuthorize,
+                    new Step<SavePartialProfileCommand>(cacheItem => new FrontendBehavior
                     {
                         Type = StepType.Success,
                         ActionType = ActionType.Finish,
@@ -75,10 +78,10 @@ namespace OwnIdSdk.NetCore3.Flow
                 }
             };
 
-            var linkWithoutPin = new Dictionary<StepType, IStep>
+            var link = new Dictionary<StepType, IStep>
             {
                 {
-                    StepType.Starting, new Step<StartFlowFlowCommand>(cacheItem => new FrontendBehavior(StepType.Link,
+                    StepType.Starting, new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Link,
                         cacheItem.ChallengeType,
                         new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType))))
                 },
@@ -96,7 +99,7 @@ namespace OwnIdSdk.NetCore3.Flow
             {
                 {
                     StepType.Starting,
-                    new Step<StartFlowFlowCommand>(cacheItem => new FrontendBehavior(StepType.ApprovePin,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.ApprovePin,
                         cacheItem.ChallengeType,
                         new PollingAction(_urlProvider.GetSecurityApprovalStatusUrl(cacheItem.Context),
                             _coreConfiguration.PollingInterval)))
@@ -119,7 +122,8 @@ namespace OwnIdSdk.NetCore3.Flow
                     })
                 },
                 {
-                    StepType.Link, new Step<SaveAccountLinkCommand>(cacheItem => new FrontendBehavior
+                    StepType.Link,
+                    new Step<SaveAccountLinkCommand>(cacheItem => new FrontendBehavior
                     {
                         Type = StepType.Success,
                         ChallengeType = cacheItem.ChallengeType,
@@ -128,11 +132,11 @@ namespace OwnIdSdk.NetCore3.Flow
                 }
             };
 
-            var recoverWithoutPin = new Dictionary<StepType, IStep>
+            var recover = new Dictionary<StepType, IStep>
             {
                 {
                     StepType.Starting,
-                    new Step<StartFlowFlowCommand>(cacheItem => new FrontendBehavior(StepType.Recover,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Recover,
                         cacheItem.ChallengeType,
                         new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType))))
                 },
@@ -150,7 +154,7 @@ namespace OwnIdSdk.NetCore3.Flow
             {
                 {
                     StepType.Starting,
-                    new Step<StartFlowFlowCommand>(cacheItem => new FrontendBehavior(StepType.ApprovePin,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.ApprovePin,
                         cacheItem.ChallengeType,
                         new PollingAction(_urlProvider.GetSecurityApprovalStatusUrl(cacheItem.Context),
                             _coreConfiguration.PollingInterval)))
@@ -182,14 +186,95 @@ namespace OwnIdSdk.NetCore3.Flow
                 }
             };
 
+            var fido2PartialRegister = new Dictionary<StepType, IStep>
+            {
+                {
+                    StepType.Starting,
+                    new Step<Fido2RegisterCommand>(cacheItem => new FrontendBehavior
+                    {
+                        Type = StepType.Fido2Success,
+                        ActionType = ActionType.Finish,
+                        ChallengeType = cacheItem.ChallengeType
+                    })
+                }
+            };
+
+            var fido2PartialLogin = new Dictionary<StepType, IStep>
+            {
+                {
+                    StepType.Starting,
+                    new Step<Fido2LoginCommand>(cacheItem => new FrontendBehavior
+                    {
+                        Type = StepType.Fido2Success,
+                        ActionType = ActionType.Finish,
+                        ChallengeType = cacheItem.ChallengeType
+                    })
+                }
+            };
+
+            var fido2Link = new Dictionary<StepType, IStep>
+            {
+                {
+                    StepType.Starting,
+                    new Step<Fido2LinkCommand>(cacheItem => new FrontendBehavior
+                    {
+                        Type = StepType.Fido2Success,
+                        ActionType = ActionType.Finish,
+                        ChallengeType = cacheItem.ChallengeType
+                    })
+                }
+            };
+
+            var fido2Recover = new Dictionary<StepType, IStep>
+            {
+                {
+                    StepType.Starting,
+                    new Step<Fido2RecoverCommand>(cacheItem => new FrontendBehavior
+                    {
+                        Type = StepType.Fido2Success,
+                        ActionType = ActionType.Finish,
+                        ChallengeType = cacheItem.ChallengeType
+                    })
+                }
+            };
+
+            var fido2LinkAndRecoverWithPin = new Dictionary<StepType, IStep>
+            {
+                {
+                    StepType.Starting,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(
+                        StepType.ApprovePin,
+                        cacheItem.ChallengeType,
+                        new PollingAction(_urlProvider.GetSecurityApprovalStatusUrl(cacheItem.Context),
+                            _coreConfiguration.PollingInterval)))
+                },
+                {
+                    StepType.ApprovePin,
+                    new Step<GetApprovalStatusCommand>(cacheItem => new FrontendBehavior
+                    {
+                        Type = cacheItem.Status == CacheItemStatus.Approved
+                            ? StepType.Success
+                            : StepType.Declined,
+                        ChallengeType = cacheItem.ChallengeType,
+                        ActionType = ActionType.Finish,
+                    })
+                }
+            };
+
             StepMap = new Dictionary<FlowType, Dictionary<StepType, IStep>>
             {
                 {FlowType.Authorize, authorize},
                 {FlowType.PartialAuthorize, partialAuthorize},
-                {FlowType.Link, linkWithoutPin},
+                {FlowType.Link, link},
                 {FlowType.LinkWithPin, linkWithPin},
-                {FlowType.Recover, recoverWithoutPin},
-                {FlowType.RecoverWithPin, recoverWitPin}
+                {FlowType.Recover, recover},
+                {FlowType.RecoverWithPin, recoverWitPin},
+                {FlowType.Fido2PartialRegister, fido2PartialRegister},
+                {FlowType.Fido2PartialLogin, fido2PartialLogin},
+                {FlowType.Fido2Link, fido2Link},
+                {FlowType.Fido2LinkWithPin, fido2LinkAndRecoverWithPin},
+                {FlowType.Fido2Recover, fido2Recover},
+                {FlowType.Fido2RecoverWithPin, fido2LinkAndRecoverWithPin},
             };
         }
     }
