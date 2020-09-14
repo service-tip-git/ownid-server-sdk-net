@@ -278,13 +278,27 @@ spec:
                 secretKeyRef:
                   name: credential-secrets
                   key: demo_private_key
+            - name: OWNID__FIDO2_ENABLED
+              value: 'true'
+            - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
+              value: https://demo.dev.ownid.com/passwordless
+            - name: OWNID__FIDO2_RELYING_PARTY_ID
+              value: demo.dev.ownid.com
+            - name: OWNID__FIDO2_RELYING_PARTY_NAME
+              value: OwnID
+            - name: OWNID__FIDO2_USER_DISPLAY_NAME
+              value: Passwordless
+            - name: OWNID__FIDO2_USER_NAME
+              value: Passwordless
+            - name: OWNID__FIDO2_ORIGIN
+              value: https://demo.dev.ownid.com
+            - name: GIGYA__DATA_CENTER
+              value: us1.gigya.com
             - name: GIGYA__SECRET
               valueFrom:
                 secretKeyRef:
                   name: credential-secrets
                   key: demo_gigya_secret
-            - name: GIGYA__DATA_CENTER
-              value: us1.gigya.com
             - name: GIGYA__API_KEY
               valueFrom:
                 secretKeyRef:
