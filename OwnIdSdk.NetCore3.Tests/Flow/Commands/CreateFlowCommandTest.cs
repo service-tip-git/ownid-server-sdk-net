@@ -42,6 +42,7 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
             var identitiesProvider = fixture.Freeze<IIdentitiesProvider>();
             var configuration = fixture.Freeze<IOwnIdCoreConfiguration>();
             var linkAdapter = fixture.Freeze<Mock<IAccountLinkHandler>>();
+            var language = fixture.Freeze<string>();
 
             configuration.Fido2.Enabled = fido2Enabled;
             configuration.MaximumNumberOfConnectedDevices = 99;
@@ -58,7 +59,8 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
                 Type = challengeType,
                 IsQr = isQr,
                 IsPartial = isPartial,
-                Payload = payload
+                Payload = payload,
+                Language = language
             });
 
             var context = identitiesProvider.GenerateContext();
@@ -76,10 +78,12 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
             else
                 did = null;
 
-            cacheService.Verify(x => x.CreateAuthFlowSessionItemAsync(context, nonce, challengeType, expectedFlowType, did, payload),
+            cacheService.Verify(
+                x => x.CreateAuthFlowSessionItemAsync(context, nonce, challengeType, expectedFlowType, did, payload),
                 Times.Once);
 
-            var url = urlProvider.GetWebAppSignWithCallbackUrl(urlProvider.GetStartFlowUrl(context));
+
+            var url = urlProvider.GetWebAppSignWithCallbackUrl(urlProvider.GetStartFlowUrl(context), language);
 
             if (fido2Enabled)
                 url = urlProvider.GetFido2Url(url, challengeType);

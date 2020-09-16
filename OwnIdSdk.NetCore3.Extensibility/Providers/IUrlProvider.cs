@@ -32,8 +32,9 @@ namespace OwnIdSdk.NetCore3.Extensibility.Providers
         ///     Generated url with redirection to Web App with nested callback url (to server side endpoint)
         /// </summary>
         /// <param name="subUrl">Nested url that will be used as callback</param>
+        /// <param name="language">language</param>
         /// <returns>Well-formatted url for Web App with callback option</returns>
-        Uri GetWebAppSignWithCallbackUrl(Uri subUrl);
+        Uri GetWebAppSignWithCallbackUrl(Uri subUrl, string language);
 
         /// <summary>
         /// Generates url to Web App connections

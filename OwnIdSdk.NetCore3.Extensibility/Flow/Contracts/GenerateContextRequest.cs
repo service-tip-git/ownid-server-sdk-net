@@ -29,5 +29,11 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts
         /// </summary>
         [JsonPropertyName("data")]
         public object Payload { get; set; }
+        
+        /// <summary>
+        ///     Language
+        /// </summary>
+        [JsonPropertyName("language")]
+        public string Language { get; set; }
     }
 }

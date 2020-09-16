@@ -68,7 +68,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 did, payload);
 
             var startFlowUrl = _urlProvider.GetStartFlowUrl(challengeContext);
-            var destinationUrl = _urlProvider.GetWebAppSignWithCallbackUrl(startFlowUrl);
+            var destinationUrl = _urlProvider.GetWebAppSignWithCallbackUrl(startFlowUrl, request.Language);
 
             if (_coreConfiguration.Fido2.Enabled
                 && (
