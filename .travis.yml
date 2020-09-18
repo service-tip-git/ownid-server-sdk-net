@@ -18,6 +18,7 @@ branches:
   - master
   - develop
   - alpha-rti
+  - andrii/169-FOR-TEST-ONLY-Security_-_WebApp_to_validate_context_on_response
 
 env:
   global:
@@ -32,7 +33,7 @@ jobs:
       env:
         ENV=staging
         REPOSITORY_URI=571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging
-    - if: branch=develop
+    - if: branch=andrii/169-FOR-TEST-ONLY-Security_-_WebApp_to_validate_context_on_response
       env:
         ENV=dev
         REPOSITORY_URI=571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-develop
@@ -67,7 +68,7 @@ deploy:
   skip_cleanup: true
   on:
       all_branches: true
-      condition: $TRAVIS_BRANCH =~ ^(develop|master)$
+      condition: $TRAVIS_BRANCH =~ ^(develop|master|andrii\/169-FOR-TEST-ONLY-Security_-_WebApp_to_validate_context_on_response)$
 - provider: script
   script: sh scripts/alpha-deploy.sh $REPOSITORY_URI $IMAGE_TAG alpha
   skip_cleanup: true
