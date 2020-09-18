@@ -58,6 +58,8 @@ namespace OwnIdSdk.NetCore3.Web.Features
 
             services.TryAddSingleton<IFlowController, FlowController>();
             services.TryAddSingleton<IFlowRunner, FlowRunner>();
+            
+            services.TryAddSingleton<IsFido2UserExistsCommand>();
 
             if (_configuration.Fido2.Enabled)
             {
@@ -72,8 +74,6 @@ namespace OwnIdSdk.NetCore3.Web.Features
                 services.TryAddSingleton<Fido2RecoverWithPinCommand>();
                 services.TryAddSingleton<Fido2RecoverWithPinCommand>();
                 
-                services.TryAddSingleton<IsFido2UserExistsCommand>();
-
                 services.AddFido2(fido2Config =>
                 {
                     var str = _configuration.Fido2.Origin.ToString().TrimEnd(new[] {'/'}).Trim();
