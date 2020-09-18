@@ -12,8 +12,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
     public class CreateFlowCommand
     {
         private readonly ICacheItemService _cacheItemService;
-        private readonly IIdentitiesProvider _identitiesProvider;
         private readonly IOwnIdCoreConfiguration _coreConfiguration;
+        private readonly IIdentitiesProvider _identitiesProvider;
         private readonly IAccountLinkHandler _linkHandler;
         private readonly IUrlProvider _urlProvider;
 
@@ -76,9 +76,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                     || request.Type == ChallengeType.Link
                     || request.Type == ChallengeType.Recover
                 ))
-            {
                 destinationUrl = _urlProvider.GetFido2Url(destinationUrl, request.Type);
-            }
 
             return new GetChallengeLinkResponse(
                 challengeContext,

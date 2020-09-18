@@ -59,7 +59,7 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
             email.Type.Should().Be("email");
             email.Validators.Count.Should().Be(2);
             email.Validators.Should().Contain(x => x.Type == "required");
-            email.Validators.Should().Contain(x =>  x.Type == "email");
+            email.Validators.Should().Contain(x => x.Type == "email");
 
             var name = config.ProfileFieldMetadata[2];
             name.Key.Should().Be("Name");
@@ -77,11 +77,11 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         public string Email { get; set; }
 
         public string Name { get; set; }
-        
+
         public int Num { get; set; }
-        
+
         public MyStruct Test { get; set; }
-        
+
         public struct MyStruct
         {
         }

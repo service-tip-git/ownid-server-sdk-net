@@ -19,12 +19,12 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 {
     public class Fido2LoginCommand : BaseFlowCommand
     {
-        private readonly IFido2 _fido2;
-        private readonly IUserHandlerAdapter _userHandlerAdapter;
         private readonly ICacheItemService _cacheItemService;
-        private readonly IJwtComposer _jwtComposer;
-        private readonly IFlowController _flowController;
         private readonly IOwnIdCoreConfiguration _configuration;
+        private readonly IFido2 _fido2;
+        private readonly IFlowController _flowController;
+        private readonly IJwtComposer _jwtComposer;
+        private readonly IUserHandlerAdapter _userHandlerAdapter;
 
         public Fido2LoginCommand(
             IFido2 fido2,
@@ -64,7 +64,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, request.Info.CredentialId,
                     string.Empty);
 
-                var jwt2 = _jwtComposer.GenerateBaseStep(relatedItem.Context, input.ClientDate, frontendBehavior,
+                var jwt2 = _jwtComposer.GenerateBaseStepJwt(relatedItem.Context, input.ClientDate, frontendBehavior,
                     request.Info.CredentialId, input.CultureInfo?.Name, true);
 
                 return new JwtContainer(jwt2);
@@ -73,9 +73,9 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             var options = new AssertionOptions
             {
                 Challenge = Encoding.ASCII.GetBytes(relatedItem.Context),
-                RpId = _configuration.Fido2.RelyingPartyId,
+                RpId = _configuration.Fido2.RelyingPartyId
             };
-            
+
             var fidoResponse = new AuthenticatorAssertionRawResponse
             {
                 Extensions = new AuthenticationExtensionsClientOutputs(),
@@ -96,7 +96,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 options,
                 Base64Url.Decode(storedFido2Info.PublicKey),
                 storedFido2Info.SignatureCounter,
-                (args) =>
+                args =>
                 {
                     var storedCredentialId = Base64Url.Decode(storedFido2Info.CredentialId);
                     var storedCredDescriptor = new PublicKeyCredentialDescriptor(storedCredentialId);
@@ -114,7 +114,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 storedFido2Info.UserId,
                 storedFido2Info.PublicKey);
 
-            var jwt = _jwtComposer.GenerateBaseStep(
+            var jwt = _jwtComposer.GenerateBaseStepJwt(
                 relatedItem.Context,
                 input.ClientDate, _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
                 storedFido2Info.UserId, input.CultureInfo?.Name, true);

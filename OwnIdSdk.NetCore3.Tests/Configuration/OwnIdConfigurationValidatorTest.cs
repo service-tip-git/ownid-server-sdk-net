@@ -8,6 +8,9 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
 {
     public class OwnIdConfigurationValidatorTest : IDisposable
     {
+        private readonly RSA _sign;
+        private readonly OwnIdCoreConfigurationValidator _validator;
+
         public OwnIdConfigurationValidatorTest()
         {
             _sign = RSA.Create();
@@ -18,9 +21,6 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         {
             _sign?.Dispose();
         }
-
-        private readonly RSA _sign;
-        private readonly OwnIdCoreConfigurationValidator _validator;
 
         [Theory]
         [InlineData(null)]
@@ -97,7 +97,7 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
             config.JwtSignCredentials = null;
             _validator.Validate(string.Empty, config).Failed.Should().BeTrue();
         }
-        
+
         [Theory]
         [InlineData(true, null, "{0} is required")]
         [InlineData(true, @"c:\dir\file", "{0} is not valid url")]
@@ -105,7 +105,7 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         [InlineData(true, "ftp://ownid.com", "{0}: https or http are supported only")]
         [InlineData(true, "http://ownid.com?param=val", "{0} should not contain query params")]
         public void Validate_Invalid_Fido2Url(bool isDev, string fido2Url, string errorMessage)
-        { 
+        {
             var config = GetValidConfiguration();
             config.Fido2.Enabled = true;
 
@@ -118,12 +118,12 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
             result.Failed.Should().BeTrue();
             result.FailureMessage.Should().BeEquivalentTo(expectedError);
         }
-        
+
         [Theory]
         [InlineData(true, @"http://ownid.com")]
         [InlineData(false, "https://ownid.com")]
         public void Validate_Valid_Fido2Url(bool isDev, string fido2Url)
-        { 
+        {
             var config = GetValidConfiguration();
             config.Fido2.Enabled = true;
 
@@ -131,10 +131,10 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
             config.IsDevEnvironment = isDev;
 
             var result = _validator.Validate(string.Empty, config);
-            
+
             result.Succeeded.Should().BeTrue();
         }
-        
+
         [Theory]
         [InlineData(true, null, "{0} is required")]
         [InlineData(true, @"c:\dir\file", "{0} is not valid url")]
@@ -142,7 +142,7 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         [InlineData(true, "ftp://ownid.com", "{0}: https or http are supported only")]
         [InlineData(true, "http://ownid.com?param=val", "{0} should not contain query params")]
         public void Validate_Invalid_Origin(bool isDev, string originUrl, string errorMessage)
-        { 
+        {
             var config = GetValidConfiguration();
             config.Fido2.Enabled = true;
 
@@ -155,12 +155,12 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
             result.Failed.Should().BeTrue();
             result.FailureMessage.Should().BeEquivalentTo(expectedError);
         }
-        
+
         [Theory]
         [InlineData(true, @"http://ownid.com")]
         [InlineData(false, "https://ownid.com")]
         public void Validate_Valid_Origin(bool isDev, string fido2Url)
-        { 
+        {
             var config = GetValidConfiguration();
             config.Fido2.Enabled = true;
 
@@ -168,7 +168,7 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
             config.IsDevEnvironment = isDev;
 
             var result = _validator.Validate(string.Empty, config);
-            
+
             result.Succeeded.Should().BeTrue();
         }
     }

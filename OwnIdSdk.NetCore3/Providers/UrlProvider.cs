@@ -12,13 +12,6 @@ namespace OwnIdSdk.NetCore3.Providers
     /// <inheritdoc cref="IUrlProvider" />
     public class UrlProvider : IUrlProvider
     {
-        private static class QueryStringParameters
-        {
-            public const string CallBackUrl = "q";
-            public const string Language = "l";
-            public const string RequestType = "t";
-        }
-        
         private readonly IOwnIdCoreConfiguration _coreConfiguration;
 
         public UrlProvider(IOwnIdCoreConfiguration coreConfiguration)
@@ -81,6 +74,11 @@ namespace OwnIdSdk.NetCore3.Providers
             return deepLink.Uri;
         }
 
+        public Uri GetConnectionRecoveryUrl(string context)
+        {
+            return GetBaseActionUrl(context, "conn-recovery");
+        }
+
         public Uri GetWebAppConnectionsUrl()
         {
             return new Uri(_coreConfiguration.OwnIdApplicationUrl, "account");
@@ -96,6 +94,13 @@ namespace OwnIdSdk.NetCore3.Providers
                     : _coreConfiguration.CallbackUrl.PathAndQuery + "/";
 
             return new Uri(_coreConfiguration.CallbackUrl, $"{path}ownid/{context}/{action}");
+        }
+
+        private static class QueryStringParameters
+        {
+            public const string CallBackUrl = "q";
+            public const string Language = "l";
+            public const string RequestType = "t";
         }
     }
 }

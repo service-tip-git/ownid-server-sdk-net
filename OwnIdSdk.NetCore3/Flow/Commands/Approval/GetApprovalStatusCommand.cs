@@ -20,7 +20,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Approval
         private readonly IJwtComposer _jwtComposer;
         private readonly IAccountRecoveryHandler _recoveryHandler;
         private readonly IServiceProvider _serviceProvider;
-        
+
         public GetApprovalStatusCommand(IJwtComposer jwtComposer, IFlowController flowController,
             IAccountRecoveryHandler recoveryHandler, IServiceProvider serviceProvider)
         {

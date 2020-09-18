@@ -20,9 +20,9 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
     public class StartFlowCommand : BaseFlowCommand
     {
         private readonly ICacheItemService _cacheItemService;
+        private readonly IOwnIdCoreConfiguration _configuration;
         private readonly IJwtService _jwtService;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IOwnIdCoreConfiguration _configuration;
 
         public StartFlowCommand(ICacheItemService cacheItemService, IJwtService jwtService,
             IServiceProvider serviceProvider, IOwnIdCoreConfiguration configuration)
@@ -85,9 +85,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 && cacheItem.FlowType != FlowType.Recover
                 && cacheItem.FlowType != FlowType.LinkWithPin
                 && cacheItem.FlowType != FlowType.RecoverWithPin)
-            {
                 return;
-            }
 
             if (string.IsNullOrEmpty(requestBody))
                 return;
@@ -105,9 +103,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             if (json == null
                 || !json.RootElement.TryGetProperty("fido2", out var fido2Element)
                 || !fido2Element.TryGetProperty("type", out var typeElement))
-            {
                 return;
-            }
 
             var initialFlowType = cacheItem.FlowType;
             var fido2RequestType = typeElement.GetString();
@@ -135,9 +131,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             }
 
             if (initialFlowType != cacheItem.FlowType)
-            {
                 await _cacheItemService.UpdateFlowAsync(cacheItem.Context, cacheItem.FlowType);
-            }
         }
     }
 }

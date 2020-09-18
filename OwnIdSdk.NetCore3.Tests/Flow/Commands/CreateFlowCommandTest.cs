@@ -46,7 +46,7 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
 
             configuration.Fido2.Enabled = fido2Enabled;
             configuration.MaximumNumberOfConnectedDevices = 99;
-            
+
             var did = fixture.Create<string>();
             linkAdapter.Setup(x => x.GetCurrentUserLinkStateAsync(It.IsAny<string>()))
                 .ReturnsAsync(new LinkState(did, 1));
@@ -76,7 +76,9 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
                 payload = null;
             }
             else
+            {
                 did = null;
+            }
 
             cacheService.Verify(
                 x => x.CreateAuthFlowSessionItemAsync(context, nonce, challengeType, expectedFlowType, did, payload),

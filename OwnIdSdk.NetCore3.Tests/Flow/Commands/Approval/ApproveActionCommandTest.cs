@@ -14,7 +14,8 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands.Approval
     {
         [Theory]
         [AutoMoqData]
-        public async Task ExecuteAsync_Fail_EmptyContext(Mock<ICacheItemService> cacheService, ApproveActionRequest request)
+        public async Task ExecuteAsync_Fail_EmptyContext(Mock<ICacheItemService> cacheService,
+            ApproveActionRequest request)
         {
             const string errorMessage = "Context and nonce are required";
             request.Context = null;
@@ -28,7 +29,8 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands.Approval
 
         [Theory]
         [AutoMoqData]
-        public async Task ExecuteAsync_Fail_EmptyNonce(Mock<ICacheItemService> cacheService, ApproveActionRequest request)
+        public async Task ExecuteAsync_Fail_EmptyNonce(Mock<ICacheItemService> cacheService,
+            ApproveActionRequest request)
         {
             const string errorMessage = "Context and nonce are required";
             request.Nonce = null;
@@ -46,7 +48,8 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands.Approval
         {
             var command = new ApproveActionCommand(cacheService.Object);
             await command.ExecuteAsync(request);
-            cacheService.Verify(x=>x.SetApprovalResolutionAsync(request.Context, request.Nonce, request.IsApproved), Times.Once);
+            cacheService.Verify(x => x.SetApprovalResolutionAsync(request.Context, request.Nonce, request.IsApproved),
+                Times.Once);
         }
     }
 }

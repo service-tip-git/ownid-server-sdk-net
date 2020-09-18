@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.ConnectionRecovery;
 using OwnIdSdk.NetCore3.Extensibility.Services;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Flow.Steps;
@@ -41,8 +42,7 @@ namespace OwnIdSdk.NetCore3.Flow
         /// <param name="includeRequester">Optional. Default = false. True if should add requester info to jwt</param>
         /// <returns>Base64 encoded string that contains JWT with hash</returns>
         public string GenerateProfileConfigJwt(string context, DateTime? clientDate,
-            FrontendBehavior nextFrontendBehavior, string did,
-            string locale = null, bool includeRequester = false)
+            FrontendBehavior nextFrontendBehavior, string did, string locale = null, bool includeRequester = false)
         {
             var data = GetFieldsConfigDictionary(did);
 
@@ -90,7 +90,7 @@ namespace OwnIdSdk.NetCore3.Flow
             return _jwtService.GenerateDataJwt(fields, clientDate);
         }
 
-        public string GenerateBaseStep(string context, DateTime? clientDate, FrontendBehavior nextFrontendBehavior,
+        public string GenerateBaseStepJwt(string context, DateTime? clientDate, FrontendBehavior nextFrontendBehavior,
             string did, string locale = null, bool includeRequester = false)
         {
             var (didKey, didValue) = GetDid(did);
@@ -112,8 +112,40 @@ namespace OwnIdSdk.NetCore3.Flow
             return _jwtService.GenerateDataJwt(fields, clientDate);
         }
 
+        public string GenerateRecoveryDataJwt(string context, DateTime? clientDate,
+            FrontendBehavior nextFrontendBehavior, ConnectionRecoveryResult<object> data, string locale = null)
+        {
+            var (didKey, didValue) = GetDid(data.DID);
+            var dataDict = new Dictionary<string, object>
+            {
+                {"profile", data.UserProfile},
+                {didKey, didValue},
+                {"pubKey", data.PublicKey},
+                {"recoveryData", data.RecoveryData}
+            };
+            var fields = GetBaseFlowFieldsDictionary(context, nextFrontendBehavior, dataDict, locale);
+            return _jwtService.GenerateDataJwt(fields, clientDate);
+        }
+
         private Dictionary<string, object> GetBaseFlowFieldsDictionary(string context,
             FrontendBehavior nextFrontendBehavior, object data = null, string locale = null)
+        {
+            var stepDict = GetStepBehavior(nextFrontendBehavior);
+
+            var fields = new Dictionary<string, object>
+            {
+                {"jti", context},
+                {"locale", locale},
+                {"nextStep", stepDict}
+            };
+
+            if (data != null)
+                fields.Add("data", data);
+
+            return fields;
+        }
+
+        private Dictionary<string, object> GetStepBehavior(FrontendBehavior nextFrontendBehavior)
         {
             var stepType = nextFrontendBehavior.Type.ToString();
             var actionType = nextFrontendBehavior.ActionType.ToString();
@@ -139,17 +171,10 @@ namespace OwnIdSdk.NetCore3.Flow
                     method = nextFrontendBehavior.Callback.Method
                 });
 
-            var fields = new Dictionary<string, object>
-            {
-                {"jti", context},
-                {"locale", locale},
-                {"nextStep", stepDict}
-            };
+            if (nextFrontendBehavior.AlternativeBehavior != null)
+                stepDict.Add("alternativeBehavior", GetStepBehavior(nextFrontendBehavior.AlternativeBehavior));
 
-            if (data != null)
-                fields.Add("data", data);
-
-            return fields;
+            return stepDict;
         }
 
         private Dictionary<string, object> GetFieldsConfigDictionary(string did)

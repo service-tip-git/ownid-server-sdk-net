@@ -14,7 +14,7 @@ namespace OwnIdSdk.NetCore3.Tests.Cryptography
         {
             const string inputStr = "test1";
             const string expectedSha1Hash = "tESsBmE/yNY3lb6a0L6vVQEZNqw=";
-            
+
             var fixture = new Fixture().SetOwnidSpecificSettings();
             var configMock = fixture.Create<OwnIdCoreConfiguration>();
             var jwtService = new JwtService(configMock);

@@ -20,7 +20,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         ///     Indicates if there is any error (general or field)
         /// </summary>
         bool HasErrors => GeneralErrors.Any() ||
-                                 FieldErrors.Any(x => x.Value.Any());
+                          FieldErrors.Any(x => x.Value.Any());
 
         /// <summary>
         ///     Executes validation with current context

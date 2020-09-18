@@ -55,6 +55,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
             services.TryAddSingleton<SaveAccountLinkCommand>();
             services.TryAddSingleton<RecoverAccountCommand>();
             services.TryAddSingleton<SaveAccountPublicKeyCommand>();
+            services.TryAddSingleton<InternalConnectionRecoveryCommand>();
 
             services.TryAddSingleton<IFlowController, FlowController>();
             services.TryAddSingleton<IFlowRunner, FlowRunner>();
@@ -65,11 +66,11 @@ namespace OwnIdSdk.NetCore3.Web.Features
             {
                 services.TryAddSingleton<Fido2RegisterCommand>();
                 services.TryAddSingleton<Fido2LoginCommand>();
-                
+
                 services.TryAddSingleton<Fido2LinkCommand>();
                 services.TryAddSingleton<Fido2GetSecurityCheckCommand>();
                 services.TryAddSingleton<Fido2LinkWithPinCommand>();
-                
+
                 services.TryAddSingleton<Fido2RecoverCommand>();
                 services.TryAddSingleton<Fido2RecoverWithPinCommand>();
                 services.TryAddSingleton<Fido2RecoverWithPinCommand>();
@@ -124,12 +125,12 @@ namespace OwnIdSdk.NetCore3.Web.Features
             WithKeys(publicKeyReader, privateKeyReader);
             return this;
         }
-        
+
         public CoreFeature WithKeys(TextReader publicKeyReader, TextReader privateKeyReader)
         {
             _configuration.JwtSignCredentials = RsaHelper.LoadKeys(publicKeyReader, privateKeyReader);
             return this;
-        } 
+        }
 
         public CoreFeature WithKeys(RSA rsa)
         {

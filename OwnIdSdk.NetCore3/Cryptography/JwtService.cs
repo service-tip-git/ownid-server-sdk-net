@@ -72,10 +72,12 @@ namespace OwnIdSdk.NetCore3.Cryptography
             var rsaSecurityKey = new RsaSecurityKey(_ownIdCoreConfiguration.JwtSignCredentials);
             var tokenHandler = new JwtSecurityTokenHandler();
 
-            var expires = (issuedAt ?? DateTime.UtcNow).Add(TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.JwtExpirationTimeout));
+            var expires =
+                (issuedAt ?? DateTime.UtcNow).Add(
+                    TimeSpan.FromMilliseconds(_ownIdCoreConfiguration.JwtExpirationTimeout));
 
             issuedAt ??= DateTime.UtcNow.Add(TimeSpan.FromHours(-1));
-            
+
             var payload = new JwtPayload(null, null, null, issuedAt, expires, issuedAt);
 
             foreach (var (key, value) in data) payload.Add(key, value);
@@ -85,7 +87,7 @@ namespace OwnIdSdk.NetCore3.Cryptography
 
             return tokenHandler.WriteToken(jwt);
         }
-        
+
         /// <summary>
         ///     Gets hash of Base64 encoded JWT string
         /// </summary>

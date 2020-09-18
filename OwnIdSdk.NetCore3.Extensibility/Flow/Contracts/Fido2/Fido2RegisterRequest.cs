@@ -6,7 +6,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2
     {
         [JsonPropertyName("fido2")]
         public RegisterInfo Info { get; set; }
-        
+
         public class RegisterInfo
         {
             public string ClientDataJSON { get; set; }

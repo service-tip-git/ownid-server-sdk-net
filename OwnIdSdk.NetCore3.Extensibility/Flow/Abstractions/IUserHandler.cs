@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.ConnectionRecovery;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
 
 namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
@@ -25,8 +26,11 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         ///     <see cref="IUserProfileFormContext{TProfile}" /> that provides valid user information and allows
         ///     to add validation or general errors
         /// </param>
-        Task CreateProfileAsync(IUserProfileFormContext<TProfile> context);
-        
+        /// <param name="recoveryToken">Recovery token</param>
+        /// <param name="recoveryData">Recovery data</param>
+        Task CreateProfileAsync(IUserProfileFormContext<TProfile> context, string recoveryToken = null,
+            string recoveryData = null);
+
         /// <summary>
         ///     Will be called whenever a user provided his profile data on registration or login
         /// </summary>
@@ -60,12 +64,12 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         Task<AuthResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId, uint fido2SignCounter);
         
         /// <summary>
-        /// Will be called to define if user with such did and public key exists.
-        /// During this method following checks should be preformed: user exists, public key exists in user data. 
+        ///     Will be called to define if user with such did and public key exists.
+        ///     During this method following checks should be preformed: user exists, public key exists in user data.
         /// </summary>
         /// <param name="did">User unique identifier</param>
         /// <param name="publicKey">User public key</param>
-        /// <returns>Check result <see cref="IdentitiesCheckResult"/></returns>
+        /// <returns>Check result <see cref="IdentitiesCheckResult" /></returns>
         Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey);
 
         /// <summary>
@@ -100,5 +104,14 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         ///     otherwise null
         /// </returns>
         Task<Fido2Info> FindFido2Info(string fido2CredentialId);
+
+        /// <summary>
+        ///     Gets data to recover connection in OwnID web app
+        /// </summary>
+        /// <param name="recoveryToken">Recovery token to search</param>
+        /// <param name="includingProfile">Indicates if result should contain user profile</param>
+        /// <returns>Data to recover</returns>
+        Task<ConnectionRecoveryResult<TProfile>> GetConnectionRecoveryDataAsync(string recoveryToken,
+            bool includingProfile = false);
     }
 }

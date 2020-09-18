@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Web.Gigya;
 using OwnIdSdk.NetCore3.Web.Gigya.ApiClient;
-using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
+using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Accounts;
 
 namespace OwnIdSdk.NetCore3.Server.Gigya.External
 {
@@ -56,13 +56,19 @@ namespace OwnIdSdk.NetCore3.Server.Gigya.External
                 return;
             }
 
+            var gigyaProfile = new GigyaUserProfile
+            {
+                Email = profile.Email,
+                FirstName = profile.FirstName
+            };
+
+            var connection = new GigyaOwnIdConnection
+            {
+                PublicKey = profile.PubKey
+            };
+
             var setAccountMessage =
-                await _gigyaRest.SetAccountInfo(newUserId, new GigyaUserProfile
-                    {
-                        Email = profile.Email,
-                        FirstName = profile.FirstName
-                    },
-                    new AccountData(profile.PubKey));
+                await _gigyaRest.SetAccountInfo(newUserId, gigyaProfile, new AccountData(connection));
 
             if (setAccountMessage.ErrorCode == 403043)
             {

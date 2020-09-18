@@ -18,21 +18,13 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 {
     public abstract class BaseFido2RegisterCommand : BaseFlowCommand
     {
-        private readonly IFido2 _fido2;
-        private readonly IJwtComposer _jwtComposer;
-        private readonly IFlowController _flowController;
         private readonly IOwnIdCoreConfiguration _configuration;
-        protected string NewUserId { get; } = Guid.NewGuid().ToString("N");
+        private readonly IFido2 _fido2;
+        private readonly IFlowController _flowController;
+        private readonly IJwtComposer _jwtComposer;
 
-        protected ICacheItemService CacheItemService { get; }
-
-        protected BaseFido2RegisterCommand(
-            IFido2 fido2,
-            ICacheItemService cacheItemService,
-            IJwtComposer jwtComposer,
-            IFlowController flowController,
-            IOwnIdCoreConfiguration configuration
-        )
+        protected BaseFido2RegisterCommand(IFido2 fido2, ICacheItemService cacheItemService, IJwtComposer jwtComposer,
+            IFlowController flowController, IOwnIdCoreConfiguration configuration)
         {
             _fido2 = fido2;
             CacheItemService = cacheItemService;
@@ -41,13 +33,16 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             _configuration = configuration;
         }
 
+        protected string NewUserId { get; } = Guid.NewGuid().ToString("N");
+
+        protected ICacheItemService CacheItemService { get; }
+
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
             if (!(input is CommandInput<string>))
                 throw new InternalLogicException($"Incorrect input type for {GetType().Name}");
         }
-
-
+        
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
@@ -84,10 +79,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 }
             };
 
-            var result = await _fido2.MakeNewCredentialAsync(
-                fido2Response,
-                options,
-                async args => await Task.FromResult(true));
+            var result =
+                await _fido2.MakeNewCredentialAsync(fido2Response, options, args => Task.FromResult(true));
 
             var publicKey = Base64Url.Encode(result.Result.PublicKey);
 
@@ -100,21 +93,15 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         protected virtual async Task ProcessFido2RegisterResponseAsync(CacheItem relatedItem, string publicKey,
             uint signatureCounter, string credentialId)
         {
-            await CacheItemService.SetFido2DataAsync(
-                relatedItem.Context,
-                publicKey,
-                signatureCounter,
-                credentialId
-            );
+            await CacheItemService.SetFido2DataAsync(relatedItem.Context, publicKey, signatureCounter, credentialId);
         }
 
         protected virtual Task<ICommandResult> GetResultAsync(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
-            var jwt = _jwtComposer.GenerateBaseStep(
-                relatedItem.Context,
-                input.ClientDate, _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
-                NewUserId, input.CultureInfo?.Name, true);
+            var behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
+            var jwt = _jwtComposer.GenerateBaseStepJwt(relatedItem.Context, input.ClientDate, behavior, NewUserId,
+                input.CultureInfo?.Name, true);
 
             return Task.FromResult((ICommandResult) new JwtContainer(jwt));
         }

@@ -8,7 +8,6 @@ using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Accounts;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Login;
-using OwnIdSdk.NetCore3.Web.Gigya.Contracts.UpdateProfile;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
 {
@@ -25,7 +24,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
 
         public async Task<GetAccountInfoResponse<TProfile>> GetUserInfoByUid(string uid)
         {
-            return await GetUserProfile(uid);    
+            return await GetUserProfile(uid);
         }
 
         public async Task<GetAccountInfoResponse<TProfile>> GetUserInfoByToken(string regToken)
@@ -157,7 +156,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
 
             return user.UID;
         }
-        
+
         public async Task<UidContainer> SearchByFido2CredentialId(string fido2CredentialId)
         {
             var parameters = ParametersFactory.CreateAuthParameters(_configuration).AddParameter("query",
@@ -171,10 +170,25 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
 
             var user = result.Results?.FirstOrDefault();
 
-            if (result.ErrorCode != 0 || (user?.Data?.Connections?.All(x => x.Fido2CredentialId != fido2CredentialId) ?? true))
+            if (result.ErrorCode != 0
+                || (user?.Data?.Connections?.All(x => x.Fido2CredentialId != fido2CredentialId) ?? true))
                 return null;
-            
+
             return user;
+        }
+
+        public async Task<GetAccountInfoResponse<TProfile>> SearchByRecoveryTokenAsync(string recoveryToken)
+        {
+            var parameters = ParametersFactory.CreateAuthParameters(_configuration).AddParameter("query",
+                $"SELECT UID, data.ownIdConnections, profile FROM accounts WHERE data.ownIdConnections.recoveryId = \"{recoveryToken}\" LIMIT 1");
+            var responseMessage = await _httpClient.PostAsync(
+                new Uri($"https://accounts.{_configuration.DataCenter}/accounts.search"),
+                new FormUrlEncodedContent(parameters));
+
+            var result = await OwnIdSerializer.DeserializeAsync<GetAccountInfoResponseList<TProfile>>(
+                await responseMessage.Content.ReadAsStreamAsync());
+
+            return result.Results.FirstOrDefault();
         }
 
         private async Task<GetAccountInfoResponse<TProfile>> GetUserProfile(string uid = null, string regToken = null)

@@ -10,6 +10,7 @@ namespace OwnIdSdk.NetCore3.Flow.Steps
         ApprovePin,
         Declined,
         Success,
+        InternalConnectionRecovery,
 
         Authorize,
         InstantAuthorize,

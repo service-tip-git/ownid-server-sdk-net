@@ -44,9 +44,24 @@ namespace OwnIdSdk.NetCore3.Flow
             {
                 {
                     StepType.Starting,
-                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Authorize,
-                        cacheItem.ChallengeType,
-                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType))))
+                    new Step<StartFlowCommand>(cacheItem =>
+                    {
+                        var alternative = new FrontendBehavior(StepType.Authorize, cacheItem.ChallengeType,
+                            new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType)));
+
+                        var mainBehavior = new FrontendBehavior(StepType.InternalConnectionRecovery,
+                            cacheItem.ChallengeType,
+                            new CallAction(_urlProvider.GetConnectionRecoveryUrl(cacheItem.Context)),
+                            alternative);
+
+                        return mainBehavior;
+                    })
+                },
+                {
+                    StepType.InternalConnectionRecovery,
+                    new Step<InternalConnectionRecoveryCommand>(cacheItem =>
+                        new FrontendBehavior(StepType.Authorize, cacheItem.ChallengeType,
+                            new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType))))
                 },
                 {
                     StepType.Authorize, new Step<SaveProfileCommand>(cacheItem => new FrontendBehavior
@@ -63,9 +78,25 @@ namespace OwnIdSdk.NetCore3.Flow
                 {
                     StepType.Starting,
                     new Step<StartFlowCommand>(cacheItem =>
-                        new FrontendBehavior(StepType.InstantAuthorize, cacheItem.ChallengeType,
+                    {
+                        var alternative = new FrontendBehavior(StepType.InstantAuthorize, cacheItem.ChallengeType,
                             new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
-                                "/partial"))))
+                                "/partial")));
+
+                        var mainBehavior = new FrontendBehavior(StepType.InternalConnectionRecovery,
+                            cacheItem.ChallengeType,
+                            new CallAction(_urlProvider.GetConnectionRecoveryUrl(cacheItem.Context)),
+                            alternative);
+
+                        return mainBehavior;
+                    })
+                },
+                {
+                    StepType.InternalConnectionRecovery,
+                    new Step<InternalConnectionRecoveryCommand>(cacheItem => new FrontendBehavior(
+                        StepType.InstantAuthorize, cacheItem.ChallengeType,
+                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
+                            "/partial"))))
                 },
                 {
                     StepType.InstantAuthorize,
@@ -256,7 +287,7 @@ namespace OwnIdSdk.NetCore3.Flow
                             ? StepType.Success
                             : StepType.Declined,
                         ChallengeType = cacheItem.ChallengeType,
-                        ActionType = ActionType.Finish,
+                        ActionType = ActionType.Finish
                     })
                 }
             };
@@ -274,7 +305,7 @@ namespace OwnIdSdk.NetCore3.Flow
                 {FlowType.Fido2Link, fido2Link},
                 {FlowType.Fido2LinkWithPin, fido2LinkAndRecoverWithPin},
                 {FlowType.Fido2Recover, fido2Recover},
-                {FlowType.Fido2RecoverWithPin, fido2LinkAndRecoverWithPin},
+                {FlowType.Fido2RecoverWithPin, fido2LinkAndRecoverWithPin}
             };
         }
     }

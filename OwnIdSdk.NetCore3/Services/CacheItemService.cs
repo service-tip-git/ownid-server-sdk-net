@@ -134,10 +134,8 @@ namespace OwnIdSdk.NetCore3.Services
                 && cacheItem.FlowType != FlowType.Fido2LinkWithPin
                 && cacheItem.FlowType != FlowType.Fido2RecoverWithPin
             )
-            {
                 throw new ArgumentException(
                     $"Can not set Fido2 information for the flow not related to Fido2. Current flow: {cacheItem.FlowType} Context: '{context}'");
-            }
 
             if (cacheItem.Status != CacheItemStatus.Initiated && cacheItem.Status != CacheItemStatus.Started)
                 throw new ArgumentException(
@@ -179,6 +177,27 @@ namespace OwnIdSdk.NetCore3.Services
             cacheItem.DID = did;
             cacheItem.PublicKey = publicKey;
             cacheItem.Status = CacheItemStatus.Finished;
+            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+        }
+
+        /// <summary>
+        ///     Sets recovery data for auth-only flow
+        /// </summary>
+        /// <param name="context">Challenge unique identifier</param>
+        /// <param name="recoveryToken">Recovery token/identifier</param>
+        /// <param name="recoveryData">Data for recovery</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task SetRecoveryDataAsync(string context, string recoveryToken, string recoveryData)
+        {
+            var cacheItem = await _cacheStore.GetAsync(context);
+
+            if (cacheItem == null)
+                throw new ArgumentException($"Can not find any item with context '{context}'");
+
+            cacheItem.RecoveryData = recoveryData;
+            cacheItem.RecoveryToken = recoveryToken;
+
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
 

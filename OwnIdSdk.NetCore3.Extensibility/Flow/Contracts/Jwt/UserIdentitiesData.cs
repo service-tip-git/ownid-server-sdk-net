@@ -13,6 +13,12 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt
         [JsonPropertyName("did")]
         public string DID { get; set; }
 
+        [JsonPropertyName("recoveryToken")]
+        public string RecoveryToken { get; set; }
+
+        [JsonPropertyName("recoveryData")]
+        public string RecoveryData { get; set; }
+
         /// <summary>
         ///     User public key generated for current organization / website
         /// </summary>

@@ -29,9 +29,9 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
             if (string.IsNullOrEmpty(bodyString))
                 return;
-            
+
             var logMessage = OwnIdSerializer.Deserialize<LogMessage>(bodyString);
-            
+
             using (LogContext.Push(new PropertyEnricher("source", "webapp")))
             using (LogContext.Push(new PropertyEnricher("version", logMessage.Version)))
             {
@@ -62,7 +62,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
         [JsonPropertyName("context")]
         public string Context { get; set; }
-        
+
         [JsonPropertyName("version")]
         public string Version { get; set; }
     }

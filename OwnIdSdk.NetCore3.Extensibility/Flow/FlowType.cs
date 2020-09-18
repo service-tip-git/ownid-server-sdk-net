@@ -8,7 +8,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow
         LinkWithPin,
         Recover,
         RecoverWithPin,
-        
+
         Fido2PartialRegister,
         Fido2PartialLogin,
         Fido2Link,

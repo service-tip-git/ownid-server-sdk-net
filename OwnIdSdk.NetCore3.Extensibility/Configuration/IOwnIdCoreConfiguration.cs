@@ -120,7 +120,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Configuration
         ///     Default: False - fields will be set only during a register requests.
         /// </remarks>
         public bool OverwriteFields { get; set; }
-        
+
         public IFido2Configuration Fido2 { get; }
     }
 }

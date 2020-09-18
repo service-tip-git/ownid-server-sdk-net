@@ -71,7 +71,7 @@ namespace OwnIdSdk.NetCore3.Redis
             if (item.IsNullOrEmpty)
                 return null;
 
-            return OwnIdSerializer.Deserialize<CacheItem>(item.ToString());;
+            return OwnIdSerializer.Deserialize<CacheItem>(item.ToString());
         }
 
         public void Remove(string key)

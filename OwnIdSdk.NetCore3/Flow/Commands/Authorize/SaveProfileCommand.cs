@@ -73,7 +73,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                 switch (checkResult)
                 {
                     case IdentitiesCheckResult.UserNotFound:
-                        await _userHandlerAdapter.CreateProfileAsync(formContext);
+                        await _userHandlerAdapter.CreateProfileAsync(formContext, userData.RecoveryToken,
+                            userData.RecoveryData);
                         break;
                     case IdentitiesCheckResult.UserExists:
                         await _userHandlerAdapter.UpdateProfileAsync(formContext);
@@ -85,9 +86,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
             }
 
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, userData.DID, userData.PublicKey);
-            var jwt = _jwtComposer.GenerateFinalStepJwt(relatedItem.Context,
-                input.ClientDate, _flowController.GetExpectedFrontendBehavior(relatedItem, StepType.Authorize),
-                input.CultureInfo?.Name);
+            var jwt = _jwtComposer.GenerateFinalStepJwt(relatedItem.Context, input.ClientDate,
+                _flowController.GetExpectedFrontendBehavior(relatedItem, StepType.Authorize), input.CultureInfo?.Name);
 
             return new JwtContainer(jwt);
         }

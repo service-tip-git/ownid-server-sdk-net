@@ -64,6 +64,8 @@ namespace OwnIdSdk.NetCore3.Services
         /// </exception>
         Task FinishAuthFlowSessionAsync(string context, string did, string publicKey);
 
+        Task SetRecoveryDataAsync(string context, string recoveryToken, string recoveryData);
+
         /// <summary>
         ///     Tries to find <see cref="CacheItem" /> by <paramref name="nonce" /> and <paramref name="context" /> in
         ///     <see cref="ICacheStore" /> and remove item if find operation was successful
@@ -86,7 +88,7 @@ namespace OwnIdSdk.NetCore3.Services
         ///     Update context flow
         /// </summary>
         /// <param name="context">context to update</param>
-        /// <param name="flowType">new <see cref="FlowType"/></param>
+        /// <param name="flowType">new <see cref="FlowType" /></param>
         Task UpdateFlowAsync(string context, FlowType flowType);
 
         /// <summary>

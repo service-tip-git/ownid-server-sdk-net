@@ -37,6 +37,8 @@ namespace OwnIdSdk.NetCore3.Web
                 builder => builder.UseMiddleware<ApproveActionMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/approval-status",
                 builder => builder.UseMiddleware<GetActionApprovalStatusMiddleware>());
+            routeBuilder.MapMiddlewarePost("ownid/{context}/conn-recovery",
+                builder => builder.UseMiddleware<InternalConnectionRecoveryMiddleware>());
 
             var configuration = app.ApplicationServices.GetService<OwnIdConfiguration>();
 

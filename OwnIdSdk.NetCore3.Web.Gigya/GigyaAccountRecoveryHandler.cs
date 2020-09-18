@@ -1,11 +1,12 @@
 using System;
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.AccountRecovery;
 using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Web.Gigya.ApiClient;
-using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts.AccountRecovery;
+using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Accounts;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya
 {
@@ -28,6 +29,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             var newPassword = Guid.NewGuid().ToString("N");
 
             var resetPasswordResponse = await _apiClient.ResetPasswordAsync(payload.ResetToken, newPassword);
+
             if (resetPasswordResponse.ErrorCode != 0)
                 throw new Exception(
                     $"Gigya.resetPassword error -> {resetPasswordResponse.GetFailureMessage()}");
@@ -38,12 +40,12 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             };
         }
 
-        public async Task OnRecoverAsync(string did, string publicKey,
-            string fido2CredentialId = null, uint? fido2SignatureCounter = null)
+        public async Task OnRecoverAsync(string did, OwnIdConnection connection)
         {
+            var gigyaOwnIdConnection = new GigyaOwnIdConnection(connection);
+
             var responseMessage =
-                await _apiClient.SetAccountInfo<TProfile>(did,
-                    data: new AccountData(publicKey, fido2CredentialId, fido2SignatureCounter));
+                await _apiClient.SetAccountInfo<TProfile>(did, data: new AccountData(gigyaOwnIdConnection));
 
             if (responseMessage.ErrorCode != 0)
                 throw new Exception($"Gigya.setAccountInfo error -> {responseMessage.GetFailureMessage()}");

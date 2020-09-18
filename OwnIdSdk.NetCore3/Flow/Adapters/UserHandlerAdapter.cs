@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.ConnectionRecovery;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Extensibility.Json;
@@ -30,9 +31,10 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
                 localizationService);
         }
 
-        public async Task CreateProfileAsync(IFormContext context)
+        public async Task CreateProfileAsync(IFormContext context, string recoveryToken = null,
+            string recoveryData = null)
         {
-            await _adaptee.CreateProfileAsync(context as UserProfileFormContext<TProfile>);
+            await _adaptee.CreateProfileAsync(context as UserProfileFormContext<TProfile>, recoveryToken, recoveryData);
         }
 
         public async Task UpdateProfileAsync(IFormContext context)
@@ -73,6 +75,20 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
         public Task<Fido2Info> FindFido2Info(string fido2CredentialId)
         {
             return _adaptee.FindFido2Info(fido2CredentialId);
+        }
+
+        public async Task<ConnectionRecoveryResult<object>> GetConnectionRecoveryDataAsync(string recoveryToken,
+            bool includingProfile = false)
+        {
+            var result = await _adaptee.GetConnectionRecoveryDataAsync(recoveryToken, includingProfile);
+
+            return new ConnectionRecoveryResult<object>
+            {
+                PublicKey = result.PublicKey,
+                RecoveryData = result.RecoveryData,
+                DID = result.DID,
+                UserProfile = result.UserProfile
+            };
         }
     }
 }

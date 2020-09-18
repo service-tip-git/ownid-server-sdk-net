@@ -26,12 +26,13 @@ namespace OwnIdSdk.NetCore3.Configuration.Profile
                 {
                     typeof(MaxLengthAttribute), new ProfileValidatorDescription("maxlength",
                         "The field {0} must be a string or array type with a maximum length of '{1}'")
-                },
+                }
                 // add here MinLength, Regex etc.
             };
 
         /// <summary>
-        ///     <see cref="ValidationAttribute"/> properties which must be excluded from <see cref="ProfileValidationRuleMetadata"/>
+        ///     <see cref="ValidationAttribute" /> properties which must be excluded from
+        ///     <see cref="ProfileValidationRuleMetadata" />
         /// </summary>
         private static readonly IList<string> BaseValidationAttributeProperties =
             typeof(ValidationAttribute).GetProperties().Select(x => x.Name).ToList();

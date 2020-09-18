@@ -5,9 +5,11 @@ using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.ConnectionRecovery;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
 using OwnIdSdk.NetCore3.Web.Gigya.ApiClient;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
+using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Accounts;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya
 {
@@ -149,7 +151,27 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             };
         }
 
-        public async Task CreateProfileAsync(IUserProfileFormContext<TProfile> context)
+        public async Task<ConnectionRecoveryResult<TProfile>> GetConnectionRecoveryDataAsync(string recoveryToken,
+            bool includingProfile = false)
+        {
+            var result = await _restApiClient.SearchByRecoveryTokenAsync(recoveryToken);
+
+            if (result?.Data?.Connections == null)
+                throw new Exception($"Can not find connection recovery token in Gigya {recoveryToken}");
+
+            var connection = result.Data.Connections.First(x => x.RecoveryToken == recoveryToken);
+
+            return new ConnectionRecoveryResult<TProfile>
+            {
+                PublicKey = connection.PublicKey,
+                DID = result.DID,
+                RecoveryData = connection.RecoveryData,
+                UserProfile = includingProfile ? result.Profile : null
+            };
+        }
+
+        public async Task CreateProfileAsync(IUserProfileFormContext<TProfile> context, string recoveryToken = null,
+            string recoveryData = null)
         {
             var loginResponse = await _restApiClient.NotifyLogin(context.DID);
 
@@ -157,8 +179,15 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 throw new Exception(
                     $"Gigya.notifyLogin error -> {loginResponse.GetFailureMessage()}");
 
+            var connection = new GigyaOwnIdConnection
+            {
+                PublicKey = context.PublicKey,
+                RecoveryToken = recoveryToken,
+                RecoveryData = recoveryData
+            };
+
             var setAccountMessage =
-                await _restApiClient.SetAccountInfo(context.DID, context.Profile, new AccountData(context.PublicKey));
+                await _restApiClient.SetAccountInfo(context.DID, context.Profile, new AccountData(connection));
 
             if (setAccountMessage.ErrorCode > 0)
             {

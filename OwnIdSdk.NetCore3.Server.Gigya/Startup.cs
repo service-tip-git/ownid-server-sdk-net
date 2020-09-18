@@ -97,7 +97,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                             x.Fido2.RelyingPartyName = ownIdSection["fido2_relying_party_name"];
                             x.Fido2.UserDisplayName = ownIdSection["fido2_user_display_name"];
                             x.Fido2.UserName = ownIdSection["fido2_user_name"];
-                            
+
                             if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
                                 x.Fido2.Origin = new Uri(ownIdSection["fido2_origin"]);
                         }
@@ -156,7 +156,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 .Enrich.WithMachineName()
                 .WriteTo.Debug()
                 .WriteTo.Console();
-            
+
             if (elasticLoggingEnabled)
             {
                 var version = Assembly.GetExecutingAssembly().GetName().Version;

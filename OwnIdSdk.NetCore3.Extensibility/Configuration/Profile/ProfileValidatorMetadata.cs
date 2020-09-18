@@ -12,6 +12,11 @@ namespace OwnIdSdk.NetCore3.Extensibility.Configuration.Profile
         private readonly ValidationAttribute _validationAttribute;
 
         /// <summary>
+        ///     Validator custom attributes specific for different type of validations
+        /// </summary>
+        public readonly Dictionary<string, string> Parameters = new Dictionary<string, string>();
+
+        /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="validationAttribute">validation attribute</param>
@@ -42,12 +47,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Configuration.Profile
         /// <remarks>Being used to localize validation errors</remarks>
         public string ErrorKey { get; set; }
 
-        /// <summary>
-        ///     Validator custom attributes specific for different type of validations
-        /// </summary>
-        public readonly Dictionary<string, string> Parameters = new Dictionary<string, string>();
-        
-        
+
         /// <summary>
         ///     Formats the localized error message to present to the user.
         /// </summary>

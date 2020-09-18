@@ -17,7 +17,8 @@ namespace OwnIdSdk.NetCore3.Tests.Extensions
         [Fact]
         public void FromShortStringToGuid_Test()
         {
-            "nVphKvsnbUaCqWqzpdHaEg".FromShortStringToGuid().Should().Be(Guid.Parse("2a615a9d-27fb-466d-82a9-6ab3a5d1da12"));
+            "nVphKvsnbUaCqWqzpdHaEg".FromShortStringToGuid().Should()
+                .Be(Guid.Parse("2a615a9d-27fb-466d-82a9-6ab3a5d1da12"));
         }
     }
 }

@@ -110,6 +110,10 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
         ///     Error
         /// </summary>
         public string Error { get; set; }
+        
+        public string RecoveryToken { get; set; }
+
+        public string RecoveryData { get; set; }
 
         /// <summary>
         ///     Creates new instance of <see cref="CacheItem" /> based on <see cref="Nonce" /> and <see cref="DID" />
@@ -132,7 +136,9 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
                 PublicKey = PublicKey,
                 Fido2SignatureCounter = Fido2SignatureCounter,
                 Fido2CredentialId = Fido2CredentialId,
-                Error = Error
+                Error = Error,
+                RecoveryData = RecoveryData,
+                RecoveryToken = RecoveryToken
             };
         }
     }
