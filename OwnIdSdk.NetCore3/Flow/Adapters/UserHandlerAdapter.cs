@@ -50,17 +50,22 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
             return _adaptee.IsUserExists(publicKey);
         }
 
-        public async Task<LoginResult<object>> OnSuccessLoginAsync(string did, string publicKey)
+        public Task<bool> IsFido2UserExists(string fido2CredentialId)
+        {
+            return _adaptee.IsFido2UserExists(fido2CredentialId);
+        }
+
+        public async Task<AuthResult<object>> OnSuccessLoginAsync(string did, string publicKey)
         {
             return await _adaptee.OnSuccessLoginAsync(did, publicKey);
         }
 
-        public async Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)
+        public async Task<AuthResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)
         {
             return await _adaptee.OnSuccessLoginByPublicKeyAsync(publicKey);
         }
 
-        public Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId, uint fido2SignCounter)
+        public Task<AuthResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId, uint fido2SignCounter)
         {
             return _adaptee.OnSuccessLoginByFido2Async(fido2CredentialId, fido2SignCounter);
         }

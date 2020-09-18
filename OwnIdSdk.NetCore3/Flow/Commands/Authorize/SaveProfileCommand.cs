@@ -45,7 +45,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                     $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType}");
         }
 
-        protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
+        protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
             if (!(input is CommandInput<JwtContainer> requestJwt))

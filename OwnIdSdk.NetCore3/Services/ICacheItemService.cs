@@ -88,5 +88,15 @@ namespace OwnIdSdk.NetCore3.Services
         /// <param name="context">context to update</param>
         /// <param name="flowType">new <see cref="FlowType"/></param>
         Task UpdateFlowAsync(string context, FlowType flowType);
+
+        /// <summary>
+        ///     Finish flow with error
+        /// </summary>
+        /// <param name="context">context to update</param>
+        /// <param name="errorMessage">error message</param>
+        /// <returns>
+        ///     A task that represents the asynchronous set error operation.
+        /// </returns>
+        Task FinishFlowWithErrorAsync(string context, string errorMessage);
     }
 }

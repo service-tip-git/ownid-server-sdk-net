@@ -44,7 +44,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             SwitchToFido2FlowIfNeededAsync(request.Data, relatedItem).Wait();
         }
 
-        protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
+        protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
             BaseFlowCommand command = relatedItem.FlowType switch

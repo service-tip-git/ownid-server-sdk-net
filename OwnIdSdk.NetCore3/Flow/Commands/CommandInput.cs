@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 
@@ -17,6 +18,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
         public DateTime ClientDate { get; set; }
     }
 
+    [DebuggerDisplay("{" + nameof(Context) + "}")]
     public class CommandInput : ICommandInput
     {
         public CommandInput(RequestIdentity requestIdentity, CultureInfo cultureInfo, DateTime clientDate)
@@ -39,6 +41,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
         public DateTime ClientDate { get; set; }
     }
 
+    [DebuggerDisplay("{" + nameof(Context) + "}: {" + nameof(Data) + "}")]
     public class CommandInput<T> : CommandInput
     {
         public CommandInput(RequestIdentity requestIdentity, CultureInfo cultureInfo, T data, DateTime clientDate) :

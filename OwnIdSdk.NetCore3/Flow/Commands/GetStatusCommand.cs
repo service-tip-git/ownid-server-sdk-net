@@ -79,6 +79,12 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             if (cacheItem.Status != CacheItemStatus.Finished)
                 return result;
 
+            if (!string.IsNullOrEmpty(cacheItem.Error))
+            {
+                result.Payload = new AuthResult<object>(cacheItem.Error);
+                return result;
+            }
+
             if (cacheItem.FlowType == FlowType.Authorize)
             {
                 result.Payload = await _userHandlerAdapter.OnSuccessLoginAsync(cacheItem.DID, cacheItem.PublicKey);
@@ -87,12 +93,12 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             {
                 switch (cacheItem.ChallengeType)
                 {
-                    case ChallengeType.Login 
-                        when cacheItem.FlowType == FlowType.Fido2PartialLogin 
+                    case ChallengeType.Login
+                        when cacheItem.FlowType == FlowType.Fido2PartialLogin
                              && string.IsNullOrWhiteSpace(cacheItem.Fido2CredentialId):
                     {
                         var errorMessage = _localizationService.GetLocalizedString("Error_UserNotFound");
-                        result.Payload = new LoginResult<object>(errorMessage);
+                        result.Payload = new AuthResult<object>(errorMessage);
                         break;
                     }
                     case ChallengeType.Login
@@ -114,7 +120,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                         when cacheItem.FlowType == FlowType.PartialAuthorize:
                     {
                         var errorMessage = _localizationService.GetLocalizedString("Error_UserNotFound");
-                        result.Payload = new LoginResult<object>(errorMessage);
+                        result.Payload = new AuthResult<object>(errorMessage);
                         break;
                     }
                     case ChallengeType.Login:
@@ -124,7 +130,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                         when await _userHandlerAdapter.IsUserExists(cacheItem.PublicKey):
                     {
                         var errorMessage = _localizationService.GetLocalizedString("Error_PhoneAlreadyConnected");
-                        result.Payload = new LoginResult<object>(errorMessage);
+                        result.Payload = new AuthResult<object>(errorMessage);
                         return result;
                     }
                     case ChallengeType.Register
@@ -165,7 +171,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             using var sha256 = new SHA256Managed();
             var hash = Convert.ToBase64String(
                 sha256.ComputeHash(Encoding.UTF8.GetBytes(publicKey)));
-            
+
             return new
             {
                 data = new

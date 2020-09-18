@@ -38,26 +38,26 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
 
         /// <summary>
         ///     Will be called whenever a user waits for authorization credentials on success login. Data passed to
-        ///     <see cref="LoginResult{T}" /> will be sent to OwnId UI SDK and passed to provided in configuration callback
+        ///     <see cref="AuthResult{T}" /> will be sent to OwnId UI SDK and passed to provided in configuration callback
         /// </summary>
         /// <param name="did">User unique identifier</param>
         /// <param name="publicKey">User public key</param>
-        Task<LoginResult<object>> OnSuccessLoginAsync(string did, string publicKey);
+        Task<AuthResult<object>> OnSuccessLoginAsync(string did, string publicKey);
 
         /// <summary>
         ///     Will be called whenever a user waits for authorization credentials on success login. Data passed to
-        ///     <see cref="LoginResult{T}" /> will be sent to OwnId UI SDK and passed to provided in configuration callback
+        ///     <see cref="AuthResult{T}" /> will be sent to OwnId UI SDK and passed to provided in configuration callback
         /// </summary>
         /// <param name="publicKey">User public key</param>
-        Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey);
+        Task<AuthResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey);
 
         /// <summary>
         ///     Will be called whenever a user waits for authorization credentials on success login. Data passed to
-        ///     <see cref="LoginResult{T}" /> will be sent to OwnId UI SDK and passed to provided in configuration callback
+        ///     <see cref="AuthResult{T}" /> will be sent to OwnId UI SDK and passed to provided in configuration callback
         /// </summary>
         /// <param name="fido2CredentialId">fido2 credential id</param>
         /// <param name="fido2SignCounter">fido2 sign counter</param>
-        Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId, uint fido2SignCounter);
+        Task<AuthResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId, uint fido2SignCounter);
         
         /// <summary>
         /// Will be called to define if user with such did and public key exists.
@@ -78,6 +78,17 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         ///     otherwise false
         /// </returns>
         Task<bool> IsUserExists(string publicKey);
+
+        /// <summary>
+        ///     Check if user with provided Fido2 credential id exists
+        /// </summary>
+        /// <param name="fido2CredentialId">Fido2 credential id</param>
+        /// <returns>
+        ///     A task that represents the asynchronous check operation.
+        ///     The task result contains true if user with provided public key exists,
+        ///     otherwise false
+        /// </returns>
+        Task<bool> IsFido2UserExists(string fido2CredentialId);
         
         /// <summary>
         ///     Try find Fido2 public key by fido2 user id

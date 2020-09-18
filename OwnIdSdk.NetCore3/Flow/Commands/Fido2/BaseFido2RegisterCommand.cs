@@ -48,7 +48,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         }
 
 
-        protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
+        protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
             var requestInput = input as CommandInput<string>;

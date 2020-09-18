@@ -197,10 +197,7 @@ namespace OwnIdSdk.NetCore3.Services
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
-            if (cacheItem == null
-                || cacheItem.Nonce != nonce
-                || cacheItem.Status == CacheItemStatus.Finished && string.IsNullOrEmpty(cacheItem.DID)
-            )
+            if (cacheItem == null || cacheItem.Nonce != nonce)
                 return null;
 
             // If finished - clear cache
@@ -229,10 +226,22 @@ namespace OwnIdSdk.NetCore3.Services
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
-            if (cacheItem == null || cacheItem.Context != context)
+            if (cacheItem == null)
                 throw new ArgumentException($"Can not find any item with context '{context}'");
 
             cacheItem.FlowType = flowType;
+
+            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+        }
+
+        public async Task FinishFlowWithErrorAsync(string context, string errorMessage)
+        {
+            var cacheItem = await _cacheStore.GetAsync(context);
+            if (cacheItem == null)
+                throw new ArgumentException($"Can not find any item with context '{context}'");
+
+            cacheItem.Status = CacheItemStatus.Finished;
+            cacheItem.Error = errorMessage;
 
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }

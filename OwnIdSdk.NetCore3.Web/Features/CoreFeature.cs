@@ -71,6 +71,8 @@ namespace OwnIdSdk.NetCore3.Web.Features
                 services.TryAddSingleton<Fido2RecoverCommand>();
                 services.TryAddSingleton<Fido2RecoverWithPinCommand>();
                 services.TryAddSingleton<Fido2RecoverWithPinCommand>();
+                
+                services.TryAddSingleton<IsFido2UserExistsCommand>();
 
                 services.AddFido2(fido2Config =>
                 {
