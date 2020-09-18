@@ -335,114 +335,114 @@ spec:
   ports:
     - port: 5004
       targetPort: 5002
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: ownid-server-netcore3-demo-gigya-2-deployment
-  namespace: dev
-  labels:
-    app: ownid-server-netcore3-demo-gigya-2
-spec:
-  revisionHistoryLimit: 1
-  replicas: 1
-  selector:
-    matchLabels:
-      app: ownid-server-netcore3-demo-gigya-2
-  template:
-    metadata:
-      labels:
-        app: ownid-server-netcore3-demo-gigya-2
-    spec:
-      containers:
-        - name: ownid-server-netcore3-demo-gigya-2
-          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-develop:latest
-          ports:
-            - containerPort: 5002
-          env:
-            - name: OWNID__WEB_APP_URL
-              value: https://sign.dev.ownid.com/sign
-            - name: OWNID__CALLBACK_URL
-              value: https://demo2.dev.ownid.com/netcore3
-            - name: OWNID__DID
-              value: did:ownid:demo_2_dev_151850889514
-            - name: OWNID__NAME
-              value: Noted (OwnID Demo) Auth only
-            - name: OWNID__DESCRIPTION
-              value: Noted (OwnID Demo) Auth only
-            - name: OWNID__ICON
-              value: data:image/x-icon;base64,AAABAAIAICAAAAEAIACoEAAAJgAAABAQAAABACAAaAQAAM4QAAAoAAAAIAAAAEAAAAABACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AK5iMP+tYS//rmIw/65hMP+uYTD/rWEv/65iMP+uYjD/rmEv/65iMP+uYjD/rmEw/65iMP+uYjD/rmEv/65iMP+uYTDPrWEvEP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8Ar2Mx/69jMf+vYzD/rmIw/69jMf+uYjD/rmIw/65iMP+vYzD/r2Mw/69jMf+uYjD/r2Mw/65jMP+uYjD/rmIw/69jMf+vYzDPr2QvEP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wCwZS//sGUv/7BlL/+/f2X/v39k/7BlL/+wZS7/sGUv/7BlL/+wZS//sGUv/7BlL/+xZi//sWYv/7BlL/+wZS7/sGUv/7BlL/+wZS/PsWYuEK1hLzCuYTAQ////AP///wD///8A////AP///wD///8A////AP///wD///8A////AMWJb//t1tH///////////////////////Li3/////////////Li3/+yZy3/smgu/7JoLv/Omob//////////////////////9Ojkv+zaC3Ps2kuEP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8Ay5R6/////////////////////////////////////////////////+jMw//ozMP/6MzD//jv7f//////////////////////1aWS/7RqLP+0ay3PtWwsEP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wC2biz/9OXg/9eok//FiGX/yY9w///////////////////////////////////////////////////////////////////////Wp5L/t24s/7duLP+4cCzPuHAsEP///wD///8A////AP///wD///8A////AP///wD///8A////ALpzLP+6cyz/unMs/8SFWf/cs5//////////////////////////////////69HF//Tl4P////////////Tl4P//////////////////////+fDu/+G8q//DglLPu3UrEP///wD///8A////AP///wD///8A////AP///wD///8Avnkp/8qQZf/w29L///////////////////////Xm4f/15uH////////////EhEz/5se4////////////26+U//////////////////////////////////nx7v/CgEHPwHsqEP///wD///8A////AP///wD///8A////AP///wDOlWX////////////////////////////t1MX/zJBZ/9qrif///////////92xlP////////////Xn4P/Plmb////////////t1cb/3rOV//Xn4P///////////9mqif/CfibPxIAlEP///wD///8A////AP///wD///8A////AOvOuv////////////ny7v/kvqL/zI9N/8aEJ//GhCb/zI5M////////////////////////////472h/9KaZ////////////9+2lv/Ggyb/1qFz////////////4LaX/8aEJv/HhCjPyIYoEP///wD///8A////AP///wD///8A7NC8////////////5sGk/9KZWv/YpXP/6Mev/9CVTf/KiiX/8NnJ///////////////////////QlEz/1qBo////////////6Miv/9agaP/v2Mj////////////jupj/yool/8uKJv/LiyfPzI0lEP///wD///8A////AP///wDgs4H/////////////////////////////////7tO9/9CRJf/fsoH/////////////////9OPW/9CSJv/apmj/////////////////////////////////+vPv/9WcTf/QkiX/0JIm/9CSJv/RkyXP0pUmEP///wD///8A////ANaZIv/pxJv/+/Tv///////////////////////x2L//1Zki/9ieO//79O/////////////mvo7/1poj/96sav////////////////////////////bm1//frWr/1pki/9WZIv/WmiL/1poi/9aaIv/XmiTP2JwiEP///wD///8A26Ef/9uhH//boR//47Rr/+O0a//js2r/26Ef/9uhH//coR//26Ef/9uhH//boR//3KEg/9uhH//boR//26Ef/9yhH//coR//26Ef/9uhH//boR//3KEf/9uhH//boR//3KEf/9uhH//coSD/26Ef/9uhH//coiLP3qQgEP///wDhqSD/4akg/+GpH//hqSD/4akg/+GoH//hqSD/4akg/+GpIP/hqR//4akg/+GpIP/hqB//4akg/+GpIP/gqB//4akg/+GpIP/hqSD/4akf/+GpIP/hqSD/4akg/+GpIP/hqSD/4Kgf/+GpIP/hqB//4akg/+GpIP/hqSLP46wgEOeyJf/nsiX/57Il/+exJP/nsiX/57Il/+exJP/nsiX/5rEk/+eyJf/nsiX/5rEk/+axJP/nsST/5rEk/+axJP/msST/5rEk/+eyJf/msST/57Ek/+exJP/nsiX/57Ek/+axJP/nsST/5rEk/+exJP/nsiX/57Ek/+axJP/osiTP////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//////////////////////////////////////////AAA//wAAH/8AAAP/AAAH/wAAA/8AAAH/AAAA/wAAAH8AAAA/AAAAHwAAAA8AAAAHAAAAAwAAAAEAAAAAAAAAAP//////////////////////////////////////////KAAAABAAAAAgAAAAAQAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wCuYi7/rmIu/65iLv+uYi7/rmIu/65iLv+uYi7/rmIu/65iLs+tYS5Q////AP///wD///8AAAAAAAAAAAAAAAAAzp98/+HFsP/hxbD/2LKW/9iylv+xZi3/u3lH/9iylv/Yspb/vX5Nz69jLTAAAAAAAAAAAAAAAAAAAAAAAAAAAOTIrv/y5Nb/9u3k/////////////////////////////////8iRXf+2bSfPt28kEAAAAAAAAAAAAAAAAAAAAADDhjv/5cqs//v28f////////////Pm1f//////////////////////+/bx/9q1hs++eR4QAAAAAAAAAAAAAAAA9OfV///////x4Mj/16ln/+3Yuv/79/H//////+3Yuv//////3rmD//jw5P/w38f/xYEhz8eFJhAAAAAAAAAAAPnx5P/8+PL/8uHK/+/avP/guHf////////////dsWr///////Xp1///////8Ny7/82NJv/NjibP0ZMkEAAAAADgsEn/8tyr//box//t0I//2qMu/+3Qj//nw3P/3ak8/+3Qj//t0I//7dCP/92qO//YnSD/2J0g/9idH8/coh8Q46wh/+OsIf/jrCH/46wh/+OsIf/jrCH/46wh/+OsIf/jrCH/46wh/+OsIf/jrCH/46wh/+OsIf/jrCH/5K0hz////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD//wAA//8AAP//AAD//wAAAD8AAAAfAAAADwAAAAcAAAADAAAAAQAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA
-            - name: OWNID__CACHE_TYPE
-              value: redis
-            - name: OWNID__CACHE_CONFIG
-              valueFrom:
-                secretKeyRef:
-                  name: credential-secrets
-                  key: redis_config
-            - name: OWNID__PUB_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: credential-secrets
-                  key: demo2_pub_key
-            - name: OWNID__PRIVATE_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: credential-secrets
-                  key: demo2_private_key
-            - name: OWNID__FIDO2_ENABLED
-              value: 'true'
-            - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
-              value: https://demo2.dev.ownid.com/passwordless
-            - name: OWNID__FIDO2_RELYING_PARTY_ID
-              value: demo2.dev.ownid.com
-            - name: OWNID__FIDO2_RELYING_PARTY_NAME
-              value: OwnID
-            - name: OWNID__FIDO2_USER_DISPLAY_NAME
-              value: Passwordless
-            - name: OWNID__FIDO2_USER_NAME
-              value: Passwordless              
-            - name: OWNID__FIDO2_ORIGIN
-              value: https://demo2.dev.ownid.com
-            - name: GIGYA__DATA_CENTER
-              value: us1.gigya.com
-            - name: GIGYA__SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: credential-secrets
-                  key: demo2_gigya_secret
-            - name: GIGYA__API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: credential-secrets
-                  key: demo2_gigya_api_key
-            - name: ELASTICCONFIGURATION__ENABLED
-              value: 'true'
-            - name: ELASTICCONFIGURATION__URI
-              valueFrom:
-                secretKeyRef:
-                  name: credential-secrets
-                  key: elastic_uri
-            - name: ELASTICCONFIGURATION__USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: credential-secrets
-                  key: elastic_username
-            - name: ELASTICCONFIGURATION__PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: credential-secrets
-                  key: elastic_password
-            - name: ASPNETCORE_ENVIRONMENT
-              value: dev
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: ownid-server-netcore3-demo-gigya-2-service
-  namespace: dev
-spec:
-  selector:
-    app: ownid-server-netcore3-demo-gigya-2
-  ports:
-    - port: 5005
-      targetPort: 5002
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: ownid-server-netcore3-demo-gigya-2-deployment
+#   namespace: dev
+#   labels:
+#     app: ownid-server-netcore3-demo-gigya-2
+# spec:
+#   revisionHistoryLimit: 1
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: ownid-server-netcore3-demo-gigya-2
+#   template:
+#     metadata:
+#       labels:
+#         app: ownid-server-netcore3-demo-gigya-2
+#     spec:
+#       containers:
+#         - name: ownid-server-netcore3-demo-gigya-2
+#           image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-develop:latest
+#           ports:
+#             - containerPort: 5002
+#           env:
+#             - name: OWNID__WEB_APP_URL
+#               value: https://sign.dev.ownid.com/sign
+#             - name: OWNID__CALLBACK_URL
+#               value: https://demo2.dev.ownid.com/netcore3
+#             - name: OWNID__DID
+#               value: did:ownid:demo_2_dev_151850889514
+#             - name: OWNID__NAME
+#               value: Noted (OwnID Demo) Auth only
+#             - name: OWNID__DESCRIPTION
+#               value: Noted (OwnID Demo) Auth only
+#             - name: OWNID__ICON
+#               value: data:image/x-icon;base64,AAABAAIAICAAAAEAIACoEAAAJgAAABAQAAABACAAaAQAAM4QAAAoAAAAIAAAAEAAAAABACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AK5iMP+tYS//rmIw/65hMP+uYTD/rWEv/65iMP+uYjD/rmEv/65iMP+uYjD/rmEw/65iMP+uYjD/rmEv/65iMP+uYTDPrWEvEP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8Ar2Mx/69jMf+vYzD/rmIw/69jMf+uYjD/rmIw/65iMP+vYzD/r2Mw/69jMf+uYjD/r2Mw/65jMP+uYjD/rmIw/69jMf+vYzDPr2QvEP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wCwZS//sGUv/7BlL/+/f2X/v39k/7BlL/+wZS7/sGUv/7BlL/+wZS//sGUv/7BlL/+xZi//sWYv/7BlL/+wZS7/sGUv/7BlL/+wZS/PsWYuEK1hLzCuYTAQ////AP///wD///8A////AP///wD///8A////AP///wD///8A////AMWJb//t1tH///////////////////////Li3/////////////Li3/+yZy3/smgu/7JoLv/Omob//////////////////////9Ojkv+zaC3Ps2kuEP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8Ay5R6/////////////////////////////////////////////////+jMw//ozMP/6MzD//jv7f//////////////////////1aWS/7RqLP+0ay3PtWwsEP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wC2biz/9OXg/9eok//FiGX/yY9w///////////////////////////////////////////////////////////////////////Wp5L/t24s/7duLP+4cCzPuHAsEP///wD///8A////AP///wD///8A////AP///wD///8A////ALpzLP+6cyz/unMs/8SFWf/cs5//////////////////////////////////69HF//Tl4P////////////Tl4P//////////////////////+fDu/+G8q//DglLPu3UrEP///wD///8A////AP///wD///8A////AP///wD///8Avnkp/8qQZf/w29L///////////////////////Xm4f/15uH////////////EhEz/5se4////////////26+U//////////////////////////////////nx7v/CgEHPwHsqEP///wD///8A////AP///wD///8A////AP///wDOlWX////////////////////////////t1MX/zJBZ/9qrif///////////92xlP////////////Xn4P/Plmb////////////t1cb/3rOV//Xn4P///////////9mqif/CfibPxIAlEP///wD///8A////AP///wD///8A////AOvOuv////////////ny7v/kvqL/zI9N/8aEJ//GhCb/zI5M////////////////////////////472h/9KaZ////////////9+2lv/Ggyb/1qFz////////////4LaX/8aEJv/HhCjPyIYoEP///wD///8A////AP///wD///8A7NC8////////////5sGk/9KZWv/YpXP/6Mev/9CVTf/KiiX/8NnJ///////////////////////QlEz/1qBo////////////6Miv/9agaP/v2Mj////////////jupj/yool/8uKJv/LiyfPzI0lEP///wD///8A////AP///wDgs4H/////////////////////////////////7tO9/9CRJf/fsoH/////////////////9OPW/9CSJv/apmj/////////////////////////////////+vPv/9WcTf/QkiX/0JIm/9CSJv/RkyXP0pUmEP///wD///8A////ANaZIv/pxJv/+/Tv///////////////////////x2L//1Zki/9ieO//79O/////////////mvo7/1poj/96sav////////////////////////////bm1//frWr/1pki/9WZIv/WmiL/1poi/9aaIv/XmiTP2JwiEP///wD///8A26Ef/9uhH//boR//47Rr/+O0a//js2r/26Ef/9uhH//coR//26Ef/9uhH//boR//3KEg/9uhH//boR//26Ef/9yhH//coR//26Ef/9uhH//boR//3KEf/9uhH//boR//3KEf/9uhH//coSD/26Ef/9uhH//coiLP3qQgEP///wDhqSD/4akg/+GpH//hqSD/4akg/+GoH//hqSD/4akg/+GpIP/hqR//4akg/+GpIP/hqB//4akg/+GpIP/gqB//4akg/+GpIP/hqSD/4akf/+GpIP/hqSD/4akg/+GpIP/hqSD/4Kgf/+GpIP/hqB//4akg/+GpIP/hqSLP46wgEOeyJf/nsiX/57Il/+exJP/nsiX/57Il/+exJP/nsiX/5rEk/+eyJf/nsiX/5rEk/+axJP/nsST/5rEk/+axJP/msST/5rEk/+eyJf/msST/57Ek/+exJP/nsiX/57Ek/+axJP/nsST/5rEk/+exJP/nsiX/57Ek/+axJP/osiTP////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//////////////////////////////////////////AAA//wAAH/8AAAP/AAAH/wAAA/8AAAH/AAAA/wAAAH8AAAA/AAAAHwAAAA8AAAAHAAAAAwAAAAEAAAAAAAAAAP//////////////////////////////////////////KAAAABAAAAAgAAAAAQAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wCuYi7/rmIu/65iLv+uYi7/rmIu/65iLv+uYi7/rmIu/65iLs+tYS5Q////AP///wD///8AAAAAAAAAAAAAAAAAzp98/+HFsP/hxbD/2LKW/9iylv+xZi3/u3lH/9iylv/Yspb/vX5Nz69jLTAAAAAAAAAAAAAAAAAAAAAAAAAAAOTIrv/y5Nb/9u3k/////////////////////////////////8iRXf+2bSfPt28kEAAAAAAAAAAAAAAAAAAAAADDhjv/5cqs//v28f////////////Pm1f//////////////////////+/bx/9q1hs++eR4QAAAAAAAAAAAAAAAA9OfV///////x4Mj/16ln/+3Yuv/79/H//////+3Yuv//////3rmD//jw5P/w38f/xYEhz8eFJhAAAAAAAAAAAPnx5P/8+PL/8uHK/+/avP/guHf////////////dsWr///////Xp1///////8Ny7/82NJv/NjibP0ZMkEAAAAADgsEn/8tyr//box//t0I//2qMu/+3Qj//nw3P/3ak8/+3Qj//t0I//7dCP/92qO//YnSD/2J0g/9idH8/coh8Q46wh/+OsIf/jrCH/46wh/+OsIf/jrCH/46wh/+OsIf/jrCH/46wh/+OsIf/jrCH/46wh/+OsIf/jrCH/5K0hz////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD//wAA//8AAP//AAD//wAAAD8AAAAfAAAADwAAAAcAAAADAAAAAQAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA
+#             - name: OWNID__CACHE_TYPE
+#               value: redis
+#             - name: OWNID__CACHE_CONFIG
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: credential-secrets
+#                   key: redis_config
+#             - name: OWNID__PUB_KEY
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: credential-secrets
+#                   key: demo2_pub_key
+#             - name: OWNID__PRIVATE_KEY
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: credential-secrets
+#                   key: demo2_private_key
+#             - name: OWNID__FIDO2_ENABLED
+#               value: 'true'
+#             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
+#               value: https://demo2.dev.ownid.com/passwordless
+#             - name: OWNID__FIDO2_RELYING_PARTY_ID
+#               value: demo2.dev.ownid.com
+#             - name: OWNID__FIDO2_RELYING_PARTY_NAME
+#               value: OwnID
+#             - name: OWNID__FIDO2_USER_DISPLAY_NAME
+#               value: Passwordless
+#             - name: OWNID__FIDO2_USER_NAME
+#               value: Passwordless              
+#             - name: OWNID__FIDO2_ORIGIN
+#               value: https://demo2.dev.ownid.com
+#             - name: GIGYA__DATA_CENTER
+#               value: us1.gigya.com
+#             - name: GIGYA__SECRET
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: credential-secrets
+#                   key: demo2_gigya_secret
+#             - name: GIGYA__API_KEY
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: credential-secrets
+#                   key: demo2_gigya_api_key
+#             - name: ELASTICCONFIGURATION__ENABLED
+#               value: 'true'
+#             - name: ELASTICCONFIGURATION__URI
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: credential-secrets
+#                   key: elastic_uri
+#             - name: ELASTICCONFIGURATION__USERNAME
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: credential-secrets
+#                   key: elastic_username
+#             - name: ELASTICCONFIGURATION__PASSWORD
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: credential-secrets
+#                   key: elastic_password
+#             - name: ASPNETCORE_ENVIRONMENT
+#               value: dev
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: ownid-server-netcore3-demo-gigya-2-service
+#   namespace: dev
+# spec:
+#   selector:
+#     app: ownid-server-netcore3-demo-gigya-2
+#   ports:
+#     - port: 5005
+#       targetPort: 5002
