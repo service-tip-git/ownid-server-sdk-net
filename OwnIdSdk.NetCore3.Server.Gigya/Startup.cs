@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OwnIdSdk.NetCore3.Redis;
 using OwnIdSdk.NetCore3.Server.Gigya.External;
+using OwnIdSdk.NetCore3.Server.Gigya.Middlewares;
+using OwnIdSdk.NetCore3.Server.Gigya.Middlewares.SecurityHeaders;
 using OwnIdSdk.NetCore3.Web;
 using OwnIdSdk.NetCore3.Web.Gigya;
 using Serilog;
@@ -137,6 +139,9 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 builder => builder.UseMiddleware<ExternalRegisterMiddleware>());
             app.UseRouter(routeBuilder.Build());
 
+            app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
+                .AddStrictTransportSecurityMaxAgeIncludeSubDomains()
+                .AddContentTypeOptionsNoSniff());
             app.UseOwnId();
         }
 
