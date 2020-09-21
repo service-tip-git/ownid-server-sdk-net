@@ -284,7 +284,7 @@ namespace OwnIdSdk.NetCore3.Flow
                     new Step<GetApprovalStatusCommand>(cacheItem => new FrontendBehavior
                     {
                         Type = cacheItem.Status == CacheItemStatus.Approved
-                            ? StepType.Success
+                            ? StepType.Fido2Success
                             : StepType.Declined,
                         ChallengeType = cacheItem.ChallengeType,
                         ActionType = ActionType.Finish
