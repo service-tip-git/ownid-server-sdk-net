@@ -18,7 +18,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts
     ///         }
     ///     </code>
     /// </example>
-    [DebuggerDisplay("{" + nameof(FieldName) + "}: {" + nameof(ErrorCode) + ("} - {" + nameof(Message) + "}"))]
+    [DebuggerDisplay("{" + nameof(FieldName) + "}: {" + nameof(ErrorCode) + "} - {" + nameof(Message) + "}")]
     public class GigyaValidationError
     {
         public int ErrorCode { get; set; }

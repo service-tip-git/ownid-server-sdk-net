@@ -31,10 +31,10 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                     $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType}");
         }
 
-        protected override Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
+        protected override Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
-            var jwt = _jwtComposer.GenerateBaseStep(relatedItem.Context,
+            var jwt = _jwtComposer.GenerateBaseStepJwt(relatedItem.Context,
                 input.ClientDate, _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
                 _identitiesProvider.GenerateUserId(), input.CultureInfo?.Name, true);
 

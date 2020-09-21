@@ -37,7 +37,8 @@ namespace OwnIdSdk.NetCore3.Configuration
 
             // Validate Fido2Url
             if (options.Fido2.Enabled
-                && !IsUriValid(nameof(options.Fido2.PasswordlessPageUrl), options.Fido2.PasswordlessPageUrl, options.IsDevEnvironment,
+                && !IsUriValid(nameof(options.Fido2.PasswordlessPageUrl), options.Fido2.PasswordlessPageUrl,
+                    options.IsDevEnvironment,
                     out var fido2ValidationError))
             {
                 return ValidateOptionsResult.Fail(fido2ValidationError);

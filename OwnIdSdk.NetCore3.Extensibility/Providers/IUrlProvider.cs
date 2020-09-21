@@ -29,24 +29,35 @@ namespace OwnIdSdk.NetCore3.Extensibility.Providers
         Uri GetSecurityApprovalStatusUrl(string context);
 
         /// <summary>
-        ///     Generated url with redirection to Web App with nested callback url (to server side endpoint)
+        ///     Generates url with redirection to Web App with nested callback url (to server side endpoint)
         /// </summary>
         /// <param name="subUrl">Nested url that will be used as callback</param>
+        /// <param name="language">language</param>
         /// <returns>Well-formatted url for Web App with callback option</returns>
-        Uri GetWebAppSignWithCallbackUrl(Uri subUrl);
+        Uri GetWebAppSignWithCallbackUrl(Uri subUrl, string language);
 
         /// <summary>
-        /// Generates url to Web App connections
+        ///     Generates url to Web App connections
         /// </summary>
         /// <returns>Well-formatted url for Web App connections</returns>
         Uri GetWebAppConnectionsUrl();
 
         /// <summary>
-        ///     Generate url with redirection to Fido2 path with nested callback url (to Web App)
+        ///     Generates url with redirection to Fido2 path with nested callback url (to Web App)
         /// </summary>
         /// <param name="subUrl">Nested url</param>
-        /// <param name="requestType">request type (only <see cref="ChallengeType.Register"/> and <see cref="ChallengeType.Login"/> are supported</param>
+        /// <param name="requestType">
+        ///     request type (only <see cref="ChallengeType.Register" /> and
+        ///     <see cref="ChallengeType.Login" /> are supported
+        /// </param>
         /// <returns>Well-formatted url for Fido2 page with callback option</returns>
         Uri GetFido2Url(Uri subUrl, ChallengeType requestType);
+
+        /// <summary>
+        ///     Generates internal connection restore url
+        /// </summary>
+        /// <param name="context">Process unique identifier</param>
+        /// <returns>Well-formatted url for internal connection restore</returns>
+        Uri GetConnectionRecoveryUrl(string context);
     }
 }

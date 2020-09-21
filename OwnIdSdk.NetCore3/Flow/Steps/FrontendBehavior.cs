@@ -11,12 +11,14 @@ namespace OwnIdSdk.NetCore3.Flow.Steps
         {
         }
 
-        public FrontendBehavior(StepType type, ChallengeType challengeType, CallAction callback)
+        public FrontendBehavior(StepType type, ChallengeType challengeType, CallAction callback,
+            FrontendBehavior alternativeBehavior = null)
         {
             Type = type;
             ActionType = ActionType.Callback;
             Callback = callback;
             ChallengeType = challengeType;
+            AlternativeBehavior = alternativeBehavior;
         }
 
         public FrontendBehavior(StepType type, ChallengeType challengeType, PollingAction polling)
@@ -52,5 +54,10 @@ namespace OwnIdSdk.NetCore3.Flow.Steps
         ///     Callback url for step data transfer
         /// </summary>
         public CallAction Callback { get; set; }
+
+        /// <summary>
+        ///     Alternative behavior
+        /// </summary>
+        public FrontendBehavior AlternativeBehavior { get; set; }
     }
 }

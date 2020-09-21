@@ -5,6 +5,7 @@ using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Extensibility.Services;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
@@ -40,7 +41,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Link
                     $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType}");
         }
 
-        protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
+        protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
             if (!(input is CommandInput<JwtContainer> requestJwt))
@@ -51,7 +52,12 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Link
             // preventing data substitution
             userData.DID = relatedItem.DID;
 
-            await _linkHandler.OnLinkAsync(userData.DID, userData.PublicKey);
+            await _linkHandler.OnLinkAsync(userData.DID, new OwnIdConnection
+            {
+                PublicKey = userData.PublicKey,
+                RecoveryToken = userData.RecoveryToken,
+                RecoveryData = userData.RecoveryData
+            });
 
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, userData.DID, userData.PublicKey);
             var jwt = _jwtComposer.GenerateFinalStepJwt(relatedItem.Context,

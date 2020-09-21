@@ -33,15 +33,15 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             }
 
             var result = await _getStatusCommand.ExecuteAsync(request);
-            
+
             context.Response.StatusCode = StatusCodes.Status200OK;
             context.Response.ContentType = "application/json";
-            
+
             // TODO: remove after web ui sdk changes enums as strings
             await context.Response.WriteAsync(JsonSerializer.Serialize<object>(result, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                IgnoreNullValues = true,
+                IgnoreNullValues = true
             }));
 
             // TODO: uncomment after web ui sdk changes enums as strings

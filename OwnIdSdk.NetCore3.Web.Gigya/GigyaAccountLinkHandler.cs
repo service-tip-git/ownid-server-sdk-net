@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Link;
 using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Web.Gigya.ApiClient;
-using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
+using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Accounts;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya
 {
@@ -81,8 +82,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             return new LinkState(did, (uint) accountInfo.Data.Connections.Count);
         }
 
-        public async Task OnLinkAsync(string did, string publicKey, string fido2CredentialId = null,
-            uint? fido2SignatureCounter = null)
+        public async Task OnLinkAsync(string did, OwnIdConnection connection)
         {
             var accountInfo = await _restApiClient.GetUserInfoByUid(did);
 
@@ -95,12 +95,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                     $"Gigya.OnLink error -> maximum number ({_ownIdConfiguration.MaximumNumberOfConnectedDevices}) of linked devices reached");
 
             // add new public key to connection 
-            accountInfo.Data.Connections.Add(new OwnIdConnection
-            {
-                PublicKey = publicKey,
-                Fido2SignatureCounter = fido2SignatureCounter,
-                Fido2CredentialId = fido2CredentialId
-            });
+            accountInfo.Data.Connections.Add(new GigyaOwnIdConnection(connection));
 
             var setAccountMessage =
                 await _restApiClient.SetAccountInfo<TProfile>(did, data: accountInfo.Data);

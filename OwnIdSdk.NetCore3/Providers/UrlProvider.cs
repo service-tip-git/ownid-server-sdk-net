@@ -42,11 +42,13 @@ namespace OwnIdSdk.NetCore3.Providers
             return GetBaseActionUrl(context, "approval-status");
         }
 
-        public Uri GetWebAppSignWithCallbackUrl(Uri subUrl)
+        public Uri GetWebAppSignWithCallbackUrl(Uri subUrl, string language)
         {
             var deepLink = new UriBuilder(new Uri(_coreConfiguration.OwnIdApplicationUrl, "sign"));
             var query = HttpUtility.ParseQueryString(deepLink.Query);
-            query["q"] = $"{subUrl.Authority}{subUrl.PathAndQuery}";
+            query[QueryStringParameters.CallBackUrl] = $"{subUrl.Authority}{subUrl.PathAndQuery}";
+            if (!string.IsNullOrWhiteSpace(language))
+                query[QueryStringParameters.Language] = language;
             deepLink.Query = query.ToString() ?? string.Empty;
             return deepLink.Uri;
         }
@@ -60,16 +62,21 @@ namespace OwnIdSdk.NetCore3.Providers
                 case ChallengeType.Link:
                 case ChallengeType.Recover:
                 case ChallengeType.Register:
-                    query["t"] = "r";
+                    query[QueryStringParameters.RequestType] = "r";
                     break;
                 case ChallengeType.Login:
-                    query["t"] = "l";
+                    query[QueryStringParameters.RequestType] = "l";
                     break;
             }
 
-            query["q"] = $"{subUrl.Authority}{subUrl.PathAndQuery}";
+            query[QueryStringParameters.CallBackUrl] = $"{subUrl.Authority}{subUrl.PathAndQuery}";
             deepLink.Query = query.ToString() ?? string.Empty;
             return deepLink.Uri;
+        }
+
+        public Uri GetConnectionRecoveryUrl(string context)
+        {
+            return GetBaseActionUrl(context, "conn-recovery");
         }
 
         public Uri GetWebAppConnectionsUrl()
@@ -87,6 +94,13 @@ namespace OwnIdSdk.NetCore3.Providers
                     : _coreConfiguration.CallbackUrl.PathAndQuery + "/";
 
             return new Uri(_coreConfiguration.CallbackUrl, $"{path}ownid/{context}/{action}");
+        }
+
+        private static class QueryStringParameters
+        {
+            public const string CallBackUrl = "q";
+            public const string Language = "l";
+            public const string RequestType = "t";
         }
     }
 }

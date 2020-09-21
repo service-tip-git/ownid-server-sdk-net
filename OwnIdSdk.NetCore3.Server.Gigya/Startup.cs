@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OwnIdSdk.NetCore3.Redis;
 using OwnIdSdk.NetCore3.Server.Gigya.External;
+using OwnIdSdk.NetCore3.Server.Gigya.Middlewares;
+using OwnIdSdk.NetCore3.Server.Gigya.Middlewares.SecurityHeaders;
 using OwnIdSdk.NetCore3.Web;
 using OwnIdSdk.NetCore3.Web.Gigya;
 using Serilog;
@@ -95,7 +97,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                             x.Fido2.RelyingPartyName = ownIdSection["fido2_relying_party_name"];
                             x.Fido2.UserDisplayName = ownIdSection["fido2_user_display_name"];
                             x.Fido2.UserName = ownIdSection["fido2_user_name"];
-                            
+
                             if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
                                 x.Fido2.Origin = new Uri(ownIdSection["fido2_origin"]);
                         }
@@ -137,6 +139,9 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 builder => builder.UseMiddleware<ExternalRegisterMiddleware>());
             app.UseRouter(routeBuilder.Build());
 
+            app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
+                .AddStrictTransportSecurityMaxAgeIncludeSubDomains()
+                .AddContentTypeOptionsNoSniff());
             app.UseOwnId();
         }
 
@@ -151,7 +156,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 .Enrich.WithMachineName()
                 .WriteTo.Debug()
                 .WriteTo.Console();
-            
+
             if (elasticLoggingEnabled)
             {
                 var version = Assembly.GetExecutingAssembly().GetName().Version;
@@ -171,7 +176,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             {
                 AutoRegisterTemplate = true,
                 IndexFormat =
-                    $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{(environment ?? "development").ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
+                    $"ownid-{(environment ?? "development").ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
                 ModifyConnectionSettings = x =>
                     x.BasicAuthentication(configuration["Username"], configuration["Password"]),
                 InlineFields = true,

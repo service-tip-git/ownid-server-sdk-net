@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.AccountRecovery;
 
 namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
@@ -24,7 +25,6 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         /// <returns>
         ///     A task that represents the asynchronous recover operation.
         /// </returns>
-        Task OnRecoverAsync(string did, string publicKey, string fido2CredentialId = null,
-            uint? fido2SignatureCounter = null);
+        Task OnRecoverAsync(string did, OwnIdConnection connection);
     }
 }

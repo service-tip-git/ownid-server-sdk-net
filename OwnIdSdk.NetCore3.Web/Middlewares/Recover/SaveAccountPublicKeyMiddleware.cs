@@ -25,7 +25,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Recover
         {
             var jwtContainer = await GetRequestJwtContainerAsync(httpContext);
             var result = await _flowRunner.RunAsync(
-                new CommandInput<JwtContainer>(RequestIdentity, GetRequestCulture(httpContext), jwtContainer, ClientDate),
+                new CommandInput<JwtContainer>(RequestIdentity, GetRequestCulture(httpContext), jwtContainer,
+                    ClientDate),
                 StepType.Recover);
             await Json(httpContext, result, StatusCodes.Status200OK);
         }

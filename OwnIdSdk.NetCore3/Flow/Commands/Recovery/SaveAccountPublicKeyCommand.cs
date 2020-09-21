@@ -5,6 +5,7 @@ using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Flow.Steps;
@@ -41,7 +42,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
                     $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType}");
         }
 
-        protected override async Task<ICommandResult> ExecuteInternal(ICommandInput input, CacheItem relatedItem,
+        protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
             if (!(input is CommandInput<JwtContainer> requestJwt))
@@ -52,7 +53,12 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
             if (!_coreConfiguration.OverwriteFields)
                 userData.Profile = null;
 
-            await _recoveryHandler.OnRecoverAsync(userData.DID, userData.PublicKey);
+            await _recoveryHandler.OnRecoverAsync(userData.DID, new OwnIdConnection
+            {
+                PublicKey = userData.PublicKey,
+                RecoveryToken = userData.RecoveryToken,
+                RecoveryData = userData.RecoveryData
+            });
 
             await _cacheItemService.FinishAuthFlowSessionAsync(input.Context, userData.DID, userData.PublicKey);
 

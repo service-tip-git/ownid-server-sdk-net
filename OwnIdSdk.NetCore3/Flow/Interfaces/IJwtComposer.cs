@@ -1,4 +1,5 @@
 using System;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.ConnectionRecovery;
 using OwnIdSdk.NetCore3.Flow.Steps;
 
 namespace OwnIdSdk.NetCore3.Flow.Interfaces
@@ -33,7 +34,20 @@ namespace OwnIdSdk.NetCore3.Flow.Interfaces
         string GenerateFinalStepJwt(string context, DateTime? clientDate, FrontendBehavior nextFrontendBehavior,
             string locale = null);
 
-        string GenerateBaseStep(string context, DateTime? clientDate, FrontendBehavior nextFrontendBehavior, string did,
+        string GenerateBaseStepJwt(string context, DateTime? clientDate, FrontendBehavior nextFrontendBehavior,
+            string did,
             string locale = null, bool includeRequester = false);
+
+        /// <summary>
+        ///     Generates JWT for performing recovery process
+        /// </summary>
+        /// <param name="context">Challenge Unique identifier</param>
+        /// <param name="clientDate">Client date</param>
+        /// <param name="nextFrontendBehavior">Next flow step description</param>
+        /// <param name="data">Recovery data</param>
+        /// <param name="locale">Optional. Content locale</param>
+        /// <returns></returns>
+        string GenerateRecoveryDataJwt(string context, DateTime? clientDate, FrontendBehavior nextFrontendBehavior,
+            ConnectionRecoveryResult<object> data, string locale = null);
     }
 }

@@ -15,11 +15,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     {
         private readonly IFlowRunner _flowRunner;
 
-        public StartFlowMiddleware(
-            RequestDelegate next,
-            IFlowRunner flowRunner,
-            ILogger<StartFlowMiddleware> logger
-        ) : base(next, logger)
+        public StartFlowMiddleware(RequestDelegate next, IFlowRunner flowRunner, ILogger<StartFlowMiddleware> logger) :
+            base(next, logger)
         {
             _flowRunner = flowRunner;
         }

@@ -134,10 +134,8 @@ namespace OwnIdSdk.NetCore3.Services
                 && cacheItem.FlowType != FlowType.Fido2LinkWithPin
                 && cacheItem.FlowType != FlowType.Fido2RecoverWithPin
             )
-            {
                 throw new ArgumentException(
                     $"Can not set Fido2 information for the flow not related to Fido2. Current flow: {cacheItem.FlowType} Context: '{context}'");
-            }
 
             if (cacheItem.Status != CacheItemStatus.Initiated && cacheItem.Status != CacheItemStatus.Started)
                 throw new ArgumentException(
@@ -183,6 +181,27 @@ namespace OwnIdSdk.NetCore3.Services
         }
 
         /// <summary>
+        ///     Sets recovery data for auth-only flow
+        /// </summary>
+        /// <param name="context">Challenge unique identifier</param>
+        /// <param name="recoveryToken">Recovery token/identifier</param>
+        /// <param name="recoveryData">Data for recovery</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task SetRecoveryDataAsync(string context, string recoveryToken, string recoveryData)
+        {
+            var cacheItem = await _cacheStore.GetAsync(context);
+
+            if (cacheItem == null)
+                throw new ArgumentException($"Can not find any item with context '{context}'");
+
+            cacheItem.RecoveryData = recoveryData;
+            cacheItem.RecoveryToken = recoveryToken;
+
+            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+        }
+
+        /// <summary>
         ///     Tries to find <see cref="CacheItem" /> by <paramref name="nonce" /> and <paramref name="context" /> in
         ///     <see cref="ICacheStore" /> and remove item if find operation was successful
         /// </summary>
@@ -197,10 +216,7 @@ namespace OwnIdSdk.NetCore3.Services
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
-            if (cacheItem == null
-                || cacheItem.Nonce != nonce
-                || cacheItem.Status == CacheItemStatus.Finished && string.IsNullOrEmpty(cacheItem.DID)
-            )
+            if (cacheItem == null || cacheItem.Nonce != nonce)
                 return null;
 
             // If finished - clear cache
@@ -229,10 +245,22 @@ namespace OwnIdSdk.NetCore3.Services
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
-            if (cacheItem == null || cacheItem.Context != context)
+            if (cacheItem == null)
                 throw new ArgumentException($"Can not find any item with context '{context}'");
 
             cacheItem.FlowType = flowType;
+
+            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+        }
+
+        public async Task FinishFlowWithErrorAsync(string context, string errorMessage)
+        {
+            var cacheItem = await _cacheStore.GetAsync(context);
+            if (cacheItem == null)
+                throw new ArgumentException($"Can not find any item with context '{context}'");
+
+            cacheItem.Status = CacheItemStatus.Finished;
+            cacheItem.Error = errorMessage;
 
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }

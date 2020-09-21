@@ -10,14 +10,13 @@ namespace OwnIdSdk.NetCore3.Flow.Steps
         ApprovePin,
         Declined,
         Success,
+        InternalConnectionRecovery,
 
         Authorize,
         InstantAuthorize,
         Link,
         Recover,
         
-        Fido2Register,
-        Fido2Login,
-        Fido2Success,
+        Fido2Success
     }
 }

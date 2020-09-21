@@ -5,9 +5,11 @@ using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.ConnectionRecovery;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
 using OwnIdSdk.NetCore3.Web.Gigya.ApiClient;
 using OwnIdSdk.NetCore3.Web.Gigya.Contracts;
+using OwnIdSdk.NetCore3.Web.Gigya.Contracts.Accounts;
 
 namespace OwnIdSdk.NetCore3.Web.Gigya
 {
@@ -25,31 +27,31 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             _logger = logger;
         }
 
-        public async Task<LoginResult<object>> OnSuccessLoginAsync(string did, string publicKey)
+        public async Task<AuthResult<object>> OnSuccessLoginAsync(string did, string publicKey)
         {
             return await OnSuccessLoginByPublicKeyAsync(publicKey);
         }
 
-        public async Task<LoginResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)
+        public async Task<AuthResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)
         {
             var did = await _restApiClient.SearchForDid(publicKey);
 
             if (string.IsNullOrEmpty(did))
-                return new LoginResult<object>("Can not find user in Gigya search result with provided public key");
+                return new AuthResult<object>("Can not find user in Gigya search result with provided public key");
 
             return await OnSuccessLoginInternalAsync(did);
         }
 
-        private async Task<LoginResult<object>> OnSuccessLoginInternalAsync(string did)
+        private async Task<AuthResult<object>> OnSuccessLoginInternalAsync(string did)
         {
             if (_configuration.LoginType == GigyaLoginType.Session)
             {
                 var loginResponse = await _restApiClient.NotifyLogin(did, "browser");
 
                 if (loginResponse.SessionInfo == null || loginResponse.ErrorCode != 0)
-                    return new LoginResult<object>($"Gigya: {loginResponse.GetFailureMessage()}");
+                    return new AuthResult<object>($"Gigya: {loginResponse.GetFailureMessage()}");
 
-                return new LoginResult<object>(new
+                return new AuthResult<object>(new
                 {
                     sessionInfo = loginResponse.SessionInfo,
                     identities = loginResponse.Identities.FirstOrDefault()
@@ -59,20 +61,20 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             var jwtResponse = await _restApiClient.GetJwt(did);
 
             if (jwtResponse.IdToken == null || jwtResponse.ErrorCode != 0)
-                return new LoginResult<object>($"Gigya: {jwtResponse.GetFailureMessage()}");
+                return new AuthResult<object>($"Gigya: {jwtResponse.GetFailureMessage()}");
 
-            return new LoginResult<object>(new
+            return new AuthResult<object>(new
             {
                 idToken = jwtResponse.IdToken
             });
         }
 
-        public async Task<LoginResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId,
+        public async Task<AuthResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId,
             uint fido2SignCounter)
         {
             var user = await _restApiClient.SearchByFido2CredentialId(fido2CredentialId);
             if (user == null)
-                return new LoginResult<object>("Can not find user in Gigya with provided fido2 user id");
+                return new AuthResult<object>("Can not find user in Gigya with provided fido2 user id");
 
             var connectionToUpdate = user.Data.Connections.First(x => x.Fido2CredentialId == fido2CredentialId);
 
@@ -122,6 +124,12 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             return !string.IsNullOrWhiteSpace(did);
         }
 
+        public async Task<bool> IsFido2UserExists(string fido2CredentialId)
+        {
+            var user = await _restApiClient.SearchByFido2CredentialId(fido2CredentialId);
+            return user != null;
+        }
+
         public async Task<Fido2Info> FindFido2Info(string fido2CredentialId)
         {
             var user = await _restApiClient.SearchByFido2CredentialId(fido2CredentialId);
@@ -143,7 +151,27 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             };
         }
 
-        public async Task CreateProfileAsync(IUserProfileFormContext<TProfile> context)
+        public async Task<ConnectionRecoveryResult<TProfile>> GetConnectionRecoveryDataAsync(string recoveryToken,
+            bool includingProfile = false)
+        {
+            var result = await _restApiClient.SearchByRecoveryTokenAsync(recoveryToken);
+
+            if (result?.Data?.Connections == null)
+                throw new Exception($"Can not find connection recovery token in Gigya {recoveryToken}");
+
+            var connection = result.Data.Connections.First(x => x.RecoveryToken == recoveryToken);
+
+            return new ConnectionRecoveryResult<TProfile>
+            {
+                PublicKey = connection.PublicKey,
+                DID = result.DID,
+                RecoveryData = connection.RecoveryData,
+                UserProfile = includingProfile ? result.Profile : null
+            };
+        }
+
+        public async Task CreateProfileAsync(IUserProfileFormContext<TProfile> context, string recoveryToken = null,
+            string recoveryData = null)
         {
             var loginResponse = await _restApiClient.NotifyLogin(context.DID);
 
@@ -151,8 +179,15 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                 throw new Exception(
                     $"Gigya.notifyLogin error -> {loginResponse.GetFailureMessage()}");
 
+            var connection = new GigyaOwnIdConnection
+            {
+                PublicKey = context.PublicKey,
+                RecoveryToken = recoveryToken,
+                RecoveryData = recoveryData
+            };
+
             var setAccountMessage =
-                await _restApiClient.SetAccountInfo(context.DID, context.Profile, new AccountData(context.PublicKey));
+                await _restApiClient.SetAccountInfo(context.DID, context.Profile, new AccountData(connection));
 
             if (setAccountMessage.ErrorCode > 0)
             {

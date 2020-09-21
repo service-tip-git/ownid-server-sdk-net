@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 
 namespace OwnIdSdk.NetCore3.Extensibility.Cache
@@ -6,6 +7,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
     /// <summary>
     ///     OwnID flow detection fields store structure
     /// </summary>
+    [DebuggerDisplay("{Context}: {Status} (ChallengeType: {ChallengeType}/FlowType: {FlowType})")]
     public class CacheItem : ICloneable
     {
         /// <summary>
@@ -105,6 +107,15 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
         public string Fido2CredentialId { get; set; }
 
         /// <summary>
+        ///     Error
+        /// </summary>
+        public string Error { get; set; }
+        
+        public string RecoveryToken { get; set; }
+
+        public string RecoveryData { get; set; }
+
+        /// <summary>
         ///     Creates new instance of <see cref="CacheItem" /> based on <see cref="Nonce" /> and <see cref="DID" />
         /// </summary>
         public object Clone()
@@ -125,6 +136,9 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
                 PublicKey = PublicKey,
                 Fido2SignatureCounter = Fido2SignatureCounter,
                 Fido2CredentialId = Fido2CredentialId,
+                Error = Error,
+                RecoveryData = RecoveryData,
+                RecoveryToken = RecoveryToken
             };
         }
     }

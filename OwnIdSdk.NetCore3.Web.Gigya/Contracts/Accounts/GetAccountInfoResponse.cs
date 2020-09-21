@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts.UpdateProfile
+namespace OwnIdSdk.NetCore3.Web.Gigya.Contracts.Accounts
 {
     public class GetAccountInfoResponse<TProfile> : BaseGigyaResponse where TProfile : class, IGigyaUserProfile
     {
