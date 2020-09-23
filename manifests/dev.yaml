@@ -279,7 +279,7 @@ spec:
                   name: credential-secrets
                   key: demo_private_key
             - name: OWNID__FIDO2_ENABLED
-              value: 'false'
+              value: 'true'
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://demo.dev.ownid.com/passwordless
             - name: OWNID__FIDO2_RELYING_PARTY_ID
