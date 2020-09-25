@@ -63,6 +63,8 @@ spec:
                 secretKeyRef:
                   name: credential-secrets
                   key: client1_gigya_api_key
+            - name: GIGYA__LOGIN_TYPE
+              value: IdToken
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
             - name: ELASTICCONFIGURATION__URI
