@@ -125,13 +125,17 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                         FlowType.RecoverWithPin => FlowType.Fido2RecoverWithPin,
                         _ => cacheItem.FlowType
                     };
+
+                    if (cacheItem.FlowType == FlowType.Fido2PartialRegister)
+                        cacheItem.ChallengeType = ChallengeType.Register;
                     break;
                 default:
                     throw new InternalLogicException($"Incorrect fido 2 request: '{fido2RequestType}'");
             }
 
             if (initialFlowType != cacheItem.FlowType)
-                await _cacheItemService.UpdateFlowAsync(cacheItem.Context, cacheItem.FlowType);
+                await _cacheItemService.UpdateFlowAsync(cacheItem.Context, cacheItem.FlowType,
+                    cacheItem.ChallengeType);
         }
     }
 }

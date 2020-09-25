@@ -241,7 +241,7 @@ namespace OwnIdSdk.NetCore3.Services
             return item;
         }
 
-        public async Task UpdateFlowAsync(string context, FlowType flowType)
+        public async Task UpdateFlowAsync(string context, FlowType flowType, ChallengeType challengeType)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
@@ -249,6 +249,7 @@ namespace OwnIdSdk.NetCore3.Services
                 throw new ArgumentException($"Can not find any item with context '{context}'");
 
             cacheItem.FlowType = flowType;
+            cacheItem.ChallengeType = challengeType;
 
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }

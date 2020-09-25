@@ -116,13 +116,6 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                         result.Payload = await _userHandlerAdapter.OnSuccessLoginByPublicKeyAsync(cacheItem.PublicKey);
                         break;
                     }
-                    case ChallengeType.Login
-                        when cacheItem.FlowType == FlowType.PartialAuthorize:
-                    {
-                        var errorMessage = _localizationService.GetLocalizedString("Error_UserNotFound");
-                        result.Payload = new AuthResult<object>(errorMessage);
-                        break;
-                    }
                     case ChallengeType.Login:
                         result.Payload = SetPartialRegisterResult(cacheItem);
                         break;

@@ -89,7 +89,8 @@ namespace OwnIdSdk.NetCore3.Services
         /// </summary>
         /// <param name="context">context to update</param>
         /// <param name="flowType">new <see cref="FlowType" /></param>
-        Task UpdateFlowAsync(string context, FlowType flowType);
+        /// <param name="challengeType">new <see cref="ChallengeType"/></param>
+        Task UpdateFlowAsync(string context, FlowType flowType, ChallengeType challengeType);
 
         /// <summary>
         ///     Finish flow with error
