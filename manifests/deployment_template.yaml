@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: <company-name>-deployment # <client-name> - name of company, for example nestle
+  namespace: alpha
+  labels:
+    app: <company-name>
+spec:
+  revisionHistoryLimit: 1
+  replicas: 2
+  selector:
+    matchLabels:
+      app: <company-name>
+  template:
+    metadata:
+      labels:
+        app: <company-name>
+    spec:
+      containers:
+        - name: <company-name>
+          image: <ownid-image-url> # path to image, ex: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging:latest
+          ports:
+            - containerPort: 5002
+          env:
+            - name: OWNID__CALLBACK_URL
+              value: https://<client-name>.ownid.com # public domain name of this deployment - ingress of CNAME
+            - name: OWNID__DID # Unique website identifier
+              value: did:<client-name>:<did>
+            - name: OWNID__NAME # Website name - will be shown on https://sign.ownid.com
+              value: <Client name>
+            - name: OWNID__DESCRIPTION # Website description - will be shown on https://sign.ownid.com
+              value: <client description>
+            - name: OWNID__ICON # Website icon - will be shown on https://sign.ownid.com
+              value: <client icon base64>
+            - name: OWNID__CACHE_TYPE # Type of cache - redis of web-cache (in memory solution for 1 instance of service)
+              value: redis
+            - name: OWNID__CACHE_CONFIG # Cache config. For redis - redis_uri
+              value: <redis uri>
+            - name: OWNID__PUB_KEY # Website public key 
+              value: <website public key>
+            - name: OWNID__PRIVATE_KEY # Website private key 
+              value: <website private key>
+            - name: OWNID__FIDO2_ENABLED # true, if you want to enable FIDO2 support
+              value: <true or false>
+            - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL # should be a subdomain. OwnID team has to create a certifificate for the URL
+              value: https://passwordless.<website domain>
+            - name: OWNID__FIDO2_RELYING_PARTY_ID # Website domain name
+              value: universalid.sap.com
+            - name: OWNID__FIDO2_RELYING_PARTY_NAME # Website domain name
+              value: UniversalID
+            - name: OWNID__FIDO2_ORIGIN # Website address
+              value: https://universalid.sap.com
+            - name: GIGYA__DATA_CENTER # Gigya data center
+              value: us1.gigya.com
+            - name: GIGYA__SECRET # Gigya secret
+              value: <gigya secret>
+            - name: GIGYA__API_KEY # Gigya api key
+              value: <gigya api key>
+            - name: GIGYA__USER_KEY # Gigya user key
+              value: <gigya user key>
+            - name: GIGYA__LOGIN_TYPE # Login type: session or IdToken (JWT will be returned instead of creating a session)
+              value: IdToken
+            - name: ASPNETCORE_ENVIRONMENT # environment
+              value: alpha
