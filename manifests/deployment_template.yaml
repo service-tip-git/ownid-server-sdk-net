@@ -23,15 +23,15 @@ spec:
             - containerPort: 5002
           env:
             - name: OWNID__CALLBACK_URL
-              value: https://<client-name>.ownid.com # public domain name of this deployment - ingress of CNAME
+              value: https://<company-name>.ownid.com or https://ownid-server.<company-domain> # public domain name of this deployment - ingress of CNAME
             - name: OWNID__DID # Unique website identifier
-              value: did:<client-name>:<did>
+              value: did:<company-name>:<did>
             - name: OWNID__NAME # Website name - will be shown on https://sign.ownid.com
-              value: <Client name>
+              value: <Company name>
             - name: OWNID__DESCRIPTION # Website description - will be shown on https://sign.ownid.com
-              value: <client description>
+              value: <Company description>
             - name: OWNID__ICON # Website icon - will be shown on https://sign.ownid.com
-              value: <client icon base64>
+              value: <Company icon base64>
             - name: OWNID__CACHE_TYPE # Type of cache - redis of web-cache (in memory solution for 1 instance of service)
               value: redis
             - name: OWNID__CACHE_CONFIG # Cache config. For redis - redis_uri
@@ -45,9 +45,9 @@ spec:
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL # should be a subdomain. OwnID team has to create a certifificate for the URL
               value: https://passwordless.<website domain>
             - name: OWNID__FIDO2_RELYING_PARTY_ID # Website domain name
-              value: universalid.sap.com
-            - name: OWNID__FIDO2_RELYING_PARTY_NAME # Website domain name
-              value: UniversalID
+              value: <domain-name>
+            - name: OWNID__FIDO2_RELYING_PARTY_NAME # Party name like Nestle
+              value: <party_name>
             - name: OWNID__FIDO2_ORIGIN # Website address
               value: https://universalid.sap.com
             - name: GIGYA__DATA_CENTER # Gigya data center

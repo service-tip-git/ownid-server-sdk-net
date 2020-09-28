@@ -49,8 +49,8 @@ spec:
                 secretKeyRef:
                   name: credential-secrets
                   key: demo_private_key
-            - name: OWNID__FIDO2_ENABLED
-              value: 'true'
+            - name: OWNID__FIDO2_ENABLED # Work in progress, FIDO2 will be supported later
+              value: 'false'
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.universalid.sap.com
             - name: OWNID__FIDO2_RELYING_PARTY_ID
