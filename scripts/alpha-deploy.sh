@@ -25,3 +25,4 @@ echo Updating image in Cluster deployment
 kubectl apply -f manifests/$ENV.yaml
 
 kubectl -n=$ENV set image deployment/nestle-hipster-deployment nestle-hipster=$REPOSITORY_URI:$IMAGE_TAG --record
+kubectl -n=$ENV set image deployment/bayer-deployment bayer=$REPOSITORY_URI:$IMAGE_TAG --record
