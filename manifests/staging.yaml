@@ -151,9 +151,9 @@ spec:
             - name: OWNID__FIDO2_ENABLED
               value: 'true'
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
-              value: https://demo.ownid.com/passwordless
+              value: https://passwordless.demo.ownid.com
             - name: OWNID__FIDO2_RELYING_PARTY_ID
-              value: demo.ownid.com
+              value: passwordless.demo.ownid.com
             - name: OWNID__FIDO2_RELYING_PARTY_NAME
               value: OwnID
             - name: OWNID__FIDO2_USER_DISPLAY_NAME
@@ -161,7 +161,7 @@ spec:
             - name: OWNID__FIDO2_USER_NAME
               value: Passwordless
             - name: OWNID__FIDO2_ORIGIN
-              value: https://demo.ownid.com
+              value: https://passwordless.demo.ownid.com
             - name: GIGYA__DATA_CENTER
               value: us1.gigya.com
             - name: GIGYA__SECRET
