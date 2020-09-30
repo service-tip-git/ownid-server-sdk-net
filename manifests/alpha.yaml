@@ -185,7 +185,7 @@ spec:
                   name: bayer-secrets
                   key: bayer_private_key
             - name: GIGYA__DATA_CENTER
-              value: us1.gigya.com
+              value: eu1.gigya.com
             - name: GIGYA__SECRET
               valueFrom:
                 secretKeyRef:
