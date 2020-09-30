@@ -184,7 +184,7 @@ namespace OwnIdSdk.NetCore3.Services
         ///     Sets recovery data for auth-only flow
         /// </summary>
         /// <param name="context">Challenge unique identifier</param>
-        /// <param name="recoveryToken">Recovery token/identifier</param>
+        /// <param name="recoveryToken">WebApp recovery token/identifier</param>
         /// <param name="recoveryData">Data for recovery</param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
@@ -196,8 +196,21 @@ namespace OwnIdSdk.NetCore3.Services
                 throw new ArgumentException($"Can not find any item with context '{context}'");
 
             cacheItem.RecoveryData = recoveryData;
-            cacheItem.RecoveryToken = recoveryToken;
+            cacheItem.WebAppRecoveryToken = recoveryToken;
 
+            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+        }
+
+        public async Task SetPasswordlessStateAsync(string context, string encryptionPassphrase,
+            string recoveryToken = null)
+        {
+            var cacheItem = await _cacheStore.GetAsync(context);
+
+            if (cacheItem == null)
+                throw new ArgumentException($"Can not find any item with context '{context}'");
+
+            cacheItem.PasswordlessRecoveryToken = recoveryToken;
+            cacheItem.PasswordlessEncryptionPassphrase = encryptionPassphrase;
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
 

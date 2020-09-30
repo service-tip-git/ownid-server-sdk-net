@@ -11,6 +11,7 @@ using OwnIdSdk.NetCore3.Flow;
 using OwnIdSdk.NetCore3.Flow.Commands;
 using OwnIdSdk.NetCore3.Flow.Commands.Approval;
 using OwnIdSdk.NetCore3.Flow.Commands.Authorize;
+using OwnIdSdk.NetCore3.Flow.Commands.ConnectionRecovery;
 using OwnIdSdk.NetCore3.Flow.Commands.Fido2;
 using OwnIdSdk.NetCore3.Flow.Commands.Link;
 using OwnIdSdk.NetCore3.Flow.Commands.Recovery;
@@ -56,6 +57,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
             services.TryAddSingleton<RecoverAccountCommand>();
             services.TryAddSingleton<SaveAccountPublicKeyCommand>();
             services.TryAddSingleton<InternalConnectionRecoveryCommand>();
+            services.TryAddSingleton<SetPasswordlessStateCommand>();
 
             services.TryAddSingleton<IFlowController, FlowController>();
             services.TryAddSingleton<IFlowRunner, FlowRunner>();

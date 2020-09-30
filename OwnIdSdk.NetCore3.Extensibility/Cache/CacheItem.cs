@@ -100,7 +100,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
         ///     Fido2 counter
         /// </summary>
         public uint? Fido2SignatureCounter { get; set; }
-        
+
         /// <summary>
         ///     Fido2 credential id
         /// </summary>
@@ -110,10 +110,31 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
         ///     Error
         /// </summary>
         public string Error { get; set; }
-        
-        public string RecoveryToken { get; set; }
 
+        /// <summary>
+        ///     Passwordless recovery token part
+        /// </summary>
+        public string PasswordlessRecoveryToken { get; set; }
+
+        /// <summary>
+        ///     WebApp recovery token part
+        /// </summary>
+        public string WebAppRecoveryToken { get; set; }
+
+        /// <summary>
+        ///     Connection recovery token
+        /// </summary>
+        public string RecoveryToken => $"{PasswordlessRecoveryToken}:::{WebAppRecoveryToken}";
+
+        /// <summary>
+        ///     Connection recovery data
+        /// </summary>
         public string RecoveryData { get; set; }
+
+        /// <summary>
+        ///     Private key encryption passphrase
+        /// </summary>
+        public string PasswordlessEncryptionPassphrase { get; set; }
 
         /// <summary>
         ///     Creates new instance of <see cref="CacheItem" /> based on <see cref="Nonce" /> and <see cref="DID" />
@@ -138,7 +159,9 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
                 Fido2CredentialId = Fido2CredentialId,
                 Error = Error,
                 RecoveryData = RecoveryData,
-                RecoveryToken = RecoveryToken
+                PasswordlessRecoveryToken = PasswordlessRecoveryToken,
+                WebAppRecoveryToken = WebAppRecoveryToken,
+                PasswordlessEncryptionPassphrase = PasswordlessEncryptionPassphrase
             };
         }
     }

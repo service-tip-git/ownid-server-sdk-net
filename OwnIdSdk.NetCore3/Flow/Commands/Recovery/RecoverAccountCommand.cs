@@ -42,9 +42,17 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
             // Recover access
             var recoverResult = await _accountRecoveryHandler.RecoverAsync(relatedItem.Payload);
 
-            var jwt = _jwtComposer.GenerateBaseStepJwt(relatedItem.Context, input.ClientDate,
-                _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType), recoverResult.DID,
-                input.CultureInfo?.Name, _needRequesterInfo);
+            var composeInfo = new BaseJwtComposeInfo
+            {
+                Context = relatedItem.Context,
+                ClientTime = input.ClientDate,
+                Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                Locale = input.CultureInfo?.Name,
+                IncludeRequester = _needRequesterInfo,
+                EncryptionPassphrase = relatedItem.PasswordlessEncryptionPassphrase
+            };
+
+            var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, recoverResult.DID);
             return new JwtContainer(jwt);
         }
     }

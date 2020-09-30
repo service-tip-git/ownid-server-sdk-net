@@ -53,8 +53,16 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                     userData.RecoveryData);
 
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, userData.DID, userData.PublicKey);
-            var jwt = _jwtComposer.GenerateFinalStepJwt(relatedItem.Context, input.ClientDate,
-                _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType), input.CultureInfo?.Name);
+            
+            var composeInfo = new BaseJwtComposeInfo
+            {
+                Context = relatedItem.Context,
+                ClientTime = input.ClientDate,
+                Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                Locale = input.CultureInfo?.Name
+            };
+            
+            var jwt = _jwtComposer.GenerateFinalStepJwt(composeInfo);
             return new JwtContainer(jwt);
         }
     }

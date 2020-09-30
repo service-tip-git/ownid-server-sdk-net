@@ -35,8 +35,17 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
         {
             var step = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
 
-            var jwt = _jwtComposer.GenerateBaseStepJwt(relatedItem.Context, input.ClientDate, step, relatedItem.DID,
-                input.CultureInfo?.Name, _needRequesterInfo);
+            var composeInfo = new BaseJwtComposeInfo
+            {
+                Context = relatedItem.Context,
+                ClientTime = input.ClientDate,
+                Behavior = step,
+                Locale = input.CultureInfo?.Name,
+                IncludeRequester = _needRequesterInfo,
+                EncryptionPassphrase = relatedItem.PasswordlessEncryptionPassphrase
+            };
+            
+            var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, relatedItem.DID);
             return Task.FromResult(new JwtContainer(jwt) as ICommandResult);
         }
     }

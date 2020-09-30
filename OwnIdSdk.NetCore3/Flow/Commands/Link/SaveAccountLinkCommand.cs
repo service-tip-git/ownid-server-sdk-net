@@ -23,8 +23,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Link
         private readonly IAccountLinkHandler _linkHandler;
 
         public SaveAccountLinkCommand(ICacheItemService cacheItemService, IJwtService jwtService,
-            IJwtComposer jwtComposer, IFlowController flowController, IAccountLinkHandler linkHandler,
-            ILocalizationService localizationService, IOwnIdCoreConfiguration coreConfiguration)
+            IJwtComposer jwtComposer, IFlowController flowController, IAccountLinkHandler linkHandler)
         {
             _cacheItemService = cacheItemService;
             _jwtService = jwtService;
@@ -60,10 +59,16 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Link
             });
 
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, userData.DID, userData.PublicKey);
-            var jwt = _jwtComposer.GenerateFinalStepJwt(relatedItem.Context,
-                input.ClientDate, _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
-                input.CultureInfo?.Name);
 
+            var composeInfo = new BaseJwtComposeInfo
+            {
+                Context = relatedItem.Context,
+                ClientTime = input.ClientDate,
+                Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                Locale = input.CultureInfo?.Name
+            };
+
+            var jwt = _jwtComposer.GenerateFinalStepJwt(composeInfo);
             return new JwtContainer(jwt);
         }
     }

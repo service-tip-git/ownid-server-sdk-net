@@ -7,7 +7,7 @@ using OwnIdSdk.NetCore3.Flow.Adapters;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Flow.Steps;
 
-namespace OwnIdSdk.NetCore3.Flow.Commands
+namespace OwnIdSdk.NetCore3.Flow.Commands.ConnectionRecovery
 {
     public class InternalConnectionRecoveryCommand : BaseFlowCommand
     {
@@ -34,11 +34,18 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             StepType currentStepType)
         {
             var comInput = input as CommandInput<string>;
-            var result = await _userHandlerAdapter.GetConnectionRecoveryDataAsync(comInput.Data, true);
-            var expectedBehavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
-            var jwt = _jwtComposer.GenerateRecoveryDataJwt(relatedItem.Context, input.ClientDate, expectedBehavior,
-                result, input.CultureInfo?.Name);
-
+            relatedItem.WebAppRecoveryToken = comInput.Data;
+            var result = await _userHandlerAdapter.GetConnectionRecoveryDataAsync(relatedItem.RecoveryToken, true);
+            
+            var composeInfo = new BaseJwtComposeInfo
+            {
+                Context = relatedItem.Context,
+                ClientTime = input.ClientDate,
+                Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                Locale = input.CultureInfo?.Name
+            };
+            
+            var jwt = _jwtComposer.GenerateRecoveryDataJwt(composeInfo, result);
             return new JwtContainer(jwt);
         }
     }

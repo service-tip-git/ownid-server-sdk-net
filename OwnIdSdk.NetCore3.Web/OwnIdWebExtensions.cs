@@ -39,6 +39,8 @@ namespace OwnIdSdk.NetCore3.Web
                 builder => builder.UseMiddleware<GetActionApprovalStatusMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/conn-recovery",
                 builder => builder.UseMiddleware<InternalConnectionRecoveryMiddleware>());
+            routeBuilder.MapMiddlewarePost("ownid/{context}/start/state",
+                builder => builder.UseMiddleware<PasswordlessStateMiddleware>());
 
             var configuration = app.ApplicationServices.GetService<OwnIdConfiguration>();
 

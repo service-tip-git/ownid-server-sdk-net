@@ -40,14 +40,19 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 Fido2CredentialId = relatedItem.Fido2CredentialId,
                 Fido2SignatureCounter = relatedItem.Fido2SignatureCounter
             });
+            
+            var composeInfo = new BaseJwtComposeInfo
+            {
+                Context = relatedItem.Context,
+                ClientTime = input.ClientDate,
+                Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                Locale = input.CultureInfo?.Name,
+                IncludeRequester = true
+            };
 
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, relatedItem.DID,
                 relatedItem.PublicKey);
-
-            var behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
-            var jwt = _jwtComposer.GenerateBaseStepJwt(relatedItem.Context, input.ClientDate,
-                behavior, relatedItem.DID, input.CultureInfo?.Name, true);
-
+            var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, relatedItem.DID);
             return new JwtContainer(jwt);
         }
     }

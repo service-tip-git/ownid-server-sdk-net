@@ -70,6 +70,7 @@ namespace OwnIdSdk.NetCore3.Providers
             }
 
             query[QueryStringParameters.CallBackUrl] = $"{subUrl.Authority}{subUrl.PathAndQuery}";
+            query[QueryStringParameters.StateSuffix] = "state";
             deepLink.Query = query.ToString() ?? string.Empty;
             return deepLink.Uri;
         }
@@ -101,6 +102,7 @@ namespace OwnIdSdk.NetCore3.Providers
             public const string CallBackUrl = "q";
             public const string Language = "l";
             public const string RequestType = "t";
+            public const string StateSuffix = "s";
         }
     }
 }

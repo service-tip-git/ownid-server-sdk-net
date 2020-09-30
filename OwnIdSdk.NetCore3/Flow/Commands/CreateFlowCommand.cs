@@ -71,17 +71,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             var destinationUrl = _urlProvider.GetWebAppSignWithCallbackUrl(startFlowUrl, request.Language);
 
             if (_coreConfiguration.Fido2.Enabled
-                && (
-                    flowType == FlowType.PartialAuthorize
+                && (flowType == FlowType.PartialAuthorize
                     || request.Type == ChallengeType.Link
-                    || request.Type == ChallengeType.Recover
-                ))
+                    || request.Type == ChallengeType.Recover))
+            {
                 destinationUrl = _urlProvider.GetFido2Url(destinationUrl, request.Type);
+            }
 
-            return new GetChallengeLinkResponse(
-                challengeContext,
-                destinationUrl.ToString(),
-                nonce,
+            return new GetChallengeLinkResponse(challengeContext, destinationUrl.ToString(), nonce,
                 _coreConfiguration.CacheExpirationTimeout);
         }
     }
