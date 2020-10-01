@@ -88,7 +88,7 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
             var url = urlProvider.GetWebAppSignWithCallbackUrl(urlProvider.GetStartFlowUrl(context), language);
 
             if (fido2Enabled)
-                url = urlProvider.GetFido2Url(url, challengeType);
+                url = urlProvider.GetFido2Url(url, challengeType, language);
 
             var expected = new GetChallengeLinkResponse(context, url.ToString(), nonce, expiration);
 

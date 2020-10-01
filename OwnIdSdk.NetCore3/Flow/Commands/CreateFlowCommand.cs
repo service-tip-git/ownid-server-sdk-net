@@ -75,7 +75,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                     || request.Type == ChallengeType.Link
                     || request.Type == ChallengeType.Recover))
             {
-                destinationUrl = _urlProvider.GetFido2Url(destinationUrl, request.Type);
+                destinationUrl = _urlProvider.GetFido2Url(destinationUrl, request.Type, request.Language);
             }
 
             return new GetChallengeLinkResponse(challengeContext, destinationUrl.ToString(), nonce,
