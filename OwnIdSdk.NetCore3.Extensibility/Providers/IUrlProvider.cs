@@ -50,8 +50,9 @@ namespace OwnIdSdk.NetCore3.Extensibility.Providers
         ///     request type (only <see cref="ChallengeType.Register" /> and
         ///     <see cref="ChallengeType.Login" /> are supported
         /// </param>
+        /// <param name="language">language</param>
         /// <returns>Well-formatted url for Fido2 page with callback option</returns>
-        Uri GetFido2Url(Uri subUrl, ChallengeType requestType);
+        Uri GetFido2Url(Uri subUrl, ChallengeType requestType, string language);
 
         /// <summary>
         ///     Generates internal connection restore url

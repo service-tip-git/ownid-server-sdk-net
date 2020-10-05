@@ -13,9 +13,9 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt
         [JsonPropertyName("did")]
         public string DID { get; set; }
 
-        [JsonPropertyName("recoveryToken")]
-        public string RecoveryToken { get; set; }
-
+        /// <summary>
+        ///     Encrypted user data for recovery
+        /// </summary>
         [JsonPropertyName("recoveryData")]
         public string RecoveryData { get; set; }
 

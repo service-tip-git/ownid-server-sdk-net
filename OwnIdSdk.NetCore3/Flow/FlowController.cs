@@ -7,6 +7,7 @@ using OwnIdSdk.NetCore3.Flow.Commands;
 using OwnIdSdk.NetCore3.Flow.Commands.Approval;
 using OwnIdSdk.NetCore3.Flow.Commands.Authorize;
 using OwnIdSdk.NetCore3.Flow.Commands.Fido2;
+using OwnIdSdk.NetCore3.Flow.Commands.Internal;
 using OwnIdSdk.NetCore3.Flow.Commands.Link;
 using OwnIdSdk.NetCore3.Flow.Commands.Recovery;
 using OwnIdSdk.NetCore3.Flow.Interfaces;

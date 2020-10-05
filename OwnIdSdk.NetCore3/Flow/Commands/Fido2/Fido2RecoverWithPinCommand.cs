@@ -44,10 +44,16 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, recoverResult.DID,
                 relatedItem.PublicKey);
 
-            var jwt = _jwtComposer.GenerateBaseStepJwt(relatedItem.Context, input.ClientDate,
-                _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType), recoverResult.DID,
-                input.CultureInfo?.Name, true);
-
+            var composeInfo = new BaseJwtComposeInfo
+            {
+                Context = relatedItem.Context,
+                ClientTime = input.ClientDate,
+                Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                Locale = input.CultureInfo?.Name,
+                IncludeRequester = true
+            };
+            
+            var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, recoverResult.DID);
             return new JwtContainer(jwt);
         }
     }

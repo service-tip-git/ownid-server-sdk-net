@@ -99,9 +99,17 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         protected virtual Task<ICommandResult> GetResultAsync(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
-            var behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
-            var jwt = _jwtComposer.GenerateBaseStepJwt(relatedItem.Context, input.ClientDate, behavior, NewUserId,
-                input.CultureInfo?.Name, true);
+            var composeInfo = new BaseJwtComposeInfo
+            {
+                Context = relatedItem.Context,
+                ClientTime = input.ClientDate,
+                Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
+                Locale = input.CultureInfo?.Name,
+                IncludeRequester = true,
+                EncToken = relatedItem.EncToken
+            };
+            
+            var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, NewUserId);
 
             return Task.FromResult((ICommandResult) new JwtContainer(jwt));
         }

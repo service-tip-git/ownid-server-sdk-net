@@ -73,7 +73,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                 switch (checkResult)
                 {
                     case IdentitiesCheckResult.UserNotFound:
-                        await _userHandlerAdapter.CreateProfileAsync(formContext, userData.RecoveryToken,
+                        await _userHandlerAdapter.CreateProfileAsync(formContext, relatedItem.RecoveryToken,
                             userData.RecoveryData);
                         break;
                     case IdentitiesCheckResult.UserExists:
@@ -85,10 +85,16 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                     throw new BusinessValidationException(formContext);
             }
 
+            var composeInfo = new BaseJwtComposeInfo
+            {
+                Context = relatedItem.Context,
+                ClientTime = input.ClientDate,
+                Locale = input.CultureInfo?.Name,
+                Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, StepType.Authorize)
+            };
+            
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, userData.DID, userData.PublicKey);
-            var jwt = _jwtComposer.GenerateFinalStepJwt(relatedItem.Context, input.ClientDate,
-                _flowController.GetExpectedFrontendBehavior(relatedItem, StepType.Authorize), input.CultureInfo?.Name);
-
+            var jwt = _jwtComposer.GenerateFinalStepJwt(composeInfo);
             return new JwtContainer(jwt);
         }
     }

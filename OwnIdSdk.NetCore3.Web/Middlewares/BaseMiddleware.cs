@@ -149,6 +149,14 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             }
         }
 
+        protected void SetCookies(HttpResponse httpResponse, List<CookieInfo> cookies)
+        {
+            foreach (var cookie in cookies)
+            {
+                httpResponse.Cookies.Append(cookie.Name, cookie.Value, cookie.Options);
+            }
+        }
+
         #region Response Shortcuts
 
         protected void OkNoContent(HttpResponse response)

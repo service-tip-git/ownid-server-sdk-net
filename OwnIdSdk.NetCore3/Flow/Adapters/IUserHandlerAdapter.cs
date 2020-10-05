@@ -2,8 +2,8 @@ using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
-using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.ConnectionRecovery;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Internal;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Extensibility.Services;
 
@@ -20,9 +20,9 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
         Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey);
 
         Task<bool> IsUserExists(string publicKey);
-        
+
         Task<bool> IsFido2UserExists(string fido2CredentialId);
-        
+
         Task<AuthResult<object>> OnSuccessLoginAsync(string did, string publicKey);
 
         Task<AuthResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey);

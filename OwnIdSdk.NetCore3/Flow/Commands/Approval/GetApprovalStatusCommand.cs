@@ -71,10 +71,17 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Approval
             }
             else if (relatedItem.Status == CacheItemStatus.Declined)
             {
-                var a = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
-                jwt = _jwtComposer.GenerateFinalStepJwt(relatedItem.Context,
-                    input.ClientDate, a,
-                    input.CultureInfo?.Name);
+                var step = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
+                
+                var composeInfo = new BaseJwtComposeInfo
+                {
+                    Context = relatedItem.Context,
+                    ClientTime = input.ClientDate,
+                    Behavior = step,
+                    Locale = input.CultureInfo?.Name
+                };
+                
+                jwt = _jwtComposer.GenerateFinalStepJwt(composeInfo);
             }
 
             return new GetApprovalStatusResponse(jwt, relatedItem.Status);

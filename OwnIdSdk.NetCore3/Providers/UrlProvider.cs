@@ -53,7 +53,7 @@ namespace OwnIdSdk.NetCore3.Providers
             return deepLink.Uri;
         }
 
-        public Uri GetFido2Url(Uri subUrl, ChallengeType requestType)
+        public Uri GetFido2Url(Uri subUrl, ChallengeType requestType, string language)
         {
             var deepLink = new UriBuilder(_coreConfiguration.Fido2.PasswordlessPageUrl);
             var query = HttpUtility.ParseQueryString(deepLink.Query);
@@ -70,6 +70,11 @@ namespace OwnIdSdk.NetCore3.Providers
             }
 
             query[QueryStringParameters.CallBackUrl] = $"{subUrl.Authority}{subUrl.PathAndQuery}";
+            query[QueryStringParameters.StateSuffix] = "state";
+            
+            if (!string.IsNullOrWhiteSpace(language))
+                query[QueryStringParameters.Language] = language;
+            
             deepLink.Query = query.ToString() ?? string.Empty;
             return deepLink.Uri;
         }
@@ -101,6 +106,7 @@ namespace OwnIdSdk.NetCore3.Providers
             public const string CallBackUrl = "q";
             public const string Language = "l";
             public const string RequestType = "t";
+            public const string StateSuffix = "s";
         }
     }
 }

@@ -35,9 +35,19 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
             StepType currentStepType)
         {
             var expectedBehavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
-            var jwt = _jwtComposer.GenerateProfileConfigJwt(relatedItem.Context, input.ClientDate, expectedBehavior,
-                _identitiesProvider.GenerateUserId(), input.CultureInfo?.Name, true);
-
+            
+            var composeInfo = new BaseJwtComposeInfo
+            {
+                Context = relatedItem.Context,
+                ClientTime = input.ClientDate,
+                Behavior = expectedBehavior,
+                Locale = input.CultureInfo?.Name,
+                IncludeRequester = true,
+                EncToken = relatedItem.EncToken,
+                CanBeRecovered = string.IsNullOrEmpty(relatedItem.RecoveryToken)
+            };
+            
+            var jwt = _jwtComposer.GenerateProfileConfigJwt(composeInfo, _identitiesProvider.GenerateUserId());
             return Task.FromResult(new JwtContainer(jwt) as ICommandResult);
         }
     }

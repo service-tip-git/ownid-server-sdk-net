@@ -1,4 +1,4 @@
-namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts
+namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Internal
 {
     public class ConnectionRecoveryRequest
     {

@@ -51,6 +51,10 @@ namespace OwnIdSdk.NetCore3.Configuration
             {
                 return ValidateOptionsResult.Fail(fido2OriginValidationError);
             }
+            
+            if(string.IsNullOrWhiteSpace(options.TopDomain))
+                return ValidateOptionsResult.Fail(
+                    $"{nameof(options.TopDomain)} is required");
 
             return options.ProfileConfiguration.Validate();
         }

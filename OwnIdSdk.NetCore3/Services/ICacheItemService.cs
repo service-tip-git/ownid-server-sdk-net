@@ -64,7 +64,16 @@ namespace OwnIdSdk.NetCore3.Services
         /// </exception>
         Task FinishAuthFlowSessionAsync(string context, string did, string publicKey);
 
-        Task SetRecoveryDataAsync(string context, string recoveryToken, string recoveryData);
+        /// <summary>
+        ///     Stores connection recovery information
+        /// </summary>
+        /// <param name="context">Challenge unique identifier</param>
+        /// <param name="recoveryData">Connection recovery data</param>
+        Task SetRecoveryDataAsync(string context, string recoveryData);
+
+        Task SetPasswordlessStateAsync(string context, string encryptionToken, string recoveryToken = null);
+
+        Task SetWebAppStateAsync(string context, string encryptionToken, string recoveryToken = null);
 
         /// <summary>
         ///     Tries to find <see cref="CacheItem" /> by <paramref name="nonce" /> and <paramref name="context" /> in
@@ -89,7 +98,8 @@ namespace OwnIdSdk.NetCore3.Services
         /// </summary>
         /// <param name="context">context to update</param>
         /// <param name="flowType">new <see cref="FlowType" /></param>
-        Task UpdateFlowAsync(string context, FlowType flowType);
+        /// <param name="challengeType">new <see cref="ChallengeType"/></param>
+        Task UpdateFlowAsync(string context, FlowType flowType, ChallengeType challengeType);
 
         /// <summary>
         ///     Finish flow with error

@@ -26,12 +26,9 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         private readonly IJwtComposer _jwtComposer;
         private readonly IUserHandlerAdapter _userHandlerAdapter;
 
-        public Fido2LoginCommand(
-            IFido2 fido2,
-            IUserHandlerAdapter userHandlerAdapter,
-            ICacheItemService cacheItemService,
-            IJwtComposer jwtComposer,
-            IFlowController flowController, IOwnIdCoreConfiguration configuration)
+        public Fido2LoginCommand(IFido2 fido2, IUserHandlerAdapter userHandlerAdapter,
+            ICacheItemService cacheItemService, IJwtComposer jwtComposer, IFlowController flowController,
+            IOwnIdCoreConfiguration configuration)
         {
             _fido2 = fido2;
             _userHandlerAdapter = userHandlerAdapter;
@@ -40,7 +37,6 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             _flowController = flowController;
             _configuration = configuration;
         }
-
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
@@ -56,6 +52,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 
             request.Info = request.Info;
             var frontendBehavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
+            var composeInfo = new BaseJwtComposeInfo
+            {
+                Context = relatedItem.Context,
+                ClientTime = input.ClientDate,
+                Behavior = frontendBehavior,
+                Locale = input.CultureInfo?.Name,
+                IncludeRequester = true
+            };
 
             var storedFido2Info = await _userHandlerAdapter.FindFido2Info(request.Info.CredentialId);
             if (storedFido2Info == null)
@@ -64,9 +68,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, request.Info.CredentialId,
                     string.Empty);
 
-                var jwt2 = _jwtComposer.GenerateBaseStepJwt(relatedItem.Context, input.ClientDate, frontendBehavior,
-                    request.Info.CredentialId, input.CultureInfo?.Name, true);
-
+                var jwt2 = _jwtComposer.GenerateBaseStepJwt(composeInfo, request.Info.CredentialId);
                 return new JwtContainer(jwt2);
             }
 
@@ -105,20 +107,13 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                     return Task.FromResult(credIdValidationResult);
                 });
 
-            await _cacheItemService.SetFido2DataAsync(relatedItem.Context,
-                storedFido2Info.PublicKey,
-                result.Counter,
+            await _cacheItemService.SetFido2DataAsync(relatedItem.Context, storedFido2Info.PublicKey, result.Counter,
                 request.Info.CredentialId);
 
-            await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context,
-                storedFido2Info.UserId,
+            await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, storedFido2Info.UserId,
                 storedFido2Info.PublicKey);
-
-            var jwt = _jwtComposer.GenerateBaseStepJwt(
-                relatedItem.Context,
-                input.ClientDate, _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
-                storedFido2Info.UserId, input.CultureInfo?.Name, true);
-
+            
+            var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, storedFido2Info.UserId);
             return new JwtContainer(jwt);
         }
     }

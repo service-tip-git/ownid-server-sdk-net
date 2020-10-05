@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
-using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.ConnectionRecovery;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Internal;
 
 namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
 {
