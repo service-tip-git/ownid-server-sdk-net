@@ -42,7 +42,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 Behavior = step,
                 Locale = input.CultureInfo?.Name,
                 IncludeRequester = _needRequesterInfo,
-                EncryptionPassphrase = relatedItem.PasswordlessEncryptionPassphrase
+                EncToken = relatedItem.EncToken,
+                CanBeRecovered = string.IsNullOrEmpty(relatedItem.RecoveryToken)
             };
             
             var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, relatedItem.DID);

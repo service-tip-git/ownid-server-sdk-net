@@ -43,7 +43,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 Behavior = step,
                 ClientTime = input.ClientDate,
                 Locale = input.CultureInfo?.Name,
-                EncryptionPassphrase = relatedItem.PasswordlessEncryptionPassphrase
+                EncToken = relatedItem.EncToken,
+                CanBeRecovered = string.IsNullOrEmpty(relatedItem.RecoveryToken)
             };
 
             var jwt = _jwtComposer.GeneratePinStepJwt(composeInfo, pin);

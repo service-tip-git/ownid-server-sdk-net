@@ -73,7 +73,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                 switch (checkResult)
                 {
                     case IdentitiesCheckResult.UserNotFound:
-                        await _userHandlerAdapter.CreateProfileAsync(formContext, userData.RecoveryToken,
+                        await _userHandlerAdapter.CreateProfileAsync(formContext, relatedItem.RecoveryToken,
                             userData.RecoveryData);
                         break;
                     case IdentitiesCheckResult.UserExists:

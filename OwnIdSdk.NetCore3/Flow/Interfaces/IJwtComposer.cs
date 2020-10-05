@@ -1,4 +1,4 @@
-using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.ConnectionRecovery;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Internal;
 
 namespace OwnIdSdk.NetCore3.Flow.Interfaces
 {

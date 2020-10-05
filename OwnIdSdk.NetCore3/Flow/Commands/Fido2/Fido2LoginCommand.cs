@@ -58,8 +58,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 ClientTime = input.ClientDate,
                 Behavior = frontendBehavior,
                 Locale = input.CultureInfo?.Name,
-                IncludeRequester = true,
-                EncryptionPassphrase = relatedItem.PasswordlessEncryptionPassphrase
+                IncludeRequester = true
             };
 
             var storedFido2Info = await _userHandlerAdapter.FindFido2Info(request.Info.CredentialId);

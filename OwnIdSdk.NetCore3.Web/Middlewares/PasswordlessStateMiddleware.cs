@@ -2,9 +2,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
-using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.ConnectionRecovery;
-using OwnIdSdk.NetCore3.Extensibility.Json;
-using OwnIdSdk.NetCore3.Flow.Commands.ConnectionRecovery;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Internal;
+using OwnIdSdk.NetCore3.Flow.Commands.Internal;
 using OwnIdSdk.NetCore3.Web.Attributes;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
@@ -22,9 +21,19 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
         protected override async Task Execute(HttpContext httpContext)
         {
-            var request = await OwnIdSerializer.DeserializeAsync<SetPasswordlessStateRequest>(httpContext.Request.Body);
+            bool.TryParse(httpContext.Request.Query["recovery"], out var requiresRecovery);
+
+            var request = new StateRequest
+            {
+                EncryptionToken = httpContext.Request.Cookies[_stateCommand.EncryptionCookieName],
+                RecoveryToken = httpContext.Request.Cookies[_stateCommand.RecoveryCookieName],
+                RequiresRecovery = requiresRecovery
+            };
+
             var result = await _stateCommand.ExecuteAsync(RequestIdentity.Context, request);
-            await Json(httpContext, result, StatusCodes.Status200OK);
+
+            SetCookies(httpContext.Response, result.Cookies);
+            OkNoContent(httpContext.Response);
         }
     }
 }

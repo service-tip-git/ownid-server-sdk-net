@@ -68,11 +68,12 @@ namespace OwnIdSdk.NetCore3.Services
         ///     Stores connection recovery information
         /// </summary>
         /// <param name="context">Challenge unique identifier</param>
-        /// <param name="recoveryToken">Connection recovery token</param>
         /// <param name="recoveryData">Connection recovery data</param>
-        Task SetRecoveryDataAsync(string context, string recoveryToken, string recoveryData);
+        Task SetRecoveryDataAsync(string context, string recoveryData);
 
-        Task SetPasswordlessStateAsync(string context, string encryptionPassphrase, string recoveryToken = null);
+        Task SetPasswordlessStateAsync(string context, string encryptionToken, string recoveryToken = null);
+
+        Task SetWebAppStateAsync(string context, string encryptionToken, string recoveryToken = null);
 
         /// <summary>
         ///     Tries to find <see cref="CacheItem" /> by <paramref name="nonce" /> and <paramref name="context" /> in

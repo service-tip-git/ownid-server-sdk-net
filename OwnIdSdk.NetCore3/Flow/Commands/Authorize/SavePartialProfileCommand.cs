@@ -48,9 +48,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
             if (string.IsNullOrEmpty(userData.PublicKey))
                 throw new CommandValidationException("No public key was provided for partial flow");
 
-            if (!string.IsNullOrEmpty(userData.RecoveryToken) && !string.IsNullOrEmpty(userData.RecoveryData))
-                await _cacheItemService.SetRecoveryDataAsync(relatedItem.Context, userData.RecoveryToken,
-                    userData.RecoveryData);
+            if (!string.IsNullOrEmpty(userData.RecoveryData))
+                await _cacheItemService.SetRecoveryDataAsync(relatedItem.Context, userData.RecoveryData);
 
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, userData.DID, userData.PublicKey);
             

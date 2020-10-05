@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using OwnIdSdk.NetCore3.Configuration.Profile;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Configuration.Profile;
+using OwnIdSdk.NetCore3.Extensions;
 
 namespace OwnIdSdk.NetCore3.Configuration
 {
@@ -15,6 +16,9 @@ namespace OwnIdSdk.NetCore3.Configuration
     /// <inheritdoc cref="IOwnIdCoreConfiguration" />
     public class OwnIdCoreConfiguration : IOwnIdCoreConfiguration, IDisposable
     {
+        private string _did;
+        private string _cookieReference;
+
         /// <summary>
         ///     Creates instance with default parameters
         /// </summary>
@@ -55,7 +59,15 @@ namespace OwnIdSdk.NetCore3.Configuration
 
         public IProfileConfiguration ProfileConfiguration { get; private set; }
 
-        public string DID { get; set; }
+        public string DID
+        {
+            get => _did;
+            set
+            {
+                _did = value;
+                _cookieReference = _did.SanitizeCookieName();
+            }
+        }
 
         public string Name { get; set; }
 
@@ -75,8 +87,11 @@ namespace OwnIdSdk.NetCore3.Configuration
 
         public bool OverwriteFields { get; set; }
 
-        public IFido2Configuration Fido2 { get; } = new Fido2Configuration();
+        public string CookieReference => _cookieReference;
+        
+        public string TopDomain { get; set; }
 
+        public IFido2Configuration Fido2 { get; } = new Fido2Configuration();
 
         /// <summary>
         ///     Sets <see cref="ProfileConfiguration" /> based on <typeparamref name="TProfile" />

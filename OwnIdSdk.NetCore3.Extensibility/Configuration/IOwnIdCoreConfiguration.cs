@@ -121,6 +121,24 @@ namespace OwnIdSdk.NetCore3.Extensibility.Configuration
         /// </remarks>
         public bool OverwriteFields { get; set; }
 
+        /// <summary>
+        ///     Cookie name identifier
+        /// </summary>
+        public string CookieReference { get; }
+
+        /// <summary>
+        ///     Passwordless page domain. Will be used as domain for cookies.
+        /// </summary>
+        public string TopDomain { get; set; }
+
+        /// <summary>
+        ///     Cookie lifespan
+        /// </summary>
+        /// <remarks>
+        ///     Default: 5 years
+        /// </remarks>
+        public int CookieExpiration => 1825;
+
         public IFido2Configuration Fido2 { get; }
     }
 }

@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
-using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.ConnectionRecovery;
+using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Internal;
 using OwnIdSdk.NetCore3.Extensibility.Services;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Flow.Steps;
@@ -81,10 +81,12 @@ namespace OwnIdSdk.NetCore3.Flow
                 data.Add(reqKey, reqValue);
             }
 
-            if (!string.IsNullOrEmpty(info.EncryptionPassphrase))
+            if (!string.IsNullOrEmpty(info.EncToken))
             {
-                data.Add("encPassphrase", info.EncryptionPassphrase);
+                data.Add("encToken", info.EncToken);
             }
+            
+            data.Add("canBeRecovered", info.CanBeRecovered);
             
             var fields = GetBaseFlowFieldsDictionary(info, data);
 

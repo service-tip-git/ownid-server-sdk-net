@@ -7,7 +7,7 @@ using OwnIdSdk.NetCore3.Flow.Adapters;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Flow.Steps;
 
-namespace OwnIdSdk.NetCore3.Flow.Commands.ConnectionRecovery
+namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
 {
     public class InternalConnectionRecoveryCommand : BaseFlowCommand
     {

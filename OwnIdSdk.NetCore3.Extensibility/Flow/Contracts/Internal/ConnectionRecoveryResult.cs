@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.ConnectionRecovery
+namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Internal
 {
     public class ConnectionRecoveryResult<TProfile> where TProfile : class
     {

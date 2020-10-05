@@ -6,9 +6,9 @@ namespace OwnIdSdk.NetCore3.Flow
     public class BaseJwtComposeInfo
     {
         /// <summary>
-        ///     WebApp encryption passphrase
+        ///     User data encryption token
         /// </summary>
-        public string EncryptionPassphrase { get; set; }
+        public string EncToken { get; set; }
 
         /// <summary>
         ///     Response locale
@@ -34,5 +34,10 @@ namespace OwnIdSdk.NetCore3.Flow
         ///     Possible behavior for WebApp
         /// </summary>
         public FrontendBehavior Behavior { get; set; }
+
+        /// <summary>
+        ///     Identifies if connection can be recovered
+        /// </summary>
+        public bool CanBeRecovered { get; set; }
     }
 }

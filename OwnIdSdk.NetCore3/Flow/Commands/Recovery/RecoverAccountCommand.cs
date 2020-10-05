@@ -49,7 +49,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
                 Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
                 Locale = input.CultureInfo?.Name,
                 IncludeRequester = _needRequesterInfo,
-                EncryptionPassphrase = relatedItem.PasswordlessEncryptionPassphrase
+                EncToken = relatedItem.EncToken,
+                CanBeRecovered = string.IsNullOrEmpty(relatedItem.RecoveryToken)
             };
 
             var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, recoverResult.DID);

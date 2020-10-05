@@ -132,9 +132,19 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
         public string RecoveryData { get; set; }
 
         /// <summary>
+        ///     Connection recovery token
+        /// </summary>
+        public string EncToken => $"{PasswordlessEncToken}:::{WebAppEncToken}";
+        
+        /// <summary>
         ///     Private key encryption passphrase
         /// </summary>
-        public string PasswordlessEncryptionPassphrase { get; set; }
+        public string PasswordlessEncToken { get; set; }
+        
+        /// <summary>
+        ///     Private key encryption passphrase
+        /// </summary>
+        public string WebAppEncToken { get; set; }
 
         /// <summary>
         ///     Creates new instance of <see cref="CacheItem" /> based on <see cref="Nonce" /> and <see cref="DID" />
@@ -161,7 +171,8 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
                 RecoveryData = RecoveryData,
                 PasswordlessRecoveryToken = PasswordlessRecoveryToken,
                 WebAppRecoveryToken = WebAppRecoveryToken,
-                PasswordlessEncryptionPassphrase = PasswordlessEncryptionPassphrase
+                PasswordlessEncToken = PasswordlessEncToken,
+                WebAppEncToken = WebAppEncToken
             };
         }
     }

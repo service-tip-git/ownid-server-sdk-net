@@ -54,7 +54,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Link
             await _linkHandler.OnLinkAsync(userData.DID, new OwnIdConnection
             {
                 PublicKey = userData.PublicKey,
-                RecoveryToken = userData.RecoveryToken,
+                RecoveryToken = relatedItem.RecoveryToken,
                 RecoveryData = userData.RecoveryData
             });
 

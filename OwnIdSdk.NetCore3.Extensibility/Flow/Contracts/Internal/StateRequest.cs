@@ -1,6 +1,6 @@
-namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.ConnectionRecovery
+namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Internal
 {
-    public class SetPasswordlessStateRequest
+    public class StateRequest
     {
         public string RecoveryToken { get; set; }
         

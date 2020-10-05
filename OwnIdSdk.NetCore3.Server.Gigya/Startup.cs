@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -35,6 +36,9 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
         {
             var ownIdSection = Configuration.GetSection("ownid");
             var gigyaSection = Configuration.GetSection("gigya");
+            var isDevelopment = Configuration.GetValue("OwnIdDevelopmentMode", false);
+            var topDomain = ownIdSection["top_domain"];
+            var webAppUrl = new Uri(ownIdSection["web_app_url"] ?? "https://sign.ownid.com");
 
             services.AddCors(x =>
             {
@@ -42,7 +46,23 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 {
                     builder.AllowAnyHeader();
                     builder.AllowAnyMethod();
-                    builder.AllowAnyOrigin();
+                    builder.AllowCredentials();
+                    builder.SetIsOriginAllowedToAllowWildcardSubdomains();
+                    
+                    var originsList = new List<string>();
+
+                    if (isDevelopment)
+                    {
+                        builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost");
+                    }
+                    else
+                    {
+                        originsList.Add($"https://*.{topDomain}");
+                        originsList.Add($"https://{topDomain}");
+                        originsList.Add(webAppUrl.ToString().TrimEnd('/'));
+                    }
+                    
+                    builder.WithOrigins(originsList.ToArray());
                 });
             });
 
@@ -75,17 +95,18 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         x.Description = ownIdSection["description"];
                         x.Icon = ownIdSection["icon"];
                         x.CallbackUrl = new Uri(ownIdSection["callback_url"]);
+                        x.TopDomain = topDomain;
+                        
                         x.CacheExpirationTimeout = ownIdSection.GetValue("cache_expiration",
                             (uint) TimeSpan.FromMinutes(10).TotalMilliseconds);
+                        
                         if (ownIdSection.Key.Contains("maximum_number_of_connected_devices"))
                             x.MaximumNumberOfConnectedDevices =
                                 ownIdSection.GetValue<uint>("maximum_number_of_connected_devices");
-
-                        //for development cases
-                        x.IsDevEnvironment = Configuration.GetValue("OwnIdDevelopmentMode", false);
-                        x.OwnIdApplicationUrl = new Uri(ownIdSection["web_app_url"] ?? "https://sign.ownid.com");
+                        
+                        x.OwnIdApplicationUrl = webAppUrl;
                         x.OverwriteFields = ownIdSection.GetValue<bool>("overwrite_fields");
-
+                        
                         x.Fido2.Enabled = ownIdSection.GetValue("fido2_enabled", false);
 
                         if (x.Fido2.Enabled)
@@ -101,6 +122,9 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                             if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
                                 x.Fido2.Origin = new Uri(ownIdSection["fido2_origin"]);
                         }
+
+                        //for development cases
+                        x.IsDevEnvironment = isDevelopment;
                     });
                 });
 

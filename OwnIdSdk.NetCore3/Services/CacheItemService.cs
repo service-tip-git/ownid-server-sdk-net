@@ -184,11 +184,10 @@ namespace OwnIdSdk.NetCore3.Services
         ///     Sets recovery data for auth-only flow
         /// </summary>
         /// <param name="context">Challenge unique identifier</param>
-        /// <param name="recoveryToken">WebApp recovery token/identifier</param>
         /// <param name="recoveryData">Data for recovery</param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task SetRecoveryDataAsync(string context, string recoveryToken, string recoveryData)
+        public async Task SetRecoveryDataAsync(string context, string recoveryData)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
@@ -196,12 +195,11 @@ namespace OwnIdSdk.NetCore3.Services
                 throw new ArgumentException($"Can not find any item with context '{context}'");
 
             cacheItem.RecoveryData = recoveryData;
-            cacheItem.WebAppRecoveryToken = recoveryToken;
 
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
 
-        public async Task SetPasswordlessStateAsync(string context, string encryptionPassphrase,
+        public async Task SetPasswordlessStateAsync(string context, string encryptionToken,
             string recoveryToken = null)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
@@ -210,7 +208,20 @@ namespace OwnIdSdk.NetCore3.Services
                 throw new ArgumentException($"Can not find any item with context '{context}'");
 
             cacheItem.PasswordlessRecoveryToken = recoveryToken;
-            cacheItem.PasswordlessEncryptionPassphrase = encryptionPassphrase;
+            cacheItem.PasswordlessEncToken = encryptionToken;
+            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+        }
+        
+        public async Task SetWebAppStateAsync(string context, string encryptionToken,
+            string recoveryToken = null)
+        {
+            var cacheItem = await _cacheStore.GetAsync(context);
+
+            if (cacheItem == null)
+                throw new ArgumentException($"Can not find any item with context '{context}'");
+
+            cacheItem.WebAppRecoveryToken = recoveryToken;
+            cacheItem.WebAppEncToken = encryptionToken;
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
 

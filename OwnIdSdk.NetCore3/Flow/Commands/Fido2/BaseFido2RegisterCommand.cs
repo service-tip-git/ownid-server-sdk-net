@@ -106,7 +106,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
                 Locale = input.CultureInfo?.Name,
                 IncludeRequester = true,
-                EncryptionPassphrase = relatedItem.PasswordlessEncryptionPassphrase
+                EncToken = relatedItem.EncToken
             };
             
             var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, NewUserId);
