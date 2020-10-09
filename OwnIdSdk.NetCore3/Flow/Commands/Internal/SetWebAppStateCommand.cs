@@ -1,6 +1,5 @@
 using System;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
@@ -26,13 +25,13 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
         public string RecoveryCookieName { get; }
 
         public string EncryptionCookieName { get; }
-        
+
         public async Task<StateResult> ExecuteAsync(string context, StateRequest request)
         {
             var result = new StateResult();
             var encryptionToken = request.EncryptionToken;
             var recoveryToken = request.RecoveryToken;
-            
+
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
@@ -58,7 +57,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
                     Options = cookieOptions
                 });
             }
-            
+
             if (request.RequiresRecovery)
             {
                 recoveryToken = string.IsNullOrWhiteSpace(request.RecoveryToken)
