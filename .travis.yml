@@ -41,9 +41,7 @@ jobs:
 
 script:
   - sh scripts/set-build-num.sh $TRAVIS_BUILD_NUMBER
-  - dotnet restore
-  # - dotnet test /p:CollectCoverage=true /p:Threshold=20
-  - docker build -t ownid-server-netcore3-gigya:latest . --network=host
+  - sh scripts/build.sh $ENV
 
 before_deploy:
   - pyenv install 3.6.3
