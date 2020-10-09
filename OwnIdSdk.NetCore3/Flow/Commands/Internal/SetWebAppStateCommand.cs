@@ -1,5 +1,6 @@
 using System;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
@@ -31,11 +32,11 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
             var result = new StateResult();
             var encryptionToken = request.EncryptionToken;
             var recoveryToken = request.RecoveryToken;
-
+            
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Domain = _configuration.TopDomain,
+                Domain = "ownid.com",
                 Secure = !_configuration.IsDevEnvironment,
                 Expires = DateTimeOffset.Now.AddYears(_configuration.CookieExpiration),
                 SameSite = SameSiteMode.Lax
