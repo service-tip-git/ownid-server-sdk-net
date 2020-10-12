@@ -38,7 +38,7 @@ jobs:
       env:
         ENV=staging
         REPOSITORY_URI=571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging
-
+        
 before_script:
   - pyenv install 3.6.3
   - pyenv global 3.6.3

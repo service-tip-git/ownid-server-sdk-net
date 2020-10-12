@@ -63,9 +63,12 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands
                 Behavior = flowController.Object.GetExpectedFrontendBehavior(relatedItem, currentStepType),
                 Locale = input.CultureInfo.Name
             };
-            
-            //TODO:
-//            jwtComposer.Verify(x => x.GeneratePinStepJwt(composeInfo, security));
+
+            jwtComposer.Verify(
+                x => x.GeneratePinStepJwt(It.Is<BaseJwtComposeInfo>(y =>
+                    y.Context == composeInfo.Context && y.ClientTime == composeInfo.ClientTime
+                                                     && y.Behavior == composeInfo.Behavior
+                                                     && y.Locale == composeInfo.Locale), security), Times.Once);
             actual.Should().BeEquivalentTo(new JwtContainer(expectedString));
         }
 

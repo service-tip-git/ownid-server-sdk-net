@@ -80,7 +80,8 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
                 Name = "name",
                 JwtSignCredentials = _sign,
                 CacheExpirationTimeout = 600000,
-                JwtExpirationTimeout = 60000
+                JwtExpirationTimeout = 60000,
+                TopDomain = "ownid.com"
             };
 
             config.Fido2.Enabled = false;

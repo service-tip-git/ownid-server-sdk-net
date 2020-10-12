@@ -46,12 +46,15 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands.Approval
                 Context = cacheItem.Context,
                 ClientTime = commandInput.ClientDate,
                 Behavior = frontendBehavior,
-                Locale  = commandInput.CultureInfo.Name
+                Locale = commandInput.CultureInfo.Name
             };
-            
+
             flowController.Verify(x => x.GetExpectedFrontendBehavior(cacheItem, currentStepType));
-            //TODO:
-            //jwtComposer.Verify(x => x.GenerateFinalStepJwt(composeInfo), Times.Once);
+            jwtComposer.Verify(
+                x => x.GenerateFinalStepJwt(It.Is<BaseJwtComposeInfo>(y =>
+                    y.Context == composeInfo.Context && y.ClientTime == composeInfo.ClientTime
+                                                     && y.Behavior == composeInfo.Behavior
+                                                     && y.Locale == composeInfo.Locale)), Times.Once);
         }
     }
 }
