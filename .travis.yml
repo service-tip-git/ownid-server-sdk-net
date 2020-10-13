@@ -38,8 +38,14 @@ jobs:
       env:
         ENV=staging
         REPOSITORY_URI=571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging
-        
-before_script:
+
+script:
+  - sh scripts/set-build-num.sh $TRAVIS_BUILD_NUMBER
+  - dotnet restore
+  # - dotnet test /p:CollectCoverage=true /p:Threshold=20
+  - docker build -t ownid-server-netcore3-gigya:latest . --network=host
+
+before_deploy:
   - pyenv install 3.6.3
   - pyenv global 3.6.3
   - pip install -U pip
@@ -47,12 +53,6 @@ before_script:
   - aws --version
   - sudo apt-get install libxml2-utils
   - "$(aws ecr get-login --region us-east-2 --no-include-email)"
-
-script:
-  - sh scripts/set-build-num.sh $TRAVIS_BUILD_NUMBER
-  - sh scripts/build.sh $ENV
-
-before_deploy:
   - curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/kubectl
   - chmod +x ./kubectl
   - sudo mv kubectl /usr/local/bin

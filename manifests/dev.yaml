@@ -108,7 +108,7 @@ metadata:
     app: ownid-server-netcore3-demo-gigya
 spec:
   revisionHistoryLimit: 1
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: ownid-server-netcore3-demo-gigya
@@ -206,42 +206,13 @@ metadata:
   name: ownid-server-netcore3-demo-gigya-service
   namespace: dev
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: ownid-server-netcore3-demo-gigya
   ports:
     - name: http
       port: 80
       targetPort: 5002
-    - name: https
-      port: 443
-      targetPort: 5002
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: ownid-server-netcore3-demo-gigya-ingress
-  namespace: dev
-  annotations:
-    kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:571861302935:certificate/7d946311-e1b3-4221-9d3c-e3c3c5903b27
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
-    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
-  labels:
-    app: ownid-server-netcore3-demo-gigya
-spec:
-  rules:
-   - http:
-        paths:
-          - path: /*
-            backend:
-              serviceName: ssl-redirect
-              servicePort: use-annotation
-          - path: /*
-            backend:
-              serviceName: ownid-server-netcore3-demo-gigya-service
-              servicePort: 80
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -252,7 +223,7 @@ metadata:
     app: ownid-server-netcore3-demo-2-gigya
 spec:
   revisionHistoryLimit: 1
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: ownid-server-netcore3-demo-2-gigya
@@ -350,39 +321,10 @@ metadata:
   name: ownid-server-netcore3-demo-2-gigya-service
   namespace: dev
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: ownid-server-netcore3-demo-2-gigya
   ports:
     - name: http
       port: 80
       targetPort: 5002
-    - name: https
-      port: 443
-      targetPort: 5002
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: ownid-server-netcore3-demo-2-gigya-ingress
-  namespace: dev
-  annotations:
-    kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:571861302935:certificate/d5104aa7-8cb8-442a-be52-065fb0f5653b
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
-    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
-  labels:
-    app: ownid-server-netcore3-demo-2-gigya
-spec:
-  rules:
-   - http:
-        paths:
-          - path: /*
-            backend:
-              serviceName: ssl-redirect
-              servicePort: use-annotation
-          - path: /*
-            backend:
-              serviceName: ownid-server-netcore3-demo-2-gigya-service
-              servicePort: 80
