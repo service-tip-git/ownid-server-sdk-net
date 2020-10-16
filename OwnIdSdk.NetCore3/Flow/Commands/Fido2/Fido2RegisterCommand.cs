@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Fido2NetLib;
+using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
@@ -10,8 +11,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
     public class Fido2RegisterCommand : BaseFido2RegisterCommand
     {
         public Fido2RegisterCommand(IFido2 fido2, ICacheItemService cacheItemService, IJwtComposer jwtComposer,
-            IFlowController flowController, IOwnIdCoreConfiguration configuration) : base(fido2, cacheItemService,
-            jwtComposer, flowController, configuration)
+            IFlowController flowController, IOwnIdCoreConfiguration configuration, IJwtService jwtService) : base(fido2,
+            cacheItemService, jwtComposer, flowController, configuration, jwtService)
         {
         }
 
