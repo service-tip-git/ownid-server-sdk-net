@@ -56,7 +56,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Link
             var userExists = await _userHandlerAdapter.IsUserExists(userData.PublicKey);
             if (userExists)
             {
-                await _cacheItemService.FinishFlowWithErrorAsync(relatedItem.Context,
+                relatedItem = await _cacheItemService.FinishFlowWithErrorAsync(relatedItem.Context,
                     _localizationService.GetLocalizedString("Error_PhoneAlreadyConnected"));
             }
             else

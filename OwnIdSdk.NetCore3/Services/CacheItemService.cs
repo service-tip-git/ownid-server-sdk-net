@@ -278,7 +278,7 @@ namespace OwnIdSdk.NetCore3.Services
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
 
-        public async Task FinishFlowWithErrorAsync(string context, string errorMessage)
+        public async Task<CacheItem> FinishFlowWithErrorAsync(string context, string errorMessage)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
             if (cacheItem == null)
@@ -288,6 +288,8 @@ namespace OwnIdSdk.NetCore3.Services
             cacheItem.Error = errorMessage;
 
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+
+            return cacheItem;
         }
     }
 }
