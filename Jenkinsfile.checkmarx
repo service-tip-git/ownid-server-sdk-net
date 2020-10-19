@@ -47,7 +47,7 @@ pipeline {
           sastEnabled: true,
           serverUrl: 'https://cx.wdf.sap.corp',
           sourceEncoding: '1',
-          username: 'GLOBAL\SAP_NVT_SAP_IO',
+          username: 'GLOBAL\\SAP_NVT_SAP_IO',
           vulnerabilityThresholdResult: 'FAILURE'
         ])
       }
