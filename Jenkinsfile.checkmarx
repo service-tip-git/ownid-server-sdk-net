@@ -26,7 +26,7 @@ pipeline {
           $class: 'CxScanBuilder',
           avoidDuplicateProjectScans: true,
           comment: '',
-          credentialsId: 'OwnIDDevOps',
+          credentialsId: 'asa-sap-io-oper-ldap',
           excludeFolders: '',
           excludeOpenSourceFolders: '',
           exclusionsSetting: 'global',
