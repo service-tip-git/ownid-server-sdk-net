@@ -26,7 +26,7 @@ pipeline {
           $class: 'CxScanBuilder',
           avoidDuplicateProjectScans: true,
           comment: '',
-          credentialsId: 'nvt-sap-io-checkmarx',
+          credentialsId: 'OwnIDDevOps',
           excludeFolders: '',
           excludeOpenSourceFolders: '',
           exclusionsSetting: 'global',
@@ -41,13 +41,13 @@ pipeline {
           incremental: true,
           osaArchiveIncludePatterns: '*.zip, *.war, *.ear, *.tgz',
           osaInstallBeforeScan: false,
-          //password: '{AQAAABAAAAAQUOishQYgKJQiBKqifWOv+2tPkfjMmK8dvbRmbNFzNwI=}',
+          // password: '{AQAAABAAAAAQUOishQYgKJQiBKqifWOv+2tPkfjMmK8dvbRmbNFzNwI=}',
           preset: '100008',
           projectName: 'ownid-server-sdk-net',
           sastEnabled: true,
           serverUrl: 'https://cx.wdf.sap.corp',
           sourceEncoding: '1',
-          //username: 'GLOBAL\\SAP_NVT_SAP_IO',
+          // username: '',
           vulnerabilityThresholdResult: 'FAILURE'
         ])
       }
