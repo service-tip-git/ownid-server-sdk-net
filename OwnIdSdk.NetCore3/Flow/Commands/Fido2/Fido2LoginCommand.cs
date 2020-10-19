@@ -3,13 +3,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Fido2NetLib;
 using Fido2NetLib.Objects;
+using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
-using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Flow.Adapters;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Flow.Steps;
@@ -21,6 +21,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
     {
         private readonly ICacheItemService _cacheItemService;
         private readonly IOwnIdCoreConfiguration _configuration;
+        private readonly IJwtService _jwtService;
         private readonly IFido2 _fido2;
         private readonly IFlowController _flowController;
         private readonly IJwtComposer _jwtComposer;
@@ -28,7 +29,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 
         public Fido2LoginCommand(IFido2 fido2, IUserHandlerAdapter userHandlerAdapter,
             ICacheItemService cacheItemService, IJwtComposer jwtComposer, IFlowController flowController,
-            IOwnIdCoreConfiguration configuration)
+            IOwnIdCoreConfiguration configuration, IJwtService jwtService)
         {
             _fido2 = fido2;
             _userHandlerAdapter = userHandlerAdapter;
@@ -36,19 +37,20 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             _jwtComposer = jwtComposer;
             _flowController = flowController;
             _configuration = configuration;
+            _jwtService = jwtService;
         }
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
-            if (!(input is CommandInput<string>))
+            if (!(input is CommandInput<JwtContainer>))
                 throw new InternalLogicException($"Incorrect input type for {nameof(Fido2LoginCommand)}");
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
-            var requestInput = input as CommandInput<string>;
-            var request = OwnIdSerializer.Deserialize<Fido2LoginRequest>(requestInput.Data);
+            var requestJwt = input as CommandInput<JwtContainer>;
+            var request = _jwtService.GetDataFromJwt<Fido2LoginRequest>(requestJwt.Data.Jwt).Data;
 
             request.Info = request.Info;
             var frontendBehavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);

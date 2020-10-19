@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Fido2NetLib;
+using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
@@ -15,8 +16,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 
         public Fido2GetSecurityCheckCommand(IFido2 fido2, ICacheItemService cacheItemService, IJwtComposer jwtComposer,
             IFlowController flowController, IOwnIdCoreConfiguration configuration,
-            GetSecurityCheckCommand getSecurityCheckCommand) : base(fido2, cacheItemService, jwtComposer,
-            flowController, configuration)
+            GetSecurityCheckCommand getSecurityCheckCommand, IJwtService jwtService) : base(fido2, cacheItemService,
+            jwtComposer, flowController, configuration, jwtService)
         {
             _getSecurityCheckCommand = getSecurityCheckCommand;
         }

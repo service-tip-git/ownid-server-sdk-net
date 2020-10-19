@@ -10,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OwnIdSdk.NetCore3.Redis;
 using OwnIdSdk.NetCore3.Server.Gigya.External;
-using OwnIdSdk.NetCore3.Server.Gigya.Middlewares;
 using OwnIdSdk.NetCore3.Server.Gigya.Middlewares.SecurityHeaders;
 using OwnIdSdk.NetCore3.Web;
 using OwnIdSdk.NetCore3.Web.Gigya;
@@ -48,7 +47,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                     builder.AllowAnyMethod();
                     builder.AllowCredentials();
                     builder.SetIsOriginAllowedToAllowWildcardSubdomains();
-                    
+
                     var originsList = new List<string>();
 
                     if (isDevelopment)
@@ -61,7 +60,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         originsList.Add($"https://{topDomain}");
                         originsList.Add(webAppUrl.ToString().TrimEnd('/'));
                     }
-                    
+
                     builder.WithOrigins(originsList.ToArray());
                 });
             });
@@ -96,17 +95,17 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         x.Icon = ownIdSection["icon"];
                         x.CallbackUrl = new Uri(ownIdSection["callback_url"]);
                         x.TopDomain = topDomain;
-                        
+
                         x.CacheExpirationTimeout = ownIdSection.GetValue("cache_expiration",
                             (uint) TimeSpan.FromMinutes(10).TotalMilliseconds);
-                        
+
                         if (ownIdSection.Key.Contains("maximum_number_of_connected_devices"))
                             x.MaximumNumberOfConnectedDevices =
                                 ownIdSection.GetValue<uint>("maximum_number_of_connected_devices");
-                        
+
                         x.OwnIdApplicationUrl = webAppUrl;
                         x.OverwriteFields = ownIdSection.GetValue<bool>("overwrite_fields");
-                        
+
                         x.Fido2.Enabled = ownIdSection.GetValue("fido2_enabled", false);
 
                         if (x.Fido2.Enabled)

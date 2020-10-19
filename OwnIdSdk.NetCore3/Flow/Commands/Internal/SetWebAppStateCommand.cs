@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Internal;
+using OwnIdSdk.NetCore3.Extensions;
 using OwnIdSdk.NetCore3.Services;
 
 namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
@@ -13,6 +14,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
     {
         private readonly ICacheItemService _cacheItemService;
         private readonly IOwnIdCoreConfiguration _configuration;
+        private readonly string _domain;
 
         public SetWebAppStateCommand(ICacheItemService cacheItemService, IOwnIdCoreConfiguration configuration)
         {
@@ -20,12 +22,13 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
             _configuration = configuration;
             EncryptionCookieName = string.Format(CookieNameTemplates.WebAppEncryption, _configuration.CookieReference);
             RecoveryCookieName = string.Format(CookieNameTemplates.WebAppRecovery, _configuration.CookieReference);
+            _domain = _configuration.OwnIdApplicationUrl.GetBaseDomain();
         }
 
         public string RecoveryCookieName { get; }
 
         public string EncryptionCookieName { get; }
-        
+
         public async Task<StateResult> ExecuteAsync(string context, StateRequest request)
         {
             var result = new StateResult();
@@ -35,7 +38,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Domain = _configuration.TopDomain,
+                Domain = _domain,
                 Secure = !_configuration.IsDevEnvironment,
                 Expires = DateTimeOffset.Now.AddYears(_configuration.CookieExpiration),
                 SameSite = SameSiteMode.Lax
@@ -57,7 +60,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
                     Options = cookieOptions
                 });
             }
-            
+
             if (request.RequiresRecovery)
             {
                 recoveryToken = string.IsNullOrWhiteSpace(request.RecoveryToken)

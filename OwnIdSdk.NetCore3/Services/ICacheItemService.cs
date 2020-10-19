@@ -109,6 +109,6 @@ namespace OwnIdSdk.NetCore3.Services
         /// <returns>
         ///     A task that represents the asynchronous set error operation.
         /// </returns>
-        Task FinishFlowWithErrorAsync(string context, string errorMessage);
+        Task<CacheItem> FinishFlowWithErrorAsync(string context, string errorMessage);
     }
 }

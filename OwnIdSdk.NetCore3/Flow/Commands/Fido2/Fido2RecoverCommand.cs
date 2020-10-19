@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Fido2NetLib;
+using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
@@ -15,8 +16,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 
         public Fido2RecoverCommand(IFido2 fido2, ICacheItemService cacheItemService, IJwtComposer jwtComposer,
             IFlowController flowController, IOwnIdCoreConfiguration configuration,
-            IAccountRecoveryHandler recoveryHandler) : base(fido2, cacheItemService, jwtComposer, flowController,
-            configuration)
+            IAccountRecoveryHandler recoveryHandler, IJwtService jwtService) : base(fido2, cacheItemService,
+            jwtComposer, flowController, configuration, jwtService)
         {
             _recoveryHandler = recoveryHandler;
         }

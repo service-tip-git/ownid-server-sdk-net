@@ -120,7 +120,7 @@ namespace OwnIdSdk.NetCore3.Flow
                 {
                     StepType.Link, new Step<SaveAccountLinkCommand>(cacheItem => new FrontendBehavior
                     {
-                        Type = StepType.Success,
+                        Type = string.IsNullOrEmpty(cacheItem.Error) ? StepType.Success : StepType.Error,
                         ActionType = ActionType.Finish,
                         ChallengeType = cacheItem.ChallengeType
                     })
@@ -157,7 +157,7 @@ namespace OwnIdSdk.NetCore3.Flow
                     StepType.Link,
                     new Step<SaveAccountLinkCommand>(cacheItem => new FrontendBehavior
                     {
-                        Type = StepType.Success,
+                        Type = string.IsNullOrEmpty(cacheItem.Error) ? StepType.Success : StepType.Error,
                         ChallengeType = cacheItem.ChallengeType,
                         ActionType = ActionType.Finish
                     })
@@ -175,7 +175,7 @@ namespace OwnIdSdk.NetCore3.Flow
                 {
                     StepType.Recover, new Step<SaveAccountPublicKeyCommand>(cacheItem => new FrontendBehavior
                     {
-                        Type = StepType.Success,
+                        Type = string.IsNullOrEmpty(cacheItem.Error) ? StepType.Success : StepType.Error,
                         ActionType = ActionType.Finish,
                         ChallengeType = cacheItem.ChallengeType
                     })
@@ -211,7 +211,7 @@ namespace OwnIdSdk.NetCore3.Flow
                 {
                     StepType.Recover, new Step<SaveAccountPublicKeyCommand>(cacheItem => new FrontendBehavior
                     {
-                        Type = StepType.Success,
+                        Type = string.IsNullOrEmpty(cacheItem.Error) ? StepType.Success : StepType.Error,
                         ActionType = ActionType.Finish,
                         ChallengeType = cacheItem.ChallengeType
                     })
@@ -222,6 +222,13 @@ namespace OwnIdSdk.NetCore3.Flow
             {
                 {
                     StepType.Starting,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.InstantAuthorize,
+                        cacheItem.ChallengeType,
+                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
+                            "/partial"))))
+                },
+                {
+                    StepType.InstantAuthorize,
                     new Step<Fido2RegisterCommand>(cacheItem => new FrontendBehavior
                     {
                         Type = StepType.Fido2Success,
@@ -235,6 +242,12 @@ namespace OwnIdSdk.NetCore3.Flow
             {
                 {
                     StepType.Starting,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.InstantAuthorize, cacheItem.ChallengeType,
+                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
+                            "/partial"))))
+                },
+                {
+                    StepType.InstantAuthorize,
                     new Step<Fido2LoginCommand>(cacheItem => new FrontendBehavior
                     {
                         Type = StepType.Fido2Success,
