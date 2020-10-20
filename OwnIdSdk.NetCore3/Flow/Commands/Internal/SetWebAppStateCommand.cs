@@ -38,7 +38,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Domain = _domain,
+                Domain = "ownid.com",
                 Secure = !_configuration.IsDevEnvironment,
                 Expires = DateTimeOffset.Now.AddYears(_configuration.CookieExpiration),
                 SameSite = SameSiteMode.Lax
