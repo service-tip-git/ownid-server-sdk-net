@@ -10,6 +10,7 @@ using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
+using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Flow.Steps;
 using OwnIdSdk.NetCore3.Services;
@@ -41,15 +42,23 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
-            if (!(input is CommandInput<JwtContainer>))
-                throw new InternalLogicException($"Incorrect input type for {GetType().Name}");
+            // if (!(input is CommandInput<JwtContainer>))
+            //     throw new InternalLogicException($"Incorrect input type for {GetType().Name}");
         }
-        
+
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType)
         {
-            var requestJwt = input as CommandInput<JwtContainer>;
-            var request = _jwtService.GetDataFromJwt<Fido2RegisterRequest>(requestJwt.Data.Jwt).Data;
+            Fido2RegisterRequest request;
+            if (input is CommandInput<JwtContainer> requestJwt)
+            {
+                request = _jwtService.GetDataFromJwt<Fido2RegisterRequest>(requestJwt.Data.Jwt).Data;
+            }
+            else
+            {
+                var requestInput = input as CommandInput<string>;
+                request = OwnIdSerializer.Deserialize<Fido2RegisterRequest>(requestInput.Data);
+            }
 
             if (request == null)
                 throw new InternalLogicException($"Incorrect Fido2 register request");
