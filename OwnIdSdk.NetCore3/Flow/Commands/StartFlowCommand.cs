@@ -10,7 +10,6 @@ using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Extensions;
 using OwnIdSdk.NetCore3.Flow.Commands.Authorize;
-using OwnIdSdk.NetCore3.Flow.Commands.Fido2;
 using OwnIdSdk.NetCore3.Flow.Commands.Recovery;
 using OwnIdSdk.NetCore3.Flow.Steps;
 using OwnIdSdk.NetCore3.Services;
@@ -57,10 +56,10 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 FlowType.LinkWithPin => _serviceProvider.GetService<GetSecurityCheckCommand>(),
                 FlowType.Fido2PartialRegister => _serviceProvider.GetService<GetPartialInfoCommand>(),
                 FlowType.Fido2PartialLogin => _serviceProvider.GetService<GetPartialInfoCommand>(),
-                FlowType.Fido2Link => _serviceProvider.GetService<Fido2LinkCommand>(),
-                FlowType.Fido2LinkWithPin => _serviceProvider.GetService<Fido2GetSecurityCheckCommand>(),
-                FlowType.Fido2Recover => _serviceProvider.GetService<Fido2RecoverCommand>(),
-                FlowType.Fido2RecoverWithPin => _serviceProvider.GetService<Fido2GetSecurityCheckCommand>(),
+                FlowType.Fido2Link => _serviceProvider.GetService<GetPartialInfoCommand>(),
+                FlowType.Fido2LinkWithPin => _serviceProvider.GetService<GetSecurityCheckCommand>(),
+                FlowType.Fido2Recover => _serviceProvider.GetService<GetPartialInfoCommand>(),
+                FlowType.Fido2RecoverWithPin => _serviceProvider.GetService<GetSecurityCheckCommand>(),
                 _ => throw new InternalLogicException($"Not supported FlowType {relatedItem.FlowType}")
             };
 

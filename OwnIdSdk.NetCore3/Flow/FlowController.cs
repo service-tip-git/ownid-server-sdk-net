@@ -261,6 +261,13 @@ namespace OwnIdSdk.NetCore3.Flow
             {
                 {
                     StepType.Starting,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Link,
+                        cacheItem.ChallengeType,
+                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
+                            "/partial"))))
+                },
+                {
+                    StepType.Link,
                     new Step<Fido2LinkCommand>(cacheItem => new FrontendBehavior
                     {
                         Type = StepType.Fido2Success,
@@ -274,6 +281,13 @@ namespace OwnIdSdk.NetCore3.Flow
             {
                 {
                     StepType.Starting,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Recover,
+                        cacheItem.ChallengeType,
+                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
+                            "/partial"))))
+                },
+                {
+                    StepType.Recover,
                     new Step<Fido2RecoverCommand>(cacheItem => new FrontendBehavior
                     {
                         Type = StepType.Fido2Success,
@@ -282,30 +296,7 @@ namespace OwnIdSdk.NetCore3.Flow
                     })
                 }
             };
-
-            var fido2LinkAndRecoverWithPin = new Dictionary<StepType, IStep>
-            {
-                {
-                    StepType.Starting,
-                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(
-                        StepType.ApprovePin,
-                        cacheItem.ChallengeType,
-                        new PollingAction(_urlProvider.GetSecurityApprovalStatusUrl(cacheItem.Context),
-                            _coreConfiguration.PollingInterval)))
-                },
-                {
-                    StepType.ApprovePin,
-                    new Step<GetApprovalStatusCommand>(cacheItem => new FrontendBehavior
-                    {
-                        Type = cacheItem.Status == CacheItemStatus.Approved
-                            ? StepType.Fido2Success
-                            : StepType.Declined,
-                        ChallengeType = cacheItem.ChallengeType,
-                        ActionType = ActionType.Finish
-                    })
-                }
-            };
-
+            
             StepMap = new Dictionary<FlowType, Dictionary<StepType, IStep>>
             {
                 {FlowType.Authorize, authorize},
@@ -317,9 +308,50 @@ namespace OwnIdSdk.NetCore3.Flow
                 {FlowType.Fido2PartialRegister, fido2PartialRegister},
                 {FlowType.Fido2PartialLogin, fido2PartialLogin},
                 {FlowType.Fido2Link, fido2Link},
-                {FlowType.Fido2LinkWithPin, fido2LinkAndRecoverWithPin},
+                {FlowType.Fido2LinkWithPin, GetFido2LinkAndRecoveryWithPinSteps<Fido2LinkWithPinCommand>(StepType.Link)},
                 {FlowType.Fido2Recover, fido2Recover},
-                {FlowType.Fido2RecoverWithPin, fido2LinkAndRecoverWithPin}
+                {FlowType.Fido2RecoverWithPin, GetFido2LinkAndRecoveryWithPinSteps<Fido2RecoverWithPinCommand>(StepType.Recover)}
+            };
+        }
+
+        private Dictionary<StepType, IStep> GetFido2LinkAndRecoveryWithPinSteps<TFido2FinishCommand>(StepType stepType)
+            where TFido2FinishCommand: BaseFido2RegisterCommand
+        {
+            return new Dictionary<StepType, IStep>
+            {
+                {
+                    StepType.Starting,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.ApprovePin,
+                        cacheItem.ChallengeType,
+                        new PollingAction(_urlProvider.GetSecurityApprovalStatusUrl(cacheItem.Context),
+                            _coreConfiguration.PollingInterval)))
+                },
+                {
+                    StepType.ApprovePin,
+                    new Step<GetApprovalStatusCommand>(cacheItem =>
+                    {
+                        if (cacheItem.Status == CacheItemStatus.Approved)
+                            return new FrontendBehavior(stepType, cacheItem.ChallengeType,
+                                new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context,
+                                    cacheItem.ChallengeType)));
+
+                        return new FrontendBehavior
+                        {
+                            Type = StepType.Declined,
+                            ChallengeType = cacheItem.ChallengeType,
+                            ActionType = ActionType.Finish
+                        };
+                    })
+                },
+                {
+                    stepType,
+                    new Step<TFido2FinishCommand>(cacheItem => new FrontendBehavior
+                    {
+                        Type = StepType.Fido2Success,
+                        ChallengeType = cacheItem.ChallengeType,
+                        ActionType = ActionType.Finish
+                    })
+                }
             };
         }
     }

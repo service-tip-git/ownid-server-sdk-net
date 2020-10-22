@@ -25,7 +25,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
-            if (!relatedItem.IsValidForAuthorize)
+            if (relatedItem.HasFinalState)
                 throw new CommandValidationException(
                     "Cache item should be not Finished with Login or Register challenge type. " +
                     $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType}");
