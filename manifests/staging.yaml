@@ -159,7 +159,7 @@ spec:
             - name: OWNID__FIDO2_RELYING_PARTY_NAME
               value: OwnID
             - name: OWNID__FIDO2_USER_DISPLAY_NAME
-              value: Passwordless
+              value: 'Skip the password'
             - name: OWNID__FIDO2_USER_NAME
               value: 'Skip the password'
             - name: OWNID__FIDO2_ORIGIN
@@ -274,7 +274,7 @@ spec:
             - name: OWNID__FIDO2_RELYING_PARTY_NAME
               value: OwnID
             - name: OWNID__FIDO2_USER_DISPLAY_NAME
-              value: Passwordless
+              value: 'Skip the password'
             - name: OWNID__FIDO2_USER_NAME
               value: 'Skip the password'
             - name: OWNID__FIDO2_ORIGIN
