@@ -161,7 +161,7 @@ spec:
             - name: OWNID__FIDO2_USER_DISPLAY_NAME
               value: Passwordless
             - name: OWNID__FIDO2_USER_NAME
-              value: Passwordless
+              value: 'Skip the password'
             - name: OWNID__FIDO2_ORIGIN
               value: https://passwordless.demo.ownid.com
             - name: OWNID__TOP_DOMAIN
@@ -276,7 +276,7 @@ spec:
             - name: OWNID__FIDO2_USER_DISPLAY_NAME
               value: Passwordless
             - name: OWNID__FIDO2_USER_NAME
-              value: Passwordless
+              value: 'Skip the password'
             - name: OWNID__FIDO2_ORIGIN
               value: https://passwordless.demo.skipthepassword.com
             - name: OWNID__TOP_DOMAIN
