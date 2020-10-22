@@ -25,8 +25,6 @@ namespace OwnIdSdk.NetCore3.Web
                 builder => builder.UseMiddleware<GenerateContextMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/start",
                 builder => builder.UseMiddleware<StartFlowMiddleware>());
-            routeBuilder.MapMiddlewarePost("ownid/{context}/start/is-fido2-user-exists/{" + IsFido2UserExistsMiddleware.CredentialIdRouteName + "}",
-                builder => builder.UseMiddleware<IsFido2UserExistsMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/challenge",
                 builder => builder.UseMiddleware<SaveProfileMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/challenge/partial",

@@ -139,6 +139,17 @@ namespace OwnIdSdk.NetCore3.Extensibility.Configuration
         /// </remarks>
         public int CookieExpiration => 1825;
 
+        /// <summary>
+        ///     Determines authenticator provider
+        /// </summary>
+        /// <remarks>
+        ///     Default is OwnIdOnly
+        /// </remarks>
+        public AuthenticationModeType AuthenticationMode { get; set; }
+
+        /// <summary>
+        ///     FIDO2 configuration
+        /// </summary>
         public IFido2Configuration Fido2 { get; }
     }
 }

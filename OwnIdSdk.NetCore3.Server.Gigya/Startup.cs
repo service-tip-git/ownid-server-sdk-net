@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Redis;
 using OwnIdSdk.NetCore3.Server.Gigya.External;
 using OwnIdSdk.NetCore3.Server.Gigya.Middlewares.SecurityHeaders;
@@ -106,9 +107,9 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         x.OwnIdApplicationUrl = webAppUrl;
                         x.OverwriteFields = ownIdSection.GetValue<bool>("overwrite_fields");
 
-                        x.Fido2.Enabled = ownIdSection.GetValue("fido2_enabled", false);
+                        x.AuthenticationMode = ownIdSection.GetValue("authentication_mode", AuthenticationModeType.OwnIdOnly);
 
-                        if (x.Fido2.Enabled)
+                        if (x.AuthenticationMode.IsFido2Enabled())
                         {
                             if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_passwordless_page_url"]))
                                 x.Fido2.PasswordlessPageUrl = new Uri(ownIdSection["fido2_passwordless_page_url"]);

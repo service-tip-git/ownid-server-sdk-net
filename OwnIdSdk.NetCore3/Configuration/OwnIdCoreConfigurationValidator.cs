@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.Options;
+using OwnIdSdk.NetCore3.Extensibility.Configuration;
 
 namespace OwnIdSdk.NetCore3.Configuration
 {
@@ -35,8 +36,10 @@ namespace OwnIdSdk.NetCore3.Configuration
                 return ValidateOptionsResult.Fail(
                     $"{nameof(options.JwtExpirationTimeout)} can not be equal to 0");
 
+            var fido2Enabled = options.AuthenticationMode.IsFido2Enabled();
+            
             // Validate Fido2Url
-            if (options.Fido2.Enabled
+            if (fido2Enabled 
                 && !IsUriValid(nameof(options.Fido2.PasswordlessPageUrl), options.Fido2.PasswordlessPageUrl,
                     options.IsDevEnvironment,
                     out var fido2ValidationError))
@@ -45,7 +48,7 @@ namespace OwnIdSdk.NetCore3.Configuration
             }
 
             // Validate Fido2Origin
-            if (options.Fido2.Enabled
+            if (fido2Enabled
                 && !IsUriValid(nameof(options.Fido2.Origin), options.Fido2.Origin, options.IsDevEnvironment,
                     out var fido2OriginValidationError))
             {

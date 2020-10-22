@@ -65,7 +65,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
             
             services.TryAddSingleton<IsFido2UserExistsCommand>();
 
-            if (_configuration.Fido2.Enabled)
+            if (_configuration.AuthenticationMode.IsFido2Enabled())
             {
                 services.TryAddSingleton<Fido2RegisterCommand>();
                 services.TryAddSingleton<Fido2LoginCommand>();

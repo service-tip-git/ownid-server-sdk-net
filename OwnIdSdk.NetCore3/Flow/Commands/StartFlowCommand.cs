@@ -76,7 +76,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
 
         private async Task SwitchToFido2FlowIfNeededAsync(string requestBody, CacheItem cacheItem)
         {
-            if (!_configuration.Fido2.Enabled)
+            if (!_configuration.AuthenticationMode.IsFido2Enabled())
                 return;
 
             if (cacheItem.FlowType != FlowType.PartialAuthorize

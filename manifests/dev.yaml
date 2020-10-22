@@ -152,8 +152,8 @@ spec:
                 secretKeyRef:
                   name: credential-secrets
                   key: demo_private_key
-            - name: OWNID__FIDO2_ENABLED
-              value: 'true'
+            - name: OWNID__AUTHENTICATION_MODE
+              value: All
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.demo.dev.ownid.com
             - name: OWNID__FIDO2_RELYING_PARTY_ID
@@ -267,8 +267,8 @@ spec:
                 secretKeyRef:
                   name: credential-secrets
                   key: demo_private_key
-            - name: OWNID__FIDO2_ENABLED
-              value: 'true'
+            - name: OWNID__AUTHENTICATION_MODE
+              value: All
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.demo.dev.skipthepassword.com
             - name: OWNID__FIDO2_RELYING_PARTY_ID

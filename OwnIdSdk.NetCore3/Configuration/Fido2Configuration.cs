@@ -5,8 +5,6 @@ namespace OwnIdSdk.NetCore3.Configuration
 {
     public class Fido2Configuration : IFido2Configuration
     {
-        public bool Enabled { get; set; }
-
         public Uri Origin { get; set; }
 
         public Uri PasswordlessPageUrl { get; set; }

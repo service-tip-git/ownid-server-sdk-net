@@ -2,6 +2,7 @@ using System;
 using System.Security.Cryptography;
 using FluentAssertions;
 using OwnIdSdk.NetCore3.Configuration;
+using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using Xunit;
 
 namespace OwnIdSdk.NetCore3.Tests.Configuration
@@ -84,7 +85,6 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
                 TopDomain = "ownid.com"
             };
 
-            config.Fido2.Enabled = false;
             config.Fido2.Origin = new Uri("https://test.com");
             config.Fido2.PasswordlessPageUrl = new Uri("https://test.com");
 
@@ -108,7 +108,7 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         public void Validate_Invalid_Fido2Url(bool isDev, string fido2Url, string errorMessage)
         {
             var config = GetValidConfiguration();
-            config.Fido2.Enabled = true;
+            config.AuthenticationMode = AuthenticationModeType.All;
 
             config.IsDevEnvironment = isDev;
             config.Fido2.PasswordlessPageUrl = !string.IsNullOrEmpty(fido2Url) ? new Uri(fido2Url) : null;
@@ -126,7 +126,7 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         public void Validate_Valid_Fido2Url(bool isDev, string fido2Url)
         {
             var config = GetValidConfiguration();
-            config.Fido2.Enabled = true;
+            config.AuthenticationMode = AuthenticationModeType.All;
 
             config.Fido2.PasswordlessPageUrl = new Uri(fido2Url);
             config.IsDevEnvironment = isDev;
@@ -145,7 +145,7 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         public void Validate_Invalid_Origin(bool isDev, string originUrl, string errorMessage)
         {
             var config = GetValidConfiguration();
-            config.Fido2.Enabled = true;
+            config.AuthenticationMode = AuthenticationModeType.All;
 
             config.IsDevEnvironment = isDev;
             config.Fido2.Origin = !string.IsNullOrEmpty(originUrl) ? new Uri(originUrl) : null;
@@ -163,7 +163,7 @@ namespace OwnIdSdk.NetCore3.Tests.Configuration
         public void Validate_Valid_Origin(bool isDev, string fido2Url)
         {
             var config = GetValidConfiguration();
-            config.Fido2.Enabled = true;
+            config.AuthenticationMode = AuthenticationModeType.All;
 
             config.Fido2.Origin = new Uri(fido2Url);
             config.IsDevEnvironment = isDev;

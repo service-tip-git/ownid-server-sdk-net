@@ -12,19 +12,19 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
     public class CreateFlowCommand
     {
         private readonly ICacheItemService _cacheItemService;
-        private readonly IOwnIdCoreConfiguration _coreConfiguration;
+        private readonly IOwnIdCoreConfiguration _configuration;
         private readonly IIdentitiesProvider _identitiesProvider;
         private readonly IAccountLinkHandler _linkHandler;
         private readonly IUrlProvider _urlProvider;
 
         public CreateFlowCommand(ICacheItemService cacheItemService, IUrlProvider urlProvider,
-            IIdentitiesProvider identitiesProvider, IOwnIdCoreConfiguration coreConfiguration,
+            IIdentitiesProvider identitiesProvider, IOwnIdCoreConfiguration configuration,
             IAccountLinkHandler linkHandler = null)
         {
             _cacheItemService = cacheItemService;
             _urlProvider = urlProvider;
             _identitiesProvider = identitiesProvider;
-            _coreConfiguration = coreConfiguration;
+            _configuration = configuration;
             _linkHandler = linkHandler;
         }
 
@@ -49,7 +49,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
 
                     var state = await _linkHandler.GetCurrentUserLinkStateAsync(request.Payload.ToString());
 
-                    if (state.ConnectedDevicesCount >= _coreConfiguration.MaximumNumberOfConnectedDevices)
+                    if (state.ConnectedDevicesCount >= _configuration.MaximumNumberOfConnectedDevices)
                         return new GetChallengeLinkResponse(default, _urlProvider.GetWebAppConnectionsUrl().ToString(),
                             default, default);
 
@@ -70,16 +70,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             var startFlowUrl = _urlProvider.GetStartFlowUrl(challengeContext);
             var destinationUrl = _urlProvider.GetWebAppSignWithCallbackUrl(startFlowUrl, request.Language);
 
-            if (_coreConfiguration.Fido2.Enabled
+            if (_configuration.AuthenticationMode.IsFido2Enabled()
                 && (flowType == FlowType.PartialAuthorize
                     || request.Type == ChallengeType.Link
                     || request.Type == ChallengeType.Recover))
-            {
                 destinationUrl = _urlProvider.GetFido2Url(destinationUrl, request.Type, request.Language);
-            }
 
             return new GetChallengeLinkResponse(challengeContext, destinationUrl.ToString(), nonce,
-                _coreConfiguration.CacheExpirationTimeout);
+                _configuration.CacheExpirationTimeout);
         }
     }
 }
