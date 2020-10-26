@@ -335,7 +335,7 @@ spec:
                   name: universalid-secrets
                   key: universalid_gigya_user_key
             - name: GIGYA__LOGIN_TYPE 
-              value: IdToken
+              value: session
             - name: ASPNETCORE_ENVIRONMENT
               value: alpha
 ---
