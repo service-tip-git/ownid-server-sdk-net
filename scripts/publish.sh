@@ -29,7 +29,7 @@ kubectl -n=$ENV set image deployment/ownid-server-netcore3-gigya-deployment owni
 kubectl -n=$ENV set image deployment/ownid-server-netcore3-demo-gigya-deployment ownid-server-netcore3-demo-gigya=$REPOSITORY_URI:$IMAGE_TAG --record
 kubectl -n=$ENV set image deployment/ownid-server-netcore3-demo-2-gigya-deployment ownid-server-netcore3-demo-2-gigya=$REPOSITORY_URI:$IMAGE_TAG --record
 
-# if [ "$ENV" = "staging" ]; then
-#         kubectl -n=$ENV set image deployment/ownid-server-netcore3-nestle-deployment ownid-server-netcore3-nestle=$REPOSITORY_URI:$IMAGE_TAG --record
-# fi
+if [ "$ENV" = "staging" ]; then
+        kubectl -n=$ENV set image deployment/gigyapoc-deployment gigyapoc=$REPOSITORY_URI:$IMAGE_TAG --record
+fi
 
