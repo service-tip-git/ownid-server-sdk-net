@@ -40,10 +40,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                 ClientTime = input.ClientDate,
                 Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
                 Locale = input.CultureInfo?.Name,
-                IncludeRequester = true,
-                EncToken = relatedItem.EncToken,
-                CanBeRecovered = string.IsNullOrEmpty(relatedItem.RecoveryToken)
+                IncludeRequester = true
             };
+
+            if (!IsStateless)
+            {
+                composeInfo.EncToken = relatedItem.EncToken;
+                composeInfo.CanBeRecovered = string.IsNullOrEmpty(relatedItem.RecoveryToken);
+            }
 
             var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, _identitiesProvider.GenerateUserId());
             return Task.FromResult(new JwtContainer(jwt) as ICommandResult);

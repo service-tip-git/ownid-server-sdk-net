@@ -9,6 +9,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
 {
     public abstract class BaseFlowCommand
     {
+        public bool IsStateless { get; set; }
+        
         public async Task<ICommandResult> ExecuteAsync(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType, bool requiresTokensValidation = true)
         {

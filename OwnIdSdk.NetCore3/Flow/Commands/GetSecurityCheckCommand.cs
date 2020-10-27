@@ -42,10 +42,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 Context = relatedItem.Context,
                 Behavior = step,
                 ClientTime = input.ClientDate,
-                Locale = input.CultureInfo?.Name,
-                EncToken = relatedItem.EncToken,
-                CanBeRecovered = string.IsNullOrEmpty(relatedItem.RecoveryToken)
+                Locale = input.CultureInfo?.Name
             };
+
+            if (!IsStateless)
+            {
+                composeInfo.EncToken = relatedItem.EncToken;
+                composeInfo.CanBeRecovered = string.IsNullOrEmpty(relatedItem.RecoveryToken);
+            }
 
             var jwt = _jwtComposer.GeneratePinStepJwt(composeInfo, pin);
             return new JwtContainer(jwt);

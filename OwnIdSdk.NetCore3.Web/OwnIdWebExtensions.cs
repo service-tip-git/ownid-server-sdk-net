@@ -25,21 +25,23 @@ namespace OwnIdSdk.NetCore3.Web
                 builder => builder.UseMiddleware<GenerateContextMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/start",
                 builder => builder.UseMiddleware<StartFlowMiddleware>());
+            routeBuilder.MapMiddlewarePost("ownid/{context}/start/state",
+                builder => builder.UseMiddleware<PasswordlessStateMiddleware>());
+            routeBuilder.MapMiddlewarePost("ownid/{context}/conn-recovery",
+                builder => builder.UseMiddleware<InternalConnectionRecoveryMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/challenge",
                 builder => builder.UseMiddleware<SaveProfileMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/challenge/partial",
                 builder => builder.UseMiddleware<SavePartialProfileMiddleware>());
-            routeBuilder.MapMiddlewarePost("ownid/status",
-                builder => builder.UseMiddleware<GetChallengeStatusMiddleware>());
+            routeBuilder.MapMiddlewarePost("ownid/{context}/challenge/fido2",
+                builder => builder.UseMiddleware<Fido2Middleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/approve",
                 builder => builder.UseMiddleware<ApproveActionMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/approval-status",
                 builder => builder.UseMiddleware<GetActionApprovalStatusMiddleware>());
-            routeBuilder.MapMiddlewarePost("ownid/{context}/conn-recovery",
-                builder => builder.UseMiddleware<InternalConnectionRecoveryMiddleware>());
-            routeBuilder.MapMiddlewarePost("ownid/{context}/start/state",
-                builder => builder.UseMiddleware<PasswordlessStateMiddleware>());
-
+            routeBuilder.MapMiddlewarePost("ownid/status",
+                builder => builder.UseMiddleware<GetChallengeStatusMiddleware>());
+            
             var configuration = app.ApplicationServices.GetService<OwnIdConfiguration>();
 
             if (configuration.HasFeature<AccountLinkFeature>())

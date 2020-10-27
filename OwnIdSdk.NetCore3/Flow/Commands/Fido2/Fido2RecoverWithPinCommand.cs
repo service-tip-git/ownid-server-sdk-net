@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
 using Fido2NetLib;
-using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Providers;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Services;
 
@@ -17,8 +17,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 
         public Fido2RecoverWithPinCommand(IAccountRecoveryHandler recoveryHandler, IFido2 fido2,
             ICacheItemService cacheItemService, IJwtComposer jwtComposer, IFlowController flowController,
-            IOwnIdCoreConfiguration configuration, IJwtService jwtService) : base(fido2, cacheItemService, jwtComposer,
-            flowController, configuration, jwtService)
+            IOwnIdCoreConfiguration configuration, IIdentitiesProvider identitiesProvider) : base(fido2,
+            cacheItemService, jwtComposer, flowController, configuration, identitiesProvider)
         {
             _recoveryHandler = recoveryHandler;
             _cacheItemService = cacheItemService;
@@ -38,9 +38,9 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 Fido2CredentialId = credentialId,
                 Fido2SignatureCounter = signatureCounter
             });
-            
+
             relatedItem.DID = recoverResult.DID;
-            
+
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, recoverResult.DID,
                 publicKey);
         }

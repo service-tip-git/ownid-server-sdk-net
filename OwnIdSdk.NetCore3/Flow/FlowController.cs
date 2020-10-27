@@ -218,39 +218,39 @@ namespace OwnIdSdk.NetCore3.Flow
                 }
             };
 
-            var fido2PartialRegister = new Dictionary<StepType, IStep>
+            var fido2Register = new Dictionary<StepType, IStep>
             {
                 {
                     StepType.Starting,
-                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.InstantAuthorize,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Fido2Authorize,
                         cacheItem.ChallengeType,
                         new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
-                            "/partial"))))
+                            "/fido2"))))
                 },
                 {
-                    StepType.InstantAuthorize,
+                    StepType.Fido2Authorize,
                     new Step<Fido2RegisterCommand>(cacheItem => new FrontendBehavior
                     {
-                        Type = StepType.Fido2Success,
+                        Type = StepType.Success,
                         ActionType = ActionType.Finish,
                         ChallengeType = cacheItem.ChallengeType
                     })
                 }
             };
 
-            var fido2PartialLogin = new Dictionary<StepType, IStep>
+            var fido2Login = new Dictionary<StepType, IStep>
             {
                 {
                     StepType.Starting,
-                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.InstantAuthorize, cacheItem.ChallengeType,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Fido2Authorize, cacheItem.ChallengeType,
                         new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
-                            "/partial"))))
+                            "/fido2"))))
                 },
                 {
-                    StepType.InstantAuthorize,
+                    StepType.Fido2Authorize,
                     new Step<Fido2LoginCommand>(cacheItem => new FrontendBehavior
                     {
-                        Type = StepType.Fido2Success,
+                        Type = StepType.Success,
                         ActionType = ActionType.Finish,
                         ChallengeType = cacheItem.ChallengeType
                     })
@@ -261,16 +261,16 @@ namespace OwnIdSdk.NetCore3.Flow
             {
                 {
                     StepType.Starting,
-                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Link,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Fido2Authorize,
                         cacheItem.ChallengeType,
                         new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
-                            "/partial"))))
+                            "/fido2"))))
                 },
                 {
-                    StepType.Link,
+                    StepType.Fido2Authorize,
                     new Step<Fido2LinkCommand>(cacheItem => new FrontendBehavior
                     {
-                        Type = StepType.Fido2Success,
+                        Type = StepType.Success,
                         ActionType = ActionType.Finish,
                         ChallengeType = cacheItem.ChallengeType
                     })
@@ -281,16 +281,16 @@ namespace OwnIdSdk.NetCore3.Flow
             {
                 {
                     StepType.Starting,
-                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Recover,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Fido2Authorize,
                         cacheItem.ChallengeType,
                         new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
-                            "/partial"))))
+                            "/fido2"))))
                 },
                 {
-                    StepType.Recover,
+                    StepType.Fido2Authorize,
                     new Step<Fido2RecoverCommand>(cacheItem => new FrontendBehavior
                     {
-                        Type = StepType.Fido2Success,
+                        Type = StepType.Success,
                         ActionType = ActionType.Finish,
                         ChallengeType = cacheItem.ChallengeType
                     })
@@ -305,16 +305,16 @@ namespace OwnIdSdk.NetCore3.Flow
                 {FlowType.LinkWithPin, linkWithPin},
                 {FlowType.Recover, recover},
                 {FlowType.RecoverWithPin, recoverWitPin},
-                {FlowType.Fido2PartialRegister, fido2PartialRegister},
-                {FlowType.Fido2PartialLogin, fido2PartialLogin},
+                {FlowType.Fido2Register, fido2Register},
+                {FlowType.Fido2Login, fido2Login},
                 {FlowType.Fido2Link, fido2Link},
-                {FlowType.Fido2LinkWithPin, GetFido2LinkAndRecoveryWithPinSteps<Fido2LinkWithPinCommand>(StepType.Link)},
+                {FlowType.Fido2LinkWithPin, GetFido2LinkAndRecoveryWithPinSteps<Fido2LinkWithPinCommand>()},
                 {FlowType.Fido2Recover, fido2Recover},
-                {FlowType.Fido2RecoverWithPin, GetFido2LinkAndRecoveryWithPinSteps<Fido2RecoverWithPinCommand>(StepType.Recover)}
+                {FlowType.Fido2RecoverWithPin, GetFido2LinkAndRecoveryWithPinSteps<Fido2RecoverWithPinCommand>()}
             };
         }
 
-        private Dictionary<StepType, IStep> GetFido2LinkAndRecoveryWithPinSteps<TFido2FinishCommand>(StepType stepType)
+        private Dictionary<StepType, IStep> GetFido2LinkAndRecoveryWithPinSteps<TFido2FinishCommand>()
             where TFido2FinishCommand: BaseFido2RegisterCommand
         {
             return new Dictionary<StepType, IStep>
@@ -331,9 +331,9 @@ namespace OwnIdSdk.NetCore3.Flow
                     new Step<GetApprovalStatusCommand>(cacheItem =>
                     {
                         if (cacheItem.Status == CacheItemStatus.Approved)
-                            return new FrontendBehavior(stepType, cacheItem.ChallengeType,
+                            return new FrontendBehavior(StepType.Fido2Authorize, cacheItem.ChallengeType,
                                 new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context,
-                                    cacheItem.ChallengeType)));
+                                    cacheItem.ChallengeType, "/fido2")));
 
                         return new FrontendBehavior
                         {
@@ -344,10 +344,10 @@ namespace OwnIdSdk.NetCore3.Flow
                     })
                 },
                 {
-                    stepType,
+                    StepType.Fido2Authorize,
                     new Step<TFido2FinishCommand>(cacheItem => new FrontendBehavior
                     {
-                        Type = StepType.Fido2Success,
+                        Type = StepType.Success,
                         ChallengeType = cacheItem.ChallengeType,
                         ActionType = ActionType.Finish
                     })

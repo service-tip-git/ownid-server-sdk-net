@@ -41,12 +41,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Approval
                 switch (relatedItem.FlowType)
                 {
                     case FlowType.LinkWithPin:
-                    case FlowType.Fido2LinkWithPin:
-                    case FlowType.Fido2RecoverWithPin:
                         command = new GetNextStepCommand(_jwtComposer, _flowController, false);
                         break;
                     case FlowType.RecoverWithPin:
                         command = new RecoverAccountCommand(_jwtComposer, _flowController, _recoveryHandler, false);
+                        break;
+                    case FlowType.Fido2LinkWithPin:
+                    case FlowType.Fido2RecoverWithPin:
+                        command = new GetNextStepCommand(_jwtComposer, _flowController, false) {IsStateless = true};
                         break;
                     default:
                         throw new InternalLogicException(
@@ -63,7 +65,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Approval
             else if (relatedItem.Status == CacheItemStatus.Declined)
             {
                 var step = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
-                
+
                 var composeInfo = new BaseJwtComposeInfo
                 {
                     Context = relatedItem.Context,
@@ -71,7 +73,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Approval
                     Behavior = step,
                     Locale = input.CultureInfo?.Name
                 };
-                
+
                 jwt = _jwtComposer.GenerateFinalStepJwt(composeInfo);
             }
 

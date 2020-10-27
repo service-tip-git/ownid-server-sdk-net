@@ -129,8 +129,8 @@ namespace OwnIdSdk.NetCore3.Services
             if (cacheItem == null || cacheItem.Context != context)
                 throw new ArgumentException($"Can not find any item with context '{context}'");
 
-            if (cacheItem.FlowType != FlowType.Fido2PartialLogin
-                && cacheItem.FlowType != FlowType.Fido2PartialRegister
+            if (cacheItem.FlowType != FlowType.Fido2Login
+                && cacheItem.FlowType != FlowType.Fido2Register
                 && cacheItem.FlowType != FlowType.Fido2LinkWithPin
                 && cacheItem.FlowType != FlowType.Fido2RecoverWithPin
             )

@@ -42,9 +42,13 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 Behavior = step,
                 Locale = input.CultureInfo?.Name,
                 IncludeRequester = _needRequesterInfo,
-                EncToken = relatedItem.EncToken,
-                CanBeRecovered = string.IsNullOrEmpty(relatedItem.RecoveryToken)
             };
+
+            if (!IsStateless)
+            {
+                composeInfo.EncToken = relatedItem.EncToken;
+                composeInfo.CanBeRecovered = string.IsNullOrEmpty(relatedItem.RecoveryToken);
+            }
             
             var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, relatedItem.DID);
             return Task.FromResult(new JwtContainer(jwt) as ICommandResult);
