@@ -21,6 +21,9 @@ echo Pushing image $REPOSITORY_URI:$IMAGE_TAG to registry
 docker tag ownid-server-netcore3-gigya:latest $REPOSITORY_URI:$IMAGE_TAG
 docker push $REPOSITORY_URI:$IMAGE_TAG
 
+echo K8S cluster selection
+aws eks --region us-east-2 update-kubeconfig --name ownid-eks
+
 echo Updating image in Cluster deployment
 kubectl apply -f manifests/$ENV.yaml
 

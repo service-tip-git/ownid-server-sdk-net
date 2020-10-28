@@ -57,7 +57,6 @@ before_deploy:
   - chmod +x ./kubectl
   - sudo mv kubectl /usr/local/bin
   - kubectl version --short --client
-  - aws eks --region us-east-2 update-kubeconfig --name ownid-eks
 
 deploy:
 - provider: script
@@ -67,7 +66,7 @@ deploy:
       all_branches: true
       condition: $TRAVIS_BRANCH =~ ^(develop|master)$
 - provider: script
-  script: sh scripts/alpha-deploy.sh $REPOSITORY_URI $IMAGE_TAG alpha
+  script: sh scripts/publish-prod.sh $REPOSITORY_URI $IMAGE_TAG alpha
   skip_cleanup: true
   on:
     branch: alpha-rti
