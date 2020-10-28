@@ -38,6 +38,7 @@ echo Prod B Deployment
 
 echo K8S cluster selection
 aws eks --region us-east-1 update-kubeconfig --name ownid-production-cluster
+kubectl config use-context arn:aws:eks:us-east-2:571861302935:cluster/ownid-eks
 
 echo Updating objects in Cluster 
 kubectl apply -f manifests/$ENV.yaml
