@@ -27,6 +27,8 @@ namespace OwnIdSdk.NetCore3.Web
                 builder => builder.UseMiddleware<StartFlowMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/start/state",
                 builder => builder.UseMiddleware<PasswordlessStateMiddleware>());
+            routeBuilder.MapMiddlewarePost("ownid/{context}/users/existence",
+                builder => builder.UseMiddleware<CheckUserExistenceMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/conn-recovery",
                 builder => builder.UseMiddleware<InternalConnectionRecoveryMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/challenge",

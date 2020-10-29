@@ -111,7 +111,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                         break;
                     }
                     case ChallengeType.Login
-                        when await _userHandlerAdapter.IsUserExists(cacheItem.PublicKey):
+                        when await _userHandlerAdapter.IsUserExistsAsync(cacheItem.PublicKey):
                     {
                         result.Payload = await _userHandlerAdapter.OnSuccessLoginByPublicKeyAsync(cacheItem.PublicKey);
                         break;
@@ -120,7 +120,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                         result.Payload = SetPartialRegisterResult(cacheItem);
                         break;
                     case ChallengeType.Register
-                        when await _userHandlerAdapter.IsUserExists(cacheItem.PublicKey):
+                        when await _userHandlerAdapter.IsUserExistsAsync(cacheItem.PublicKey):
                     {
                         var errorMessage = _localizationService.GetLocalizedString("Error_PhoneAlreadyConnected");
                         result.Payload = new AuthResult<object>(errorMessage);

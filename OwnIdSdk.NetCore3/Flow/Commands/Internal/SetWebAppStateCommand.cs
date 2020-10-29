@@ -22,7 +22,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
             _configuration = configuration;
             EncryptionCookieName = string.Format(CookieNameTemplates.WebAppEncryption, _configuration.CookieReference);
             RecoveryCookieName = string.Format(CookieNameTemplates.WebAppRecovery, _configuration.CookieReference);
-            _domain = _configuration.OwnIdApplicationUrl.GetBaseDomain();
+            _domain = _configuration.OwnIdApplicationUrl.GetWebAppBaseDomain();
         }
 
         public string RecoveryCookieName { get; }
@@ -38,7 +38,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Domain = "ownid.com",
+                Domain = _domain,
                 Secure = !_configuration.IsDevEnvironment,
                 Expires = DateTimeOffset.Now.AddYears(_configuration.CookieExpiration),
                 SameSite = SameSiteMode.Lax
@@ -66,13 +66,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
                 recoveryToken = string.IsNullOrWhiteSpace(request.RecoveryToken)
                     ? Guid.NewGuid().ToString("n")
                     : request.RecoveryToken;
-
-                result.Cookies.Add(new CookieInfo
-                {
-                    Name = RecoveryCookieName,
-                    Value = recoveryToken,
-                    Options = cookieOptions
-                });
+                
+                if (request.RecoveryToken == recoveryToken)
+                    result.Cookies.Add(new CookieInfo
+                    {
+                        Name = RecoveryCookieName,
+                        Value = recoveryToken,
+                        Options = cookieOptions
+                    });
             }
 
             await _cacheItemService.SetWebAppStateAsync(context, encryptionToken, recoveryToken);

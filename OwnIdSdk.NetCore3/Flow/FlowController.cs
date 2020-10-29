@@ -80,21 +80,39 @@ namespace OwnIdSdk.NetCore3.Flow
                     StepType.Starting,
                     new Step<StartFlowCommand>(cacheItem =>
                     {
-                        var alternative = new FrontendBehavior(StepType.InstantAuthorize, cacheItem.ChallengeType,
+                        var authorizeStep = new FrontendBehavior(
+                            StepType.InstantAuthorize, cacheItem.ChallengeType,
                             new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
                                 "/partial")));
-
-                        var mainBehavior = new FrontendBehavior(StepType.InternalConnectionRecovery,
+                        
+                        var internalRecovery = new FrontendBehavior(StepType.InternalConnectionRecovery,
                             cacheItem.ChallengeType,
                             new CallAction(_urlProvider.GetConnectionRecoveryUrl(cacheItem.Context)),
-                            alternative);
+                            authorizeStep);
 
-                        return mainBehavior;
+                        if (cacheItem.ChallengeType != ChallengeType.Register) 
+                            return internalRecovery;
+                        
+                        var checkUser = new FrontendBehavior(StepType.CheckUserExistence, cacheItem.ChallengeType,
+                            new CallAction(_urlProvider.GetUserExistenceUrl(cacheItem.Context)), authorizeStep);
+                            
+                        if (!string.IsNullOrEmpty(cacheItem.RecoveryToken))
+                            checkUser.AlternativeBehavior = internalRecovery;
+
+                        return checkUser;
+
                     })
                 },
                 {
                     StepType.InternalConnectionRecovery,
                     new Step<InternalConnectionRecoveryCommand>(cacheItem => new FrontendBehavior(
+                            StepType.InstantAuthorize, cacheItem.ChallengeType,
+                            new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
+                                "/partial"))))
+                },
+                {
+                    StepType.CheckUserExistence,
+                    new Step<CheckUserExistenceCommand>(cacheItem => new FrontendBehavior(
                         StepType.InstantAuthorize, cacheItem.ChallengeType,
                         new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
                             "/partial"))))

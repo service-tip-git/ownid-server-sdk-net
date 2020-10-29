@@ -42,5 +42,13 @@ namespace OwnIdSdk.NetCore3.Flow.Interfaces
         /// <param name="data">Recovery data</param>
         /// <returns>Base64 encoded string that contains JWT</returns>
         string GenerateRecoveryDataJwt(BaseJwtComposeInfo info, ConnectionRecoveryResult<object> data);
+
+        /// <summary>
+        ///     Generates JWT for data with step
+        /// </summary>
+        /// <param name="info">Base composition info</param>
+        /// <param name="data">Data</param>
+        /// <returns>Base64 encoded string that contains JWT</returns>
+        string GenerateDataStepJwt<T>(BaseJwtComposeInfo info, T data) where T : class;
     }
 }

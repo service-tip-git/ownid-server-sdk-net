@@ -47,7 +47,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType)
+            StepType currentStepType, bool isStateless)
         {
             var request = OwnIdSerializer.Deserialize<Fido2RegisterRequest>((input as CommandInput<string>)!.Data);
 

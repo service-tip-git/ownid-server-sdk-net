@@ -84,6 +84,11 @@ namespace OwnIdSdk.NetCore3.Providers
             return GetBaseActionUrl(context, "conn-recovery");
         }
 
+        public Uri GetUserExistenceUrl(string context)
+        {
+            return GetBaseActionUrl(context, "users/existence");
+        }
+
         public Uri GetWebAppConnectionsUrl()
         {
             return new Uri(_coreConfiguration.OwnIdApplicationUrl, "account");

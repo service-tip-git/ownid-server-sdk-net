@@ -124,7 +124,9 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
         /// <summary>
         ///     Connection recovery token
         /// </summary>
-        public string RecoveryToken => $"{PasswordlessRecoveryToken}:::{WebAppRecoveryToken}";
+        public string RecoveryToken => !string.IsNullOrEmpty(WebAppRecoveryToken)
+            ? $"{PasswordlessRecoveryToken}:::{WebAppRecoveryToken}"
+            : string.Empty;
 
         /// <summary>
         ///     Connection recovery data
@@ -135,12 +137,12 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
         ///     Connection recovery token
         /// </summary>
         public string EncToken => $"{PasswordlessEncToken}:::{WebAppEncToken}";
-        
+
         /// <summary>
         ///     Private key encryption passphrase
         /// </summary>
         public string PasswordlessEncToken { get; set; }
-        
+
         /// <summary>
         ///     Private key encryption passphrase
         /// </summary>

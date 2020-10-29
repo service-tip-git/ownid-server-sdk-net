@@ -46,7 +46,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType)
+            StepType currentStepType, bool isStateless)
         {
             if (!(input is CommandInput<JwtContainer> requestJwt))
                 throw new InternalLogicException($"Incorrect input type for {nameof(SaveProfileCommand)}");

@@ -37,7 +37,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType)
+            StepType currentStepType, bool isStateless)
         {
             // Recover access
             var recoverResult = await _accountRecoveryHandler.RecoverAsync(relatedItem.Payload);
@@ -50,7 +50,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
                 Locale = input.CultureInfo?.Name,
                 IncludeRequester = _needRequesterInfo,
                 EncToken = relatedItem.EncToken,
-                CanBeRecovered = string.IsNullOrEmpty(relatedItem.RecoveryToken)
+                CanBeRecovered = !string.IsNullOrEmpty(relatedItem.RecoveryToken)
             };
 
             var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, recoverResult.DID);

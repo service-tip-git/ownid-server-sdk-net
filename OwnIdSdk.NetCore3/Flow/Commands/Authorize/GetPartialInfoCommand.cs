@@ -32,7 +32,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
         }
 
         protected override Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType)
+            StepType currentStepType, bool isStateless)
         {
             var composeInfo = new BaseJwtComposeInfo
             {
@@ -43,10 +43,10 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                 IncludeRequester = true
             };
 
-            if (!IsStateless)
+            if (!isStateless)
             {
                 composeInfo.EncToken = relatedItem.EncToken;
-                composeInfo.CanBeRecovered = string.IsNullOrEmpty(relatedItem.RecoveryToken);
+                composeInfo.CanBeRecovered = !string.IsNullOrEmpty(relatedItem.RecoveryToken);
             }
 
             var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, _identitiesProvider.GenerateUserId());

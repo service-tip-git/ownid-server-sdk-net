@@ -46,7 +46,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType)
+            StepType currentStepType, bool isStateless)
         {
             BaseFlowCommand command = relatedItem.FlowType switch
             {
@@ -65,9 +65,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 _ => throw new InternalLogicException($"Not supported FlowType {relatedItem.FlowType}")
             };
 
-            command.IsStateless = _isStateless;
-            
-            var commandResult = await command.ExecuteAsync(input, relatedItem, currentStepType, false);
+            var commandResult = await command.ExecuteAsync(input, relatedItem, currentStepType, false, _isStateless);
 
             if (!(commandResult is JwtContainer jwtContainer))
                 throw new InternalLogicException("Incorrect command result type");

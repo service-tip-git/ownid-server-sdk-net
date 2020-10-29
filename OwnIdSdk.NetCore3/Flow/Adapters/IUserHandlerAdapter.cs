@@ -19,9 +19,9 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
 
         Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey);
 
-        Task<bool> IsUserExists(string publicKey);
+        Task<bool> IsUserExistsAsync(string publicKey);
 
-        Task<bool> IsFido2UserExists(string fido2CredentialId);
+        Task<bool> IsFido2UserExistsAsync(string fido2CredentialId);
 
         Task<AuthResult<object>> OnSuccessLoginAsync(string did, string publicKey);
 
@@ -29,7 +29,7 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
 
         Task<AuthResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId, uint fido2SignCounter);
 
-        Task<Fido2Info> FindFido2Info(string fido2CredentialId);
+        Task<Fido2Info> FindFido2InfoAsync(string fido2CredentialId);
 
         Task<ConnectionRecoveryResult<object>> GetConnectionRecoveryDataAsync(string recoveryToken,
             bool includingProfile = false);

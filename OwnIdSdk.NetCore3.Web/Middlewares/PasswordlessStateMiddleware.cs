@@ -16,15 +16,16 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     [RequestDescriptor(BaseRequestFields.Context)]
     public class PasswordlessStateMiddleware : BaseMiddleware
     {
-        private readonly SetPasswordlessStateCommand _stateCommand;
-        private readonly IsFido2UserExistsCommand _userExistsCommand;
         private readonly IOwnIdCoreConfiguration _configuration;
+        private readonly SetPasswordlessStateCommand _stateCommand;
+        private readonly CheckUserExistenceCommand _userExistenceCommand;
 
         public PasswordlessStateMiddleware(RequestDelegate next, ILogger<PasswordlessStateMiddleware> logger,
-            SetPasswordlessStateCommand stateCommand, IsFido2UserExistsCommand userExistsCommand, IOwnIdCoreConfiguration configuration) : base(next, logger)
+            SetPasswordlessStateCommand stateCommand, CheckUserExistenceCommand userExistenceCommand,
+            IOwnIdCoreConfiguration configuration) : base(next, logger)
         {
             _stateCommand = stateCommand;
-            _userExistsCommand = userExistsCommand;
+            _userExistenceCommand = userExistenceCommand;
             _configuration = configuration;
         }
 
@@ -50,12 +51,11 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 RecoveryToken = httpContext.Request.Cookies[_stateCommand.RecoveryCookieName],
                 RequiresRecovery = request.IsIncompatible
             };
-            
+
             var stateResult = await _stateCommand.ExecuteAsync(RequestIdentity.Context, stateRequest);
             SetCookies(httpContext.Response, stateResult.Cookies);
 
             if (!request.IsIncompatible)
-            {
                 result.Config = new InitFido2Response.ClientSideFido2Config
                 {
                     UserName = _configuration.Fido2.UserName,
@@ -63,17 +63,22 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                     RelyingPartyId = _configuration.Fido2.RelyingPartyId,
                     RelyingPartyName = _configuration.Fido2.RelyingPartyName
                 };
-            }
 
             if (!string.IsNullOrWhiteSpace(request.CredId))
             {
-                var commandInput = new CommandInput<string>(RequestIdentity, GetRequestCulture(httpContext), request.CredId,
-                    ClientDate);
+                var existenceRequest = new UserExistsRequest
+                {
+                    AuthenticatorType = ExtAuthenticatorType.Fido2,
+                    ErrorOnExisting = true,
+                    UserIdentifier = request.CredId
+                };
 
-                result.UserExists = await _userExistsCommand.ExecuteAsync(commandInput);
+                var commandInput = new CommandInput<UserExistsRequest>(RequestIdentity, GetRequestCulture(httpContext),
+                    existenceRequest, ClientDate);
+
+                result.UserExists = await _userExistenceCommand.Check(commandInput);
             }
-                
-            
+
             await Json(httpContext, result, StatusCodes.Status200OK);
         }
     }

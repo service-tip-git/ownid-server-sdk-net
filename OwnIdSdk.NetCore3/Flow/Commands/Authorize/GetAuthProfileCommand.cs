@@ -32,7 +32,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
         }
 
         protected override Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType)
+            StepType currentStepType, bool isStateless)
         {
             var expectedBehavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
             
@@ -44,7 +44,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                 Locale = input.CultureInfo?.Name,
                 IncludeRequester = true,
                 EncToken = relatedItem.EncToken,
-                CanBeRecovered = string.IsNullOrEmpty(relatedItem.RecoveryToken)
+                CanBeRecovered = !string.IsNullOrEmpty(relatedItem.RecoveryToken)
             };
             
             var jwt = _jwtComposer.GenerateProfileConfigJwt(composeInfo, _identitiesProvider.GenerateUserId());

@@ -63,7 +63,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
             services.TryAddSingleton<IFlowController, FlowController>();
             services.TryAddSingleton<IFlowRunner, FlowRunner>();
             
-            services.TryAddSingleton<IsFido2UserExistsCommand>();
+            services.TryAddSingleton<CheckUserExistenceCommand>();
 
             if (_configuration.AuthenticationMode.IsFido2Enabled())
             {

@@ -42,33 +42,6 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             return await OnSuccessLoginInternalAsync(did);
         }
 
-        private async Task<AuthResult<object>> OnSuccessLoginInternalAsync(string did)
-        {
-            if (_configuration.LoginType == GigyaLoginType.Session)
-            {
-                var loginResponse = await _restApiClient.NotifyLogin(did, "browser");
-
-                if (loginResponse.SessionInfo == null || loginResponse.ErrorCode != 0)
-                    return new AuthResult<object>($"Gigya: {loginResponse.GetFailureMessage()}");
-
-                return new AuthResult<object>(new
-                {
-                    sessionInfo = loginResponse.SessionInfo,
-                    identities = loginResponse.Identities.FirstOrDefault()
-                });
-            }
-
-            var jwtResponse = await _restApiClient.GetJwt(did);
-
-            if (jwtResponse.IdToken == null || jwtResponse.ErrorCode != 0)
-                return new AuthResult<object>($"Gigya: {jwtResponse.GetFailureMessage()}");
-
-            return new AuthResult<object>(new
-            {
-                idToken = jwtResponse.IdToken
-            });
-        }
-
         public async Task<AuthResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId,
             uint fido2SignCounter)
         {
@@ -83,11 +56,9 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             var setAccountResponse = await _restApiClient.SetAccountInfo(user.UID, (TProfile) null, user.Data);
             if (setAccountResponse.ErrorCode > 0)
-            {
                 throw new Exception(
                     $"did: {user.UID} " +
                     $"Gigya.setAccountInfo for EXISTING user error -> {setAccountResponse.GetFailureMessage()}");
-            }
 
             return await OnSuccessLoginInternalAsync(user.UID);
         }
@@ -157,7 +128,10 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             var result = await _restApiClient.SearchByRecoveryTokenAsync(recoveryToken);
 
             if (result?.Data?.Connections == null)
-                throw new Exception($"Can not find connection recovery token in Gigya {recoveryToken}");
+            {
+                _logger.LogError($"Can not find connection recovery token in Gigya {recoveryToken}");
+                return null;
+            }
 
             var connection = result.Data.Connections.First(x => x.RecoveryToken == recoveryToken);
 
@@ -218,12 +192,37 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             }
         }
 
+        private async Task<AuthResult<object>> OnSuccessLoginInternalAsync(string did)
+        {
+            if (_configuration.LoginType == GigyaLoginType.Session)
+            {
+                var loginResponse = await _restApiClient.NotifyLogin(did, "browser");
+
+                if (loginResponse.SessionInfo == null || loginResponse.ErrorCode != 0)
+                    return new AuthResult<object>($"Gigya: {loginResponse.GetFailureMessage()}");
+
+                return new AuthResult<object>(new
+                {
+                    sessionInfo = loginResponse.SessionInfo,
+                    identities = loginResponse.Identities.FirstOrDefault()
+                });
+            }
+
+            var jwtResponse = await _restApiClient.GetJwt(did);
+
+            if (jwtResponse.IdToken == null || jwtResponse.ErrorCode != 0)
+                return new AuthResult<object>($"Gigya: {jwtResponse.GetFailureMessage()}");
+
+            return new AuthResult<object>(new
+            {
+                idToken = jwtResponse.IdToken
+            });
+        }
+
         private static void SetErrorsToContext(IUserProfileFormContext<TProfile> context, BaseGigyaResponse response)
         {
             if (response.ValidationErrors != null && response.ValidationErrors.Any())
-            {
                 foreach (var validationError in response.ValidationErrors)
-                {
                     //
                     // TODO: find better way to map field name to profile property
                     //
@@ -236,12 +235,8 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                             context.SetGeneralError(validationError.Message);
                             break;
                     }
-                }
-            }
             else
-            {
                 context.SetGeneralError(response.UserFriendlyFailureMessage);
-            }
         }
     }
 }

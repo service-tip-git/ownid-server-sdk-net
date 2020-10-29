@@ -60,5 +60,12 @@ namespace OwnIdSdk.NetCore3.Extensibility.Providers
         /// <param name="context">Process unique identifier</param>
         /// <returns>Well-formatted url for internal connection restore</returns>
         Uri GetConnectionRecoveryUrl(string context);
+
+        /// <summary>
+        ///     Generates internal connection restore url
+        /// </summary>
+        /// <param name="context">Process unique identifier</param>
+        /// <returns>Well-formatted url to check user existence</returns>
+        Uri GetUserExistenceUrl(string context);
     }
 }
