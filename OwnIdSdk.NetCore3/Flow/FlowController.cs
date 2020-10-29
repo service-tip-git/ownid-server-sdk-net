@@ -281,7 +281,7 @@ namespace OwnIdSdk.NetCore3.Flow
                     StepType.Starting,
                     new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Fido2Authorize,
                         cacheItem.ChallengeType,
-                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
+                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, ChallengeType.Register,
                             "/fido2"))))
                 },
                 {
@@ -301,7 +301,7 @@ namespace OwnIdSdk.NetCore3.Flow
                     StepType.Starting,
                     new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Fido2Authorize,
                         cacheItem.ChallengeType,
-                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
+                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, ChallengeType.Register,
                             "/fido2"))))
                 },
                 {
@@ -351,7 +351,7 @@ namespace OwnIdSdk.NetCore3.Flow
                         if (cacheItem.Status == CacheItemStatus.Approved)
                             return new FrontendBehavior(StepType.Fido2Authorize, cacheItem.ChallengeType,
                                 new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context,
-                                    cacheItem.ChallengeType, "/fido2")));
+                                    ChallengeType.Register, "/fido2")));
 
                         return new FrontendBehavior
                         {
