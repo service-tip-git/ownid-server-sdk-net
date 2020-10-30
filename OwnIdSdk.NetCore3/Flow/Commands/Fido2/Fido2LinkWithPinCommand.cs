@@ -35,7 +35,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             {
                 PublicKey = publicKey,
                 Fido2CredentialId = credentialId,
-                Fido2SignatureCounter = signatureCounter
+                Fido2SignatureCounter = signatureCounter.ToString()
             });
 
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, relatedItem.DID, publicKey);

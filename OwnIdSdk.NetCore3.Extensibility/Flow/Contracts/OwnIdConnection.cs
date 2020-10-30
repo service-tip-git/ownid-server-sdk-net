@@ -10,7 +10,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts
         /// <summary>
         ///     Fido2 signature counter
         /// </summary>
-        public uint? Fido2SignatureCounter { get; set; }
+        public string Fido2SignatureCounter { get; set; }
 
         /// <summary>
         ///     Fido2 credential id

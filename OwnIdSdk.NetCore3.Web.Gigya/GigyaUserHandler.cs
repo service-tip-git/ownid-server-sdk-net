@@ -52,7 +52,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             var connectionToUpdate = user.Data.Connections.First(x => x.Fido2CredentialId == fido2CredentialId);
 
             // Update signature counter
-            connectionToUpdate.Fido2SignatureCounter = fido2SignCounter;
+            connectionToUpdate.Fido2SignatureCounter = fido2SignCounter.ToString();
 
             var setAccountResponse = await _restApiClient.SetAccountInfo(user.UID, (TProfile) null, user.Data);
             if (setAccountResponse.ErrorCode > 0)
@@ -109,15 +109,18 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
 
             var connection = user.Data.Connections.First(c => c.Fido2CredentialId == fido2CredentialId);
 
-            if (connection.Fido2SignatureCounter == null)
+            if (String.IsNullOrEmpty(connection.Fido2SignatureCounter)
+                || !uint.TryParse(connection.Fido2SignatureCounter, out var signatureCounter))
+            {
                 throw new Exception(
                     $"connection with fido2 credential id '{fido2CredentialId}' doesn't have signature count");
+            }
 
             return new Fido2Info
             {
                 UserId = user.UID,
                 PublicKey = connection.PublicKey,
-                SignatureCounter = connection.Fido2SignatureCounter.Value,
+                SignatureCounter = signatureCounter,
                 CredentialId = connection.Fido2CredentialId
             };
         }

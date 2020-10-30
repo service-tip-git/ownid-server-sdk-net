@@ -138,7 +138,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                             data = new
                             {
                                 pubKey = cacheItem.PublicKey,
-                                fido2SignatureCounter = cacheItem.Fido2SignatureCounter,
+                                fido2SignatureCounter = cacheItem.Fido2SignatureCounter.ToString(),
                                 fido2CredentialId = cacheItem.Fido2CredentialId
                             }
                         };
