@@ -23,7 +23,6 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
         private readonly IOwnIdCoreConfiguration _configuration;
         private readonly IJwtService _jwtService;
         private readonly IServiceProvider _serviceProvider;
-        private bool _isStateless;
 
         public StartFlowCommand(ICacheItemService cacheItemService, IJwtService jwtService,
             IServiceProvider serviceProvider, IOwnIdCoreConfiguration configuration)
@@ -39,15 +38,15 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             if (relatedItem.HasFinalState)
                 throw new CommandValidationException("Flow is already finished");
 
-            if (!(input is CommandInput<string> request))
+            if (!(input is CommandInput<string>))
                 throw new InternalLogicException($"Incorrect input type for {nameof(StartFlowCommand)}");
-
-            SwitchToFido2FlowIfNeededAsync(request.Data, relatedItem).Wait();
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
             StepType currentStepType, bool isStateless)
         {
+            var isFido2 = await SwitchToFido2FlowIfNeededAsync(((CommandInput<string>) input).Data, relatedItem);
+            
             BaseFlowCommand command = relatedItem.FlowType switch
             {
                 FlowType.Authorize => _serviceProvider.GetService<GetAuthProfileCommand>(),
@@ -65,7 +64,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 _ => throw new InternalLogicException($"Not supported FlowType {relatedItem.FlowType}")
             };
 
-            var commandResult = await command.ExecuteAsync(input, relatedItem, currentStepType, false, _isStateless);
+            var commandResult = await command.ExecuteAsync(input, relatedItem, currentStepType, false, isFido2);
 
             if (!(commandResult is JwtContainer jwtContainer))
                 throw new InternalLogicException("Incorrect command result type");
@@ -76,25 +75,25 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             return commandResult;
         }
 
-        private async Task SwitchToFido2FlowIfNeededAsync(string requestBody, CacheItem cacheItem)
+        private async Task<bool> SwitchToFido2FlowIfNeededAsync(string requestBody, CacheItem cacheItem)
         {
             if (!_configuration.AuthenticationMode.IsFido2Enabled())
-                return;
+                return false;
 
             if (cacheItem.FlowType != FlowType.PartialAuthorize
                 && cacheItem.FlowType != FlowType.Link
                 && cacheItem.FlowType != FlowType.Recover
                 && cacheItem.FlowType != FlowType.LinkWithPin
                 && cacheItem.FlowType != FlowType.RecoverWithPin)
-                return;
+                return false;
 
             if (string.IsNullOrEmpty(requestBody))
-                return;
+                return false;
 
             var routing = OwnIdSerializer.Deserialize<ExtAuthenticationRouting>(requestBody);
 
             if (routing.Authenticator != ExtAuthenticatorType.Fido2)
-                return;
+                return false;
 
             var initialFlowType = cacheItem.FlowType;
             switch (routing.Type)
@@ -123,11 +122,11 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                     throw new InternalLogicException($"Incorrect fido2 request: '{routing.Type}'");
             }
 
-            _isStateless = true;
-
             if (initialFlowType != cacheItem.FlowType)
                 await _cacheItemService.UpdateFlowAsync(cacheItem.Context, cacheItem.FlowType,
                     cacheItem.ChallengeType);
+
+            return true;
         }
     }
 }
