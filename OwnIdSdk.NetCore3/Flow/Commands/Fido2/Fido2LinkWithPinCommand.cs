@@ -1,59 +1,44 @@
 using System.Threading.Tasks;
+using Fido2NetLib;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
-using OwnIdSdk.NetCore3.Extensibility.Flow;
+using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
-using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
+using OwnIdSdk.NetCore3.Extensibility.Providers;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
-using OwnIdSdk.NetCore3.Flow.Steps;
 using OwnIdSdk.NetCore3.Services;
 
 namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 {
-    public class Fido2LinkWithPinCommand : BaseFlowCommand
+    public class Fido2LinkWithPinCommand : BaseFido2RegisterCommand
     {
         private readonly ICacheItemService _cacheItemService;
-        private readonly IFlowController _flowController;
-        private readonly IJwtComposer _jwtComposer;
         private readonly IAccountLinkHandler _linkHandler;
 
-
-        public Fido2LinkWithPinCommand(IAccountLinkHandler linkHandler, ICacheItemService cacheItemService,
-            IJwtComposer jwtComposer, IFlowController flowController)
+        public Fido2LinkWithPinCommand(IFido2 fido2, ICacheItemService cacheItemService, IJwtComposer jwtComposer,
+            IFlowController flowController, IOwnIdCoreConfiguration configuration, IAccountLinkHandler linkHandler,
+            IIdentitiesProvider identitiesProvider) : base(fido2, cacheItemService, jwtComposer, flowController,
+            configuration, identitiesProvider)
         {
             _linkHandler = linkHandler;
             _cacheItemService = cacheItemService;
-            _jwtComposer = jwtComposer;
-            _flowController = flowController;
         }
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
         }
 
-        protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType)
+        protected override async Task ProcessFido2RegisterResponseAsync(CacheItem relatedItem, string publicKey,
+            uint signatureCounter, string credentialId)
         {
             await _linkHandler.OnLinkAsync(relatedItem.DID, new OwnIdConnection
             {
-                PublicKey = relatedItem.PublicKey,
-                Fido2CredentialId = relatedItem.Fido2CredentialId,
-                Fido2SignatureCounter = relatedItem.Fido2SignatureCounter
+                PublicKey = publicKey,
+                Fido2CredentialId = credentialId,
+                Fido2SignatureCounter = signatureCounter.ToString()
             });
-            
-            var composeInfo = new BaseJwtComposeInfo
-            {
-                Context = relatedItem.Context,
-                ClientTime = input.ClientDate,
-                Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
-                Locale = input.CultureInfo?.Name,
-                IncludeRequester = true
-            };
 
-            await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, relatedItem.DID,
-                relatedItem.PublicKey);
-            var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, relatedItem.DID);
-            return new JwtContainer(jwt);
+            await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, relatedItem.DID, publicKey);
         }
     }
 }

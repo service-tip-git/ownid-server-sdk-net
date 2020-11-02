@@ -50,14 +50,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType)
+            StepType currentStepType, bool isStateless)
         {
             if (!(input is CommandInput<JwtContainer> requestJwt))
                 throw new InternalLogicException($"Incorrect input type for {nameof(SaveAccountPublicKeyCommand)}");
 
             var userData = _jwtService.GetDataFromJwt<UserProfileData>(requestJwt.Data.Jwt).Data;
 
-            var userExists = await _userHandlerAdapter.IsUserExists(userData.PublicKey);
+            var userExists = await _userHandlerAdapter.IsUserExistsAsync(userData.PublicKey);
             if (userExists)
             {
                 relatedItem = await _cacheItemService.FinishFlowWithErrorAsync(relatedItem.Context,

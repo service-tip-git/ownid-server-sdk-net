@@ -91,6 +91,8 @@ namespace OwnIdSdk.NetCore3.Configuration
         
         public string TopDomain { get; set; }
 
+        public AuthenticationModeType AuthenticationMode { get; set; }
+        
         public IFido2Configuration Fido2 { get; } = new Fido2Configuration();
 
         /// <summary>

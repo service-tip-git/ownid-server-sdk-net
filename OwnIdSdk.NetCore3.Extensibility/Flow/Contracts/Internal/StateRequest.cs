@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Internal
 {
     public class StateRequest
@@ -7,5 +9,8 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Internal
         public string EncryptionToken { get; set; }
         
         public bool RequiresRecovery { get; set; }
+        
+        [JsonIgnore]
+        public StateRequest State { get; set; }
     }
 }

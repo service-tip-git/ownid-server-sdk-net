@@ -47,12 +47,12 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
             return await _adaptee.CheckUserIdentitiesAsync(did, publicKey);
         }
 
-        public Task<bool> IsUserExists(string publicKey)
+        public Task<bool> IsUserExistsAsync(string publicKey)
         {
             return _adaptee.IsUserExists(publicKey);
         }
 
-        public Task<bool> IsFido2UserExists(string fido2CredentialId)
+        public Task<bool> IsFido2UserExistsAsync(string fido2CredentialId)
         {
             return _adaptee.IsFido2UserExists(fido2CredentialId);
         }
@@ -72,7 +72,7 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
             return _adaptee.OnSuccessLoginByFido2Async(fido2CredentialId, fido2SignCounter);
         }
 
-        public Task<Fido2Info> FindFido2Info(string fido2CredentialId)
+        public Task<Fido2Info> FindFido2InfoAsync(string fido2CredentialId)
         {
             return _adaptee.FindFido2Info(fido2CredentialId);
         }
@@ -81,6 +81,9 @@ namespace OwnIdSdk.NetCore3.Flow.Adapters
             bool includingProfile = false)
         {
             var result = await _adaptee.GetConnectionRecoveryDataAsync(recoveryToken, includingProfile);
+
+            if (result == null)
+                return null;
 
             return new ConnectionRecoveryResult<object>
             {

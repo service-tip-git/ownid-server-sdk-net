@@ -5,11 +5,6 @@ namespace OwnIdSdk.NetCore3.Extensibility.Configuration
     public interface IFido2Configuration
     {
         /// <summary>
-        ///     Indicate if we use FIDO2
-        /// </summary>
-        bool Enabled { get; set; }
-
-        /// <summary>
         ///     Fido2 origin
         /// </summary>
         Uri Origin { get; set; }

@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
 using Fido2NetLib;
-using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
+using OwnIdSdk.NetCore3.Extensibility.Providers;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Services;
 
@@ -16,8 +16,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 
         public Fido2LinkCommand(IFido2 fido2, ICacheItemService cacheItemService, IJwtComposer jwtComposer,
             IFlowController flowController, IOwnIdCoreConfiguration configuration, IAccountLinkHandler linkHandler,
-            IJwtService jwtService) : base(fido2, cacheItemService, jwtComposer, flowController, configuration,
-            jwtService)
+            IIdentitiesProvider identitiesProvider) : base(fido2, cacheItemService, jwtComposer, flowController,
+            configuration, identitiesProvider)
         {
             _linkHandler = linkHandler;
         }
@@ -29,7 +29,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             {
                 PublicKey = publicKey,
                 Fido2CredentialId = credentialId,
-                Fido2SignatureCounter = signatureCounter
+                Fido2SignatureCounter = signatureCounter.ToString()
             });
 
             await CacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, relatedItem.DID, publicKey);

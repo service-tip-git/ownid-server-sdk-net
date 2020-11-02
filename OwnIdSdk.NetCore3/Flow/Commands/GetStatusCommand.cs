@@ -94,7 +94,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 switch (cacheItem.ChallengeType)
                 {
                     case ChallengeType.Login
-                        when cacheItem.FlowType == FlowType.Fido2PartialLogin
+                        when cacheItem.FlowType == FlowType.Fido2Login
                              && string.IsNullOrWhiteSpace(cacheItem.Fido2CredentialId):
                     {
                         var errorMessage = _localizationService.GetLocalizedString("Error_UserNotFound");
@@ -111,7 +111,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                         break;
                     }
                     case ChallengeType.Login
-                        when await _userHandlerAdapter.IsUserExists(cacheItem.PublicKey):
+                        when await _userHandlerAdapter.IsUserExistsAsync(cacheItem.PublicKey):
                     {
                         result.Payload = await _userHandlerAdapter.OnSuccessLoginByPublicKeyAsync(cacheItem.PublicKey);
                         break;
@@ -120,7 +120,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                         result.Payload = SetPartialRegisterResult(cacheItem);
                         break;
                     case ChallengeType.Register
-                        when await _userHandlerAdapter.IsUserExists(cacheItem.PublicKey):
+                        when await _userHandlerAdapter.IsUserExistsAsync(cacheItem.PublicKey):
                     {
                         var errorMessage = _localizationService.GetLocalizedString("Error_PhoneAlreadyConnected");
                         result.Payload = new AuthResult<object>(errorMessage);
@@ -138,7 +138,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                             data = new
                             {
                                 pubKey = cacheItem.PublicKey,
-                                fido2SignatureCounter = cacheItem.Fido2SignatureCounter,
+                                fido2SignatureCounter = cacheItem.Fido2SignatureCounter.ToString(),
                                 fido2CredentialId = cacheItem.Fido2CredentialId
                             }
                         };

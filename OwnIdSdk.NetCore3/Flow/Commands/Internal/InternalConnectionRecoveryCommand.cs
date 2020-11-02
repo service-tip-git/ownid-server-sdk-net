@@ -25,16 +25,11 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
-            if (!(input is CommandInput<string>))
-                throw new InternalLogicException(
-                    $"Incorrect input type for {nameof(InternalConnectionRecoveryCommand)}");
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType)
+            StepType currentStepType, bool isStateless)
         {
-            var comInput = input as CommandInput<string>;
-            relatedItem.WebAppRecoveryToken = comInput.Data;
             var result = await _userHandlerAdapter.GetConnectionRecoveryDataAsync(relatedItem.RecoveryToken, true);
             
             var composeInfo = new BaseJwtComposeInfo
@@ -42,7 +37,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
                 Context = relatedItem.Context,
                 ClientTime = input.ClientDate,
                 Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
-                Locale = input.CultureInfo?.Name
+                Locale = input.CultureInfo?.Name,
+                EncToken = relatedItem.EncToken
             };
             
             var jwt = _jwtComposer.GenerateRecoveryDataJwt(composeInfo, result);

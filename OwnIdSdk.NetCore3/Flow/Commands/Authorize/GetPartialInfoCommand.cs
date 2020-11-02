@@ -25,14 +25,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
-            if (!relatedItem.IsValidForAuthorize)
+            if (relatedItem.HasFinalState)
                 throw new CommandValidationException(
                     "Cache item should be not Finished with Login or Register challenge type. " +
                     $"Actual Status={relatedItem.Status.ToString()} ChallengeType={relatedItem.ChallengeType}");
         }
 
         protected override Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType)
+            StepType currentStepType, bool isStateless)
         {
             var composeInfo = new BaseJwtComposeInfo
             {
@@ -40,10 +40,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                 ClientTime = input.ClientDate,
                 Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
                 Locale = input.CultureInfo?.Name,
-                IncludeRequester = true,
-                EncToken = relatedItem.EncToken,
-                CanBeRecovered = string.IsNullOrEmpty(relatedItem.RecoveryToken)
+                IncludeRequester = true
             };
+
+            if (!isStateless)
+            {
+                composeInfo.EncToken = relatedItem.EncToken;
+                composeInfo.CanBeRecovered = !string.IsNullOrEmpty(relatedItem.RecoveryToken);
+            }
 
             var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, _identitiesProvider.GenerateUserId());
             return Task.FromResult(new JwtContainer(jwt) as ICommandResult);

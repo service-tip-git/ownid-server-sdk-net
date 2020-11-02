@@ -9,8 +9,9 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
 {
     public abstract class BaseFlowCommand
     {
+        //TODO stateless as attribute
         public async Task<ICommandResult> ExecuteAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType, bool requiresTokensValidation = true)
+            StepType currentStepType, bool requiresTokensValidation = true, bool isStateless = false)
         {
             BasicValidation(input, relatedItem);
 
@@ -19,13 +20,13 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
 
             Validate(input, relatedItem);
 
-            return await ExecuteInternalAsync(input, relatedItem, currentStepType);
+            return await ExecuteInternalAsync(input, relatedItem, currentStepType, isStateless);
         }
 
         protected abstract void Validate(ICommandInput input, CacheItem relatedItem);
 
         protected abstract Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType);
+            StepType currentStepType, bool isStateless);
 
         protected void ValidateCacheItemTokens(CacheItem item, ICommandInput commandInput)
         {

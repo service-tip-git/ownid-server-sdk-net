@@ -129,17 +129,24 @@ namespace OwnIdSdk.NetCore3.Services
             if (cacheItem == null || cacheItem.Context != context)
                 throw new ArgumentException($"Can not find any item with context '{context}'");
 
-            if (cacheItem.FlowType != FlowType.Fido2PartialLogin
-                && cacheItem.FlowType != FlowType.Fido2PartialRegister
+            if (cacheItem.FlowType != FlowType.Fido2Login
+                && cacheItem.FlowType != FlowType.Fido2Register
                 && cacheItem.FlowType != FlowType.Fido2LinkWithPin
                 && cacheItem.FlowType != FlowType.Fido2RecoverWithPin
             )
+            {
                 throw new ArgumentException(
                     $"Can not set Fido2 information for the flow not related to Fido2. Current flow: {cacheItem.FlowType} Context: '{context}'");
+            }
 
-            if (cacheItem.Status != CacheItemStatus.Initiated && cacheItem.Status != CacheItemStatus.Started)
+            if (cacheItem.Status != CacheItemStatus.Initiated
+                && cacheItem.Status != CacheItemStatus.Started
+                && cacheItem.Status != CacheItemStatus.Approved
+            )
+            {
                 throw new ArgumentException(
                     $"Incorrect status={cacheItem.Status.ToString()} for setting public key for context '{context}'");
+            }
 
             cacheItem.PublicKey = publicKey;
             cacheItem.Fido2SignatureCounter = fido2Counter;

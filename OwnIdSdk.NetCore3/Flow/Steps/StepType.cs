@@ -12,12 +12,12 @@ namespace OwnIdSdk.NetCore3.Flow.Steps
         Success,
         Error,
         InternalConnectionRecovery,
+        CheckUserExistence,
 
         Authorize,
         InstantAuthorize,
+        Fido2Authorize,
         Link,
-        Recover,
-        
-        Fido2Success
+        Recover
     }
 }

@@ -21,6 +21,25 @@ echo Pushing image $REPOSITORY_URI:$IMAGE_TAG to registry
 docker tag ownid-server-netcore3-gigya:latest $REPOSITORY_URI:$IMAGE_TAG
 docker push $REPOSITORY_URI:$IMAGE_TAG
 
+echo Prod A Deployment
+
+echo K8S cluster selection
+aws eks --region us-east-2 update-kubeconfig --name ownid-eks
+
+echo Updating objects in Cluster 
+kubectl apply -f manifests/$ENV.yaml
+
+echo Updating images in Cluster deployments
+kubectl -n=$ENV set image deployment/nestle-hipster-deployment nestle-hipster=$REPOSITORY_URI:$IMAGE_TAG --record
+kubectl -n=$ENV set image deployment/bayer-deployment bayer=$REPOSITORY_URI:$IMAGE_TAG --record
+kubectl -n=$ENV set image deployment/universalid-deployment universalid=$REPOSITORY_URI:$IMAGE_TAG --record
+
+echo Prod B Deployment
+
+echo K8S cluster selection
+aws eks --region us-east-1 update-kubeconfig --name ownid-production-cluster
+kubectl config use-context arn:aws:eks:us-east-2:571861302935:cluster/ownid-eks
+
 echo Updating objects in Cluster 
 kubectl apply -f manifests/$ENV.yaml
 

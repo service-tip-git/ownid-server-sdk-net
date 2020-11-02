@@ -81,13 +81,10 @@ namespace OwnIdSdk.NetCore3.Flow
                 data.Add(reqKey, reqValue);
             }
 
-            if (!string.IsNullOrEmpty(info.EncToken))
-            {
-                data.Add("encToken", info.EncToken);
-            }
-            
+            if (!string.IsNullOrEmpty(info.EncToken)) data.Add("encToken", info.EncToken);
+
             data.Add("canBeRecovered", info.CanBeRecovered);
-            
+
             var fields = GetBaseFlowFieldsDictionary(info, data);
 
             return _jwtService.GenerateDataJwt(fields, info.ClientTime);
@@ -95,15 +92,30 @@ namespace OwnIdSdk.NetCore3.Flow
 
         public string GenerateRecoveryDataJwt(BaseJwtComposeInfo info, ConnectionRecoveryResult<object> data)
         {
-            var (didKey, didValue) = GetDid(data.DID);
             var dataDict = new Dictionary<string, object>
             {
-                {"profile", data.UserProfile},
-                {didKey, didValue},
-                {"pubKey", data.PublicKey},
-                {"recoveryData", data.RecoveryData}
+                {"encToken", info.EncToken}
             };
+            
+            if (data != null)
+            {
+                var (didKey, didValue) = GetDid(data.DID);
+                dataDict = new Dictionary<string, object>
+                {
+                    {"profile", data.UserProfile},
+                    {didKey, didValue},
+                    {"pubKey", data.PublicKey},
+                    {"recoveryData", data.RecoveryData}
+                };
+            }
+            
             var fields = GetBaseFlowFieldsDictionary(info, dataDict);
+            return _jwtService.GenerateDataJwt(fields, info.ClientTime);
+        }
+
+        public string GenerateDataStepJwt<T>(BaseJwtComposeInfo info, T data) where T : class
+        {
+            var fields = GetBaseFlowFieldsDictionary(info, data);
             return _jwtService.GenerateDataJwt(fields, info.ClientTime);
         }
 

@@ -37,8 +37,7 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands.Approval
                     It.Is<StepType>(y => y == currentStepType))).Returns(frontendBehavior);
 
             var commandInput = new CommandInput(requestIdentity, CultureInfo.CurrentCulture, DateTime.Now);
-            var command = new GetApprovalStatusCommand(jwtComposer.Object, flowController.Object, recoveryHandler,
-                serviceProvider);
+            var command = new GetApprovalStatusCommand(jwtComposer.Object, flowController.Object, recoveryHandler);
             await command.ExecuteAsync(commandInput, cacheItem, currentStepType);
 
             var composeInfo = new BaseJwtComposeInfo

@@ -3,13 +3,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Fido2NetLib;
 using Fido2NetLib.Objects;
-using OwnIdSdk.NetCore3.Cryptography;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
+using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Flow.Adapters;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Flow.Steps;
@@ -21,7 +21,6 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
     {
         private readonly ICacheItemService _cacheItemService;
         private readonly IOwnIdCoreConfiguration _configuration;
-        private readonly IJwtService _jwtService;
         private readonly IFido2 _fido2;
         private readonly IFlowController _flowController;
         private readonly IJwtComposer _jwtComposer;
@@ -29,7 +28,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 
         public Fido2LoginCommand(IFido2 fido2, IUserHandlerAdapter userHandlerAdapter,
             ICacheItemService cacheItemService, IJwtComposer jwtComposer, IFlowController flowController,
-            IOwnIdCoreConfiguration configuration, IJwtService jwtService)
+            IOwnIdCoreConfiguration configuration)
         {
             _fido2 = fido2;
             _userHandlerAdapter = userHandlerAdapter;
@@ -37,40 +36,36 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             _jwtComposer = jwtComposer;
             _flowController = flowController;
             _configuration = configuration;
-            _jwtService = jwtService;
         }
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
-            if (!(input is CommandInput<JwtContainer>))
-                throw new InternalLogicException($"Incorrect input type for {nameof(Fido2LoginCommand)}");
+            if (!(input is CommandInput<string>))
+                throw new InternalLogicException($"Incorrect input type for {GetType().Name}");
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType)
+            StepType currentStepType, bool isStateless)
         {
-            var requestJwt = input as CommandInput<JwtContainer>;
-            var request = _jwtService.GetDataFromJwt<Fido2LoginRequest>(requestJwt.Data.Jwt).Data;
+            var request = OwnIdSerializer.Deserialize<Fido2LoginRequest>((input as CommandInput<string>)!.Data);
 
-            request.Info = request.Info;
             var frontendBehavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
             var composeInfo = new BaseJwtComposeInfo
             {
                 Context = relatedItem.Context,
                 ClientTime = input.ClientDate,
                 Behavior = frontendBehavior,
-                Locale = input.CultureInfo?.Name,
-                IncludeRequester = true
+                Locale = input.CultureInfo?.Name
             };
 
-            var storedFido2Info = await _userHandlerAdapter.FindFido2Info(request.Info.CredentialId);
+            var storedFido2Info = await _userHandlerAdapter.FindFido2InfoAsync(request.CredentialId);
             if (storedFido2Info == null)
             {
                 // TODO: add fail finish method + handling
-                await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, request.Info.CredentialId,
+                await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, request.CredentialId,
                     string.Empty);
 
-                var jwt2 = _jwtComposer.GenerateBaseStepJwt(composeInfo, request.Info.CredentialId);
+                var jwt2 = _jwtComposer.GenerateBaseStepJwt(composeInfo, request.CredentialId);
                 return new JwtContainer(jwt2);
             }
 
@@ -83,13 +78,13 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             var fidoResponse = new AuthenticatorAssertionRawResponse
             {
                 Extensions = new AuthenticationExtensionsClientOutputs(),
-                Id = Base64Url.Decode(request.Info.CredentialId),
-                RawId = Base64Url.Decode(request.Info.CredentialId),
+                Id = Base64Url.Decode(request.CredentialId),
+                RawId = Base64Url.Decode(request.CredentialId),
                 Response = new AuthenticatorAssertionRawResponse.AssertionResponse
                 {
-                    AuthenticatorData = Base64Url.Decode(request.Info.AuthenticatorData),
-                    ClientDataJson = Base64Url.Decode(request.Info.ClientDataJSON),
-                    Signature = Base64Url.Decode(request.Info.Signature),
+                    AuthenticatorData = Base64Url.Decode(request.AuthenticatorData),
+                    ClientDataJson = Base64Url.Decode(request.ClientDataJson),
+                    Signature = Base64Url.Decode(request.Signature),
                     UserHandle = Base64Url.Decode(storedFido2Info.UserId)
                 },
                 Type = PublicKeyCredentialType.PublicKey
@@ -110,11 +105,11 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 });
 
             await _cacheItemService.SetFido2DataAsync(relatedItem.Context, storedFido2Info.PublicKey, result.Counter,
-                request.Info.CredentialId);
+                request.CredentialId);
 
             await _cacheItemService.FinishAuthFlowSessionAsync(relatedItem.Context, storedFido2Info.UserId,
                 storedFido2Info.PublicKey);
-            
+
             var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, storedFido2Info.UserId);
             return new JwtContainer(jwt);
         }
