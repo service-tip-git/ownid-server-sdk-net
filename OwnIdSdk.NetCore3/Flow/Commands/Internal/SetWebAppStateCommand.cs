@@ -67,7 +67,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
                     ? Guid.NewGuid().ToString("n")
                     : request.RecoveryToken;
                 
-                if (request.RecoveryToken == recoveryToken)
+                if (request.RecoveryToken != recoveryToken)
                     result.Cookies.Add(new CookieInfo
                     {
                         Name = RecoveryCookieName,
