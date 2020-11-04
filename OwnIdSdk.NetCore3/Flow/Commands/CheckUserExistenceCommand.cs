@@ -70,6 +70,11 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
 
         public async Task<bool> Check(CommandInput<UserExistsRequest> input)
         {
+            // Do nothing for recovery flow
+            var relatedItem = await _cacheItemService.GetCacheItemByContextAsync(input.Context);
+            if (relatedItem.ChallengeType == ChallengeType.Recover)
+                return false;
+
             bool result;
 
             if (string.IsNullOrWhiteSpace(input.Data.UserIdentifier))
