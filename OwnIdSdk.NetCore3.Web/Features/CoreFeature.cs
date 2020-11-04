@@ -38,6 +38,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
             services.TryAddSingleton<IJwtService, JwtService>();
             services.TryAddSingleton<IJwtComposer, JwtComposer>();
             services.TryAddSingleton<ICacheItemService, CacheItemService>();
+            services.TryAddSingleton<IEncodingService, EncodingService>();
             services.TryAddSingleton<IUrlProvider, UrlProvider>();
             services.TryAddSingleton<IIdentitiesProvider, GuidIdentitiesProvider>();
 

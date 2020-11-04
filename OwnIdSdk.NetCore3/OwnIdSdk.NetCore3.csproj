@@ -15,4 +15,10 @@
       <ProjectReference Include="..\OwnIdSdk.NetCore3.Extensibility\OwnIdSdk.NetCore3.Extensibility.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>OwnIdSdk.NetCore3.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
 </Project>

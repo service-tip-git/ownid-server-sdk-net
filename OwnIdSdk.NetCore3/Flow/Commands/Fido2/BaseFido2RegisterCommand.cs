@@ -16,17 +16,18 @@ using OwnIdSdk.NetCore3.Services;
 
 namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 {
-    public abstract class BaseFido2RegisterCommand : BaseFlowCommand
+    public class BaseFido2RegisterCommand : BaseFlowCommand
     {
         private readonly IOwnIdCoreConfiguration _configuration;
         private readonly IFido2 _fido2;
         private readonly IFlowController _flowController;
         private readonly IIdentitiesProvider _identitiesProvider;
+        private readonly IEncodingService _encodingService;
         private readonly IJwtComposer _jwtComposer;
 
-        protected BaseFido2RegisterCommand(IFido2 fido2, ICacheItemService cacheItemService, IJwtComposer jwtComposer,
+        internal BaseFido2RegisterCommand(IFido2 fido2, ICacheItemService cacheItemService, IJwtComposer jwtComposer,
             IFlowController flowController, IOwnIdCoreConfiguration configuration,
-            IIdentitiesProvider identitiesProvider)
+            IIdentitiesProvider identitiesProvider, IEncodingService encodingService)
         {
             _fido2 = fido2;
             CacheItemService = cacheItemService;
@@ -34,6 +35,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             _flowController = flowController;
             _configuration = configuration;
             _identitiesProvider = identitiesProvider;
+            _encodingService = encodingService;
         }
 
         protected string NewUserId => _identitiesProvider.GenerateUserId();
@@ -51,24 +53,28 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         {
             var request = OwnIdSerializer.Deserialize<Fido2RegisterRequest>((input as CommandInput<string>)!.Data);
 
-            if (request == null)
-                throw new InternalLogicException("Incorrect Fido2 register request");
+            if (string.IsNullOrWhiteSpace(request.AttestationObject))
+                throw new InternalLogicException("Incorrect Fido2 register request: AttestationObject is missing");
+
+            if (string.IsNullOrWhiteSpace(request.ClientDataJson))
+                throw new InternalLogicException("Incorrect Fido2 register request: ClientDataJson is missing");
+
 
             var fido2Response = new AuthenticatorAttestationRawResponse
             {
-                Id = Base64Url.Decode(NewUserId),
-                RawId = Base64Url.Decode(NewUserId),
+                Id = _encodingService.Base64UrlDecode(NewUserId),
+                RawId = _encodingService.Base64UrlDecode(NewUserId),
                 Type = PublicKeyCredentialType.PublicKey,
                 Response = new AuthenticatorAttestationRawResponse.ResponseData
                 {
-                    AttestationObject = Base64Url.Decode(request.AttestationObject),
-                    ClientDataJson = Base64Url.Decode(request.ClientDataJson)
+                    AttestationObject = _encodingService.Base64UrlDecode(request.AttestationObject),
+                    ClientDataJson = _encodingService.Base64UrlDecode(request.ClientDataJson)
                 }
             };
 
             var options = new CredentialCreateOptions
             {
-                Challenge = Encoding.ASCII.GetBytes(relatedItem.Context),
+                Challenge = _encodingService.ASCIIDecode(relatedItem.Context),
                 Rp = new PublicKeyCredentialRpEntity(
                     _configuration.Fido2.RelyingPartyId,
                     _configuration.Fido2.RelyingPartyName,
@@ -77,17 +83,19 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
                 {
                     DisplayName = _configuration.Fido2.UserDisplayName,
                     Name = _configuration.Fido2.UserName,
-                    Id = Base64Url.Decode(NewUserId)
+                    Id = _encodingService.Base64UrlDecode(NewUserId)
                 }
             };
 
-            var result =
-                await _fido2.MakeNewCredentialAsync(fido2Response, options, args => Task.FromResult(true));
+            var result = await _fido2.MakeNewCredentialAsync(fido2Response, options, args => Task.FromResult(true));
 
-            var publicKey = Base64Url.Encode(result.Result.PublicKey);
+            if (result == null)
+                throw new InternalLogicException("Cannot verify fido2 register request");
+
+            var publicKey = _encodingService.Base64UrlEncode(result.Result.PublicKey);
 
             await ProcessFido2RegisterResponseAsync(relatedItem, publicKey, result.Result.Counter,
-                Base64Url.Encode(result.Result.CredentialId));
+                _encodingService.Base64UrlEncode(result.Result.CredentialId));
 
             return await GetResultAsync(input, relatedItem, currentStepType);
         }

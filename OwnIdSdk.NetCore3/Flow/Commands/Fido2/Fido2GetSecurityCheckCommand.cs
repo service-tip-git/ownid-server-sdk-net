@@ -16,8 +16,9 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
 
         public Fido2GetSecurityCheckCommand(IFido2 fido2, ICacheItemService cacheItemService, IJwtComposer jwtComposer,
             IFlowController flowController, IOwnIdCoreConfiguration configuration,
-            GetSecurityCheckCommand getSecurityCheckCommand, IIdentitiesProvider identitiesProvider) : base(fido2,
-            cacheItemService, jwtComposer, flowController, configuration, identitiesProvider)
+            IIdentitiesProvider identitiesProvider, IEncodingService encodingService,
+            GetSecurityCheckCommand getSecurityCheckCommand) : base(fido2, cacheItemService,
+            jwtComposer, flowController, configuration, identitiesProvider, encodingService)
         {
             _getSecurityCheckCommand = getSecurityCheckCommand;
         }

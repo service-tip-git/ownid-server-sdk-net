@@ -15,15 +15,16 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         private readonly ICacheItemService _cacheItemService;
         private readonly IAccountRecoveryHandler _recoveryHandler;
 
-        public Fido2RecoverWithPinCommand(IAccountRecoveryHandler recoveryHandler, IFido2 fido2,
-            ICacheItemService cacheItemService, IJwtComposer jwtComposer, IFlowController flowController,
-            IOwnIdCoreConfiguration configuration, IIdentitiesProvider identitiesProvider) : base(fido2,
-            cacheItemService, jwtComposer, flowController, configuration, identitiesProvider)
+        public Fido2RecoverWithPinCommand(IFido2 fido2, ICacheItemService cacheItemService, IJwtComposer jwtComposer,
+            IFlowController flowController, IOwnIdCoreConfiguration configuration,
+            IIdentitiesProvider identitiesProvider, IEncodingService encodingService,
+            IAccountRecoveryHandler recoveryHandler) : base(fido2, cacheItemService, jwtComposer, flowController,
+            configuration, identitiesProvider, encodingService)
         {
-            _recoveryHandler = recoveryHandler;
             _cacheItemService = cacheItemService;
+            _recoveryHandler = recoveryHandler;
         }
-
+        
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
         }

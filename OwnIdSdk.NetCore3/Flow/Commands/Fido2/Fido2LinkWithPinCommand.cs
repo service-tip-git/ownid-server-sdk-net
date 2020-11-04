@@ -15,13 +15,15 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         private readonly ICacheItemService _cacheItemService;
         private readonly IAccountLinkHandler _linkHandler;
 
+
         public Fido2LinkWithPinCommand(IFido2 fido2, ICacheItemService cacheItemService, IJwtComposer jwtComposer,
-            IFlowController flowController, IOwnIdCoreConfiguration configuration, IAccountLinkHandler linkHandler,
-            IIdentitiesProvider identitiesProvider) : base(fido2, cacheItemService, jwtComposer, flowController,
-            configuration, identitiesProvider)
+            IFlowController flowController, IOwnIdCoreConfiguration configuration,
+            IIdentitiesProvider identitiesProvider, IEncodingService encodingService, IAccountLinkHandler linkHandler) :
+            base(fido2, cacheItemService, jwtComposer, flowController, configuration, identitiesProvider,
+                encodingService)
         {
-            _linkHandler = linkHandler;
             _cacheItemService = cacheItemService;
+            _linkHandler = linkHandler;
         }
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
