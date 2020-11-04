@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
+using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Internal;
@@ -64,12 +65,16 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                     RelyingPartyName = _configuration.Fido2.RelyingPartyName
                 };
 
+
             if (!string.IsNullOrWhiteSpace(request.CredId))
             {
+                // Check if user exists
+                // If yes during registration - cancel registration -> 
+                // if no during login - switch to "link at login" flow (at WebApp)
                 var existenceRequest = new UserExistsRequest
                 {
                     AuthenticatorType = ExtAuthenticatorType.Fido2,
-                    ErrorOnExisting = true,
+                    ErrorOnExisting = request.FlowType == "r",
                     UserIdentifier = request.CredId
                 };
 

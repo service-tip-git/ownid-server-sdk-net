@@ -8,5 +8,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2
         public bool IsIncompatible { get; set; }
         
         public string CredId { get; set; }
+        
+        public string FlowType { get; set; }
     }
 }
