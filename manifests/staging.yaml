@@ -380,8 +380,8 @@ spec:
                 secretKeyRef:
                   name: gigyapoc-secrets
                   key: gigyapoc_private_key
-            - name: OWNID__FIDO2_ENABLED
-              value: 'true'
+            - name: OWNID__AUTHENTICATION_MODE
+              value: All
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.gigyainsurance.gigyapoc.com
             - name: OWNID__FIDO2_RELYING_PARTY_ID
@@ -414,7 +414,7 @@ spec:
                   name: gigyapoc-secrets
                   key: gigyapoc_gigya_user_key
             - name: GIGYA__LOGIN_TYPE 
-              value: IdToken
+              value: session
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
             - name: ELASTICCONFIGURATION__URI
