@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Exceptions;
@@ -25,9 +26,9 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
-            // var throwEx = true;
-            // if (throwEx)
-            //     throw new InternalLogicException("test exception");
+            var r = new Random();
+            if (r.Next(1,3) != 1)
+                 throw new InternalLogicException("test exception");
             
             if (relatedItem.HasFinalState)
                 throw new CommandValidationException(
