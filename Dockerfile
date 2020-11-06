@@ -42,5 +42,5 @@ ENV ASPNETCORE_ENVIRONMENT="dev"
 #RUN rm -f /var/cache/apk/*
 ENTRYPOINT ["dotnet", "OwnIdSdk.NetCore3.Server.Gigya.dll"]
 
-# docker build -t ownid-server-netcore3-gigya:latest .
-# docker run -it -p 5002:5002 ownid-server-netcore3-gigya:latest
+# docker build -t ownid-server-gigya:latest .
+# docker run -it -p 5002:5002 ownid-server-gigya:latest

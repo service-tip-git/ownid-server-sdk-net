@@ -16,9 +16,11 @@ spec:
       labels:
         app: nestle-hipster
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: nestle-hipster
-          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging:latest
+          image: ownid.common.repositories.cloud.sap/server:latest
           ports:
             - containerPort: 5002
           env:
@@ -149,9 +151,11 @@ spec:
       labels:
         app: bayer
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: bayer
-          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging:latest
+          image: ownid.common.repositories.cloud.sap/server:latest
           ports:
             - containerPort: 5002
           env:
@@ -282,9 +286,11 @@ spec:
       labels:
         app: universalid
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: universalid
-          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging:latest
+          image: ownid.common.repositories.cloud.sap/server:latest
           ports:
             - containerPort: 5002
           env:

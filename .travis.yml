@@ -22,28 +22,24 @@ branches:
 env:
   global:
     - secure: AMLcgd4W7YkWntUq9dYJgVyIlLeUh5s8p8KK+oiJGDSoU45nTC48t6tMhtayPyllEkYBNL4MxlFMRw4BVJgTL9vExuWgRJBdPBKDJUrKpSuZv5s5FQ5vN2ofN0P6j9dGEJVHSesyfnQQij1I6zzYLGgujA2x5E6xmx0t3W9zrfVJx8vPq8nkBqt8xUbTOFjLVEQJMVUeA/sQtjL7PoZhA7SlXma+G0eobWZrLntWcggO1VQuJuexJZqsoL3/WTYCbMqeOJXX4UD7lRaDCn+dVQFGF9nUmsEQi46a7GSnaGhZt2RpBKCyNRchVVSVvtRs/q+oXGqFGE2nUDs1Oj/jpJ52ywMdlLSTjHPNZ8cDPtvQoYenhMpHw6MT+GQ9nHBir/oAYQWkU+4ddnYTzh7u7wdk4HIcs7iOye6+xhAorjVjrJ+nVlCVbIhQniag4ejn6WlXnxpZUTNZsIg3PBdQWv87zLDZANXPtVFMSkD2DtqzxuAvoxpkbGBDhc2UN39CWbu0gfYixyCHEdjA6jX1g8ndeMZmUFiz3GtJwz8Fb1VSBiqJ2TUvwacdSnefajnj3UGROJP/L0zP0fegZY5vUVQwX4Zxz72GweLdNq1ZZJuV1KCqr9OldetkyndCMOgfJuiv+OFQeGvB3OZJo7+kJJDFVfxXN1Rv/FJJ4wdBUzQ=
-    - IMAGE_TAG=$TRAVIS_COMMIT
 
 jobs:
   include:
     - if: branch=master
       env:
         ENV=staging
-        REPOSITORY_URI=571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging
     - if: branch=develop
       env:
         ENV=dev
-        REPOSITORY_URI=571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-develop
     - if: branch=alpha-rti
       env:
         ENV=staging
-        REPOSITORY_URI=571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging
 
 script:
   - sh scripts/set-build-num.sh $TRAVIS_BUILD_NUMBER
   - dotnet restore
   # - dotnet test /p:CollectCoverage=true /p:Threshold=20
-  - docker build -t ownid-server-netcore3-gigya:latest . --network=host
+  - docker build -t ownid-server-gigya:latest . --network=host
 
 before_deploy:
   - pyenv install 3.6.3
@@ -52,21 +48,21 @@ before_deploy:
   - pip install awscli
   - aws --version
   - sudo apt-get install libxml2-utils
-  - "$(aws ecr get-login --region us-east-2 --no-include-email)"
   - curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/kubectl
   - chmod +x ./kubectl
   - sudo mv kubectl /usr/local/bin
   - kubectl version --short --client
+  - docker login -u $ARTIFACTORY_USERNAME -p $ARTIFACTORY_PASSWORD $ARTIFACTORY_URL
 
 deploy:
 - provider: script
-  script: sh scripts/publish.sh $REPOSITORY_URI $IMAGE_TAG $ENV
+  script: sh scripts/deploy.sh $ENV
   skip_cleanup: true
   on:
       all_branches: true
       condition: $TRAVIS_BRANCH =~ ^(develop|master)$
 - provider: script
-  script: sh scripts/publish-prod.sh $REPOSITORY_URI $IMAGE_TAG alpha
+  script: sh scripts/deploy-prod.sh alpha
   skip_cleanup: true
   on:
     branch: alpha-rti

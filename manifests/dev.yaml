@@ -16,9 +16,11 @@ spec:
       labels:
         app: ownid-server-netcore3-gigya
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: ownid-server-netcore3-gigya
-          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-develop:latest
+          image: ownid.common.repositories.cloud.sap/server:latest
           ports:
             - containerPort: 5002
           env:
@@ -117,9 +119,11 @@ spec:
       labels:
         app: ownid-server-netcore3-demo-gigya
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: ownid-server-netcore3-demo-gigya
-          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-develop:latest
+          image: ownid.common.repositories.cloud.sap/server:latest
           ports:
             - containerPort: 5002
           env:
@@ -232,9 +236,11 @@ spec:
       labels:
         app: ownid-server-netcore3-demo-2-gigya
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: ownid-server-netcore3-demo-2-gigya
-          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-develop:latest
+          image: ownid.common.repositories.cloud.sap/server:latest
           ports:
             - containerPort: 5002
           env:
@@ -347,9 +353,11 @@ spec:
       labels:
         app: ownid-server-netcore3-demo-3-gigya
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: ownid-server-netcore3-demo-3-gigya
-          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-develop:latest
+          image: ownid.common.repositories.cloud.sap/server:latest
           ports:
             - containerPort: 5002
           env:
@@ -462,9 +470,11 @@ spec:
       labels:
         app: ownid-server-netcore3-demo-4-gigya
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: ownid-server-netcore3-demo-4-gigya
-          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-develop:latest
+          image: ownid.common.repositories.cloud.sap/server:latest
           ports:
             - containerPort: 5002
           env:
