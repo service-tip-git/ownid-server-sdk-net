@@ -89,7 +89,7 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands.FIdo2
 
             await Assert.ThrowsAsync<InternalLogicException>(async () =>
             {
-                await _sut.ExecuteAsync(input, _relatedItem, _currentStepType, false, _isStateless);
+                await _sut.ExecuteAsync(input, _relatedItem, _currentStepType, false);
             });
         }
 
@@ -111,7 +111,7 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands.FIdo2
             var input = GetInput(inputJson);
 
             await Assert.ThrowsAsync(expectedException,
-                async () => { await _sut.ExecuteAsync(input, _relatedItem, _currentStepType, false, _isStateless); });
+                async () => { await _sut.ExecuteAsync(input, _relatedItem, _currentStepType, false); });
         }
 
         [Fact]
@@ -122,7 +122,7 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands.FIdo2
 
             await Assert.ThrowsAsync<InternalLogicException>(async () =>
             {
-                await _sut.ExecuteAsync(input, _relatedItem, _currentStepType, false, _isStateless);
+                await _sut.ExecuteAsync(input, _relatedItem, _currentStepType, false);
             });
         }
 

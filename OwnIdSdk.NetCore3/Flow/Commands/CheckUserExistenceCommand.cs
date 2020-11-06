@@ -41,7 +41,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType, bool isStateless)
+            StepType currentStepType)
         {
             var request = input as CommandInput<UserExistsRequest>;
             var result = await Check(request);

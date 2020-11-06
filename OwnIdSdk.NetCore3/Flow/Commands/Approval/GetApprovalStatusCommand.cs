@@ -30,14 +30,13 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Approval
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType, bool isStateless)
+            StepType currentStepType)
         {
             string jwt = null;
 
             if (relatedItem.Status == CacheItemStatus.Approved)
             {
                 BaseFlowCommand command;
-                var isFido2 = false;
 
                 switch (relatedItem.FlowType)
                 {
@@ -50,14 +49,13 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Approval
                     case FlowType.Fido2LinkWithPin:
                     case FlowType.Fido2RecoverWithPin:
                         command = new GetNextStepCommand(_jwtComposer, _flowController, false);
-                        isFido2 = true;
                         break;
                     default:
                         throw new InternalLogicException(
                             $"Not supported FlowType for get approval status '{relatedItem.FlowType.ToString()}'");
                 }
 
-                var commandResult = await command.ExecuteAsync(input, relatedItem, currentStepType, isStateless: isFido2);
+                var commandResult = await command.ExecuteAsync(input, relatedItem, currentStepType);
 
                 if (!(commandResult is JwtContainer jwtContainer))
                     throw new InternalLogicException("Incorrect command result type");

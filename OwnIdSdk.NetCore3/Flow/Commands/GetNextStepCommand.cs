@@ -31,7 +31,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
         }
 
         protected override Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType, bool isStateless)
+            StepType currentStepType)
         {
             var step = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
 
@@ -44,7 +44,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 IncludeRequester = _needRequesterInfo,
             };
 
-            if (!isStateless)
+            if (!relatedItem.IsStateless)
             {
                 composeInfo.EncToken = relatedItem.EncToken;
                 composeInfo.CanBeRecovered = !string.IsNullOrEmpty(relatedItem.RecoveryToken);
