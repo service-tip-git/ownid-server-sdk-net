@@ -2,7 +2,7 @@ namespace OwnIdSdk.NetCore3
 {
     public static class Constants
     {
-        public const string OwinIdApplicationAddress = "https://ownid.com/sign";
+        public const string OwinIdApplicationAddress = "https://app.ownid.com";
 
         #region Error messages constants
 

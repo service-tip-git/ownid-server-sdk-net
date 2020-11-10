@@ -38,7 +38,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             var gigyaSection = Configuration.GetSection("gigya");
             var isDevelopment = Configuration.GetValue("OwnIdDevelopmentMode", false);
             var topDomain = ownIdSection["top_domain"];
-            var webAppUrl = new Uri(ownIdSection["web_app_url"] ?? "https://sign.ownid.com");
+            var webAppUrl = new Uri(ownIdSection["web_app_url"] ?? Constants.OwinIdApplicationAddress);
 
             services.AddCors(x =>
             {
