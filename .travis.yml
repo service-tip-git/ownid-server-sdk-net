@@ -17,7 +17,7 @@ branches:
   only:
   - master
   - develop
-  - /^releases\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$/
+  - /^release\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$/
 
 env:
   global:
@@ -31,7 +31,7 @@ jobs:
     - if: branch=develop
       env:
         ENV=dev
-    - if: branch =~ ^releases\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$
+    - if: branch =~ ^release\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$
       env:
         ENV=prod
 
@@ -66,7 +66,7 @@ deploy:
   skip_cleanup: true
   on:
     all_branches: true
-    condition: $TRAVIS_BRANCH =~ ^releases\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$
+    condition: $TRAVIS_BRANCH =~ ^release\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*
 
 after_deploy:
   - bash scripts/test_runner.sh server-sdk $ENV
