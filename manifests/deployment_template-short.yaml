@@ -44,16 +44,8 @@ spec:
               value: All
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL # Passwordless page subdomain (CNAME). Example: https://passwordless.my-company.com
               value: https://passwordless.<website domain>
-            - name: OWNID__FIDO2_RELYING_PARTY_ID # Website domain name. Example: my-company.com 
-              value: <domain-name>
             - name: OWNID__FIDO2_RELYING_PARTY_NAME # Party(company) name that will be shown to user. Example: My Company, Nestle, BBC
               value: <party_name>
-            - name: OWNID__FIDO2_USER_NAME # Mobile FIDO2 identity name. Default is 'Skip the password'
-              value: 'Skip the password'
-            - name: OWNID__FIDO2_USER_DISPLAY_NAME # Display name for user on FIDO2 page. Value is copied from OWNID__FIDO2_USER_NAME by default
-              value: 'Skip the password'
-            - name: OWNID__FIDO2_ORIGIN # passwordless page host. Value is copied from OWNID__FIDO2_PASSWORDLESS_PAGE_URL by default
-              value: https://passwordless.<website domain>
             - name: OWNID__TOP_DOMAIN # Company domain that Passwordless page is tightened to. Example: my-company.com
               value: <company-domain>
             - name: GIGYA__DATA_CENTER # Gigya data center
@@ -66,13 +58,5 @@ spec:
               value: <gigya user key>
             - name: GIGYA__LOGIN_TYPE # Login type: session or IdToken (JWT will be returned instead of creating a session)
               value: IdToken
-            - name: ELASTICCONFIGURATION__ENABLED # Enable Elastic Search logging
-              value: 'true'
-            - name: ELASTICCONFIGURATION__URI # Elastic Search server url
-              value: <elastic search server url>
-            - name: ELASTICCONFIGURATION__USERNAME # Elastic Search user name
-              value: <elastic search username>
-            - name: ELASTICCONFIGURATION__PASSWORD # Elastic Search password
-              value: <elastic search password>
             - name: ASPNETCORE_ENVIRONMENT # environment
               value: alpha

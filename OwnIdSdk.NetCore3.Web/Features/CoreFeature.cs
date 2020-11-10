@@ -63,7 +63,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
 
             services.TryAddSingleton<IFlowController, FlowController>();
             services.TryAddSingleton<IFlowRunner, FlowRunner>();
-            
+
             services.TryAddSingleton<CheckUserExistenceCommand>();
 
             if (_configuration.AuthenticationMode.IsFido2Enabled())
@@ -78,7 +78,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
                 services.TryAddSingleton<Fido2RecoverCommand>();
                 services.TryAddSingleton<Fido2RecoverWithPinCommand>();
                 services.TryAddSingleton<Fido2RecoverWithPinCommand>();
-                
+
                 services.AddFido2(fido2Config =>
                 {
                     var str = _configuration.Fido2.Origin.ToString().TrimEnd(new[] {'/'}).Trim();
@@ -103,6 +103,10 @@ namespace OwnIdSdk.NetCore3.Web.Features
             if (_configuration.MaximumNumberOfConnectedDevices == default)
                 _configuration.MaximumNumberOfConnectedDevices = 1;
 
+            if (_configuration.AuthenticationMode.IsFido2Enabled()
+                && string.IsNullOrEmpty(_configuration.Fido2.UserName))
+                _configuration.Fido2.UserName = "Skip the password";
+            
             return this;
         }
 

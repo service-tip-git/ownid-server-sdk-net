@@ -162,8 +162,6 @@ spec:
               value: https://passwordless.demo.dev.ownid.com
             - name: OWNID__FIDO2_RELYING_PARTY_NAME
               value: OwnID
-            - name: OWNID__FIDO2_USER_NAME
-              value: 'Skip the password'
             - name: OWNID__TOP_DOMAIN
               value: demo.dev.ownid.com
             - name: GIGYA__DATA_CENTER
@@ -273,8 +271,6 @@ spec:
               value: https://passwordless.demo.dev.skipthepassword.com
             - name: OWNID__FIDO2_RELYING_PARTY_NAME
               value: OwnID
-            - name: OWNID__FIDO2_USER_NAME
-              value: 'Skip the password'
             - name: OWNID__TOP_DOMAIN
               value: demo.dev.skipthepassword.com
             - name: GIGYA__DATA_CENTER
@@ -384,8 +380,6 @@ spec:
               value: https://passwordless.demo3.dev.ownid.com
             - name: OWNID__FIDO2_RELYING_PARTY_NAME
               value: OwnID
-            - name: OWNID__FIDO2_USER_NAME
-              value: 'Skip the password'
             - name: OWNID__TOP_DOMAIN
               value: demo3.dev.ownid.com
             - name: GIGYA__DATA_CENTER
@@ -495,8 +489,6 @@ spec:
               value: https://passwordless.demo4.dev.ownid.com
             - name: OWNID__FIDO2_RELYING_PARTY_NAME
               value: OwnID
-            - name: OWNID__FIDO2_USER_NAME
-              value: 'Skip the password'
             - name: OWNID__TOP_DOMAIN
               value: demo4.dev.ownid.com
             - name: GIGYA__DATA_CENTER
