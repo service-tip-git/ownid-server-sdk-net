@@ -20,17 +20,9 @@ aws eks --region us-east-2 update-kubeconfig --name ownid-eks
 kubectl config get-contexts
 
 echo Prod A Deployment
-echo K8S cluster selection
 kubectl config use-context arn:aws:eks:us-east-1:571861302935:cluster/ownid-production-cluster
-
-pwd
-
 sh scripts/prod/k8s-update.sh $IMAGE_URI
 
 echo Prod B Deployment
-echo K8S cluster selection
 kubectl config use-context arn:aws:eks:us-east-2:571861302935:cluster/ownid-eks
-
-pwd
-
 sh scripts/prod/k8s-update.sh $IMAGE_URI
