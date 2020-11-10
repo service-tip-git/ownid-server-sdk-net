@@ -107,20 +107,29 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         x.OwnIdApplicationUrl = webAppUrl;
                         x.OverwriteFields = ownIdSection.GetValue<bool>("overwrite_fields");
 
-                        x.AuthenticationMode = ownIdSection.GetValue("authentication_mode", AuthenticationModeType.OwnIdOnly);
+                        x.AuthenticationMode =
+                            ownIdSection.GetValue("authentication_mode", AuthenticationModeType.OwnIdOnly);
 
                         if (x.AuthenticationMode.IsFido2Enabled())
                         {
                             if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_passwordless_page_url"]))
                                 x.Fido2.PasswordlessPageUrl = new Uri(ownIdSection["fido2_passwordless_page_url"]);
 
-                            x.Fido2.RelyingPartyId = ownIdSection["fido2_relying_party_id"];
+                            x.Fido2.RelyingPartyId = !string.IsNullOrWhiteSpace(ownIdSection["fido2_relying_party_id"])
+                                ? ownIdSection["fido2_relying_party_id"]
+                                : x.Fido2.PasswordlessPageUrl?.Host;
+
                             x.Fido2.RelyingPartyName = ownIdSection["fido2_relying_party_name"];
-                            x.Fido2.UserDisplayName = ownIdSection["fido2_user_display_name"];
                             x.Fido2.UserName = ownIdSection["fido2_user_name"];
 
-                            if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
-                                x.Fido2.Origin = new Uri(ownIdSection["fido2_origin"]);
+                            x.Fido2.UserDisplayName =
+                                !string.IsNullOrWhiteSpace(ownIdSection["fido2_user_display_name"])
+                                    ? ownIdSection["fido2_user_display_name"]
+                                    : x.Fido2.UserName;
+
+                            x.Fido2.Origin = !string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"])
+                                ? new Uri(ownIdSection["fido2_origin"])
+                                : x.Fido2.PasswordlessPageUrl;
                         }
 
                         //for development cases
