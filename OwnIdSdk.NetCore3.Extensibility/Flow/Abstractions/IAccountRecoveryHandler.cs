@@ -26,5 +26,12 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         ///     A task that represents the asynchronous recover operation.
         /// </returns>
         Task OnRecoverAsync(string did, OwnIdConnection connection);
+
+        /// <summary>
+        ///     Remove existing connections from existing users
+        /// </summary>
+        /// <param name="publicKey">public key to be cleared</param>
+        /// <returns>A task that represents the asynchronous remove operation.</returns>
+        Task RemoveConnectionsAsync(string publicKey);
     }
 }

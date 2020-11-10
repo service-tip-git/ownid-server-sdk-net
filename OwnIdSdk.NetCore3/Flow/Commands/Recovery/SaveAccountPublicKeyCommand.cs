@@ -57,26 +57,19 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
 
             var userData = _jwtService.GetDataFromJwt<UserProfileData>(requestJwt.Data.Jwt).Data;
 
-            var userExists = await _userHandlerAdapter.IsUserExistsAsync(userData.PublicKey);
-            if (userExists)
-            {
-                relatedItem = await _cacheItemService.FinishFlowWithErrorAsync(relatedItem.Context,
-                    _localizationService.GetLocalizedString("Error_PhoneAlreadyConnected"));
-            }
-            else
-            {
-                if (!_coreConfiguration.OverwriteFields)
-                    userData.Profile = null;
+            await _recoveryHandler.RemoveConnectionsAsync(userData.PublicKey);
 
-                await _recoveryHandler.OnRecoverAsync(userData.DID, new OwnIdConnection
-                {
-                    PublicKey = userData.PublicKey,
-                    RecoveryToken = relatedItem.RecoveryToken,
-                    RecoveryData = userData.RecoveryData
-                });
+            if (!_coreConfiguration.OverwriteFields)
+                userData.Profile = null;
 
-                await _cacheItemService.FinishAuthFlowSessionAsync(input.Context, userData.DID, userData.PublicKey);
-            }
+            await _recoveryHandler.OnRecoverAsync(userData.DID, new OwnIdConnection
+            {
+                PublicKey = userData.PublicKey,
+                RecoveryToken = relatedItem.RecoveryToken,
+                RecoveryData = userData.RecoveryData
+            });
+
+            await _cacheItemService.FinishAuthFlowSessionAsync(input.Context, userData.DID, userData.PublicKey);
 
             var composeInfo = new BaseJwtComposeInfo
             {
