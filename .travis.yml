@@ -59,13 +59,14 @@ deploy:
   script: sh scripts/deploy.sh $ENV
   skip_cleanup: true
   on:
-      all_branches: true
-      condition: $TRAVIS_BRANCH =~ ^(develop|master)$
+    all_branches: true
+    condition: $TRAVIS_BRANCH =~ ^(develop|master)$
 - provider: script
   script: sh scripts/prod/deploy.sh
   skip_cleanup: true
   on:
-    branch: $TRAVIS_BRANCH =~ ^(?i:releases)\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$
+    all_branches: true
+    condition: $TRAVIS_BRANCH =~ ^(?i:releases)\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$
 
 after_deploy:
   - bash scripts/test_runner.sh server-sdk $ENV
