@@ -69,3 +69,4 @@ deploy:
 
 after_deploy:
   - bash scripts/test_runner.sh server-sdk $ENV
+  
