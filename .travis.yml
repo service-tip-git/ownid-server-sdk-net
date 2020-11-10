@@ -17,7 +17,7 @@ branches:
   only:
   - master
   - develop
-  - alpha-rti
+  - ^(?i:releases)\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$
 
 env:
   global:
@@ -31,14 +31,14 @@ jobs:
     - if: branch=develop
       env:
         ENV=dev
-    - if: branch=alpha-rti
+    - if: branch=^(?i:releases)\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$
       env:
-        ENV=staging
+        ENV=prod
 
 script:
   - sh scripts/set-build-num.sh $TRAVIS_BUILD_NUMBER
   - dotnet restore
-  # - dotnet test /p:CollectCoverage=true /p:Threshold=20
+  - dotnet test /p:CollectCoverage=true /p:Threshold=20
   - docker build -t ownid-server-gigya:latest . --network=host
 
 before_deploy:
@@ -62,10 +62,10 @@ deploy:
       all_branches: true
       condition: $TRAVIS_BRANCH =~ ^(develop|master)$
 - provider: script
-  script: sh scripts/deploy-prod.sh alpha
+  script: sh scripts/prod/deploy.sh
   skip_cleanup: true
   on:
-    branch: alpha-rti
+    branch: ^(?i:releases)\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$
 
 after_deploy:
   - bash scripts/test_runner.sh server-sdk $ENV
