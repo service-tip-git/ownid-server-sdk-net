@@ -10,7 +10,6 @@ docker push $IMAGE_URI
 echo Adding K8S clusters...
 aws eks --region us-east-1 update-kubeconfig --name ownid-production-cluster
 aws eks --region us-east-2 update-kubeconfig --name ownid-eks
-kubectl config get-contexts
 
 echo Prod A Deployment
 kubectl config use-context arn:aws:eks:us-east-1:571861302935:cluster/ownid-production-cluster
