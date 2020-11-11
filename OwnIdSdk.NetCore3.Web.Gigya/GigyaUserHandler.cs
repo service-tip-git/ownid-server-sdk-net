@@ -60,7 +60,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
                     $"did: {user.UID} " +
                     $"Gigya.setAccountInfo for EXISTING user error -> {setAccountResponse.GetFailureMessage()}");
 
-            return await OnSuccessLoginInternalAsync(user.UID);
+            return await OnSuccessLoginInternalAsync(user.UID, true);
         }
 
         public async Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey)
@@ -195,11 +195,11 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             }
         }
 
-        private async Task<AuthResult<object>> OnSuccessLoginInternalAsync(string did)
+        private async Task<AuthResult<object>> OnSuccessLoginInternalAsync(string did, bool isFido = false)
         {
             if (_configuration.LoginType == GigyaLoginType.Session)
             {
-                var loginResponse = await _restApiClient.NotifyLogin(did, "browser");
+                var loginResponse = await _restApiClient.NotifyLogin(did, "browser", isFido);
 
                 if (loginResponse.SessionInfo == null || loginResponse.ErrorCode != 0)
                     return new AuthResult<object>($"Gigya: {loginResponse.GetFailureMessage()}");

@@ -60,11 +60,11 @@ namespace OwnIdSdk.NetCore3.Web.Gigya.ApiClient
             return setAccountResponse;
         }
 
-        public async Task<LoginResponse> NotifyLogin(string did, string targetEnvironment = null)
+        public async Task<LoginResponse> NotifyLogin(string did, string targetEnvironment = null, bool isFido = false)
         {
             var parameters = ParametersFactory.CreateAuthParameters(_configuration)
                 .AddParameter("siteUID", did)
-                .AddParameter("skipValidation", bool.TrueString);
+                .AddParameter("skipValidation", !isFido);
 
             if (!string.IsNullOrEmpty(targetEnvironment))
                 parameters.AddParameter("targetEnv", targetEnvironment);
