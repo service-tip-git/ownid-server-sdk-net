@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.AccountRecovery;
@@ -32,8 +33,7 @@ namespace OwnIdSdk.NetCore3.Web.Gigya
             var resetPasswordResponse = await _apiClient.ResetPasswordAsync(payload.ResetToken, newPassword);
 
             if (resetPasswordResponse.ErrorCode != 0)
-                throw new Exception(
-                    $"Gigya.resetPassword error -> {resetPasswordResponse.GetFailureMessage()}");
+                throw new OwnIdException(resetPasswordResponse.ErrorDetails);
 
             return new AccountRecoveryResult
             {

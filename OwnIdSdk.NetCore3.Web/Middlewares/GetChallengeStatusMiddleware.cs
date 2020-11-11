@@ -14,7 +14,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         private readonly GetStatusCommand _getStatusCommand;
 
         public GetChallengeStatusMiddleware(RequestDelegate next, GetStatusCommand getStatusCommand,
-            ILogger<GetChallengeStatusMiddleware> logger) : base(next, logger)
+            ILogger<GetChallengeStatusMiddleware> logger, StopFlowCommand stopFlowCommand) : base(next, logger,
+            stopFlowCommand)
         {
             _getStatusCommand = getStatusCommand;
         }

@@ -84,31 +84,30 @@ namespace OwnIdSdk.NetCore3.Flow
                             StepType.InstantAuthorize, cacheItem.ChallengeType,
                             new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
                                 "/partial")));
-                        
+
                         var internalRecovery = new FrontendBehavior(StepType.InternalConnectionRecovery,
                             cacheItem.ChallengeType,
                             new CallAction(_urlProvider.GetConnectionRecoveryUrl(cacheItem.Context)),
                             authorizeStep);
 
-                        if (cacheItem.ChallengeType != ChallengeType.Register) 
+                        if (cacheItem.ChallengeType != ChallengeType.Register)
                             return internalRecovery;
-                        
+
                         var checkUser = new FrontendBehavior(StepType.CheckUserExistence, cacheItem.ChallengeType,
                             new CallAction(_urlProvider.GetUserExistenceUrl(cacheItem.Context)), authorizeStep);
-                            
+
                         if (!string.IsNullOrEmpty(cacheItem.RecoveryToken))
                             checkUser.AlternativeBehavior = internalRecovery;
 
                         return checkUser;
-
                     })
                 },
                 {
                     StepType.InternalConnectionRecovery,
                     new Step<InternalConnectionRecoveryCommand>(cacheItem => new FrontendBehavior(
-                            StepType.InstantAuthorize, cacheItem.ChallengeType,
-                            new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
-                                "/partial"))))
+                        StepType.InstantAuthorize, cacheItem.ChallengeType,
+                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
+                            "/partial"))))
                 },
                 {
                     StepType.CheckUserExistence,
@@ -260,7 +259,8 @@ namespace OwnIdSdk.NetCore3.Flow
             {
                 {
                     StepType.Starting,
-                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Fido2Authorize, cacheItem.ChallengeType,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Fido2Authorize,
+                        cacheItem.ChallengeType,
                         new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
                             "/fido2"))))
                 },
@@ -308,13 +308,13 @@ namespace OwnIdSdk.NetCore3.Flow
                     StepType.Fido2Authorize,
                     new Step<Fido2RecoverCommand>(cacheItem => new FrontendBehavior
                     {
-                        Type = StepType.Success,
+                        Type = string.IsNullOrEmpty(cacheItem.Error) ? StepType.Success : StepType.Error,
                         ActionType = ActionType.Finish,
                         ChallengeType = cacheItem.ChallengeType
                     })
                 }
             };
-            
+
             StepMap = new Dictionary<FlowType, Dictionary<StepType, IStep>>
             {
                 {FlowType.Authorize, authorize},
@@ -333,7 +333,7 @@ namespace OwnIdSdk.NetCore3.Flow
         }
 
         private Dictionary<StepType, IStep> GetFido2LinkAndRecoveryWithPinSteps<TFido2FinishCommand>()
-            where TFido2FinishCommand: BaseFido2RegisterCommand
+            where TFido2FinishCommand : BaseFido2RegisterCommand
         {
             return new Dictionary<StepType, IStep>
             {
@@ -365,7 +365,7 @@ namespace OwnIdSdk.NetCore3.Flow
                     StepType.Fido2Authorize,
                     new Step<TFido2FinishCommand>(cacheItem => new FrontendBehavior
                     {
-                        Type = StepType.Success,
+                        Type = string.IsNullOrEmpty(cacheItem.Error) ? StepType.Success : StepType.Error,
                         ChallengeType = cacheItem.ChallengeType,
                         ActionType = ActionType.Finish
                     })

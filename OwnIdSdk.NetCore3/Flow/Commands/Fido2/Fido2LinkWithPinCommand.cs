@@ -15,7 +15,6 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
         private readonly ICacheItemService _cacheItemService;
         private readonly IAccountLinkHandler _linkHandler;
 
-
         public Fido2LinkWithPinCommand(IFido2 fido2, ICacheItemService cacheItemService, IJwtComposer jwtComposer,
             IFlowController flowController, IOwnIdCoreConfiguration configuration,
             IIdentitiesProvider identitiesProvider, IEncodingService encodingService, IAccountLinkHandler linkHandler) :

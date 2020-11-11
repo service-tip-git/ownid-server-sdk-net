@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using AutoFixture;
 using Fido2NetLib;
-using Fido2NetLib.Objects;
 using Moq;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;

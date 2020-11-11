@@ -2,13 +2,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
-using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Internal;
 using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Flow.Commands;
-using OwnIdSdk.NetCore3.Flow.Commands.Fido2;
 using OwnIdSdk.NetCore3.Flow.Commands.Internal;
 using OwnIdSdk.NetCore3.Web.Attributes;
 
@@ -23,7 +21,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
 
         public PasswordlessStateMiddleware(RequestDelegate next, ILogger<PasswordlessStateMiddleware> logger,
             SetPasswordlessStateCommand stateCommand, CheckUserExistenceCommand userExistenceCommand,
-            IOwnIdCoreConfiguration configuration) : base(next, logger)
+            IOwnIdCoreConfiguration configuration, StopFlowCommand stopFlowCommand) : base(next, logger,
+            stopFlowCommand)
         {
             _stateCommand = stateCommand;
             _userExistenceCommand = userExistenceCommand;

@@ -47,6 +47,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
             services.TryAddSingleton<GetSecurityCheckCommand>();
             services.TryAddSingleton<GetStatusCommand>();
             services.TryAddSingleton<StartFlowCommand>();
+            services.TryAddSingleton<StopFlowCommand>();
             services.TryAddSingleton<ApproveActionCommand>();
             services.TryAddSingleton<GetApprovalStatusCommand>();
             services.TryAddSingleton<GetAuthProfileCommand>();

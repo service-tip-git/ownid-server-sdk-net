@@ -12,7 +12,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         private readonly CreateFlowCommand _createFlowCommand;
 
         public GenerateContextMiddleware(RequestDelegate next, CreateFlowCommand createFlowCommand,
-            ILogger<GenerateContextMiddleware> logger) : base(next, logger)
+            ILogger<GenerateContextMiddleware> logger, StopFlowCommand stopFlowCommand) : base(next, logger,
+            stopFlowCommand)
         {
             _createFlowCommand = createFlowCommand;
         }

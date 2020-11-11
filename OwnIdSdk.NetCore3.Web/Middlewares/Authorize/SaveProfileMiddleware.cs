@@ -17,7 +17,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Authorize
         private readonly IFlowRunner _flowRunner;
 
         public SaveProfileMiddleware(RequestDelegate next, IFlowRunner flowRunner,
-            ILogger<SaveProfileMiddleware> logger) : base(next, logger)
+            ILogger<SaveProfileMiddleware> logger, StopFlowCommand stopFlowCommand) : base(next, logger,
+            stopFlowCommand)
         {
             _flowRunner = flowRunner;
         }

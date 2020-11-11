@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.AccountRecovery;
 
@@ -17,6 +18,7 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions
         ///     A task that represents the asynchronous recover operation.
         ///     The task result contains <see cref="AccountRecoveryResult" />
         /// </returns>
+        /// <exception cref="OwnIdException">Thrown when recovery process fails</exception>
         Task<AccountRecoveryResult> RecoverAsync(string accountRecoveryPayload);
 
         /// <summary>

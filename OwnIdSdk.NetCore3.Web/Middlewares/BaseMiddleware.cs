@@ -13,6 +13,7 @@ using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Extensibility.Json;
 using OwnIdSdk.NetCore3.Extensions;
+using OwnIdSdk.NetCore3.Flow.Commands;
 using OwnIdSdk.NetCore3.Web.Attributes;
 
 namespace OwnIdSdk.NetCore3.Web.Middlewares
@@ -27,12 +28,14 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         protected readonly ILogger Logger;
         protected readonly RequestDelegate Next;
         protected DateTime ClientDate { get; private set; }
+        private readonly StopFlowCommand _stopFlowCommand;
 
 
-        protected BaseMiddleware(RequestDelegate next, ILogger logger)
+        protected BaseMiddleware(RequestDelegate next, ILogger logger, StopFlowCommand stopFlowCommand)
         {
             Next = next;
             Logger = logger;
+            _stopFlowCommand = stopFlowCommand;
 
             var attrs = GetType().GetCustomAttribute(typeof(RequestDescriptorAttribute));
 
@@ -116,6 +119,13 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             try
             {
                 await functionToInvoke(httpContext);
+            }
+            catch (OwnIdException e)
+            {
+                var input = new CommandInput(RequestIdentity, GetRequestCulture(httpContext), ClientDate);
+
+                var result = await _stopFlowCommand.ExecuteAsync(input, e.Message);
+                await Json(httpContext, result, StatusCodes.Status200OK);
             }
             catch (InternalLogicException e)
             {
