@@ -56,7 +56,5 @@ spec:
               value: <gigya api key>
             - name: GIGYA__USER_KEY # Gigya user key
               value: <gigya user key>
-            - name: GIGYA__LOGIN_TYPE # Login type: session or IdToken (JWT will be returned instead of creating a session)
-              value: IdToken
             - name: ASPNETCORE_ENVIRONMENT # environment
               value: alpha

@@ -64,8 +64,8 @@ spec:
               value: <gigya api key>
             - name: GIGYA__USER_KEY # Gigya user key
               value: <gigya user key>
-            - name: GIGYA__LOGIN_TYPE # Login type: session or IdToken (JWT will be returned instead of creating a session)
-              value: IdToken
+            - name: GIGYA__LOGIN_TYPE # Login type: session or IdToken (JWT will be returned instead of creating a session). Default: session
+              value: session
             - name: ELASTICCONFIGURATION__ENABLED # Enable Elastic Search logging
               value: 'true'
             - name: ELASTICCONFIGURATION__URI # Elastic Search server url
