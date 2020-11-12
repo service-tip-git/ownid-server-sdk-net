@@ -7,6 +7,8 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Fido2
         public ClientSideFido2Config Config { get; set; }
         
         public bool IsFido2Only { get; set; }
+        
+        public string CredId { get; set; }
 
         public class ClientSideFido2Config
         {

@@ -33,6 +33,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         {
             var request = await OwnIdSerializer.DeserializeAsync<InitFido2Request>(httpContext.Request.Body);
             var isFido2Only = _configuration.AuthenticationMode == AuthenticationModeType.Fido2Only;
+            var isRegistration = request.FlowType == "r";
 
             var result = new InitFido2Response
             {
@@ -44,12 +45,13 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 await Json(httpContext, result, StatusCodes.Status200OK);
                 return;
             }
-
+            
             var stateRequest = new StateRequest
             {
                 EncryptionToken = httpContext.Request.Cookies[_stateCommand.EncryptionCookieName],
                 RecoveryToken = httpContext.Request.Cookies[_stateCommand.RecoveryCookieName],
-                RequiresRecovery = request.IsIncompatible
+                RequiresRecovery = request.IsIncompatible,
+                CredId = request.CredId
             };
 
             var stateResult = await _stateCommand.ExecuteAsync(RequestIdentity.Context, stateRequest);
@@ -64,8 +66,9 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                     RelyingPartyName = _configuration.Fido2.RelyingPartyName
                 };
 
-
-            if (!string.IsNullOrWhiteSpace(request.CredId))
+            var credIdToCheck = request.CredId ?? httpContext.Request.Cookies[_stateCommand.CredIdCookieName];
+            
+            if (!string.IsNullOrWhiteSpace(credIdToCheck))
             {
                 // Check if user exists
                 // If yes during registration - cancel registration -> 
@@ -73,14 +76,15 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 var existenceRequest = new UserExistsRequest
                 {
                     AuthenticatorType = ExtAuthenticatorType.Fido2,
-                    ErrorOnExisting = request.FlowType == "r",
-                    UserIdentifier = request.CredId
+                    ErrorOnExisting = isRegistration,
+                    UserIdentifier = credIdToCheck
                 };
 
                 var commandInput = new CommandInput<UserExistsRequest>(RequestIdentity, GetRequestCulture(httpContext),
                     existenceRequest, ClientDate);
 
                 result.UserExists = await _userExistenceCommand.Check(commandInput);
+                result.CredId = credIdToCheck;
             }
 
             await Json(httpContext, result, StatusCodes.Status200OK);

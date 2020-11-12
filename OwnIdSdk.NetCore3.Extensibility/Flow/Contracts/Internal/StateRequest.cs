@@ -10,6 +10,8 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Internal
         
         public bool RequiresRecovery { get; set; }
         
+        public string CredId { get; set; }
+        
         [JsonIgnore]
         public StateRequest State { get; set; }
     }

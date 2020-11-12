@@ -6,6 +6,8 @@ namespace OwnIdSdk.NetCore3.Extensibility.Flow.Contracts
 
         public const string PasswordlessEncryption = "psw-enc-{0}";
         
+        public const string PasswordlessCredId = "psw-credid-{0}";
+        
         public const string WebAppRecovery = "sign-r-{0}";
         
         public const string WebAppEncryption = "sign-enc-{0}";
