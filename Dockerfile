@@ -22,7 +22,7 @@ COPY --from=build-env /app/out .
 
 
 #ENV ALLOWEDHOSTS="localhost"
-ENV OWNID__WEB_APP_URL="https://sign.ownid.com"
+ENV OWNID__WEB_APP_URL="https://app.ownid.com"
 ENV OWNID__CALLBACK_URL="https://localhost:5002"
 ENV OWNID__PUB_KEY="./keys/jwtRS256.key.pub"
 ENV OWNID__PRIVATE_KEY="./keys/jwtRS256.key"
@@ -32,15 +32,10 @@ ENV OWNID__DESCRIPTION="Local Client NetCore3 environment"
 ENV GIGYA__SECRET="g157+kUR3kxvgIX4MneEWnVgBVzhQe4dXfoNe9ceSNA="
 ENV GIGYA__API_KEY="3_s5-gLs4aLp5FXluP8HXs7_JN40XWNlbvYWVCCkbNCqlhW6Sm5Z4tXGGsHcSJYD3W"
 ENV OWNID__CACHE_TYPE="web-cache"
-ENV OWNID__CACHE_CONFIG="ownid-cache.pfjshm.ng.0001.use2.cache.amazonaws.com:6379"
 ENV ELASTICCONFIGURATION__ENABLED="false"
-ENV ASPNETCORE_ENVIRONMENT="dev"
+ENV ASPNETCORE_ENVIRONMENT="prod"
 
-#RUN rm -rf /usr/bin/wget
-#RUN apk -U upgrade
-#RUN apk add --upgrade busybox
-#RUN rm -f /var/cache/apk/*
 ENTRYPOINT ["dotnet", "OwnIdSdk.NetCore3.Server.Gigya.dll"]
 
-# docker build -t ownid-server-netcore3-gigya:latest .
-# docker run -it -p 5002:5002 ownid-server-netcore3-gigya:latest
+# docker build -t ownid-server-gigya:latest .
+# docker run -it -p 5002:5002 ownid-server-gigya:latest

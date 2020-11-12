@@ -16,7 +16,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         private readonly IFlowRunner _flowRunner;
 
         public CheckUserExistenceMiddleware(RequestDelegate next, ILogger<CheckUserExistenceMiddleware> logger,
-            IFlowRunner flowRunner) : base(next, logger)
+            IFlowRunner flowRunner, StopFlowCommand stopFlowCommand) : base(next, logger, stopFlowCommand)
         {
             _flowRunner = flowRunner;
         }
@@ -24,10 +24,10 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         protected override async Task Execute(HttpContext httpContext)
         {
             var request = await OwnIdSerializer.DeserializeAsync<UserExistsRequest>(httpContext.Request.Body);
-            
+
             var commandInput = new CommandInput<UserExistsRequest>(RequestIdentity, GetRequestCulture(httpContext),
                 request, ClientDate);
-            
+
             var result = await _flowRunner.RunAsync(commandInput, StepType.CheckUserExistence);
             await Json(httpContext, result, StatusCodes.Status200OK);
         }

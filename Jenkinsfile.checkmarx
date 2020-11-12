@@ -47,6 +47,7 @@ pipeline {
           sastEnabled: true,
           serverUrl: 'https://cx.wdf.sap.corp',
           sourceEncoding: '1',
+          useOwnServerCredentials: true,
           // username: '',
           vulnerabilityThresholdResult: 'FAILURE'
         ])

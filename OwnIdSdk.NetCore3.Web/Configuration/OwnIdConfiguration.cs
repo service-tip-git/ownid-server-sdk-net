@@ -85,7 +85,11 @@ namespace OwnIdSdk.NetCore3.Web.Configuration
                 throw new InvalidOperationException(
                     $"{nameof(LocalizationFeature)} should be added");
 
-            foreach (var feature in _features.Values) feature.Validate();
+            foreach (var feature in _features.Values)
+            {
+                feature.FillEmptyWithOptional();
+                feature.Validate();
+            }
         }
 
         /// <summary>

@@ -16,7 +16,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Recover
         private readonly IFlowRunner _flowRunner;
 
         public SaveAccountPublicKeyMiddleware(RequestDelegate next, IFlowRunner flowRunner,
-            ILogger<SaveAccountPublicKeyMiddleware> logger) : base(next, logger)
+            ILogger<SaveAccountPublicKeyMiddleware> logger, StopFlowCommand stopFlowCommand) : base(next, logger,
+            stopFlowCommand)
         {
             _flowRunner = flowRunner;
         }

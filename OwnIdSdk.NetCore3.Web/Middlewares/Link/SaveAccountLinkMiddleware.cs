@@ -16,7 +16,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Link
         private readonly IFlowRunner _flowRunner;
 
         public SaveAccountLinkMiddleware(RequestDelegate next, IFlowRunner flowRunner,
-            ILogger<SaveAccountLinkMiddleware> logger) : base(next, logger)
+            ILogger<SaveAccountLinkMiddleware> logger, StopFlowCommand stopFlowCommand) : base(next, logger,
+            stopFlowCommand)
         {
             _flowRunner = flowRunner;
         }

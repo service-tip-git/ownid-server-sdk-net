@@ -38,7 +38,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             var gigyaSection = Configuration.GetSection("gigya");
             var isDevelopment = Configuration.GetValue("OwnIdDevelopmentMode", false);
             var topDomain = ownIdSection["top_domain"];
-            var webAppUrl = new Uri(ownIdSection["web_app_url"] ?? "https://sign.ownid.com");
+            var webAppUrl = new Uri(ownIdSection["web_app_url"] ?? Constants.OwinIdApplicationAddress);
 
             services.AddCors(x =>
             {
@@ -107,7 +107,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         x.OwnIdApplicationUrl = webAppUrl;
                         x.OverwriteFields = ownIdSection.GetValue<bool>("overwrite_fields");
 
-                        x.AuthenticationMode = ownIdSection.GetValue("authentication_mode", AuthenticationModeType.OwnIdOnly);
+                        x.AuthenticationMode =
+                            ownIdSection.GetValue("authentication_mode", AuthenticationModeType.OwnIdOnly);
 
                         if (x.AuthenticationMode.IsFido2Enabled())
                         {
@@ -116,10 +117,10 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
                             x.Fido2.RelyingPartyId = ownIdSection["fido2_relying_party_id"];
                             x.Fido2.RelyingPartyName = ownIdSection["fido2_relying_party_name"];
-                            x.Fido2.UserDisplayName = ownIdSection["fido2_user_display_name"];
                             x.Fido2.UserName = ownIdSection["fido2_user_name"];
+                            x.Fido2.UserDisplayName = ownIdSection["fido2_user_display_name"];
 
-                            if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
+                            if(!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
                                 x.Fido2.Origin = new Uri(ownIdSection["fido2_origin"]);
                         }
 
@@ -157,7 +158,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             // TODO: not for prod
             app.UseMiddleware<LogRequestMiddleware>();
             var routeBuilder = new RouteBuilder(app);
-            routeBuilder.MapMiddlewarePost("log",
+            routeBuilder.MapMiddlewarePost("ownid/log",
                 builder => builder.UseMiddleware<LogMiddleware>());
             routeBuilder.MapMiddlewarePost("not-ownid/register",
                 builder => builder.UseMiddleware<ExternalRegisterMiddleware>());

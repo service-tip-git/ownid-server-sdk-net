@@ -24,6 +24,18 @@ namespace OwnIdSdk.Tools.Configurator
             
             var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly()?.Location);
             var defaultName = Path.GetFileName(currentDir);
+            var keysPath = Path.Combine(currentDir, "keys");
+            
+            var createEntireConfig =  ReadValue("Create entire config (y) or RSA keys only (n)", "y", possibleValues: new []{"y", "n"});
+
+            if (createEntireConfig == "n")
+            {
+                await GenerateKeysAsync(keysPath);
+                Console.WriteLine($"Keys directory: {keysPath}", Color.Green);
+                Console.WriteLine("Done! Press any key to close", Color.Green);
+                Console.ReadKey();
+                return;
+            }
             
             var name = ReadValue("Website name", defaultName);
             var description = ReadValue("Description");
@@ -61,15 +73,7 @@ namespace OwnIdSdk.Tools.Configurator
             
             Console.WriteLine($"{Environment.NewLine}Processing...{Environment.NewLine}", Color.Blue);
 
-            Console.WriteLine($"Creating keys...", Color.Gray);
-            var keysPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly()?.Location), "keys");
-
-            if (!Directory.Exists(keysPath))
-                Directory.CreateDirectory(keysPath);
-            
-            var keys = RSA.Create(4096);
-            var privateKey = $"-----BEGIN RSA PRIVATE KEY-----{Environment.NewLine}{Convert.ToBase64String(keys.ExportRSAPrivateKey())}{Environment.NewLine}-----END RSA PRIVATE KEY-----";
-            var publicKey = $"-----BEGIN RSA PUBLIC KEY-----{Environment.NewLine}{Convert.ToBase64String(keys.ExportRSAPublicKey())}{Environment.NewLine}-----END RSA PUBLIC KEY-----";
+            var keys = await GenerateKeysAsync(keysPath);
             
             var config = new Config
             {
@@ -78,8 +82,8 @@ namespace OwnIdSdk.Tools.Configurator
                 CallbackUrl = callbackUrl,
                 Icon = icon,
                 OverwriteFields = overwriteFields.ToLowerInvariant() == "y",
-                PrivateKey = Path.Combine(keysPath, "key.private"),
-                PublicKey = Path.Combine(keysPath, "key.pub"),
+                PrivateKey = keys.privatePath,
+                PublicKey = keys.publicPath,
                 RedisConnection = redisConnection,
                 DID = $"did:{name}:{Guid.NewGuid():N}",
                 Fido2Enabled = enableFido2,
@@ -90,16 +94,6 @@ namespace OwnIdSdk.Tools.Configurator
                 Fido2RelyingPartyName = fido2RelyingPartyName,
                 Fido2UserDisplayName = fido2UserDisplayName
             };
-            
-            File.Delete(config.PrivateKey);
-            File.Delete(config.PublicKey);
-
-            await using var pubFile = File.Open(config.PublicKey, FileMode.CreateNew);
-            await using var privateFile = File.Open(config.PrivateKey, FileMode.CreateNew);
-            await pubFile.WriteAsync(System.Text.Encoding.UTF8.GetBytes(publicKey));
-            await privateFile.WriteAsync(System.Text.Encoding.UTF8.GetBytes(privateKey));
-            await pubFile.FlushAsync();
-            await privateFile.FlushAsync();
             
             var configFilePath = Path.Combine(currentDir, "appsettings.json");
             
@@ -156,6 +150,33 @@ namespace OwnIdSdk.Tools.Configurator
             Console.WriteLine($"Keys directory: {keysPath}", Color.Green);
             Console.WriteLine("Done! Press any key to close", Color.Green);
             Console.ReadKey();
+        }
+
+        static async Task<(string publicPath, string privatePath)> GenerateKeysAsync(string path)
+        {
+            Console.WriteLine($"Creating keys...", Color.Gray);
+            
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            
+            var keys = RSA.Create(4096);
+            var privateKey = $"-----BEGIN RSA PRIVATE KEY-----{Environment.NewLine}{Convert.ToBase64String(keys.ExportRSAPrivateKey())}{Environment.NewLine}-----END RSA PRIVATE KEY-----";
+            var publicKey = $"-----BEGIN RSA PUBLIC KEY-----{Environment.NewLine}{Convert.ToBase64String(keys.ExportRSAPublicKey())}{Environment.NewLine}-----END RSA PUBLIC KEY-----";
+
+            var publicPath = Path.Combine(path, "key.pub");
+            var privatePath = Path.Combine(path, "key.private");
+
+            File.Delete(privatePath);
+            File.Delete(publicPath);
+            
+            await using var pubFile = File.Open(publicPath, FileMode.CreateNew);
+            await using var privateFile = File.Open(privatePath, FileMode.CreateNew);
+            await pubFile.WriteAsync(System.Text.Encoding.UTF8.GetBytes(publicKey));
+            await privateFile.WriteAsync(System.Text.Encoding.UTF8.GetBytes(privateKey));
+            await pubFile.FlushAsync();
+            await privateFile.FlushAsync();
+
+            return (publicPath, privatePath);
         }
 
         static string ReadValue(string name, string defaultValue = null, bool isRequired = false, string[] possibleValues = null)

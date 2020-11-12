@@ -16,9 +16,11 @@ spec:
       labels:
         app: ownid-server-netcore3-gigya
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: ownid-server-netcore3-gigya
-          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging:latest
+          image: ownid.common.repositories.cloud.sap/server:latest
           ports:
             - containerPort: 5002
           env:
@@ -115,9 +117,11 @@ spec:
       labels:
         app: ownid-server-netcore3-demo-gigya
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: ownid-server-netcore3-demo-gigya
-          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging:latest
+          image: ownid.common.repositories.cloud.sap/server:latest
           ports:
             - containerPort: 5002
           env:
@@ -154,16 +158,8 @@ spec:
               value: All
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.demo.ownid.com
-            - name: OWNID__FIDO2_RELYING_PARTY_ID
-              value: passwordless.demo.ownid.com
             - name: OWNID__FIDO2_RELYING_PARTY_NAME
               value: OwnID
-            - name: OWNID__FIDO2_USER_DISPLAY_NAME
-              value: 'Skip the password'
-            - name: OWNID__FIDO2_USER_NAME
-              value: 'Skip the password'
-            - name: OWNID__FIDO2_ORIGIN
-              value: https://passwordless.demo.ownid.com
             - name: OWNID__TOP_DOMAIN
               value: demo.ownid.com
             - name: GIGYA__DATA_CENTER
@@ -230,9 +226,11 @@ spec:
       labels:
         app: ownid-server-netcore3-demo-2-gigya
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: ownid-server-netcore3-demo-2-gigya
-          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging:latest
+          image: ownid.common.repositories.cloud.sap/server:latest
           ports:
             - containerPort: 5002
           env:
@@ -269,16 +267,8 @@ spec:
               value: All
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.demo.skipthepassword.com
-            - name: OWNID__FIDO2_RELYING_PARTY_ID
-              value: passwordless.demo.skipthepassword.com
             - name: OWNID__FIDO2_RELYING_PARTY_NAME
               value: OwnID
-            - name: OWNID__FIDO2_USER_DISPLAY_NAME
-              value: 'Skip the password'
-            - name: OWNID__FIDO2_USER_NAME
-              value: 'Skip the password'
-            - name: OWNID__FIDO2_ORIGIN
-              value: https://passwordless.demo.skipthepassword.com
             - name: OWNID__TOP_DOMAIN
               value: demo.skipthepassword.com
             - name: GIGYA__DATA_CENTER
@@ -345,9 +335,11 @@ spec:
       labels:
         app: gigyapoc
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: gigyapoc
-          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging:latest
+          image: ownid.common.repositories.cloud.sap/server:latest
           ports:
             - containerPort: 5002
           env:
@@ -384,16 +376,8 @@ spec:
               value: All
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.gigyainsurance.gigyapoc.com
-            - name: OWNID__FIDO2_RELYING_PARTY_ID
-              value: passwordless.gigyainsurance.gigyapoc.com
             - name: OWNID__FIDO2_RELYING_PARTY_NAME
               value: OwnID
-            - name: OWNID__FIDO2_USER_DISPLAY_NAME
-              value: 'Skip the password'
-            - name: OWNID__FIDO2_USER_NAME
-              value: 'Skip the password'
-            - name: OWNID__FIDO2_ORIGIN
-              value: https://passwordless.gigyainsurance.gigyapoc.com
             - name: OWNID__TOP_DOMAIN
               value: gigyapoc.com
             - name: GIGYA__DATA_CENTER
@@ -467,9 +451,11 @@ spec:
       labels:
         app: ownid-server-netcore3-demo-3-gigya
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: ownid-server-netcore3-demo-3-gigya
-          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging:latest
+          image: ownid.common.repositories.cloud.sap/server:latest
           ports:
             - containerPort: 5002
           env:
@@ -506,16 +492,8 @@ spec:
               value: Fido2Only
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.demo3.ownid.com
-            - name: OWNID__FIDO2_RELYING_PARTY_ID
-              value: passwordless.demo3.ownid.com
             - name: OWNID__FIDO2_RELYING_PARTY_NAME
               value: OwnID
-            - name: OWNID__FIDO2_USER_DISPLAY_NAME
-              value: 'Skip the password'
-            - name: OWNID__FIDO2_USER_NAME
-              value: 'Skip the password'
-            - name: OWNID__FIDO2_ORIGIN
-              value: https://passwordless.demo3.ownid.com
             - name: OWNID__TOP_DOMAIN
               value: demo3.ownid.com
             - name: GIGYA__DATA_CENTER
@@ -582,9 +560,11 @@ spec:
       labels:
         app: ownid-server-netcore3-demo-4-gigya
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: ownid-server-netcore3-demo-4-gigya
-          image: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging:latest
+          image: ownid.common.repositories.cloud.sap/server:latest
           ports:
             - containerPort: 5002
           env:
@@ -621,16 +601,8 @@ spec:
               value: OwnIdOnly
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.demo4.ownid.com
-            - name: OWNID__FIDO2_RELYING_PARTY_ID
-              value: passwordless.demo4.ownid.com
             - name: OWNID__FIDO2_RELYING_PARTY_NAME
               value: OwnID
-            - name: OWNID__FIDO2_USER_DISPLAY_NAME
-              value: 'Skip the password'
-            - name: OWNID__FIDO2_USER_NAME
-              value: 'Skip the password'
-            - name: OWNID__FIDO2_ORIGIN
-              value: https://passwordless.demo4.ownid.com
             - name: OWNID__TOP_DOMAIN
               value: demo4.ownid.com
             - name: GIGYA__DATA_CENTER

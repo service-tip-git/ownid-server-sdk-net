@@ -47,6 +47,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
             services.TryAddSingleton<GetSecurityCheckCommand>();
             services.TryAddSingleton<GetStatusCommand>();
             services.TryAddSingleton<StartFlowCommand>();
+            services.TryAddSingleton<StopFlowCommand>();
             services.TryAddSingleton<ApproveActionCommand>();
             services.TryAddSingleton<GetApprovalStatusCommand>();
             services.TryAddSingleton<GetAuthProfileCommand>();
@@ -63,7 +64,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
 
             services.TryAddSingleton<IFlowController, FlowController>();
             services.TryAddSingleton<IFlowRunner, FlowRunner>();
-            
+
             services.TryAddSingleton<CheckUserExistenceCommand>();
 
             if (_configuration.AuthenticationMode.IsFido2Enabled())
@@ -78,7 +79,7 @@ namespace OwnIdSdk.NetCore3.Web.Features
                 services.TryAddSingleton<Fido2RecoverCommand>();
                 services.TryAddSingleton<Fido2RecoverWithPinCommand>();
                 services.TryAddSingleton<Fido2RecoverWithPinCommand>();
-                
+
                 services.AddFido2(fido2Config =>
                 {
                     var str = _configuration.Fido2.Origin.ToString().TrimEnd(new[] {'/'}).Trim();
@@ -103,6 +104,22 @@ namespace OwnIdSdk.NetCore3.Web.Features
             if (_configuration.MaximumNumberOfConnectedDevices == default)
                 _configuration.MaximumNumberOfConnectedDevices = 1;
 
+            if (_configuration.AuthenticationMode.IsFido2Enabled())
+            {
+                if (string.IsNullOrWhiteSpace(_configuration.Fido2.RelyingPartyId))
+                    _configuration.Fido2.RelyingPartyId = _configuration.Fido2.PasswordlessPageUrl?.Host;
+                
+                if(string.IsNullOrWhiteSpace(_configuration.Fido2.UserName))
+                    _configuration.Fido2.UserName = "Skip the password";
+
+                if (string.IsNullOrWhiteSpace(_configuration.Fido2.UserDisplayName))
+                    _configuration.Fido2.UserDisplayName = _configuration.Fido2.UserName;
+
+                if (_configuration.Fido2.Origin == null)
+                    _configuration.Fido2.Origin = _configuration.Fido2.PasswordlessPageUrl;
+
+            }
+            
             return this;
         }
 

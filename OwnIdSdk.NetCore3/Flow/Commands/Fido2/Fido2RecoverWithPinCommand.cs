@@ -24,7 +24,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
             _cacheItemService = cacheItemService;
             _recoveryHandler = recoveryHandler;
         }
-        
+
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
         }
