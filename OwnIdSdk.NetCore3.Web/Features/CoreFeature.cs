@@ -104,9 +104,21 @@ namespace OwnIdSdk.NetCore3.Web.Features
             if (_configuration.MaximumNumberOfConnectedDevices == default)
                 _configuration.MaximumNumberOfConnectedDevices = 1;
 
-            if (_configuration.AuthenticationMode.IsFido2Enabled()
-                && string.IsNullOrEmpty(_configuration.Fido2.UserName))
-                _configuration.Fido2.UserName = "Skip the password";
+            if (_configuration.AuthenticationMode.IsFido2Enabled())
+            {
+                if (string.IsNullOrWhiteSpace(_configuration.Fido2.RelyingPartyId))
+                    _configuration.Fido2.RelyingPartyId = _configuration.Fido2.PasswordlessPageUrl?.Host;
+                
+                if(string.IsNullOrWhiteSpace(_configuration.Fido2.UserName))
+                    _configuration.Fido2.UserName = "Skip the password";
+
+                if (string.IsNullOrWhiteSpace(_configuration.Fido2.UserDisplayName))
+                    _configuration.Fido2.UserDisplayName = _configuration.Fido2.UserName;
+
+                if (_configuration.Fido2.Origin == null)
+                    _configuration.Fido2.Origin = _configuration.Fido2.PasswordlessPageUrl;
+
+            }
             
             return this;
         }

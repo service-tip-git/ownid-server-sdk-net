@@ -24,7 +24,7 @@ namespace OwnIdSdk.NetCore3.Web.Configuration
         {
             Services = services;
             AddOrUpdateFeature(new CoreFeature().FillEmptyWithOptional());
-            AddOrUpdateFeature(new LocalizationFeature());
+            AddOrUpdateFeature(new LocalizationFeature().FillEmptyWithOptional());
         }
 
         public OwnIdConfigurationBuilder(OwnIdConfiguration configuration)
