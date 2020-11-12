@@ -18,6 +18,7 @@ branches:
   - master
   - develop
   - /^release\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$/
+  - andrii/369-TESTING-Retry_pattern_error
 
 env:
   global:
@@ -28,7 +29,7 @@ jobs:
     - if: branch=master
       env:
         ENV=staging
-    - if: branch=develop
+    - if: branch=andrii/369-TESTING-Retry_pattern_error
       env:
         ENV=dev
     - if: branch =~ ^release\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$
@@ -60,7 +61,7 @@ deploy:
   skip_cleanup: true
   on:
     all_branches: true
-    condition: $TRAVIS_BRANCH =~ ^(develop|master)$
+    condition: $TRAVIS_BRANCH =~ ^(develop|master|andrii\/369-TESTING-Retry_pattern_error)$
 - provider: script
   script: sh scripts/prod/deploy.sh
   skip_cleanup: true
