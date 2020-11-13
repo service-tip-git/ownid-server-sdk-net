@@ -90,6 +90,8 @@ spec:
                 secretKeyRef:
                   name: ownid-secrets
                   key: elastic_password
+            - name: SERVER_MODE
+              value: pilot
 ---
 apiVersion: v1
 kind: Service
