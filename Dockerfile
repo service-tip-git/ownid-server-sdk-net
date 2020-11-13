@@ -22,7 +22,7 @@ COPY --from=build-env /app/out .
 
 
 #ENV ALLOWEDHOSTS="localhost"
-ENV OWNID__WEB_APP_URL="https://app.ownid.com"
+#ENV OWNID__WEB_APP_URL="https://app.ownid.com"
 ENV OWNID__CALLBACK_URL="https://localhost:5002"
 ENV OWNID__PUB_KEY="./keys/jwtRS256.key.pub"
 ENV OWNID__PRIVATE_KEY="./keys/jwtRS256.key"

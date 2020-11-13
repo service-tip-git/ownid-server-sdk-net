@@ -56,5 +56,3 @@ spec:
               value: <gigya api key>
             - name: GIGYA__USER_KEY # Gigya user key
               value: <gigya user key>
-            - name: ASPNETCORE_ENVIRONMENT # environment
-              value: alpha

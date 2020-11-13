@@ -75,4 +75,4 @@ spec:
             - name: ELASTICCONFIGURATION__PASSWORD # Elastic Search password
               value: <elastic search password>
             - name: ASPNETCORE_ENVIRONMENT # environment
-              value: alpha
+              value: prod
