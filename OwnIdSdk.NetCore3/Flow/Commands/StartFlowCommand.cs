@@ -9,6 +9,7 @@ using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Extensibility.Json;
+using OwnIdSdk.NetCore3.Extensibility.Services;
 using OwnIdSdk.NetCore3.Extensions;
 using OwnIdSdk.NetCore3.Flow.Commands.Authorize;
 using OwnIdSdk.NetCore3.Flow.Commands.Recovery;
@@ -21,16 +22,19 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
     {
         private readonly ICacheItemService _cacheItemService;
         private readonly IOwnIdCoreConfiguration _configuration;
+        private readonly IMetricsService _metricsService;
         private readonly IJwtService _jwtService;
         private readonly IServiceProvider _serviceProvider;
 
         public StartFlowCommand(ICacheItemService cacheItemService, IJwtService jwtService,
-            IServiceProvider serviceProvider, IOwnIdCoreConfiguration configuration)
+            IServiceProvider serviceProvider, IOwnIdCoreConfiguration configuration,
+            IMetricsService metricsService = null)
         {
             _cacheItemService = cacheItemService;
             _jwtService = jwtService;
             _serviceProvider = serviceProvider;
             _configuration = configuration;
+            _metricsService = metricsService;
         }
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
@@ -108,6 +112,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 return;
 
             var initialFlowType = cacheItem.FlowType;
+            var initialChallengeType = cacheItem.ChallengeType;
             switch (routing.Type)
             {
                 case "l":
@@ -135,8 +140,16 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
             }
 
             if (initialFlowType != cacheItem.FlowType)
+            {
                 await _cacheItemService.UpdateFlowAsync(cacheItem.Context, cacheItem.FlowType,
                     cacheItem.ChallengeType);
+
+                if (initialChallengeType != cacheItem.ChallengeType)
+                {
+                    _metricsService?.LogAsync($"{initialChallengeType} switched");
+                    _metricsService?.LogAsync(cacheItem.ChallengeType.ToString());
+                }
+            }
         }
     }
 }

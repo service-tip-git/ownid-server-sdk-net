@@ -86,6 +86,25 @@ spec:
                 secretKeyRef:
                   name: credential-secrets
                   key: elastic_password
+            - name: Metrics_Enable
+              value: 'true'
+            - name: Metrics_Namespace
+              value: 'OwnId Dev'
+            - name: AWS__Region
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: region
+            - name: AWS__AccessKeyId
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: access_key_id
+            - name: AWS__SecretAccessKey
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: secret_access_key
             - name: ASPNETCORE_ENVIRONMENT
               value: dev
             - name: SERILOG__MINIMUMLEVEL__DEFAULT

@@ -74,5 +74,15 @@ spec:
               value: <elastic search username>
             - name: ELASTICCONFIGURATION__PASSWORD # Elastic Search password
               value: <elastic search password>
+            - name: Metrics_Enable # Metrics enabled
+              value: 'true'
+            - name: Metrics_Namespace # AWS Metrics namespace
+              value: <namespace>
+            - name: AWS__Region # AWS Region
+              value: <region>
+            - name: AWS__AccessKeyId # AWS access key Id
+              value: <access key id> 
+            - name: AWS__SecretAccessKey # AWS secret access key
+              value: <secret access key>  
             - name: ASPNETCORE_ENVIRONMENT # environment
               value: prod

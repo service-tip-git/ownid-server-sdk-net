@@ -9,6 +9,7 @@ using OwnIdSdk.NetCore3.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
+using OwnIdSdk.NetCore3.Extensibility.Services;
 using OwnIdSdk.NetCore3.Web.Extensibility;
 using OwnIdSdk.NetCore3.Web.Features;
 
@@ -45,6 +46,11 @@ namespace OwnIdSdk.NetCore3.Web.Configuration
         public void UseAccountLinking<THandler>() where THandler : class, IAccountLinkHandler
         {
             WithFeature<AccountLinkFeature>(x => x.UseAccountLinking<THandler>());
+        }
+        
+        public void UseMetrics<TMetricsService>() where TMetricsService : class, IMetricsService
+        {
+            WithFeature<MetricsFeature>(x => x.UseMetrics<TMetricsService>());
         }
 
         public void UseAccountRecovery<THandler>()
