@@ -84,7 +84,7 @@ namespace OwnIdSdk.NetCore3.Services
         /// <returns>
         ///     <see cref="CacheItemStatus" /> and <c>did</c> if <see cref="CacheItem" /> was found, otherwise null
         /// </returns>
-        Task<CacheItem> PopFinishedAuthFlowSessionAsync(string context, string nonce);
+        Task<CacheItem> GetFinishedAuthFlowSessionAsync(string context, string nonce);
 
         /// <summary>
         ///     Tries to find <see cref="CacheItem" /> by <paramref name="context" /> in <see cref="ICacheStore" />

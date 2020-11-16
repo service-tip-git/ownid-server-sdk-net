@@ -86,6 +86,8 @@ spec:
                   key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: staging
+            - name: SERILOG__MINIMUMLEVEL__DEFAULT
+              value: Debug
 ---
 apiVersion: v1
 kind: Service
@@ -193,6 +195,8 @@ spec:
                   key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: staging
+            - name: SERILOG__MINIMUMLEVEL__DEFAULT
+              value: Debug
 ---
 apiVersion: v1
 kind: Service
@@ -302,6 +306,8 @@ spec:
                   key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: staging
+            - name: SERILOG__MINIMUMLEVEL__DEFAULT
+              value: Debug
 ---
 apiVersion: v1
 kind: Service
@@ -418,6 +424,8 @@ spec:
                   key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: staging
+            - name: SERILOG__MINIMUMLEVEL__DEFAULT
+              value: Debug
 ---
 apiVersion: v1
 kind: Service
@@ -527,6 +535,8 @@ spec:
                   key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: staging
+            - name: SERILOG__MINIMUMLEVEL__DEFAULT
+              value: Debug
 ---
 apiVersion: v1
 kind: Service
@@ -636,6 +646,8 @@ spec:
                   key: elastic_password
             - name: ASPNETCORE_ENVIRONMENT
               value: staging
+            - name: SERILOG__MINIMUMLEVEL__DEFAULT
+              value: Debug
 ---
 apiVersion: v1
 kind: Service

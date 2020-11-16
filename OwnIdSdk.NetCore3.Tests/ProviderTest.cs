@@ -139,14 +139,14 @@
 //         [Fact]
 //         public async Task GetDIDAsync_NotExistingElement()
 //         {
-//             var result = await _jwtComposer.PopFinishedAuthFlowSessionAsync(NotExistingContext, NotExistingNonce);
+//             var result = await _jwtComposer.GetFinishedAuthFlowSessionAsync(NotExistingContext, NotExistingNonce);
 //             Assert.Null(result);
 //         }
 //
 //         [Fact]
 //         public async Task GetDIDAsync_WrongNonce()
 //         {
-//             var result = await _jwtComposer.PopFinishedAuthFlowSessionAsync(ExistingContextWithDID, NotExistingNonce);
+//             var result = await _jwtComposer.GetFinishedAuthFlowSessionAsync(ExistingContextWithDID, NotExistingNonce);
 //             Assert.Null(result);
 //         }
 //
@@ -154,7 +154,7 @@
 //         public async Task GetDIDAsync_ExistingWithoutDID()
 //         {
 //             var result =
-//                 await _jwtComposer.PopFinishedAuthFlowSessionAsync(ExistingContextWithoutDID,
+//                 await _jwtComposer.GetFinishedAuthFlowSessionAsync(ExistingContextWithoutDID,
 //                     _existingItemWithoutDID.Nonce);
 //             Assert.NotNull(result);
 //             Assert.NotEqual(CacheItemStatus.Finished, result.Status);
@@ -165,7 +165,7 @@
 //         public async Task GetDIDAsync_ExistingWithDID()
 //         {
 //             var result =
-//                 await _jwtComposer.PopFinishedAuthFlowSessionAsync(ExistingContextWithDID,
+//                 await _jwtComposer.GetFinishedAuthFlowSessionAsync(ExistingContextWithDID,
 //                     _existingItemWithDID.Nonce);
 //             Assert.NotNull(result);
 //             Assert.Equal(CacheItemStatus.Finished, result.Status);

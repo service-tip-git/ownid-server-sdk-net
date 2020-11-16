@@ -55,7 +55,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 return null;
 
             var cacheItem =
-                await _cacheItemService.PopFinishedAuthFlowSessionAsync(requestItem.Context, requestItem.Nonce);
+                await _cacheItemService.GetFinishedAuthFlowSessionAsync(requestItem.Context, requestItem.Nonce);
 
             if (cacheItem == null)
                 return null;

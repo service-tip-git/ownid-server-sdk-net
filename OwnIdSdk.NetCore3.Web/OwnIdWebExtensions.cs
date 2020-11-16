@@ -19,6 +19,11 @@ namespace OwnIdSdk.NetCore3.Web
         /// </summary>
         public static void UseOwnId(this IApplicationBuilder app)
         {
+            var configuration = app.ApplicationServices.GetService<OwnIdConfiguration>();
+
+            if (configuration.HasFeature<MetricsFeature>())
+                app.UseMiddleware<MetricsMiddleware>();
+
             var routeBuilder = new RouteBuilder(app);
 
             routeBuilder.MapMiddlewarePost("ownid",
@@ -43,8 +48,6 @@ namespace OwnIdSdk.NetCore3.Web
                 builder => builder.UseMiddleware<GetActionApprovalStatusMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/status",
                 builder => builder.UseMiddleware<GetChallengeStatusMiddleware>());
-            
-            var configuration = app.ApplicationServices.GetService<OwnIdConfiguration>();
 
             if (configuration.HasFeature<AccountLinkFeature>())
                 routeBuilder.MapMiddlewarePost("ownid/{context}/link",

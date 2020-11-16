@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OwnIdSdk.NetCore3.Extensibility.Configuration;
 using OwnIdSdk.NetCore3.Redis;
+using OwnIdSdk.NetCore3.Server.Gigya.Configuration;
 using OwnIdSdk.NetCore3.Server.Gigya.External;
 using OwnIdSdk.NetCore3.Server.Gigya.Middlewares.SecurityHeaders;
 using OwnIdSdk.NetCore3.Web;
@@ -44,6 +45,12 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             var topDomain = ownIdSection["top_domain"];
             var webAppUrl = new Uri(ownIdSection["web_app_url"] ?? Constants.OwinIdApplicationAddress);
 
+            services.AddOptions();
+            services.Configure<AwsConfiguration>(Configuration.GetSection("AWS"));
+            services.Configure<Metrics>(Configuration.GetSection("Metrics"));
+
+            var metricsConfiguration = Configuration.GetSection("Metrics").Get<Metrics>();
+            
             services.AddCors(x =>
             {
                 x.AddPolicy(CorsPolicyName, builder =>
@@ -87,6 +94,9 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                     if (string.IsNullOrEmpty(loginTypeString) || !Enum.TryParse(gigyaSection["login_type"], true,
                         out GigyaLoginType loginType)) loginType = GigyaLoginType.Session;
 
+                    if (metricsConfiguration.Enable)
+                        builder.UseMetrics<AwsMetricsService>();
+                    
                     builder.UseGigya(gigyaSection["data_center"], gigyaSection["api_key"], gigyaSection["secret"],
                         gigyaSection["user_key"], loginType);
                     builder.SetKeys(ownIdSection["pub_key"], ownIdSection["private_key"]);
