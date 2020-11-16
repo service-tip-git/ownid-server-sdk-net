@@ -7,5 +7,9 @@ namespace OwnIdSdk.NetCore3.Extensibility.Exceptions
         public InternalLogicException(string message) : base(message)
         {
         }
+
+        public InternalLogicException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }

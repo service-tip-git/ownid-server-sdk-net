@@ -37,7 +37,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType, bool isStateless)
+            StepType currentStepType)
         {
             // Recover access
             var recoverResult = await _accountRecoveryHandler.RecoverAsync(relatedItem.Payload);

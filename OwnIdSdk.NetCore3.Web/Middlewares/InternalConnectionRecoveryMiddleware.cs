@@ -15,7 +15,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         private readonly IFlowRunner _flowRunner;
 
         public InternalConnectionRecoveryMiddleware(RequestDelegate next,
-            ILogger<InternalConnectionRecoveryMiddleware> logger, IFlowRunner flowRunner) : base(next, logger)
+            ILogger<InternalConnectionRecoveryMiddleware> logger, IFlowRunner flowRunner,
+            StopFlowCommand stopFlowCommand) : base(next, logger, stopFlowCommand)
         {
             _flowRunner = flowRunner;
         }

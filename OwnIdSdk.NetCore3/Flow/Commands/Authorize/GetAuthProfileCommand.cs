@@ -32,7 +32,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
         }
 
         protected override Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType, bool isStateless)
+            StepType currentStepType)
         {
             var expectedBehavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
             

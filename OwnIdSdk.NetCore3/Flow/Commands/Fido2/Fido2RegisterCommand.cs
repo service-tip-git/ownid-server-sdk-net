@@ -12,8 +12,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Fido2
     {
         public Fido2RegisterCommand(IFido2 fido2, ICacheItemService cacheItemService, IJwtComposer jwtComposer,
             IFlowController flowController, IOwnIdCoreConfiguration configuration,
-            IIdentitiesProvider identitiesProvider) : base(fido2, cacheItemService, jwtComposer, flowController,
-            configuration, identitiesProvider)
+            IIdentitiesProvider identitiesProvider, IEncodingService encodingService) : base(fido2, cacheItemService,
+            jwtComposer, flowController, configuration, identitiesProvider, encodingService)
         {
         }
 

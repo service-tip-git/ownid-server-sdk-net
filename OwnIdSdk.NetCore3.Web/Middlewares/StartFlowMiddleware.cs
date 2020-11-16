@@ -18,8 +18,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
         private readonly IFlowRunner _flowRunner;
         private readonly SetWebAppStateCommand _stateCommand;
 
-        public StartFlowMiddleware(RequestDelegate next, IFlowRunner flowRunner, ILogger<StartFlowMiddleware> logger, 
-            SetWebAppStateCommand stateCommand) : base(next, logger)
+        public StartFlowMiddleware(RequestDelegate next, IFlowRunner flowRunner, ILogger<StartFlowMiddleware> logger,
+            SetWebAppStateCommand stateCommand, StopFlowCommand stopFlowCommand) : base(next, logger, stopFlowCommand)
         {
             _flowRunner = flowRunner;
             _stateCommand = stateCommand;
@@ -34,9 +34,9 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 RecoveryToken = httpContext.Request.Cookies[_stateCommand.RecoveryCookieName],
                 RequiresRecovery = requiresRecovery
             };
-            
+
             var stateResult = await _stateCommand.ExecuteAsync(RequestIdentity.Context, request);
-            
+
             using var requestBodyStreamReader = new StreamReader(httpContext.Request.Body);
             var requestBody = await requestBodyStreamReader.ReadToEndAsync();
 
@@ -44,9 +44,9 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 ClientDate);
 
             var commandResult = await _flowRunner.RunAsync(commandInput, StepType.Starting);
-            
+
             SetCookies(httpContext.Response, stateResult.Cookies);
-            
+
             await Json(httpContext, commandResult, StatusCodes.Status200OK);
         }
     }

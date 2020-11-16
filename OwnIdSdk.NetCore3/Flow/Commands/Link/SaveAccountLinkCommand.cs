@@ -46,7 +46,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Link
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType, bool isStateless)
+            StepType currentStepType)
         {
             if (!(input is CommandInput<JwtContainer> requestJwt))
                 throw new InternalLogicException($"Incorrect input type for {nameof(SaveAccountLinkCommand)}");

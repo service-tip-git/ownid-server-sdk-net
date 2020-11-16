@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,9 +37,12 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
         {
             var ownIdSection = Configuration.GetSection("ownid");
             var gigyaSection = Configuration.GetSection("gigya");
-            var isDevelopment = Configuration.GetValue("OwnIdDevelopmentMode", false);
+            
+            if (!Enum.TryParse(Configuration["server_mode"], true, out ServerMode serverMode))
+                serverMode = ServerMode.Production;
+            
             var topDomain = ownIdSection["top_domain"];
-            var webAppUrl = new Uri(ownIdSection["web_app_url"] ?? "https://sign.ownid.com");
+            var webAppUrl = new Uri(ownIdSection["web_app_url"] ?? Constants.OwinIdApplicationAddress);
 
             services.AddCors(x =>
             {
@@ -51,15 +55,24 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
                     var originsList = new List<string>();
 
-                    if (isDevelopment)
+                    switch (serverMode)
                     {
-                        builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost");
-                    }
-                    else
-                    {
-                        originsList.Add($"https://*.{topDomain}");
-                        originsList.Add($"https://{topDomain}");
-                        originsList.Add(webAppUrl.ToString().TrimEnd('/'));
+                        case ServerMode.Pilot:
+                            builder.SetIsOriginAllowed(origin => true);
+                            break;
+                        case ServerMode.Local:
+                            builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost");
+                            break;
+                        default:
+                            originsList.Add($"https://*.{topDomain}");
+                            originsList.Add($"https://{topDomain}");
+                            originsList.Add(webAppUrl.ToString().TrimEnd('/'));
+
+                            var additionalOrigins = ownIdSection["add_cors_origins"];
+
+                            if (!string.IsNullOrWhiteSpace(additionalOrigins))
+                                originsList.AddRange(additionalOrigins.Split(';').Select(o => o.Trim()));
+                            break;
                     }
 
                     builder.WithOrigins(originsList.ToArray());
@@ -107,7 +120,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                         x.OwnIdApplicationUrl = webAppUrl;
                         x.OverwriteFields = ownIdSection.GetValue<bool>("overwrite_fields");
 
-                        x.AuthenticationMode = ownIdSection.GetValue("authentication_mode", AuthenticationModeType.OwnIdOnly);
+                        x.AuthenticationMode =
+                            ownIdSection.GetValue("authentication_mode", AuthenticationModeType.OwnIdOnly);
 
                         if (x.AuthenticationMode.IsFido2Enabled())
                         {
@@ -116,15 +130,15 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
                             x.Fido2.RelyingPartyId = ownIdSection["fido2_relying_party_id"];
                             x.Fido2.RelyingPartyName = ownIdSection["fido2_relying_party_name"];
-                            x.Fido2.UserDisplayName = ownIdSection["fido2_user_display_name"];
                             x.Fido2.UserName = ownIdSection["fido2_user_name"];
+                            x.Fido2.UserDisplayName = ownIdSection["fido2_user_display_name"];
 
-                            if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
+                            if(!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
                                 x.Fido2.Origin = new Uri(ownIdSection["fido2_origin"]);
                         }
 
                         //for development cases
-                        x.IsDevEnvironment = isDevelopment;
+                        x.IsDevEnvironment = serverMode == ServerMode.Local;
                     });
                 });
 
@@ -157,7 +171,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             // TODO: not for prod
             app.UseMiddleware<LogRequestMiddleware>();
             var routeBuilder = new RouteBuilder(app);
-            routeBuilder.MapMiddlewarePost("log",
+            routeBuilder.MapMiddlewarePost("ownid/log",
                 builder => builder.UseMiddleware<LogMiddleware>());
             routeBuilder.MapMiddlewarePost("not-ownid/register",
                 builder => builder.UseMiddleware<ExternalRegisterMiddleware>());

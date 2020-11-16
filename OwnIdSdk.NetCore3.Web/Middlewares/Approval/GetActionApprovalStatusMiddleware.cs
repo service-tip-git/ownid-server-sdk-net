@@ -15,7 +15,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares.Approval
         private readonly IFlowRunner _flowRunner;
 
         public GetActionApprovalStatusMiddleware(RequestDelegate next, IFlowRunner flowRunner,
-            ILogger<GetActionApprovalStatusMiddleware> logger) : base(next, logger)
+            ILogger<GetActionApprovalStatusMiddleware> logger, StopFlowCommand stopFlowCommand) : base(next, logger,
+            stopFlowCommand)
         {
             _flowRunner = flowRunner;
         }

@@ -41,6 +41,17 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
         public FlowType FlowType { get; set; }
 
         /// <summary>
+        ///     Indicate if current flow is Fido2 flow
+        /// </summary>
+        public bool IsStateless =>
+            FlowType == FlowType.Fido2Login
+            || FlowType == FlowType.Fido2Register
+            || FlowType == FlowType.Fido2Link
+            || FlowType == FlowType.Fido2LinkWithPin
+            || FlowType == FlowType.Fido2Recover
+            || FlowType == FlowType.Fido2RecoverWithPin;
+
+        /// <summary>
         ///     Request Token from Web App
         /// </summary>
         public string RequestToken { get; set; }

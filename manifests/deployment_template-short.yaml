@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: <company-name>-deployment # <client-name> - name of company, for example nestle
+  namespace: prod
+  labels:
+    app: <company-name>
+spec:
+  revisionHistoryLimit: 1
+  replicas: 2
+  selector:
+    matchLabels:
+      app: <company-name>
+  template:
+    metadata:
+      labels:
+        app: <company-name>
+    spec:
+      containers:
+        - name: <company-name>
+          image: <ownid-image-url> # path to image, ex: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging:latest
+          ports:
+            - containerPort: 5002
+          env:
+            - name: OWNID__CALLBACK_URL # Public server domain name (CNAME). Example: https://my-company.ownid.com 
+              value: https://<company-name>.ownid.com 
+            - name: OWNID__DID # Unique website identifier. Example: did:my-company:63302f94e20e45a4a3e7a6e5f1863a16
+              value: did:<company-name>:<did>
+            - name: OWNID__NAME # Website name - will be shown on https://app.ownid.com
+              value: <Company name>
+            - name: OWNID__DESCRIPTION # Website description - will be shown on https://app.ownid.com
+              value: <Company description>
+            - name: OWNID__ICON # Website icon - will be shown on https://app.ownid.com
+              value: <Company icon base64>
+            - name: OWNID__CACHE_TYPE # Type of cache
+              value: redis
+            - name: OWNID__CACHE_CONFIG # Redis connection string
+              value: <redis uri>
+            - name: OWNID__PUB_KEY # Website RSA public key 
+              value: <website public key>
+            - name: OWNID__PRIVATE_KEY # Website RSA private key 
+              value: <website private key>
+            - name: OWNID__AUTHENTICATION_MODE # Authentication mode: All(OwnID or FIDO2), OwnIdOnly, Fido2Only
+              value: All
+            - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL # Passwordless page subdomain (CNAME). Example: https://passwordless.my-company.com
+              value: https://passwordless.<website domain>
+            - name: OWNID__FIDO2_RELYING_PARTY_NAME # Party(company) name that will be shown to user. Example: My Company, Nestle, BBC
+              value: <party_name>
+            - name: OWNID__TOP_DOMAIN # Company domain that Passwordless page is tightened to. Example: my-company.com
+              value: <company-domain>
+            - name: GIGYA__DATA_CENTER # Gigya data center
+              value: us1.gigya.com
+            - name: GIGYA__SECRET # Gigya secret
+              value: <gigya secret>
+            - name: GIGYA__API_KEY # Gigya api key
+              value: <gigya api key>
+            - name: GIGYA__USER_KEY # Gigya user key
+              value: <gigya user key>

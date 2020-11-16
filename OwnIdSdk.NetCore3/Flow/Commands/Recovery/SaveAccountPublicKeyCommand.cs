@@ -7,8 +7,6 @@ using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Abstractions;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
-using OwnIdSdk.NetCore3.Extensibility.Services;
-using OwnIdSdk.NetCore3.Flow.Adapters;
 using OwnIdSdk.NetCore3.Flow.Interfaces;
 using OwnIdSdk.NetCore3.Flow.Steps;
 using OwnIdSdk.NetCore3.Services;
@@ -19,8 +17,6 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
     {
         private readonly ICacheItemService _cacheItemService;
         private readonly IOwnIdCoreConfiguration _coreConfiguration;
-        private readonly IUserHandlerAdapter _userHandlerAdapter;
-        private readonly ILocalizationService _localizationService;
         private readonly IFlowController _flowController;
         private readonly IJwtComposer _jwtComposer;
         private readonly IJwtService _jwtService;
@@ -28,8 +24,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
 
         public SaveAccountPublicKeyCommand(ICacheItemService cacheItemService, IJwtService jwtService,
             IJwtComposer jwtComposer, IFlowController flowController, IAccountRecoveryHandler recoveryHandler,
-            IOwnIdCoreConfiguration coreConfiguration, IUserHandlerAdapter userHandlerAdapter,
-            ILocalizationService localizationService)
+            IOwnIdCoreConfiguration coreConfiguration)
         {
             _cacheItemService = cacheItemService;
             _jwtService = jwtService;
@@ -37,8 +32,6 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
             _flowController = flowController;
             _recoveryHandler = recoveryHandler;
             _coreConfiguration = coreConfiguration;
-            _userHandlerAdapter = userHandlerAdapter;
-            _localizationService = localizationService;
         }
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
@@ -50,33 +43,26 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Recovery
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType, bool isStateless)
+            StepType currentStepType)
         {
             if (!(input is CommandInput<JwtContainer> requestJwt))
                 throw new InternalLogicException($"Incorrect input type for {nameof(SaveAccountPublicKeyCommand)}");
 
             var userData = _jwtService.GetDataFromJwt<UserProfileData>(requestJwt.Data.Jwt).Data;
 
-            var userExists = await _userHandlerAdapter.IsUserExistsAsync(userData.PublicKey);
-            if (userExists)
-            {
-                relatedItem = await _cacheItemService.FinishFlowWithErrorAsync(relatedItem.Context,
-                    _localizationService.GetLocalizedString("Error_PhoneAlreadyConnected"));
-            }
-            else
-            {
-                if (!_coreConfiguration.OverwriteFields)
-                    userData.Profile = null;
+            await _recoveryHandler.RemoveConnectionsAsync(userData.PublicKey);
 
-                await _recoveryHandler.OnRecoverAsync(userData.DID, new OwnIdConnection
-                {
-                    PublicKey = userData.PublicKey,
-                    RecoveryToken = relatedItem.RecoveryToken,
-                    RecoveryData = userData.RecoveryData
-                });
+            if (!_coreConfiguration.OverwriteFields)
+                userData.Profile = null;
 
-                await _cacheItemService.FinishAuthFlowSessionAsync(input.Context, userData.DID, userData.PublicKey);
-            }
+            await _recoveryHandler.OnRecoverAsync(userData.DID, new OwnIdConnection
+            {
+                PublicKey = userData.PublicKey,
+                RecoveryToken = relatedItem.RecoveryToken,
+                RecoveryData = userData.RecoveryData
+            });
+
+            await _cacheItemService.FinishAuthFlowSessionAsync(input.Context, userData.DID, userData.PublicKey);
 
             var composeInfo = new BaseJwtComposeInfo
             {

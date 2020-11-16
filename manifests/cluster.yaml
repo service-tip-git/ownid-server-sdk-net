@@ -15,13 +15,6 @@ metadata:
 apiVersion: 'v1'
 kind: 'Namespace'
 metadata:
-  name: 'alpha'
-  labels:
-    name: 'alpha'
----
-apiVersion: 'v1'
-kind: 'Namespace'
-metadata:
   name: 'prod'
   labels:
     name: 'prod'

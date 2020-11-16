@@ -25,6 +25,10 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
+            // var throwEx = true;
+            // if (throwEx)
+            //     throw new InternalLogicException("test exception");
+            
             if (relatedItem.HasFinalState)
                 throw new CommandValidationException(
                     "Cache item should be not have final state" +
@@ -32,7 +36,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType, bool isStateless)
+            StepType currentStepType)
         {
             var step = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);
             var pin = await _cacheItemService.SetSecurityCodeAsync(relatedItem.Context);
@@ -45,7 +49,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
                 Locale = input.CultureInfo?.Name
             };
 
-            if (!isStateless)
+            if (!relatedItem.IsStateless)
             {
                 composeInfo.EncToken = relatedItem.EncToken;
                 composeInfo.CanBeRecovered = !string.IsNullOrEmpty(relatedItem.RecoveryToken);

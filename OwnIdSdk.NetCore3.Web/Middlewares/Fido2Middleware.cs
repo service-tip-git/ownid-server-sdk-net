@@ -15,8 +15,8 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
     {
         private readonly IFlowRunner _flowRunner;
 
-        public Fido2Middleware(RequestDelegate next, IFlowRunner flowRunner, ILogger<Fido2Middleware> logger) : base(
-            next, logger)
+        public Fido2Middleware(RequestDelegate next, IFlowRunner flowRunner, ILogger<Fido2Middleware> logger,
+            StopFlowCommand stopFlowCommand) : base(next, logger, stopFlowCommand)
         {
             _flowRunner = flowRunner;
         }

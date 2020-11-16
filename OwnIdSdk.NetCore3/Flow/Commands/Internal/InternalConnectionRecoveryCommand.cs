@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using OwnIdSdk.NetCore3.Extensibility.Cache;
-using OwnIdSdk.NetCore3.Extensibility.Exceptions;
 using OwnIdSdk.NetCore3.Extensibility.Flow;
 using OwnIdSdk.NetCore3.Extensibility.Flow.Contracts.Jwt;
 using OwnIdSdk.NetCore3.Flow.Adapters;
@@ -28,7 +27,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType, bool isStateless)
+            StepType currentStepType)
         {
             var result = await _userHandlerAdapter.GetConnectionRecoveryDataAsync(relatedItem.RecoveryToken, true);
             

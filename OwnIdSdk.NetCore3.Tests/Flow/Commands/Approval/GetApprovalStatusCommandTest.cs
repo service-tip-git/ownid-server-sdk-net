@@ -20,8 +20,8 @@ namespace OwnIdSdk.NetCore3.Tests.Flow.Commands.Approval
         [Theory]
         [AutoMoqData]
         public async Task ExecuteAsync_Decline_Success(Mock<IJwtComposer> jwtComposer,
-            Mock<IFlowController> flowController, IAccountRecoveryHandler recoveryHandler,
-            IServiceProvider serviceProvider, CacheItem cacheItem, FrontendBehavior frontendBehavior)
+            Mock<IFlowController> flowController, IAccountRecoveryHandler recoveryHandler, CacheItem cacheItem,
+            FrontendBehavior frontendBehavior)
         {
             var requestIdentity = new RequestIdentity
             {

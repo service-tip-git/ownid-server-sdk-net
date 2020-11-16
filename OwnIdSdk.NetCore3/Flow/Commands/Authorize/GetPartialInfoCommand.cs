@@ -25,6 +25,10 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
+            // var throwEx = true;
+            // if (throwEx)
+            //     throw new InternalLogicException("test exception");
+            
             if (relatedItem.HasFinalState)
                 throw new CommandValidationException(
                     "Cache item should be not Finished with Login or Register challenge type. " +
@@ -32,7 +36,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
         }
 
         protected override Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType, bool isStateless)
+            StepType currentStepType)
         {
             var composeInfo = new BaseJwtComposeInfo
             {
@@ -43,7 +47,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Authorize
                 IncludeRequester = true
             };
 
-            if (!isStateless)
+            if (!relatedItem.IsStateless)
             {
                 composeInfo.EncToken = relatedItem.EncToken;
                 composeInfo.CanBeRecovered = !string.IsNullOrEmpty(relatedItem.RecoveryToken);

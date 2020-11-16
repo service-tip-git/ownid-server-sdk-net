@@ -41,7 +41,7 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
         }
 
         protected override async Task<ICommandResult> ExecuteInternalAsync(ICommandInput input, CacheItem relatedItem,
-            StepType currentStepType, bool isStateless)
+            StepType currentStepType)
         {
             var request = input as CommandInput<UserExistsRequest>;
             var result = await Check(request);
@@ -70,6 +70,11 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
 
         public async Task<bool> Check(CommandInput<UserExistsRequest> input)
         {
+            // Do nothing for recovery flow
+            var relatedItem = await _cacheItemService.GetCacheItemByContextAsync(input.Context);
+            if (relatedItem.ChallengeType == ChallengeType.Recover)
+                return false;
+
             bool result;
 
             if (string.IsNullOrWhiteSpace(input.Data.UserIdentifier))

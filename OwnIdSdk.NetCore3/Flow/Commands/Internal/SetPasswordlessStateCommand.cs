@@ -19,11 +19,14 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
             _configuration = configuration;
             EncryptionCookieName = string.Format(CookieNameTemplates.PasswordlessEncryption, _configuration.CookieReference);
             RecoveryCookieName = string.Format(CookieNameTemplates.PasswordlessRecovery, _configuration.CookieReference);
+            CredIdCookieName = string.Format(CookieNameTemplates.PasswordlessCredId, _configuration.CookieReference);
         }
 
         public string RecoveryCookieName { get; }
 
         public string EncryptionCookieName { get; }
+        
+        public string CredIdCookieName { get; }
 
         public async Task<StateResult> ExecuteAsync(string context, StateRequest request)
         {
@@ -61,6 +64,16 @@ namespace OwnIdSdk.NetCore3.Flow.Commands.Internal
                 {
                     Name = RecoveryCookieName,
                     Value = recoveryToken,
+                    Options = cookieOptions
+                });
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.CredId))
+            {
+                result.Cookies.Add(new CookieInfo
+                {
+                    Name = CredIdCookieName,
+                    Value = request.CredId,
                     Options = cookieOptions
                 });
             }
