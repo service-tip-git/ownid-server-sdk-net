@@ -94,7 +94,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                     if (string.IsNullOrEmpty(loginTypeString) || !Enum.TryParse(gigyaSection["login_type"], true,
                         out GigyaLoginType loginType)) loginType = GigyaLoginType.Session;
 
-                    if (metricsConfiguration.Enable)
+                    if (metricsConfiguration != null && metricsConfiguration.Enable)
                         builder.UseMetrics<AwsMetricsService>();
                     
                     builder.UseGigya(gigyaSection["data_center"], gigyaSection["api_key"], gigyaSection["secret"],

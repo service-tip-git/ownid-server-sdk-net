@@ -74,9 +74,9 @@ spec:
               value: <elastic search username>
             - name: ELASTICCONFIGURATION__PASSWORD # Elastic Search password
               value: <elastic search password>
-            - name: Metrics_Enable # Metrics enabled
+            - name: Metrics__Enable # Metrics enabled
               value: 'true'
-            - name: Metrics_Namespace # AWS Metrics namespace
+            - name: Metrics__Namespace # AWS Metrics namespace
               value: <namespace>
             - name: AWS__Region # AWS Region
               value: <region>

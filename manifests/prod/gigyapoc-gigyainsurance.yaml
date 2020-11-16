@@ -93,9 +93,9 @@ spec:
                 secretKeyRef:
                   name: ownid-secrets
                   key: elastic_password
-            - name: Metrics_Enable
+            - name: Metrics__Enable
               value: 'true'
-            - name: Metrics_Namespace
+            - name: Metrics__Namespace
               value: 'Gigyapoc-Gigyainsurance'
             - name: AWS__Region
               valueFrom:
