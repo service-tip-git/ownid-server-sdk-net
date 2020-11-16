@@ -86,9 +86,9 @@ spec:
                 secretKeyRef:
                   name: credential-secrets
                   key: elastic_password
-            - name: Metrics_Enable
+            - name: Metrics__Enable
               value: 'true'
-            - name: Metrics_Namespace
+            - name: Metrics__Namespace
               value: 'OwnId Dev'
             - name: AWS__Region
               valueFrom:

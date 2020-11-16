@@ -95,9 +95,9 @@ spec:
                   key: elastic_password
             - name: SERVER_MODE
               value: pilot
-            - name: Metrics_Enable
+            - name: Metrics__Enable
               value: 'true'
-            - name: Metrics_Namespace
+            - name: Metrics__Namespace
               value: 'Nestle-Hipster'
             - name: AWS__Region
               valueFrom:
