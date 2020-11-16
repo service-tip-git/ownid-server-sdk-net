@@ -23,7 +23,7 @@ spec:
             - containerPort: 5002
           env:
             - name: OWNID__CALLBACK_URL # Public server domain name (CNAME). Example: https://my-company.ownid.com 
-              value: https://<company-name>.ownid.com 
+              value: https://<company-name>.ownid.com
             - name: OWNID__DID # Unique website identifier. Example: did:my-company:63302f94e20e45a4a3e7a6e5f1863a16
               value: did:<company-name>:<did>
             - name: OWNID__NAME # Website name - will be shown on https://app.ownid.com
@@ -56,3 +56,14 @@ spec:
               value: <gigya api key>
             - name: GIGYA__USER_KEY # Gigya user key
               value: <gigya user key>
+            - name: Metrics_Enable # Metrics enabled
+              value: 'true'
+            - name: Metrics_Namespace # AWS Metrics namespace
+              value: <namespace>
+            - name: AWS__Region # AWS Region
+              value: <region>
+            - name: AWS__AccessKeyId # AWS access key Id
+              value: <access key id>
+            - name: AWS__SecretAccessKey # AWS secret access key
+              value: <secret access key>      
+            
