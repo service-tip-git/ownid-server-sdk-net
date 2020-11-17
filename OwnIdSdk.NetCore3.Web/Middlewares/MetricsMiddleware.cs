@@ -29,6 +29,11 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             }
         }
 
+        private class ApprovalStatus
+        {
+            public string Status { get; set; }
+        }
+
         private readonly RequestDelegate _next;
         private readonly ICacheItemService _cacheItemService;
         private readonly IMetricsService _metricsService;
@@ -85,7 +90,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             var match = ContextRegex.Match(httpContext.Request.Path.Value);
             return match.Success ? match.Groups["context"].Value : null;
         }
-        
+
         private async Task ProcessRequestAsync(HttpContext httpContext)
         {
             if (!httpContext.Request.Path.HasValue
@@ -107,6 +112,7 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 httpContext.Request.Body.Position = 0;
                 return;
             }
+
             httpContext.Request.Body.Position = 0;
 
             var context = GetOwnIdContext(httpContext);
@@ -117,14 +123,19 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             if (item == null)
                 return;
 
-            await _metricsService.LogAsync(item.ChallengeType.ToString());
+            await _metricsService.LogStartAsync(item.ChallengeType.ToString());
         }
 
         private async Task ProcessResponseAsync(HttpContext httpContext)
         {
             if (!httpContext.Request.Path.HasValue
                 || httpContext.Request.Method != HttpMethod.Post.Method
-                || !httpContext.Request.Path.Value.EndsWith("/status"))
+                ||
+                (
+                    !httpContext.Request.Path.Value.EndsWith("/status")
+                    && !httpContext.Request.Path.Value.EndsWith("/approval-status")
+                )
+            )
             {
                 return;
             }
@@ -132,6 +143,36 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
             httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
             var response = await new StreamReader(httpContext.Response.Body).ReadToEndAsync();
 
+            if (httpContext.Request.Path.Value.EndsWith("/status"))
+            {
+                await ProcessStatusResponseAsync(response);
+            }
+            else if (httpContext.Request.Path.Value.EndsWith("/approval-status"))
+            {
+                await ProcessApprovalStatusResponseAsync(response, httpContext);
+            }
+        }
+
+        private async Task ProcessApprovalStatusResponseAsync(string response, HttpContext httpContext)
+        {
+            var approvalStatus = OwnIdSerializer.Deserialize<ApprovalStatus>(response);
+            if (!string.Equals(approvalStatus.Status, CacheItemStatus.Declined.ToString(),
+                StringComparison.InvariantCultureIgnoreCase))
+            {
+                return;
+            }
+
+            var ownIdContext = GetOwnIdContext(httpContext);
+
+            var cacheItem = await _cacheItemService.GetCacheItemByContextAsync(ownIdContext);
+            if (cacheItem == null)
+                return;
+
+            await _metricsService.LogCancelAsync($"{cacheItem.ChallengeType}");
+        }
+
+        private async Task ProcessStatusResponseAsync(string response)
+        {
             var statuses = OwnIdSerializer.Deserialize<List<ContextStatus>>(response);
             foreach (var item in statuses.Where(i => i.Status == CacheItemStatus.Finished))
             {
@@ -139,8 +180,14 @@ namespace OwnIdSdk.NetCore3.Web.Middlewares
                 if (cacheItem == null)
                     continue;
 
-                var result = string.IsNullOrEmpty(item.Payload?.Error) ? "success" : "error";
-                await _metricsService.LogAsync($"{cacheItem.ChallengeType} {result}");
+                if (string.IsNullOrEmpty(item.Payload?.Error))
+                {
+                    await _metricsService.LogFinishAsync($"{cacheItem.ChallengeType}");
+                }
+                else
+                {
+                    await _metricsService.LogErrorAsync($"{cacheItem.ChallengeType}");
+                }
             }
         }
     }

@@ -32,7 +32,6 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             }
         }
 
-        private readonly IOptions<AwsConfiguration> _awsConfiguration;
         private readonly IOptions<Metrics> _metricsConfiguration;
         private readonly ILogger<AwsMetricsService> _logger;
 
@@ -50,7 +49,6 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
         public AwsMetricsService(IOptions<AwsConfiguration> awsConfiguration, IOptions<Metrics> metricsConfiguration,
             ILogger<AwsMetricsService> logger)
         {
-            _awsConfiguration = awsConfiguration;
             _metricsConfiguration = metricsConfiguration;
             _logger = logger;
 
@@ -60,16 +58,10 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
                 Enabled = true
             };
             _timer.Elapsed += ProcessQueue;
-            
-            _amazonCloudWatchClient = new AmazonCloudWatchClient(_awsConfiguration.Value.AccessKeyId,
-                _awsConfiguration.Value.SecretAccessKey,
-                RegionEndpoint.GetBySystemName(_awsConfiguration.Value.Region));
-        }
 
-        public Task LogAsync(string metricName)
-        {
-            _loggedData.Enqueue(new Metric(RoundToMinute(DateTime.UtcNow), metricName));
-            return Task.CompletedTask;
+            _amazonCloudWatchClient = new AmazonCloudWatchClient(awsConfiguration.Value.AccessKeyId,
+                awsConfiguration.Value.SecretAccessKey,
+                RegionEndpoint.GetBySystemName(awsConfiguration.Value.Region));
         }
 
         private readonly object _processQueueSync = new object();
@@ -173,6 +165,37 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
         {
             _timer?.Dispose();
             _amazonCloudWatchClient?.Dispose();
+        }
+
+        public Task LogStartAsync(string actionName)
+        {
+            return LogAsync(actionName);
+        }
+
+        public Task LogFinishAsync(string actionName)
+        {
+            return LogAsync($"{actionName} success");
+        }
+
+        public Task LogErrorAsync(string actionName)
+        {
+            return LogAsync($"{actionName} error");
+        }
+
+        public Task LogSwitchAsync(string actionName)
+        {
+            return LogAsync($"{actionName} switched");
+        }
+
+        public Task LogCancelAsync(string actionName)
+        {
+            return LogAsync($"{actionName} canceled");
+        }
+
+        private Task LogAsync(string metricName)
+        {
+            _loggedData.Enqueue(new Metric(RoundToMinute(DateTime.UtcNow), metricName));
+            return Task.CompletedTask;
         }
     }
 }
