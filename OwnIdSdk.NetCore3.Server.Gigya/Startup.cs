@@ -183,8 +183,8 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
             var routeBuilder = new RouteBuilder(app);
             routeBuilder.MapMiddlewarePost("ownid/log",
                 builder => builder.UseMiddleware<LogMiddleware>());
-            routeBuilder.MapMiddlewarePost("not-ownid/register",
-                builder => builder.UseMiddleware<ExternalRegisterMiddleware>());
+            // routeBuilder.MapMiddlewarePost("not-ownid/register",
+            //     builder => builder.UseMiddleware<ExternalRegisterMiddleware>());
             app.UseRouter(routeBuilder.Build());
 
             app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()

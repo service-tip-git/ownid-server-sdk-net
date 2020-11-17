@@ -13,10 +13,10 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 {
     public class LogMiddleware
     {
-        private readonly ILogger<LogRequestMiddleware> _logger;
+        private readonly ILogger<LogMiddleware> _logger;
         private readonly RequestDelegate _next;
 
-        public LogMiddleware(RequestDelegate next, ILogger<LogRequestMiddleware> logger)
+        public LogMiddleware(RequestDelegate next, ILogger<LogMiddleware> logger)
         {
             _next = next;
             _logger = logger;
