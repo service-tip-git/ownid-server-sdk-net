@@ -146,8 +146,8 @@ namespace OwnIdSdk.NetCore3.Flow.Commands
 
                 if (initialChallengeType != cacheItem.ChallengeType)
                 {
-                    _metricsService?.LogAsync($"{initialChallengeType} switched");
-                    _metricsService?.LogAsync(cacheItem.ChallengeType.ToString());
+                    _metricsService?.LogSwitchAsync($"{initialChallengeType}");
+                    _metricsService?.LogStartAsync($"{cacheItem.ChallengeType}");
                 }
             }
         }

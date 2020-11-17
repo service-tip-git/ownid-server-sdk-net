@@ -20,7 +20,7 @@ namespace OwnIdSdk.NetCore3.Server.Gigya
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if (string.Equals(context.Request.Path, "/log", StringComparison.InvariantCultureIgnoreCase))
+            if (string.Equals(context.Request.Path, "/ownid/log", StringComparison.InvariantCultureIgnoreCase))
             {
                 await _next(context);
                 return;
