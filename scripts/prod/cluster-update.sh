@@ -1,6 +1,11 @@
 #!bin/sh
 IMAGE_URI=$1
 
+echo Deploying Demo
+kubectl apply -f manifests/prod/demo.yaml
+kubectl -n=prod set image deployment/ownid-demo-server-deployment ownid-demo-server=$IMAGE_URI --record
+echo
+
 echo Deploying Pilot
 kubectl apply -f manifests/prod/pilot.yaml
 kubectl -n=prod set image deployment/ownid-pilot-server-deployment ownid-pilot-server=$IMAGE_URI --record
