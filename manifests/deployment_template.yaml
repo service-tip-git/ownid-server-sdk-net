@@ -46,7 +46,7 @@ spec:
               value: https://passwordless.<website domain>
             - name: OWNID__FIDO2_RELYING_PARTY_ID # Website domain name. Example: my-company.com 
               value: <domain-name>
-            - name: OWNID__FIDO2_RELYING_PARTY_NAME # Party(company) name that will be shown to user. Example: My Company, Nestle, BBC
+            - name: OWNID__FIDO2_RELYING_PARTY_NAME # Party(company) name that will be shown to user. Example: My Company, Nestle, BBC. Value is copied from OWNID__NAME by default
               value: <party_name>
             - name: OWNID__FIDO2_USER_NAME # Mobile FIDO2 identity name. Default is 'Skip the password'
               value: 'Skip the password'

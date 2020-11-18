@@ -44,8 +44,6 @@ spec:
               value: All
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL # Passwordless page subdomain (CNAME). Example: https://passwordless.my-company.com
               value: https://passwordless.<website domain>
-            - name: OWNID__FIDO2_RELYING_PARTY_NAME # Party(company) name that will be shown to user. Example: My Company, Nestle, BBC
-              value: <party_name>
             - name: OWNID__TOP_DOMAIN # Company domain that Passwordless page is tightened to. Example: my-company.com
               value: <company-domain>
             - name: GIGYA__DATA_CENTER # Gigya data center

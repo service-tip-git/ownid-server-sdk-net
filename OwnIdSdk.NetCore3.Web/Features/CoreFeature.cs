@@ -108,6 +108,9 @@ namespace OwnIdSdk.NetCore3.Web.Features
             {
                 if (string.IsNullOrWhiteSpace(_configuration.Fido2.RelyingPartyId))
                     _configuration.Fido2.RelyingPartyId = _configuration.Fido2.PasswordlessPageUrl?.Host;
+
+                if (string.IsNullOrWhiteSpace(_configuration.Fido2.RelyingPartyName))
+                    _configuration.Fido2.RelyingPartyName = _configuration.Name;
                 
                 if(string.IsNullOrWhiteSpace(_configuration.Fido2.UserName))
                     _configuration.Fido2.UserName = "Skip the password";
