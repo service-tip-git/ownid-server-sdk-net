@@ -60,7 +60,7 @@ spec:
             - name: OWNID__FIDO2_RELYING_PARTY_NAME
               value: OwnID
             - name: OWNID__TOP_DOMAIN
-              value: demo.ownid.com
+              value: demo.staging.ownid.com
             - name: GIGYA__DATA_CENTER
               value: us1.gigya.com
             - name: GIGYA__SECRET
@@ -282,7 +282,7 @@ spec:
             - name: OWNID__FIDO2_RELYING_PARTY_NAME
               value: OwnID
             - name: OWNID__TOP_DOMAIN
-              value: demo3.ownid.com
+              value: demo3.staging.ownid.com
             - name: GIGYA__DATA_CENTER
               value: us1.gigya.com
             - name: GIGYA__SECRET
@@ -393,7 +393,7 @@ spec:
             - name: OWNID__FIDO2_RELYING_PARTY_NAME
               value: OwnID
             - name: OWNID__TOP_DOMAIN
-              value: demo4.ownid.com
+              value: demo4.staging.ownid.com
             - name: GIGYA__DATA_CENTER
               value: us1.gigya.com
             - name: GIGYA__SECRET
