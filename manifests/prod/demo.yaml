@@ -48,8 +48,6 @@ spec:
               value: All
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.demo.ownid.com
-            - name: OWNID__FIDO2_RELYING_PARTY_NAME
-              value: OwnID
             - name: OWNID__TOP_DOMAIN
               value: demo.ownid.com
             - name: GIGYA__DATA_CENTER

@@ -48,8 +48,6 @@ spec:
               value: All
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.pilot.ownid.com
-            - name: OWNID__FIDO2_RELYING_PARTY_NAME
-              value: OwnIDPilot
             - name: OWNID__FIDO2_USER_NAME
               value: 'Skip the password'
             - name: OWNID__TOP_DOMAIN
