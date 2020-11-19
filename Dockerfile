@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 WORKDIR /app
 
 EXPOSE 5002
@@ -12,11 +12,10 @@ COPY ./OwnIdSdk.NetCore3.Web.Gigya ./OwnIdSdk.NetCore3.Web.Gigya
 COPY ./OwnIdSdk.NetCore3.Server.Gigya ./OwnIdSdk.NetCore3.Server.Gigya
 COPY ./OwnIdSdk.NetCore3.Redis ./OwnIdSdk.NetCore3.Redis
 
-RUN dotnet restore ./OwnIdSdk.NetCore3.Server.Gigya/OwnIdSdk.NetCore3.Server.Gigya.csproj
 RUN dotnet publish ./OwnIdSdk.NetCore3.Server.Gigya/OwnIdSdk.NetCore3.Server.Gigya.csproj -c Release -o out
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine
 WORKDIR /app
 COPY --from=build-env /app/out .
 
