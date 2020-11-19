@@ -4,7 +4,7 @@
       "collectionName":"OwnIdSdk",
       "folders":[
         {
-          "startingFolderPath":"OwnIdSdk.NetCore3.Web/Resources",
+          "startingFolderPath":"OwnID.Web/Resources",
           "sourceFilters":["strings.json"],
           "targetFolderPath":"."
         }

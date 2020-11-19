@@ -14,7 +14,7 @@ ENV=$1
 # aws s3 cp ./OwnIdSdk.NetCore3.Web/bin/Release/netcoreapp3.1 $S3PATH/$FOLDER --recursive
 
 #Deploy Netcore3 Server-Gigya
-PKG_VERSION=`xmllint --xpath "string(//Project/PropertyGroup/AssemblyVersion)" ./OwnIdSdk.NetCore3.Server.Gigya/OwnIdSdk.NetCore3.Server.Gigya.csproj`
+PKG_VERSION=`xmllint --xpath "string(//Project/PropertyGroup/AssemblyVersion)" ./OwnID.Server.Gigya/OwnID.Server.Gigya.csproj`
 IMAGE_URI=$ARTIFACTORY_URL/$ENV/server/ownid-server-gigya_${PKG_VERSION-}:$TRAVIS_COMMIT
 
 echo Docker push to $IMAGE_URI

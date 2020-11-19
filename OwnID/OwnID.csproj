@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Fido2" Version="2.0.0-preview2" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.4" />
+      <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.6.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>OwnID.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\OwnID.Extensibility\OwnID.Extensibility.csproj" />
+    </ItemGroup>
+
+</Project>
