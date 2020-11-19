@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "OwnIdSdk.NetCore3.Server.Gigya": {
+    "OwnID.Server.Gigya": {
       "commandName": "Project",
       "launchBrowser": false,
       "launchUrl": "weatherforecast",
