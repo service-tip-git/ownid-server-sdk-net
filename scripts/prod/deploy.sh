@@ -7,6 +7,10 @@ echo Docker push to $IMAGE_URI
 docker tag ownid-server-gigya:latest $IMAGE_URI
 docker push $IMAGE_URI
 
+echo Update IMAGE in base kustomization.yaml
+(cd manifests/base && kustomize edit set image server-gigya=$IMAGE_URI)
+echo
+
 echo Adding K8S clusters...
 aws eks --region us-east-1 update-kubeconfig --name ownid-production-cluster
 aws eks --region us-east-2 update-kubeconfig --name ownid-eks
@@ -15,10 +19,10 @@ echo
 echo Prod A Deployment
 kubectl config use-context arn:aws:eks:us-east-1:571861302935:cluster/ownid-production-cluster
 echo
-bash scripts/prod/cluster-update.sh $IMAGE_URI
+bash scripts/prod/cluster-update.sh
 echo
 
 echo Prod B Deployment
 kubectl config use-context arn:aws:eks:us-east-2:571861302935:cluster/ownid-eks
 echo
-bash scripts/prod/cluster-update.sh $IMAGE_URI
+bash scripts/prod/cluster-update.sh

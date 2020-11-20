@@ -1,9 +1,4 @@
 #!bin/bash
-IMAGE_URI=$1
-
-echo Update IMAGE in base kustomization.yaml
-(cd manifests/base && kustomize edit set image server-gigya=$IMAGE_URI)
-echo
 
 apps=( demo pilot nestle-hipster bayer universalid gigyapoc-gigyainsurance )
 

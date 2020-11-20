@@ -22,7 +22,9 @@ apps=( demo demo2 demo3 demo4 )
 
 for app in "${apps[@]}"
 do
+    echo Deploying $app
 	kustomize build manifests/$ENV/$app/ | kubectl apply -f -
+    echo
 done
 
 #example
