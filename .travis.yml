@@ -40,7 +40,7 @@ jobs:
         ENV=dev
 
 script:
-  - sh scripts/set-build-num.sh $TRAVIS_BUILD_NUMBER
+  - bash scripts/set-build-num.sh $TRAVIS_BUILD_NUMBER
   - dotnet test /p:CollectCoverage=true /p:Threshold=20
   - docker build -t ownid-server-gigya:latest . --network=host
 
@@ -62,13 +62,13 @@ before_deploy:
 
 deploy:
 - provider: script
-  script: sh scripts/deploy.sh $ENV
+  script: bash scripts/deploy.sh $ENV
   skip_cleanup: true
   on:
     all_branches: true
     condition: $TRAVIS_BRANCH =~ ^(develop|master|bohdan/kustomize)$
 - provider: script
-  script: sh scripts/prod/deploy.sh
+  script: bash scripts/prod/deploy.sh
   skip_cleanup: true
   on:
     all_branches: true
