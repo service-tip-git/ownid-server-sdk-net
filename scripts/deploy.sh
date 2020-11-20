@@ -13,11 +13,14 @@ docker push $IMAGE_URI
 echo K8S cluster selection
 aws eks --region us-east-2 update-kubeconfig --name ownid-eks
 
-echo Apply latest manifest files
-kubectl apply -f manifests/$ENV.yaml
+echo Update IMAGE in base kustomization.yaml
+(cd manifests/base && kustomize edit set image server-gigya=$IMAGE_URI)
 
-echo Images URI update
-kubectl -n=$ENV set image deployment/ownid-server-netcore3-demo-gigya-deployment ownid-server-netcore3-demo-gigya=$IMAGE_URI --record
-kubectl -n=$ENV set image deployment/ownid-server-netcore3-demo-2-gigya-deployment ownid-server-netcore3-demo-2-gigya=$IMAGE_URI --record
-kubectl -n=$ENV set image deployment/ownid-server-netcore3-demo-3-gigya-deployment ownid-server-netcore3-demo-3-gigya=$IMAGE_URI --record
-kubectl -n=$ENV set image deployment/ownid-server-netcore3-demo-4-gigya-deployment ownid-server-netcore3-demo-4-gigya=$IMAGE_URI --record
+echo Applications update 
+kustomize build manifests/$ENV/demo/ | kubectl apply -f -
+kustomize build manifests/$ENV/demo2/ | kubectl apply -f -
+kustomize build manifests/$ENV/demo3/ | kubectl apply -f -
+kustomize build manifests/$ENV/demo4/ | kubectl apply -f -
+
+#example
+#kustomize build manifests/dev/demo/ > manifests/result.yaml
