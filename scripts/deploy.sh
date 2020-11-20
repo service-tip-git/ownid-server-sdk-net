@@ -1,4 +1,4 @@
-#!bin/sh
+#!/bin/bash
 
 ENV=$1
 
@@ -17,10 +17,13 @@ echo Update IMAGE in base kustomization.yaml
 (cd manifests/base && kustomize edit set image server-gigya=$IMAGE_URI)
 
 echo Applications update 
-kustomize build manifests/$ENV/demo/ | kubectl apply -f -
-kustomize build manifests/$ENV/demo2/ | kubectl apply -f -
-kustomize build manifests/$ENV/demo3/ | kubectl apply -f -
-kustomize build manifests/$ENV/demo4/ | kubectl apply -f -
+
+apps=( demo demo2 demo3 demo4 )
+
+for app in "${apps[@]}"
+do
+	kustomize build manifests/$ENV/$app/ | kubectl apply -f -
+done
 
 #example
 #kustomize build manifests/dev/demo/ > manifests/result.yaml
