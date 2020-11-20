@@ -18,6 +18,7 @@ branches:
   - master
   - develop
   - /^release\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$/
+  - bohdan/kustomize
 
 env:
   global:
@@ -34,6 +35,9 @@ jobs:
     - if: branch =~ ^release\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$
       env:
         ENV=prod
+    - if: branch=bohdan/kustomize
+      env:
+        ENV=dev
 
 script:
   - sh scripts/set-build-num.sh $TRAVIS_BUILD_NUMBER
@@ -63,7 +67,7 @@ deploy:
   skip_cleanup: true
   on:
     all_branches: true
-    condition: $TRAVIS_BRANCH =~ ^(develop|master)$
+    condition: $TRAVIS_BRANCH =~ ^(develop|master|bohdan/kustomize)$
 - provider: script
   script: sh scripts/prod/deploy.sh
   skip_cleanup: true
