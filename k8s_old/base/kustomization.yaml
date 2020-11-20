@@ -3,7 +3,4 @@ kind: Kustomization
 
 resources:
   - deployment.yaml
-  - service.yaml
-
-commonLabels:
-  app: ownid-server
+  - image-pull-secret.yaml

@@ -1,9 +1,14 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+
 resources:
-  - deployment.yaml
-  - service.yaml
+- ../base
+
+nameSuffix: -bayer 
 
 commonLabels:
-  app: ownid-server
+  appId: bayer
+
+patchesStrategicMerge:
+- container.yaml

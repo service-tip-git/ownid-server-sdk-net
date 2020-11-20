@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ownid-server
+spec:
+  template:
+    spec:
+      containers:
+        - name: ownid-server # (1)
+          env:
+            - name: OWNID__CALLBACK_URL
+              value: https://server.demo.dev.ownid.com
+            - name: OWNID__DID
+              value: did:ownid:demo_dev_151850889514
+            - name: OWNID__NAME
+              value: Noted (OwnID Demo)
+            - name: OWNID__DESCRIPTION
+              value: Noted (OwnID Demo)
+            - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
+              value: https://passwordless.demo.dev.ownid.com
+            - name: OWNID__TOP_DOMAIN
+              value: demo.dev.ownid.com
+            - name: Metrics__Enable
+              value: 'true'
+            - name: Metrics__Namespace
+              value: 'OwnId Dev'
+            - name: AWS__Region
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: region
+            - name: AWS__AccessKeyId
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: access_key_id
+            - name: AWS__SecretAccessKey
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: secret_access_key

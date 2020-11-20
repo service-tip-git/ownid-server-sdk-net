@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ownid-server
+spec:
+  template:
+    spec:
+      containers:
+        - name: ownid-server # (1)
+          env:
+            - name: OWNID__CALLBACK_URL
+              value: https://server.pilot.ownid.com
+            - name: OWNID__DID
+              value: did:ownid:pilot
+            - name: OWNID__NAME
+              value: OwnID Pilot
+            - name: OWNID__DESCRIPTION
+              value: OwnID Pilot
+            - name: OWNID__PUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pilot-secrets
+                  key: public_key
+            - name: OWNID__PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pilot-secrets
+                  key: private_key
+            - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
+              value: https://passwordless.pilot.ownid.com
+            - name: OWNID__TOP_DOMAIN
+              value: pilot.ownid.com
+            - name: GIGYA__DATA_CENTER
+              value: us1.gigya.com
+            - name: GIGYA__SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: pilot-secrets
+                  key: gigya_secret
+            - name: GIGYA__API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pilot-secrets
+                  key: gigya_api_key
+            - name: SERVER_MODE
+              value: pilot
+            - name: Metrics__Enable
+              value: 'true'
+            - name: Metrics__Namespace
+              value: 'pilot'

@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ownid-server
+spec:
+  template:
+    spec:
+      containers:
+        - name: ownid-server # (1)
+          env:
+            - name: OWNID__WEB_APP_URL
+              value: https://sign.dev.ownid.com
+            - name: ASPNETCORE_ENVIRONMENT
+              value: dev
+            - name: SERILOG__MINIMUMLEVEL__DEFAULT
+              value: Debug

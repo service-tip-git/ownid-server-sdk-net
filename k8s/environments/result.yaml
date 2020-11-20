@@ -1,0 +1,140 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ownid-server
+    appId: gigyapoc-gigyainsurance
+  name: ownid-server-gigyapoc-gigyainsurance
+  namespace: prod
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 5002
+  selector:
+    app: ownid-server
+    appId: gigyapoc-gigyainsurance
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ownid-server
+    appId: gigyapoc-gigyainsurance
+  name: ownid-server-gigyapoc-gigyainsurance
+  namespace: prod
+spec:
+  replicas: 2
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: ownid-server
+      appId: gigyapoc-gigyainsurance
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: ownid-server
+        appId: gigyapoc-gigyainsurance
+    spec:
+      containers:
+      - env:
+        - name: OWNID__CALLBACK_URL
+          value: https://gigyainsurance-gigyapoc.ownid.com
+        - name: OWNID__DID
+          value: did:gigyapoc:gigyainsurance_prod
+        - name: OWNID__NAME
+          value: Gigya Insurance
+        - name: OWNID__DESCRIPTION
+          value: Gigya Insurance
+        - name: OWNID__ICON
+          value: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEzElEQVRYhe1WW2wUVRj+zpmZnZ29dbvbbbf0YmlJ07Tcgg2B0jYFjRQRoz6oCUjgATUx8UHEFx98MjyQaPBCuMUXjNEmagwBCQYaa6lQUiJVYlegXUpbpN122e3uzuzOzDk+FCqXdm81Jib+j+d85/u//NcD/HeNUouvfilEu/ivu5aKGmr9mw9cXPTsIdNasa55IVw0n0dW/7KnqSDUA2CSu7pxIQKEfB4RyQFAmJScxStFu68yfu30UQB8IULyMk/TO4dKtxy8CiLkFUkgzxSACNRa3rTa4q5oV2/99iW4yfIVkFUFE9EmWsvXPinavbWiw18jOcuWizZ3KwAqKM4qa/m6Ndro+d58hJBMAKp4Xd51b38r2bwbyJxoDs4JUpHRjqneT3cxNRT9xwRQpcjlbXrruGT3tpK5vf8tg3MY8cmeUM8HG5kaimUrIF0XUE/TniOyq2TLXM45nyn6e3eEEAiSUiG6FxepIxdOAiyrrpi/CIkAi6ukEXcdMGaOm7o2wDk3dDVy6q4M48E3BFZvzau5DKc0EeBcj4f7QKWEHhu/YMRuDzA9GWCMDYS69m5TKtZupKJcQAAZ90WIEEB0lpUlhs58gSxmQ8YivN+slS3NnhVbv9YToV8ku2+DNjl0WLIXNYuKa/mD0rkx/tO+CiN87c9MnDlNQveqXR8KFvsSwWJvMNRI19TFg68nQ4HvlPLVrxBClFkgIRSSY9S9cvt+ltIGjUjwBohAAP5IRHISQCyulNVXuyMS+P75O32H3xUUT1Hhym2HiChTSgXfLA6A5ChpFQSxikh2Itj8unfNG2e1icDnTJuK38+Z0ypNDJ05aSYmWrSxiz1gOhPtxVWSw//UPB1q4Zwz2VO9XSooa4sP/7zfTDw6I3IaxVyPpbSRnm6Lr6FeLn18lR4du8SM5ODcYM6mgxe2grMYTCMFzjS5eOnqh2F5fSYc1et3WzxLNnDGBokg2gCAMzYOQorvzYX4SO/70/2fdVBJbuB6fFIuWbaJSLYS7WZ314IFhPuOvkYEq4XpiURp+76AOhn8yOIqa2dMvyTJtnbMKDIAMCM6csXqX7FpovO9zXPUYPoUWIpX1BHZY3v4nKemU0ydiNkqW9oJpe7pwIm9ICxharHZdBjTt0YAgJvJGIAEzCQDSz2yrNJ2gWftm8eIKLNU6PfLc91zIujc5KPqjbM/xq6eOiwqhRWyt+YZDkAdu3zQiASv6+Hrf6jDXSfm85EhBQSEUM98t8ZUIBidChyYJSsob5hRxg09erM/PfeMpU2BER0bFJ2li7MhApWoXLi4DQAMNdpthK+NL1iAqU4NibaS2kw4ALCWNjZSSVnKORAfPncEQFafk7TEqXCwR3L6mgVHmSsDDXUsad9DCIeZTFyKX/+hIxvnGQUkb/f3MtMYd9Y9txug82KtlS3NlgL/C5wjEb58bCeMuDEf9mFLvwtYijHGB501bZ8IrkpJj9zs43osOXtPKFWq1q8vXPbiV4RQ8c7AyZe1G53dyOGLnnkdE0od9S9td9W0fQxwpsdCvUwLBwFAsBfXiYq7menawJ1fO3ZqI+fOZ+s4ewEzRkV3td/+WOsO2Vf3hGDzLALnLBUZ7k/evnI8Huz8hicjWq7O/zcA+AsO4u78jsOhmQAAAABJRU5ErkJggg==
+        - name: OWNID__PUB_KEY
+          valueFrom:
+            secretKeyRef:
+              key: public_key
+              name: gigyapoc-gigyainsurance-secret
+        - name: OWNID__PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              key: private_key
+              name: gigyapoc-gigyainsurance-secret
+        - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
+          value: https://passwordless.gigyainsurance.gigyapoc.com
+        - name: OWNID__TOP_DOMAIN
+          value: gigyapoc.com
+        - name: GIGYA__DATA_CENTER
+          value: us1.gigya.com
+        - name: GIGYA__SECRET
+          valueFrom:
+            secretKeyRef:
+              key: gigya_secret
+              name: gigyapoc-gigyainsurance-secret
+        - name: GIGYA__API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: gigya_api_key
+              name: gigyapoc-gigyainsurance-secret
+        - name: GIGYA__USER_KEY
+          valueFrom:
+            secretKeyRef:
+              key: gigya_user_key
+              name: gigyapoc-gigyainsurance-secret
+        - name: Metrics__Enable
+          value: "true"
+        - name: Metrics__Namespace
+          value: Gigyapoc-Gigyainsurance
+        - name: ASPNETCORE_ENVIRONMENT
+          value: prod
+        - name: OWNID__CACHE_TYPE
+          value: redis
+        - name: OWNID__CACHE_CONFIG
+          valueFrom:
+            secretKeyRef:
+              key: redis_config
+              name: ownid-secrets
+        - name: ELASTICCONFIGURATION__ENABLED
+          value: "true"
+        - name: ELASTICCONFIGURATION__URI
+          valueFrom:
+            secretKeyRef:
+              key: elastic_uri
+              name: ownid-secrets
+        - name: ELASTICCONFIGURATION__USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: elastic_username
+              name: ownid-secrets
+        - name: ELASTICCONFIGURATION__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: elastic_password
+              name: ownid-secrets
+        - name: AWS__Region
+          valueFrom:
+            secretKeyRef:
+              key: region
+              name: aws-secret
+        - name: AWS__AccessKeyId
+          valueFrom:
+            secretKeyRef:
+              key: access_key_id
+              name: aws-secret
+        - name: AWS__SecretAccessKey
+          valueFrom:
+            secretKeyRef:
+              key: secret_access_key
+              name: aws-secret
+        - name: OWNID__AUTHENTICATION_MODE
+          value: All
+        image: ownid.common.repositories.cloud.sap/server:latest
+        name: ownid-server
+        ports:
+        - containerPort: 5002
+      imagePullSecrets:
+      - name: regcred
