@@ -15,10 +15,10 @@ echo
 echo Prod A Deployment
 kubectl config use-context arn:aws:eks:us-east-1:571861302935:cluster/ownid-production-cluster
 echo
-sh scripts/prod/cluster-update.sh $IMAGE_URI
+bash scripts/prod/cluster-update.sh $IMAGE_URI
 echo
 
 echo Prod B Deployment
 kubectl config use-context arn:aws:eks:us-east-2:571861302935:cluster/ownid-eks
 echo
-sh scripts/prod/cluster-update.sh $IMAGE_URI
+bash scripts/prod/cluster-update.sh $IMAGE_URI
