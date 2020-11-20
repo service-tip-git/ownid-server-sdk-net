@@ -16,13 +16,26 @@ aws eks --region us-east-1 update-kubeconfig --name ownid-production-cluster
 aws eks --region us-east-2 update-kubeconfig --name ownid-eks
 echo
 
+# Add new client to the list. It's name of folder in manifests/prod/
+apps=( demo pilot nestle-hipster bayer universalid gigyapoc-gigyainsurance )
+
 echo Prod A Deployment
 kubectl config use-context arn:aws:eks:us-east-1:571861302935:cluster/ownid-production-cluster
 echo
-bash scripts/prod/cluster-update.sh
+for app in "${apps[@]}"
+do
+    echo Deploying $app
+	kustomize build manifests/prod/$app/ | kubectl apply -f -
+    echo
+done
 echo
 
 echo Prod B Deployment
 kubectl config use-context arn:aws:eks:us-east-2:571861302935:cluster/ownid-eks
 echo
-bash scripts/prod/cluster-update.sh
+for app in "${apps[@]}"
+do
+    echo Deploying $app
+	kustomize build manifests/prod/$app/ | kubectl apply -f -
+    echo
+done

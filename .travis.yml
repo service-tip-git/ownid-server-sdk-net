@@ -64,7 +64,7 @@ deploy:
     all_branches: true
     condition: $TRAVIS_BRANCH =~ ^(develop|master)$
 - provider: script
-  script: bash scripts/prod/deploy.sh
+  script: bash scripts/deploy-prod.sh
   skip_cleanup: true
   on:
     all_branches: true
