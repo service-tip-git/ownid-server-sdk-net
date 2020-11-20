@@ -1,24 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: <company-name>-deployment # <client-name> - name of company, for example nestle
+  name: server-gigya-<company-name> # <client-name> - name of company, for example nestle
   namespace: prod
   labels:
-    app: <company-name>
+    app: server-gigya
+    appId: <company-name>
 spec:
   revisionHistoryLimit: 1
   replicas: 2
   selector:
     matchLabels:
-      app: <company-name>
+      app: server-gigya
+      appId: <company-name>
   template:
     metadata:
       labels:
-        app: <company-name>
+        app: server-gigya
+        appId: <company-name>
     spec:
       containers:
-        - name: <company-name>
-          image: <ownid-image-url> # path to image, ex: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging:latest
+        - name: server-gigya
+          image: server-gigya:latest # path to image, ex: 571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging:latest
           ports:
             - containerPort: 5002
           env:
