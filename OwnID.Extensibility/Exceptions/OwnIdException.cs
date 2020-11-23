@@ -2,18 +2,23 @@ using System;
 
 namespace OwnID.Extensibility.Exceptions
 {
-    public class OwnIdException : Exception
+    public sealed class OwnIdException : Exception
     {
+        public ErrorType ErrorType { get; }
+
         public OwnIdException()
         {
         }
 
-        public OwnIdException(string message) : base(message)
+        public OwnIdException(ErrorType errorType, string message) : base(message)
         {
+            ErrorType = errorType;
         }
 
-        public OwnIdException(string message, Exception innerException) : base(message, innerException)
+        public OwnIdException(ErrorType errorType, string message, Exception innerException) : base(message,
+            innerException)
         {
+            ErrorType = errorType;
         }
     }
 }

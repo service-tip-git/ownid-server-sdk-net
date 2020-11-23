@@ -1,3 +1,4 @@
+using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow;
 
 namespace OwnID.Flow.Steps
@@ -7,6 +8,16 @@ namespace OwnID.Flow.Steps
     /// </summary>
     public class FrontendBehavior
     {
+        public static FrontendBehavior CreateError(ErrorType errorType)
+        {
+            return new FrontendBehavior
+            {
+                ActionType = ActionType.Finish,
+                Type = StepType.Error,
+                Error = errorType
+            };
+        }
+        
         public FrontendBehavior()
         {
         }
@@ -59,5 +70,13 @@ namespace OwnID.Flow.Steps
         ///     Alternative behavior
         /// </summary>
         public FrontendBehavior AlternativeBehavior { get; set; }
+        
+        /// <summary>
+        ///     Error code
+        /// </summary>
+        /// <remarks>
+        ///    Has value only if <see cref="Type"/> is <see cref="StepType.Error"/>
+        /// </remarks>
+        public ErrorType? Error { get; set; }
     }
 }

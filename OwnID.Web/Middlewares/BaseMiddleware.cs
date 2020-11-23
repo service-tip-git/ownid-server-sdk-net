@@ -124,7 +124,7 @@ namespace OwnID.Web.Middlewares
             {
                 var input = new CommandInput(RequestIdentity, GetRequestCulture(httpContext), ClientDate);
 
-                var result = await _stopFlowCommand.ExecuteAsync(input, e.Message);
+                var result = await _stopFlowCommand.ExecuteAsync(input, e.ErrorType, e.Message);
                 await Json(httpContext, result, StatusCodes.Status200OK);
             }
             catch (InternalLogicException e)

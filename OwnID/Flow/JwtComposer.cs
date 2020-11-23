@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -7,6 +8,7 @@ using OwnID.Flow.Steps;
 using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Flow.Contracts.Internal;
 using OwnID.Extensibility.Services;
+using OwnID.Extensions;
 
 namespace OwnID.Flow
 {
@@ -96,7 +98,7 @@ namespace OwnID.Flow
             {
                 {"encToken", info.EncToken}
             };
-            
+
             if (data != null)
             {
                 var (didKey, didValue) = GetDid(data.DID);
@@ -108,7 +110,7 @@ namespace OwnID.Flow
                     {"recoveryData", data.RecoveryData}
                 };
             }
-            
+
             var fields = GetBaseFlowFieldsDictionary(info, dataDict);
             return _jwtService.GenerateDataJwt(fields, info.ClientTime);
         }
@@ -138,14 +140,32 @@ namespace OwnID.Flow
 
         private Dictionary<string, object> GetStepBehavior(FrontendBehavior nextFrontendBehavior)
         {
+            if (nextFrontendBehavior.Error != null && nextFrontendBehavior.Type != StepType.Error)
+            {
+                throw new ArgumentException(
+                    $"{nameof(nextFrontendBehavior.Error)} can be supplied only if {nameof(nextFrontendBehavior.Type)} is '{nameof(StepType.Error)}'",
+                    nameof(nextFrontendBehavior));
+            }
+
+            if (nextFrontendBehavior.Error == null && nextFrontendBehavior.Type == StepType.Error)
+            {
+                throw new ArgumentException(
+                    $"{nameof(nextFrontendBehavior.Error)} must be provided if {nameof(nextFrontendBehavior.Type)} is '{nameof(StepType.Error)}'",
+                    nameof(nextFrontendBehavior));
+            }
+
             var stepType = nextFrontendBehavior.Type.ToString();
             var actionType = nextFrontendBehavior.ActionType.ToString();
             var stepDict = new Dictionary<string, object>
             {
                 {"type", stepType.First().ToString().ToLowerInvariant() + stepType.Substring(1)},
                 {"actionType", actionType.First().ToString().ToLowerInvariant() + actionType.Substring(1)},
-                {"challengeType", nextFrontendBehavior.ChallengeType.ToString().ToLowerInvariant()}
             };
+
+            if (nextFrontendBehavior.Error != null)
+                stepDict.Add("error", nextFrontendBehavior.Error.ToString().ToCamelCase());
+            else
+                stepDict.Add("challengeType", nextFrontendBehavior.ChallengeType.ToString().ToLowerInvariant());
 
             if (nextFrontendBehavior.Polling != null)
                 stepDict.Add("polling", new

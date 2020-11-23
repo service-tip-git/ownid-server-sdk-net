@@ -18,7 +18,7 @@ namespace OwnID.Extensibility.Flow.Abstractions
         ///     A task that represents the asynchronous recover operation.
         ///     The task result contains <see cref="AccountRecoveryResult" />
         /// </returns>
-        /// <exception cref="OwnIdException">Thrown when recovery process fails</exception>
+        /// <exception cref="RecoveryTokenExpiredException">Thrown when recovery token expired</exception>
         Task<AccountRecoveryResult> RecoverAsync(string accountRecoveryPayload);
 
         /// <summary>

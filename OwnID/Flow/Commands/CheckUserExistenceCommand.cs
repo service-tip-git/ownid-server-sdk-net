@@ -54,12 +54,7 @@ namespace OwnID.Flow.Commands
             };
 
             if (result && request!.Data.ErrorOnExisting)
-                composeInfo.Behavior = new FrontendBehavior
-                {
-                    Type = StepType.Error,
-                    ActionType = ActionType.Finish,
-                    ChallengeType = relatedItem.ChallengeType
-                };
+                composeInfo.Behavior = FrontendBehavior.CreateError(ErrorType.UserAlreadyExists);
             else
                 // TODO: add webapp routing for !result && input.Data.ErrorOnNoEntry
                 composeInfo.Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType);

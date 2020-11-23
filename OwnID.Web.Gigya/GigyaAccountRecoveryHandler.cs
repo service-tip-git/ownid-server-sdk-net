@@ -33,7 +33,7 @@ namespace OwnID.Web.Gigya
             var resetPasswordResponse = await _apiClient.ResetPasswordAsync(payload.ResetToken, newPassword);
 
             if (resetPasswordResponse.ErrorCode != 0)
-                throw new OwnIdException(resetPasswordResponse.ErrorDetails);
+                throw new OwnIdException(ErrorType.RecoveryTokenExpired, resetPasswordResponse.ErrorDetails);
 
             return new AccountRecoveryResult
             {
