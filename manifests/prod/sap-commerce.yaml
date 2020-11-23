@@ -93,6 +93,8 @@ spec:
                 secretKeyRef:
                   name: ownid-secrets
                   key: elastic_password
+            - name: SERVER_MODE
+              value: pilot
             - name: Metrics__Enable
               value: 'true'
             - name: Metrics__Namespace
