@@ -218,7 +218,7 @@ namespace OwnID.Services
             cacheItem.PasswordlessEncToken = encryptionToken;
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
-        
+
         public async Task SetWebAppStateAsync(string context, string encryptionToken,
             string recoveryToken = null)
         {
@@ -232,25 +232,22 @@ namespace OwnID.Services
             await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
         }
 
-        /// <summary>
-        ///     Tries to find <see cref="CacheItem" /> by <paramref name="nonce" /> and <paramref name="context" /> in
-        ///     <see cref="ICacheStore" />
-        /// </summary>
-        /// <param name="context">Challenge unique identifier</param>
-        /// <param name="nonce">Nonce</param>
-        /// <returns>
-        ///     <see cref="CacheItemStatus" /> and <c>did</c> if <see cref="CacheItem" /> was found, otherwise null
-        /// </returns>
-        public async Task<CacheItem> GetFinishedAuthFlowSessionAsync(
-            string context,
-            string nonce)
+        public async Task<CacheItem> PopFinishedCacheItemAsync(string context, string nonce)
         {
             var cacheItem = await _cacheStore.GetAsync(context);
 
-            if (cacheItem == null || cacheItem.Nonce != nonce)
+            if (cacheItem == null || cacheItem.Nonce != nonce || cacheItem.Status == CacheItemStatus.Popped)
                 return null;
 
-            return cacheItem.Clone() as CacheItem;
+            if (cacheItem.Status != CacheItemStatus.Finished)
+                return cacheItem.Clone() as CacheItem;
+
+            var result = cacheItem.Clone() as CacheItem;
+
+            cacheItem.Status = CacheItemStatus.Popped;
+            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+
+            return result;
         }
 
         /// <summary>
