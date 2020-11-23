@@ -31,5 +31,9 @@ kubectl apply -f manifests/prod/gigyapoc-gigyainsurance.yaml
 kubectl -n=prod set image deployment/gigyapoc-gigyainsurance-deployment gigyapoc-gigyainsurance=$IMAGE_URI --record
 echo
 
+echo Deploying SAP-Commerce
+kubectl apply -f manifests/prod/sap-commerce.yaml
+kubectl -n=prod set image deployment/sap-commerce-deployment sap-commerce=$IMAGE_URI --record
+echo
 
 
