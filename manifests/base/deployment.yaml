@@ -32,12 +32,12 @@ spec:
             - name: GIGYA__SECRET
               valueFrom:
                 secretKeyRef:
-                  name: demo-secrets
+                  name: demo-secret
                   key: gigya_secret
             - name: GIGYA__API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: demo-secrets
+                  name: demo-secret
                   key: gigya_api_key
             - name: OWNID__CACHE_TYPE
               value: redis
