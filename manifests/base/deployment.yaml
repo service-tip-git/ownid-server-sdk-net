@@ -18,13 +18,13 @@ spec:
             - name: OWNID__PUB_KEY
               valueFrom:
                 secretKeyRef:
-                  name: credential-secrets
-                  key: demo_pub_key
+                  name: demo-secret
+                  key: public_key
             - name: OWNID__PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: credential-secrets
-                  key: demo_private_key
+                  name: demo-secret
+                  key: private_key
             - name: OWNID__AUTHENTICATION_MODE
               value: All
             - name: GIGYA__DATA_CENTER
@@ -32,34 +32,34 @@ spec:
             - name: GIGYA__SECRET
               valueFrom:
                 secretKeyRef:
-                  name: credential-secrets
-                  key: demo_gigya_secret
+                  name: demo-secrets
+                  key: gigya_secret
             - name: GIGYA__API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: credential-secrets
-                  key: demo_gigya_api_key
+                  name: demo-secrets
+                  key: gigya_api_key
             - name: OWNID__CACHE_TYPE
               value: redis
             - name: OWNID__CACHE_CONFIG
               valueFrom:
                 secretKeyRef:
-                  name: credential-secrets
+                  name: ownid-secrets
                   key: redis_config
             - name: ELASTICCONFIGURATION__ENABLED
               value: 'true'
             - name: ELASTICCONFIGURATION__URI
               valueFrom:
                 secretKeyRef:
-                  name: credential-secrets
+                  name: ownid-secrets
                   key: elastic_uri
             - name: ELASTICCONFIGURATION__USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: credential-secrets
+                  name: ownid-secrets
                   key: elastic_username
             - name: ELASTICCONFIGURATION__PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: credential-secrets
+                  name: ownid-secrets
                   key: elastic_password
