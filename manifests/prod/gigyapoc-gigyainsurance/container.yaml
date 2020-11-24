@@ -1,28 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gigyapoc-gigyainsurance-deployment
-  namespace: prod
-  labels:
-    app: gigyapoc-gigyainsurance
+  name: server-gigya
 spec:
-  revisionHistoryLimit: 1
-  replicas: 2
-  selector:
-    matchLabels:
-      app: gigyapoc-gigyainsurance
   template:
-    metadata:
-      labels:
-        app: gigyapoc-gigyainsurance
     spec:
-      imagePullSecrets:
-        - name: regcred
       containers:
-        - name: gigyapoc-gigyainsurance
-          image: ownid.common.repositories.cloud.sap/server:latest
-          ports:
-            - containerPort: 5002
+        - name: server-gigya
           env:
             - name: OWNID__CALLBACK_URL
               value: https://gigyainsurance-gigyapoc.ownid.com
@@ -44,8 +28,6 @@ spec:
                 secretKeyRef:
                   name: gigyapoc-gigyainsurance-secret
                   key: private_key
-            - name: OWNID__AUTHENTICATION_MODE
-              value: All
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.gigyainsurance.gigyapoc.com
             - name: OWNID__TOP_DOMAIN
@@ -67,60 +49,7 @@ spec:
                 secretKeyRef:
                   name: gigyapoc-gigyainsurance-secret
                   key: gigya_user_key
-            - name: OWNID__CACHE_TYPE
-              value: redis
-            - name: OWNID__CACHE_CONFIG
-              valueFrom:
-                secretKeyRef:
-                  name: ownid-secrets
-                  key: redis_config
-            - name: ELASTICCONFIGURATION__ENABLED
-              value: 'true'
-            - name: ELASTICCONFIGURATION__URI
-              valueFrom:
-                secretKeyRef:
-                  name: ownid-secrets
-                  key: elastic_uri
-            - name: ELASTICCONFIGURATION__USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: ownid-secrets
-                  key: elastic_username
-            - name: ELASTICCONFIGURATION__PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: ownid-secrets
-                  key: elastic_password
             - name: Metrics__Enable
               value: 'true'
             - name: Metrics__Namespace
               value: 'Gigyapoc-Gigyainsurance'
-            - name: AWS__Region
-              valueFrom:
-                secretKeyRef:
-                  name: aws-secret
-                  key: region
-            - name: AWS__AccessKeyId
-              valueFrom:
-                secretKeyRef:
-                  name: aws-secret
-                  key: access_key_id
-            - name: AWS__SecretAccessKey
-              valueFrom:
-                secretKeyRef:
-                  name: aws-secret
-                  key: secret_access_key
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: gigyapoc-gigyainsurance-service
-  namespace: prod
-spec:
-  type: LoadBalancer
-  selector:
-    app: gigyapoc-gigyainsurance
-  ports:
-    - name: http
-      port: 80
-      targetPort: 5002

@@ -1,28 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nestle-hipster-deployment
-  namespace: prod
-  labels:
-    app: nestle-hipster
+  name: server-gigya
 spec:
-  revisionHistoryLimit: 1
-  replicas: 2
-  selector:
-    matchLabels:
-      app: nestle-hipster
   template:
-    metadata:
-      labels:
-        app: nestle-hipster
     spec:
-      imagePullSecrets:
-        - name: regcred
       containers:
-        - name: nestle-hipster
-          image: ownid.common.repositories.cloud.sap/server:latest
-          ports:
-            - containerPort: 5002
+        - name: server-gigya
           env:
             - name: OWNID__CALLBACK_URL
               value: https://nestle-hipster.ownid.com
@@ -67,62 +51,9 @@ spec:
                 secretKeyRef:
                   name: nestle-hipster-secret
                   key: gigya_user_key
-            - name: OWNID__CACHE_TYPE
-              value: redis
-            - name: OWNID__CACHE_CONFIG
-              valueFrom:
-                secretKeyRef:
-                  name: ownid-secrets
-                  key: redis_config
-            - name: ELASTICCONFIGURATION__ENABLED
-              value: 'true'
-            - name: ELASTICCONFIGURATION__URI
-              valueFrom:
-                secretKeyRef:
-                  name: ownid-secrets
-                  key: elastic_uri
-            - name: ELASTICCONFIGURATION__USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: ownid-secrets
-                  key: elastic_username
-            - name: ELASTICCONFIGURATION__PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: ownid-secrets
-                  key: elastic_password
             - name: SERVER_MODE
               value: pilot
             - name: Metrics__Enable
               value: 'true'
             - name: Metrics__Namespace
               value: 'Nestle-Hipster'
-            - name: AWS__Region
-              valueFrom:
-                secretKeyRef:
-                  name: aws-secret
-                  key: region
-            - name: AWS__AccessKeyId
-              valueFrom:
-                secretKeyRef:
-                  name: aws-secret
-                  key: access_key_id
-            - name: AWS__SecretAccessKey
-              valueFrom:
-                secretKeyRef:
-                  name: aws-secret
-                  key: secret_access_key
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: nestle-hipster-service
-  namespace: prod
-spec:
-  type: LoadBalancer
-  selector:
-    app: nestle-hipster
-  ports:
-    - name: http
-      port: 80
-      targetPort: 5002
