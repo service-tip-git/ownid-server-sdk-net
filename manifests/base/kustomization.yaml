@@ -7,7 +7,4 @@ resources:
 
 commonLabels:
   app: server-gigya
-images:
-- name: server-gigya
-  newName: ownid.common.repositories.cloud.sap/dev/server/ownid-server-gigya_1.0.1007
-  newTag: 0e6983b7f081381977ba2457d7b9a39d73c4b15f
+
