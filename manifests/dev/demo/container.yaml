@@ -20,6 +20,8 @@ spec:
               value: https://passwordless.demo.dev.ownid.com
             - name: OWNID__TOP_DOMAIN
               value: demo.dev.ownid.com
+            - name: OWNID__MAGIC_LINK__REDIRECT_URL
+              value: https://demo.dev.ownid.com/login
             - name: Metrics__Enable
               value: 'true'
             - name: Metrics__Namespace

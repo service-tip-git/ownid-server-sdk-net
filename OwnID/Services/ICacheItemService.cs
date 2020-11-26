@@ -95,11 +95,17 @@ namespace OwnID.Services
         Task<CacheItem> GetCacheItemByContextAsync(string context);
 
         /// <summary>
+        ///     Removes item by context
+        /// </summary>
+        /// <param name="context">Challenge unique identifier</param>
+        Task RemoveItem(string context);
+
+        /// <summary>
         ///     Update context flow
         /// </summary>
         /// <param name="context">context to update</param>
         /// <param name="flowType">new <see cref="FlowType" /></param>
-        /// <param name="challengeType">new <see cref="ChallengeType"/></param>
+        /// <param name="challengeType">new <see cref="ChallengeType" /></param>
         Task UpdateFlowAsync(string context, FlowType flowType, ChallengeType challengeType);
 
         /// <summary>
@@ -111,5 +117,15 @@ namespace OwnID.Services
         ///     A task that represents the asynchronous set error operation.
         /// </returns>
         Task<CacheItem> FinishFlowWithErrorAsync(string context, string errorMessage);
+
+        /// <summary>
+        ///     Creates record related to magic link process
+        /// </summary>
+        /// <param name="context">Challenge unique identifier</param>
+        /// <param name="did">User unique identifier</param>
+        /// <param name="payload">Token</param>
+        /// <param name="challengeType">Action that will be resolved with provided token</param>
+        Task CreateMagicLinkAsync(string context, string did, string payload,
+            ChallengeType challengeType = ChallengeType.Login);
     }
 }

@@ -8,6 +8,7 @@ using OwnID.Web.Middlewares;
 using OwnID.Web.Middlewares.Approval;
 using OwnID.Web.Middlewares.Authorize;
 using OwnID.Web.Middlewares.Link;
+using OwnID.Web.Middlewares.MagicLink;
 using OwnID.Web.Middlewares.Recover;
 
 namespace OwnID.Web
@@ -56,6 +57,14 @@ namespace OwnID.Web
             if (configuration.HasFeature<AccountRecoveryFeature>())
                 routeBuilder.MapMiddlewarePost("ownid/{context}/recover",
                     builder => builder.UseMiddleware<SaveAccountPublicKeyMiddleware>());
+
+            if (configuration.HasFeature<MagicLinkFeature>())
+            {
+                routeBuilder.MapMiddlewareGet("ownid/magic",
+                    builder => builder.UseMiddleware<SendMagicLinkMiddleware>());
+                routeBuilder.MapMiddlewarePost("ownid/magic",
+                    builder => builder.UseMiddleware<ExchangeMagicLinkMiddleware>());
+            }
 
             app.UseRouter(routeBuilder.Build());
         }

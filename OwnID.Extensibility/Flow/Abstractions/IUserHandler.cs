@@ -113,5 +113,12 @@ namespace OwnID.Extensibility.Flow.Abstractions
         /// <returns>Data to recover</returns>
         Task<ConnectionRecoveryResult<TProfile>> GetConnectionRecoveryDataAsync(string recoveryToken,
             bool includingProfile = false);
+
+        /// <summary>
+        /// Searches and returns user ID with provided email
+        /// </summary>
+        /// <param name="email">Email to search</param>
+        /// <returns>User ID if there is a user with such email or null if not</returns>
+        Task<string> GetUserIdByEmail(string email);
     }
 }

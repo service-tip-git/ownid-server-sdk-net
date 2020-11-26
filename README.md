@@ -41,8 +41,4 @@ Sometimes you can face a problem that nothing was changed and you still see brow
 
 Kibana link: https://search-ownid-logs-yjr6aqw5uk7ezojoejxr4tpeim.us-east-2.es.amazonaws.com/_plugin/kibana/
 
-Username: ownid
-
-Password: Ownid_321
-
 Dashboards: https://search-ownid-logs-yjr6aqw5uk7ezojoejxr4tpeim.us-east-2.es.amazonaws.com/_plugin/kibana/app/kibana#/dashboards?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now%2Fw,to:now%2Fw))

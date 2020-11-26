@@ -57,6 +57,12 @@ spec:
               value: https://passwordless.<website domain>
             - name: OWNID__TOP_DOMAIN # Company domain that Passwordless page is tightened to. Example: my-company.com
               value: <company-domain>
+            - name: OWNID__MAGIC_LINK__REDIRECT_URL # Magic Link redirect url. It should lead to web page with referenced OWNID UI SDK
+              value: https://my-comany.com/login
+            - name: OWNID__MAGIC_LINK__TOKEN_LIFETIME # Magic Link token lifetime. In milliseconds. Default is equal to 10 minutes
+              value: 600000
+            - name: OWNID__MAGIC_LINK__SAME_BROWSER # Restricts Magic Link to be used in the same browser it was requested. Default is true
+              value: 'true'
             - name: GIGYA__DATA_CENTER # Gigya data center
               value: us1.gigya.com
             - name: GIGYA__SECRET # Gigya secret
@@ -87,3 +93,17 @@ spec:
               value: <secret access key>  
             - name: ASPNETCORE_ENVIRONMENT # environment
               value: prod
+            - name: SMTP__HOST # SMTP Server host
+              value: <smtp.my-company.com>
+            - name: SMTP__PORT # SMTP Server port. Default is 465
+              value: 465 
+            - name: SMTP__USER_NAME # SMTP Server User Name (auth)
+              value: <user name>
+            - name: SMTP__PASSWORD # SMTP Server Password (auth)
+              value: <password>
+            - name: SMTP__SSL # SMTP use secure connection. Default is false
+              value: 'false'
+            - name: SMTP__FROM_ADDRESS # Use this email like from address 
+              value: no-reply@my-company.com
+            - name: SMTP__FROM_NAME # Use this like from user friendly name 
+              value: Magic Link - My Company  

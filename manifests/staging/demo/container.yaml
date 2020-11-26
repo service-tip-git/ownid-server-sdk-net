@@ -20,3 +20,5 @@ spec:
               value: https://passwordless.demo.staging.ownid.com
             - name: OWNID__TOP_DOMAIN
               value: demo.staging.ownid.com
+            - name: OWNID__MAGIC_LINK__REDIRECT_URL
+              value: https://demo.staging.ownid.com/login

@@ -29,6 +29,9 @@ namespace OwnID.Web.Gigya
 
         public async Task<AuthResult<object>> OnSuccessLoginAsync(string did, string publicKey)
         {
+            if (string.IsNullOrEmpty(publicKey))
+                return await OnSuccessLoginInternalAsync(did);
+            
             return await OnSuccessLoginByPublicKeyAsync(publicKey);
         }
 
@@ -145,6 +148,12 @@ namespace OwnID.Web.Gigya
                 RecoveryData = connection.RecoveryData,
                 UserProfile = includingProfile ? result.Profile : null
             };
+        }
+
+        public async Task<string> GetUserIdByEmail(string email)
+        {
+            var result = await _restApiClient.SearchByEmailAsync(email);
+            return result?.DID;
         }
 
         public async Task CreateProfileAsync(IUserProfileFormContext<TProfile> context, string recoveryToken = null,

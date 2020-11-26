@@ -191,6 +191,20 @@ namespace OwnID.Web.Gigya.ApiClient
             return result.Results.FirstOrDefault();
         }
 
+        public async Task<GetAccountInfoResponse<TProfile>> SearchByEmailAsync(string email)
+        {
+            var parameters = ParametersFactory.CreateAuthParameters(_configuration).AddParameter("query",
+                $"SELECT UID FROM accounts WHERE profile.email = \"{email}\" LIMIT 1");
+            var responseMessage = await _httpClient.PostAsync(
+                new Uri($"https://accounts.{_configuration.DataCenter}/accounts.search"),
+                new FormUrlEncodedContent(parameters));
+
+            var result = await OwnIdSerializer.DeserializeAsync<GetAccountInfoResponseList<TProfile>>(
+                await responseMessage.Content.ReadAsStreamAsync());
+
+            return result.Results.FirstOrDefault();
+        }
+
         private async Task<GetAccountInfoResponse<TProfile>> GetUserProfile(string uid = null, string regToken = null)
         {
             var parameters = ParametersFactory.CreateAuthParameters(_configuration);

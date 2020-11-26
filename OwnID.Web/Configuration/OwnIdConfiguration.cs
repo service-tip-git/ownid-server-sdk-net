@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using OwnID.Web.Attributes;
 using OwnID.Web.Extensibility;
 using OwnID.Web.Features;
 
@@ -87,6 +89,14 @@ namespace OwnID.Web.Configuration
 
             foreach (var feature in _features.Values)
             {
+                var attrs = feature.GetType().GetCustomAttribute(typeof(FeatureDependencyAttribute));
+
+                if (attrs != null && attrs is FeatureDependencyAttribute dependency)
+                    foreach (var dependencyType in dependency.Types)
+                        if (!_features.ContainsKey(dependencyType))
+                            throw new InvalidOperationException(
+                                $"{dependencyType.Name} feature is required for {feature.GetType().Name} feature");
+
                 feature.FillEmptyWithOptional();
                 feature.Validate();
             }

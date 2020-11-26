@@ -33,5 +33,7 @@ namespace OwnID.Flow.Adapters
 
         Task<ConnectionRecoveryResult<object>> GetConnectionRecoveryDataAsync(string recoveryToken,
             bool includingProfile = false);
+        
+        Task<string> GetUserIdByEmail(string email);
     }
 }
