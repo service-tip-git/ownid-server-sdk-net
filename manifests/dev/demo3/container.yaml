@@ -22,3 +22,5 @@ spec:
               value: https://passwordless.demo3.dev.ownid.com
             - name: OWNID__TOP_DOMAIN
               value: demo3.dev.ownid.com
+            - name: OWNID__MAGIC_LINK__REDIRECT_URL
+              value: https://demo3.dev.ownid.com/login

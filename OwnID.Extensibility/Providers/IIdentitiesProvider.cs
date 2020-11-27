@@ -23,5 +23,10 @@ namespace OwnID.Extensibility.Providers
         ///     Generates user unique identifier
         /// </summary>
         public string GenerateUserId();
+
+        /// <summary>
+        ///     Generates magic link token
+        /// </summary>
+        public string GenerateMagicLinkToken();
     }
 }

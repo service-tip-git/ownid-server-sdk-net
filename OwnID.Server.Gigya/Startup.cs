@@ -145,10 +145,32 @@ namespace OwnID.Server.Gigya
                             if(!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
                                 x.Fido2.Origin = new Uri(ownIdSection["fido2_origin"]);
                         }
-
                         //for development cases
                         x.IsDevEnvironment = serverMode == ServerMode.Local;
                     });
+
+                    var smtpSection = Configuration.GetSection("smtp");
+                    
+                    builder.UseSmtp(smtp =>
+                    {
+                        smtp.FromAddress = smtpSection["from_address"];
+                        smtp.FromName = smtpSection["from_name"];
+                        smtp.UserName = smtpSection["user_name"];
+                        smtp.Password = smtpSection["password"];
+                        smtp.Host = smtpSection["host"];
+                        smtp.UseSsl = smtpSection.GetValue("ssl", false); 
+                        smtp.Port = smtpSection.GetValue("port", 0); 
+                    });
+
+                    var magicLinkSection = ownIdSection.GetSection("magic_link");
+
+                    if (magicLinkSection != null)
+                        builder.UseMagicLink(ml =>
+                        {
+                            ml.RedirectUrl = new Uri(magicLinkSection["redirect_url"]);
+                            ml.TokenLifetime = magicLinkSection.GetValue<uint>("token_lifetime", 0);
+                            ml.SameBrowserUsageOnly = magicLinkSection.GetValue("same_browser", true);
+                        });
                 });
 
             // TODO: not for prod

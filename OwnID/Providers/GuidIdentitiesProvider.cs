@@ -30,5 +30,10 @@ namespace OwnID.Providers
         {
             return Guid.NewGuid().ToString();
         }
+
+        public string GenerateMagicLinkToken()
+        {
+            return Guid.NewGuid().ToShortString();
+        }
     }
 }

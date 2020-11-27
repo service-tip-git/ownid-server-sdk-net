@@ -93,5 +93,10 @@ namespace OwnID.Flow.Adapters
                 UserProfile = result.UserProfile
             };
         }
+
+        public Task<string> GetUserIdByEmail(string email)
+        {
+            return _adaptee.GetUserIdByEmail(email);
+        }
     }
 }

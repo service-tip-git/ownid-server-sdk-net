@@ -20,3 +20,5 @@ spec:
               value: https://passwordless.demo.dev.skipthepassword.com
             - name: OWNID__TOP_DOMAIN
               value: demo.dev.skipthepassword.com
+            - name: OWNID__MAGIC_LINK__REDIRECT_URL
+              value: https://demo.dev.skipthepassword.com/login

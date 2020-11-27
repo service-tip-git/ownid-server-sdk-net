@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Configuration;
-using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow;
 
 namespace OwnID.Services
@@ -10,12 +9,15 @@ namespace OwnID.Services
     public class CacheItemService : ICacheItemService
     {
         private readonly ICacheStore _cacheStore;
-        private readonly TimeSpan _expirationTimeout;
+        private readonly TimeSpan _flowExpirationTimeout;
+        private readonly TimeSpan _magicLinkExpirationTimeout;
 
-        public CacheItemService(ICacheStore cacheStore, IOwnIdCoreConfiguration coreConfiguration)
+        public CacheItemService(ICacheStore cacheStore, IOwnIdCoreConfiguration coreConfiguration,
+            IMagicLinkConfiguration magicLinkConfiguration = null)
         {
             _cacheStore = cacheStore;
-            _expirationTimeout = TimeSpan.FromMilliseconds(coreConfiguration.CacheExpirationTimeout);
+            _magicLinkExpirationTimeout = TimeSpan.FromMilliseconds(magicLinkConfiguration?.TokenLifetime ?? 0);
+            _flowExpirationTimeout = TimeSpan.FromMilliseconds(coreConfiguration.CacheExpirationTimeout);
         }
 
         /// <summary>
@@ -39,7 +41,7 @@ namespace OwnID.Services
                 DID = did,
                 Payload = payload,
                 FlowType = flowType
-            }, _expirationTimeout);
+            }, _flowExpirationTimeout);
         }
 
         /// <summary>
@@ -53,10 +55,7 @@ namespace OwnID.Services
         /// </exception>
         public async Task SetSecurityTokensAsync(string context, string requestToken, string responseToken)
         {
-            var cacheItem = await _cacheStore.GetAsync(context);
-
-            if (cacheItem == null)
-                throw new ArgumentException($"Can not find any item with context '{context}'");
+            var cacheItem = await GetItemAsync(context);
 
             cacheItem.RequestToken = requestToken;
             cacheItem.ResponseToken = responseToken;
@@ -65,7 +64,7 @@ namespace OwnID.Services
             if (cacheItem.Status == CacheItemStatus.Initiated)
                 cacheItem.Status = CacheItemStatus.Started;
 
-            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+            await _cacheStore.SetAsync(context, cacheItem, _flowExpirationTimeout);
         }
 
         /// <summary>
@@ -78,10 +77,7 @@ namespace OwnID.Services
         {
             var random = new Random();
             var pin = random.Next(0, 9999).ToString("D4");
-            var cacheItem = await _cacheStore.GetAsync(context);
-
-            if (cacheItem == null)
-                throw new ArgumentException($"Can not find any item with context '{context}'");
+            var cacheItem = await GetItemAsync(context);
 
             if (cacheItem.Status != CacheItemStatus.Initiated && cacheItem.Status != CacheItemStatus.Started)
                 throw new ArgumentException(
@@ -94,7 +90,7 @@ namespace OwnID.Services
             cacheItem.SecurityCode = pin;
             cacheItem.Status = CacheItemStatus.WaitingForApproval;
 
-            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+            await _cacheStore.SetAsync(context, cacheItem, _flowExpirationTimeout);
 
             return pin;
         }
@@ -109,50 +105,43 @@ namespace OwnID.Services
         /// <exception cref="ArgumentException">Cache item has incorrect status to set resolution</exception>
         public async Task SetApprovalResolutionAsync(string context, string nonce, bool isApproved)
         {
-            var cacheItem = await _cacheStore.GetAsync(context);
+            var cacheItem = await GetItemAsync(context);
 
-            if (cacheItem == null || cacheItem.Context != context || cacheItem.Nonce != nonce)
-                throw new ArgumentException($"Can not find any item with context '{context}'");
+            if (cacheItem.Nonce != nonce)
+                throw new ArgumentException($"Can not find any item with context '{context}' and nonce '{nonce}'");
 
             if (cacheItem.Status != CacheItemStatus.WaitingForApproval)
                 throw new ArgumentException($"Incorrect status={cacheItem.Status.ToString()} for approval '{context}'");
 
             cacheItem.Status = isApproved ? CacheItemStatus.Approved : CacheItemStatus.Declined;
-            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+            await _cacheStore.SetAsync(context, cacheItem, _flowExpirationTimeout);
         }
 
         public async Task SetFido2DataAsync(string context, string publicKey, uint fido2Counter,
             string fido2CredentialId)
         {
-            var cacheItem = await _cacheStore.GetAsync(context);
-
-            if (cacheItem == null || cacheItem.Context != context)
-                throw new ArgumentException($"Can not find any item with context '{context}'");
+            var cacheItem = await GetItemAsync(context);
 
             if (cacheItem.FlowType != FlowType.Fido2Login
                 && cacheItem.FlowType != FlowType.Fido2Register
                 && cacheItem.FlowType != FlowType.Fido2LinkWithPin
                 && cacheItem.FlowType != FlowType.Fido2RecoverWithPin
             )
-            {
                 throw new ArgumentException(
                     $"Can not set Fido2 information for the flow not related to Fido2. Current flow: {cacheItem.FlowType} Context: '{context}'");
-            }
 
             if (cacheItem.Status != CacheItemStatus.Initiated
                 && cacheItem.Status != CacheItemStatus.Started
                 && cacheItem.Status != CacheItemStatus.Approved
             )
-            {
                 throw new ArgumentException(
                     $"Incorrect status={cacheItem.Status.ToString()} for setting public key for context '{context}'");
-            }
 
             cacheItem.PublicKey = publicKey;
             cacheItem.Fido2SignatureCounter = fido2Counter;
             cacheItem.Fido2CredentialId = fido2CredentialId;
 
-            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+            await _cacheStore.SetAsync(context, cacheItem, _flowExpirationTimeout);
         }
 
         /// <summary>
@@ -169,11 +158,8 @@ namespace OwnID.Services
         /// </exception>
         public async Task FinishAuthFlowSessionAsync(string context, string did, string publicKey)
         {
-            var cacheItem = await _cacheStore.GetAsync(context);
-
-            if (cacheItem == null)
-                throw new ArgumentException($"Can not find any item with context '{context}'");
-
+            var cacheItem = await GetItemAsync(context);
+            
             if (cacheItem.ChallengeType == ChallengeType.Link && cacheItem.DID != did)
                 throw new ArgumentException($"Wrong user for linking {did}");
 
@@ -184,7 +170,7 @@ namespace OwnID.Services
             cacheItem.DID = did;
             cacheItem.PublicKey = publicKey;
             cacheItem.Status = CacheItemStatus.Finished;
-            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+            await _cacheStore.SetAsync(context, cacheItem, _flowExpirationTimeout);
         }
 
         /// <summary>
@@ -196,45 +182,38 @@ namespace OwnID.Services
         /// <exception cref="ArgumentException"></exception>
         public async Task SetRecoveryDataAsync(string context, string recoveryData)
         {
-            var cacheItem = await _cacheStore.GetAsync(context);
-
-            if (cacheItem == null)
-                throw new ArgumentException($"Can not find any item with context '{context}'");
+            var cacheItem = await GetItemAsync(context);
 
             cacheItem.RecoveryData = recoveryData;
 
-            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+            await _cacheStore.SetAsync(context, cacheItem, _flowExpirationTimeout);
         }
 
         public async Task SetPasswordlessStateAsync(string context, string encryptionToken,
             string recoveryToken = null)
         {
-            var cacheItem = await _cacheStore.GetAsync(context);
-
-            if (cacheItem == null)
-                throw new ArgumentException($"Can not find any item with context '{context}'");
-
+            var cacheItem = await GetItemAsync(context);
+            
             cacheItem.PasswordlessRecoveryToken = recoveryToken;
             cacheItem.PasswordlessEncToken = encryptionToken;
-            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+            
+            await _cacheStore.SetAsync(context, cacheItem, _flowExpirationTimeout);
         }
 
         public async Task SetWebAppStateAsync(string context, string encryptionToken,
             string recoveryToken = null)
         {
-            var cacheItem = await _cacheStore.GetAsync(context);
-
-            if (cacheItem == null)
-                throw new ArgumentException($"Can not find any item with context '{context}'");
-
+            var cacheItem = await GetItemAsync(context);
+            
             cacheItem.WebAppRecoveryToken = recoveryToken;
             cacheItem.WebAppEncToken = encryptionToken;
-            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+            
+            await _cacheStore.SetAsync(context, cacheItem, _flowExpirationTimeout);
         }
 
         public async Task<CacheItem> PopFinishedCacheItemAsync(string context, string nonce)
         {
-            var cacheItem = await _cacheStore.GetAsync(context);
+            var cacheItem = await GetItemAsync(context, false);
 
             if (cacheItem == null || cacheItem.Nonce != nonce || cacheItem.Status == CacheItemStatus.Popped)
                 return null;
@@ -245,7 +224,7 @@ namespace OwnID.Services
             var result = cacheItem.Clone() as CacheItem;
 
             cacheItem.Status = CacheItemStatus.Popped;
-            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+            await _cacheStore.SetAsync(context, cacheItem, _flowExpirationTimeout);
 
             return result;
         }
@@ -257,37 +236,54 @@ namespace OwnID.Services
         /// <returns><see cref="CacheItem" /> or null</returns>
         public async Task<CacheItem> GetCacheItemByContextAsync(string context)
         {
-            var item = (await _cacheStore.GetAsync(context))?.Clone() as CacheItem;
+            return (await GetItemAsync(context)).Clone() as CacheItem;
+        }
 
-            if (item == null)
-                throw new InternalLogicException($"No cache item was found with context={context}");
-
-            return item;
+        public Task RemoveItem(string context)
+        {
+            return _cacheStore.RemoveAsync(context);
         }
 
         public async Task UpdateFlowAsync(string context, FlowType flowType, ChallengeType challengeType)
         {
-            var cacheItem = await _cacheStore.GetAsync(context);
-
-            if (cacheItem == null)
-                throw new ArgumentException($"Can not find any item with context '{context}'");
+            var cacheItem = await GetItemAsync(context);
 
             cacheItem.FlowType = flowType;
             cacheItem.ChallengeType = challengeType;
 
-            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+            await _cacheStore.SetAsync(context, cacheItem, _flowExpirationTimeout);
         }
 
         public async Task<CacheItem> FinishFlowWithErrorAsync(string context, string errorMessage)
         {
-            var cacheItem = await _cacheStore.GetAsync(context);
-            if (cacheItem == null)
-                throw new ArgumentException($"Can not find any item with context '{context}'");
+            var cacheItem = await GetItemAsync(context);
 
             cacheItem.Status = CacheItemStatus.Finished;
             cacheItem.Error = errorMessage;
 
-            await _cacheStore.SetAsync(context, cacheItem, _expirationTimeout);
+            await _cacheStore.SetAsync(context, cacheItem, _flowExpirationTimeout);
+
+            return cacheItem;
+        }
+
+        public async Task CreateMagicLinkAsync(string context, string did, string payload, ChallengeType challengeType = ChallengeType.Login)
+        {
+            await _cacheStore.SetAsync(context, new CacheItem
+            {
+                ChallengeType = challengeType,
+                Context = context,
+                Payload = payload,
+                DID = did,
+                Status = CacheItemStatus.Finished
+            }, _magicLinkExpirationTimeout);
+        }
+
+        private async Task<CacheItem> GetItemAsync(string context, bool withError = true)
+        {
+            var cacheItem = await _cacheStore.GetAsync(context);
+            
+            if (withError && cacheItem == null)
+                throw new ArgumentException($"Can not find any item with context '{context}'");
 
             return cacheItem;
         }

@@ -62,7 +62,7 @@ namespace OwnID.Configuration
             return options.ProfileConfiguration.Validate();
         }
 
-        private bool IsUriValid(string name, Uri value, bool isDevEnvironment, out string error)
+        public static bool IsUriValid(string name, Uri value, bool isDevEnvironment, out string error)
         {
             error = null;
 

@@ -47,11 +47,6 @@ namespace OwnID.Web.Configuration
         {
             WithFeature<AccountLinkFeature>(x => x.UseAccountLinking<THandler>());
         }
-        
-        public void UseMetrics<TMetricsService>() where TMetricsService : class, IMetricsService
-        {
-            WithFeature<MetricsFeature>(x => x.UseMetrics<TMetricsService>());
-        }
 
         public void UseAccountRecovery<THandler>()
             where THandler : class, IAccountRecoveryHandler
@@ -87,6 +82,11 @@ namespace OwnID.Web.Configuration
             where TFeature : class, IFeatureConfiguration
         {
             Configuration = Configuration.WithFeature(feature);
+        }
+
+        public void UseMetrics<TMetricsService>() where TMetricsService : class, IMetricsService
+        {
+            WithFeature<MetricsFeature>(x => x.UseMetrics<TMetricsService>());
         }
 
         /// <summary>
@@ -175,6 +175,25 @@ namespace OwnID.Web.Configuration
         public void UseWebCacheStore()
         {
             WithFeature<CacheStoreFeature>(x => x.UseWebCacheStore());
+        }
+
+        /// <summary>
+        ///     Enables sending mail with SMTP
+        /// </summary>
+        public void UseSmtp([NotNull] Action<ISmtpConfiguration> modifyAction)
+        {
+            WithFeature<EmailFeature>(x => x.WithConfiguration(modifyAction));
+        }
+        
+        /// <summary>
+        ///     Allows to use Magic Link feature
+        /// </summary>
+        /// <remarks>
+        ///     SMTP is required
+        /// </remarks>
+        public void UseMagicLink([NotNull] Action<IMagicLinkConfiguration> modifyAction)
+        {
+            WithFeature<MagicLinkFeature>(x => x.WithConfiguration(modifyAction));
         }
 
         private OwnIdConfigurationBuilder WithFeature<TFeature>(Func<TFeature, TFeature> setupFunc)
