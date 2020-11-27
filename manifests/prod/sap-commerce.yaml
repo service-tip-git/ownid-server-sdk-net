@@ -53,7 +53,7 @@ spec:
             - name: OWNID__TOP_DOMAIN
               value: sap-commerce.ownid.com
             - name: GIGYA__DATA_CENTER
-              value: eu1.gigya.com
+              value: us1.gigya.com
             - name: GIGYA__SECRET
               valueFrom:
                 secretKeyRef:
