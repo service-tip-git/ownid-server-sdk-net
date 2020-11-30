@@ -1,0 +1,12 @@
+{
+  "OwnIdSdkDefault" : {
+    "Email" : "E-Mail",
+    "First Name" : "Vorname",
+    "Last Name" : "Nachname",
+    "Nickname" : "Spitzname",
+    "Field {0} is required" : "Feld {0} ist erforderlich",
+    "Field {0} has incorrect format" : "Feld {0} hat falsches Format",
+    "The field {0} must be a string or array type with a maximum length of '{1}'" : "Das Feld {0} muss ein Zeichenfolgen- oder Array-Typ mit einer maximalen Länge von \"{1}\" sein",
+    "Error_PhoneAlreadyConnected" : "Ihr Telefon ist bereits einem Konto zugeordnet, gehen Sie zur Anmeldeseite"
+  }
+}

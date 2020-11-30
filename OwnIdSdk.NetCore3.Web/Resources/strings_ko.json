@@ -1,0 +1,12 @@
+{
+  "OwnIdSdkDefault" : {
+    "Email" : "전자메일",
+    "First Name" : "이름",
+    "Last Name" : "성",
+    "Nickname" : "애칭",
+    "Field {0} is required" : "{0} 필드는 필수 항목입니다.",
+    "Field {0} has incorrect format" : "{0} 필드의 형식이 잘못되었습니다.",
+    "The field {0} must be a string or array type with a maximum length of '{1}'" : "{0} 필드는 문자열 또는 배열 유형이어야 하며 최대 길이는 '{1}'자입니다.",
+    "Error_PhoneAlreadyConnected" : "전화기가 계정에 이미 연결되어 있습니다. 로그인 페이지로 이동하십시오."
+  }
+}
