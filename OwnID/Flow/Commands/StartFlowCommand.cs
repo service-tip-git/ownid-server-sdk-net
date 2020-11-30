@@ -13,6 +13,7 @@ using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Flow.Contracts.Jwt;
 using OwnID.Extensibility.Json;
+using OwnID.Extensibility.Metrics;
 using OwnID.Extensibility.Services;
 using OwnID.Extensions;
 
@@ -22,19 +23,19 @@ namespace OwnID.Flow.Commands
     {
         private readonly ICacheItemService _cacheItemService;
         private readonly IOwnIdCoreConfiguration _configuration;
-        private readonly IMetricsService _metricsService;
+        private readonly IEventsMetricsService _eventsMetricsService;
         private readonly IJwtService _jwtService;
         private readonly IServiceProvider _serviceProvider;
 
         public StartFlowCommand(ICacheItemService cacheItemService, IJwtService jwtService,
             IServiceProvider serviceProvider, IOwnIdCoreConfiguration configuration,
-            IMetricsService metricsService = null)
+            IEventsMetricsService eventsMetricsService = null)
         {
             _cacheItemService = cacheItemService;
             _jwtService = jwtService;
             _serviceProvider = serviceProvider;
             _configuration = configuration;
-            _metricsService = metricsService;
+            _eventsMetricsService = eventsMetricsService;
         }
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
@@ -146,8 +147,8 @@ namespace OwnID.Flow.Commands
 
                 if (initialChallengeType != cacheItem.ChallengeType)
                 {
-                    _metricsService?.LogSwitchAsync($"{initialChallengeType}");
-                    _metricsService?.LogStartAsync($"{cacheItem.ChallengeType}");
+                    _eventsMetricsService?.LogSwitchAsync(initialChallengeType.ToEventType());
+                    _eventsMetricsService?.LogStartAsync(cacheItem.ChallengeType.ToEventType());
                 }
             }
         }

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Json;
-using OwnID.Extensibility.Services;
+using OwnID.Extensibility.Metrics;
 using OwnID.Services;
 
 namespace OwnID.Web.Middlewares
@@ -36,17 +36,17 @@ namespace OwnID.Web.Middlewares
 
         private readonly RequestDelegate _next;
         private readonly ICacheItemService _cacheItemService;
-        private readonly IMetricsService _metricsService;
+        private readonly IEventsMetricsService _eventsMetricsService;
         private readonly ILogger<MetricsMiddleware> _logger;
 
         private static readonly Regex ContextRegex = new Regex(@"ownid\/(?<context>[^\/]*)\/.*", RegexOptions.Compiled);
 
         public MetricsMiddleware(RequestDelegate next, ICacheItemService cacheItemService,
-            IMetricsService metricsService, ILogger<MetricsMiddleware> logger)
+            IEventsMetricsService eventsMetricsService, ILogger<MetricsMiddleware> logger)
         {
             _next = next;
             _cacheItemService = cacheItemService;
-            _metricsService = metricsService;
+            _eventsMetricsService = eventsMetricsService;
             _logger = logger;
         }
 
@@ -123,7 +123,7 @@ namespace OwnID.Web.Middlewares
             if (item == null)
                 return;
 
-            await _metricsService.LogStartAsync(item.ChallengeType.ToString());
+            await _eventsMetricsService.LogStartAsync(item.ChallengeType.ToEventType());
         }
 
         private async Task ProcessResponseAsync(HttpContext httpContext)
@@ -168,7 +168,7 @@ namespace OwnID.Web.Middlewares
             if (cacheItem == null)
                 return;
 
-            await _metricsService.LogCancelAsync($"{cacheItem.ChallengeType}");
+            await _eventsMetricsService.LogCancelAsync(cacheItem.ChallengeType.ToEventType());
         }
 
         private async Task ProcessStatusResponseAsync(string response)
@@ -182,11 +182,11 @@ namespace OwnID.Web.Middlewares
 
                 if (string.IsNullOrEmpty(item.Payload?.Error))
                 {
-                    await _metricsService.LogFinishAsync($"{cacheItem.ChallengeType}");
+                    await _eventsMetricsService.LogFinishAsync(cacheItem.ChallengeType.ToEventType());
                 }
                 else
                 {
-                    await _metricsService.LogErrorAsync($"{cacheItem.ChallengeType}");
+                    await _eventsMetricsService.LogErrorAsync(cacheItem.ChallengeType.ToEventType());
                 }
             }
         }

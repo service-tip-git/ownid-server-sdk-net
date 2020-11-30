@@ -8,18 +8,14 @@ using Amazon;
 using Amazon.CloudWatch;
 using Amazon.CloudWatch.Model;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using OwnID.Extensibility.Services;
-using OwnID.Server.Gigya.Configuration;
+using OwnID.Extensibility.Metrics;
 
-namespace OwnID.Server.Gigya
+namespace OwnID.Server.Gigya.Metrics
 {
-    public class AwsMetricsService : IMetricsService, IDisposable
+    public class AwsEventsMetricsService : IEventsMetricsService, IDisposable
     {
         private const int TimerInterval = 5 * 1000;
-        private const int BatchSize = 100;
-        private const int UpdateInterval = 60 * 1000;
-
+        
         private readonly struct Metric
         {
             public DateTime Date { get; }
@@ -32,10 +28,10 @@ namespace OwnID.Server.Gigya
             }
         }
 
-        private readonly IOptions<Metrics> _metricsConfiguration;
-        private readonly ILogger<AwsMetricsService> _logger;
+        private readonly MetricsConfiguration _metricsConfiguration;
+        private readonly ILogger<AwsEventsMetricsService> _logger;
 
-        private readonly TimeSpan _updateInterval = TimeSpan.FromMilliseconds(UpdateInterval);
+        private readonly TimeSpan _updateInterval;
         private readonly Timer _timer;
         private DateTime _lastUpdatedTime = DateTime.UtcNow;
         private readonly AmazonCloudWatchClient _amazonCloudWatchClient;
@@ -44,12 +40,13 @@ namespace OwnID.Server.Gigya
 
         private bool ShouldProcess =>
             _loggedData.Count != 0
-            && (_loggedData.Count > BatchSize || DateTime.UtcNow - _lastUpdatedTime >= _updateInterval);
+            && (_loggedData.Count > _metricsConfiguration.EventsThreshold || DateTime.UtcNow - _lastUpdatedTime >= _updateInterval);
 
-        public AwsMetricsService(IOptions<AwsConfiguration> awsConfiguration, IOptions<Metrics> metricsConfiguration,
-            ILogger<AwsMetricsService> logger)
+        public AwsEventsMetricsService(AwsConfiguration awsConfiguration, MetricsConfiguration metricsConfiguration,
+            ILogger<AwsEventsMetricsService> logger)
         {
             _metricsConfiguration = metricsConfiguration;
+            _updateInterval = TimeSpan.FromMilliseconds(metricsConfiguration.Interval);
             _logger = logger;
 
             _timer = new Timer(TimerInterval)
@@ -59,9 +56,9 @@ namespace OwnID.Server.Gigya
             };
             _timer.Elapsed += ProcessQueue;
 
-            _amazonCloudWatchClient = new AmazonCloudWatchClient(awsConfiguration.Value.AccessKeyId,
-                awsConfiguration.Value.SecretAccessKey,
-                RegionEndpoint.GetBySystemName(awsConfiguration.Value.Region));
+            _amazonCloudWatchClient = new AmazonCloudWatchClient(awsConfiguration.AccessKeyId,
+                awsConfiguration.SecretAccessKey,
+                RegionEndpoint.GetBySystemName(awsConfiguration.Region));
         }
 
         private readonly object _processQueueSync = new object();
@@ -84,8 +81,8 @@ namespace OwnID.Server.Gigya
                     var process = true;
                     while (process)
                     {
-                        var items = new List<Metric>(BatchSize);
-                        for (var i = 0; i < BatchSize; i++)
+                        var items = new List<Metric>(_metricsConfiguration.EventsThreshold);
+                        for (var i = 0; i < _metricsConfiguration.EventsThreshold; i++)
                         {
                             if (!_loggedData.TryDequeue(out var item))
                             {
@@ -138,7 +135,7 @@ namespace OwnID.Server.Gigya
             var request = new PutMetricDataRequest
             {
                 MetricData = metrics,
-                Namespace = _metricsConfiguration.Value.Namespace
+                Namespace = _metricsConfiguration.Namespace
             };
 
             try
@@ -167,29 +164,29 @@ namespace OwnID.Server.Gigya
             _amazonCloudWatchClient?.Dispose();
         }
 
-        public Task LogStartAsync(string actionName)
+        public Task LogStartAsync(EventType eventType)
         {
-            return LogAsync(actionName);
+            return LogAsync(eventType.ToString());
         }
 
-        public Task LogFinishAsync(string actionName)
+        public Task LogFinishAsync(EventType eventType)
         {
-            return LogAsync($"{actionName} success");
+            return LogAsync($"{eventType} success");
         }
 
-        public Task LogErrorAsync(string actionName)
+        public Task LogErrorAsync(EventType eventType)
         {
-            return LogAsync($"{actionName} error");
+            return LogAsync($"{eventType} error");
         }
 
-        public Task LogSwitchAsync(string actionName)
+        public Task LogSwitchAsync(EventType eventType)
         {
-            return LogAsync($"{actionName} switched");
+            return LogAsync($"{eventType} switched");
         }
 
-        public Task LogCancelAsync(string actionName)
+        public Task LogCancelAsync(EventType eventType)
         {
-            return LogAsync($"{actionName} canceled");
+            return LogAsync($"{eventType} canceled");
         }
 
         private Task LogAsync(string metricName)

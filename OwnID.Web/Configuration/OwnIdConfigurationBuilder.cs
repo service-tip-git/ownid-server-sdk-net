@@ -84,11 +84,6 @@ namespace OwnID.Web.Configuration
             Configuration = Configuration.WithFeature(feature);
         }
 
-        public void UseMetrics<TMetricsService>() where TMetricsService : class, IMetricsService
-        {
-            WithFeature<MetricsFeature>(x => x.UseMetrics<TMetricsService>());
-        }
-
         /// <summary>
         ///     Allows to change Core Configuration that is necessary for start
         /// </summary>

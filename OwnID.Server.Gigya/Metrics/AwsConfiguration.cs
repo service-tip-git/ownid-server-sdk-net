@@ -1,4 +1,4 @@
-namespace OwnID.Server.Gigya.Configuration
+namespace OwnID.Server.Gigya.Metrics
 {
     public class AwsConfiguration
     {
