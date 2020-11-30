@@ -33,6 +33,12 @@ namespace OwnIdSdk.NetCore3.Extensibility.Cache
         /// <summary>
         ///     Process is finished
         /// </summary>
-        Finished = 99
+        Finished = 99,
+        
+        
+        /// <summary>
+        ///     Indicate that cache item is popped and must not be used for any business flow
+        /// </summary>
+        Popped = 999
     }
 }

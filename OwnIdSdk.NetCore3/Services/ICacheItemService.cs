@@ -77,14 +77,15 @@ namespace OwnIdSdk.NetCore3.Services
 
         /// <summary>
         ///     Tries to find <see cref="CacheItem" /> by <paramref name="nonce" /> and <paramref name="context" /> in
-        ///     <see cref="ICacheStore" /> and remove item if find operation was successful
+        ///     <see cref="ICacheStore" /> and change status to <see cref="CacheItemStatus.Popped"/>
+        ///     if it was <see cref="CacheItemStatus.Finished"/>
         /// </summary>
         /// <param name="context">Challenge unique identifier</param>
         /// <param name="nonce">Nonce</param>
         /// <returns>
-        ///     <see cref="CacheItemStatus" /> and <c>did</c> if <see cref="CacheItem" /> was found, otherwise null
+        ///     <see cref="CacheItem" /> if any was, otherwise null
         /// </returns>
-        Task<CacheItem> GetFinishedAuthFlowSessionAsync(string context, string nonce);
+        Task<CacheItem> PopFinishedCacheItemAsync(string context, string nonce);
 
         /// <summary>
         ///     Tries to find <see cref="CacheItem" /> by <paramref name="context" /> in <see cref="ICacheStore" />
