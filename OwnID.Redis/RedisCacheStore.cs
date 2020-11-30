@@ -28,12 +28,7 @@ namespace OwnID.Redis
         {
             var serializedData = OwnIdSerializer.Serialize(data);
 
-            bool isSuccess;
-
-            if (data.Status == CacheItemStatus.Started)
-                isSuccess = _redisDb.StringSet(key, serializedData, expiration);
-            else
-                isSuccess = _redisDb.StringSet(key, serializedData);
+            var isSuccess = _redisDb.StringSet(key, serializedData, expiration);
 
             if (!isSuccess)
                 throw new Exception($"Can not set element to redis with context {data.Context}");
@@ -43,13 +38,8 @@ namespace OwnID.Redis
         {
             var serializedData = OwnIdSerializer.Serialize(data);
 
-            bool isSuccess;
-
-            if (data.Status == CacheItemStatus.Started)
-                isSuccess = await _redisDb.StringSetAsync(key, serializedData, expiration);
-            else
-                isSuccess = await _redisDb.StringSetAsync(key, serializedData);
-
+            var isSuccess = await _redisDb.StringSetAsync(key, serializedData, expiration);
+            
             if (!isSuccess)
                 throw new Exception($"Can not set element to redis with context {data.Context}");
         }
