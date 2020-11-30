@@ -22,9 +22,6 @@ namespace OwnID.Web
         {
             var configuration = app.ApplicationServices.GetService<OwnIdConfiguration>();
 
-            if (configuration.HasFeature<MetricsFeature>())
-                app.UseMiddleware<MetricsMiddleware>();
-
             var routeBuilder = new RouteBuilder(app);
 
             routeBuilder.MapMiddlewarePost("ownid",

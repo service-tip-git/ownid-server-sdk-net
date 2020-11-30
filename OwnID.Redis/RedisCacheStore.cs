@@ -83,5 +83,11 @@ namespace OwnID.Redis
         {
             await _redisDb.KeyDeleteAsync(key, CommandFlags.FireAndForget);
         }
+
+        public async Task<(long keysCount, long itemsSize)> GetMemoryStatsAsync()
+        {
+            var result = (await _redisDb.ExecuteAsync("memory", "stats")).ToDictionary();
+            return (long.Parse(result["keys.count"].ToString() ?? "0"), long.Parse(result["dataset.bytes"].ToString() ?? "0"));
+        }
     }
 }

@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OwnID.Extensibility.Configuration;
 using OwnID.Redis;
-using OwnID.Server.Gigya.Configuration;
+using OwnID.Server.Gigya.Metrics;
 using OwnID.Server.Gigya.Middlewares.SecurityHeaders;
 using OwnID.Web;
 using OwnID.Web.Gigya;
@@ -44,12 +44,6 @@ namespace OwnID.Server.Gigya
             var topDomain = ownIdSection["top_domain"];
             var webAppUrl = new Uri(ownIdSection["web_app_url"] ?? Constants.OwinIdApplicationAddress);
 
-            services.AddOptions();
-            services.Configure<AwsConfiguration>(Configuration.GetSection("AWS"));
-            services.Configure<Metrics>(Configuration.GetSection("Metrics"));
-
-            var metricsConfiguration = Configuration.GetSection("Metrics").Get<Metrics>();
-            
             services.AddCors(x =>
             {
                 x.AddPolicy(CorsPolicyName, builder =>
@@ -84,6 +78,8 @@ namespace OwnID.Server.Gigya
                     builder.WithOrigins(originsList.ToArray());
                 });
             });
+            
+            services.AddMetrics(Configuration);
 
             services.AddOwnId(
                 builder =>
@@ -93,9 +89,6 @@ namespace OwnID.Server.Gigya
                     if (string.IsNullOrEmpty(loginTypeString) || !Enum.TryParse(gigyaSection["login_type"], true,
                         out GigyaLoginType loginType)) loginType = GigyaLoginType.Session;
 
-                    if (metricsConfiguration != null && metricsConfiguration.Enable)
-                        builder.UseMetrics<AwsMetricsService>();
-                    
                     builder.UseGigya(gigyaSection["data_center"], gigyaSection["api_key"], gigyaSection["secret"],
                         gigyaSection["user_key"], loginType);
                     builder.SetKeys(ownIdSection["pub_key"], ownIdSection["private_key"]);
@@ -174,7 +167,7 @@ namespace OwnID.Server.Gigya
                 });
 
             // TODO: not for prod
-            services.AddHostedService<CpuMemoryLogService>();
+            services.AddHostedService<TelemetryLogService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -204,13 +197,13 @@ namespace OwnID.Server.Gigya
             var routeBuilder = new RouteBuilder(app);
             routeBuilder.MapMiddlewarePost("ownid/log",
                 builder => builder.UseMiddleware<LogMiddleware>());
-            // routeBuilder.MapMiddlewarePost("not-ownid/register",
-            //     builder => builder.UseMiddleware<ExternalRegisterMiddleware>());
             app.UseRouter(routeBuilder.Build());
 
             app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
                 .AddStrictTransportSecurityMaxAgeIncludeSubDomains()
                 .AddContentTypeOptionsNoSniff());
+            
+            app.UseMetrics();
             app.UseOwnId();
         }
 
