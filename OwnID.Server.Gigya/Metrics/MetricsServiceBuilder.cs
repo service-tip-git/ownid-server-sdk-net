@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using OwnID.Extensibility.Metrics;
 using OwnID.Web.Middlewares;
 
 namespace OwnID.Server.Gigya.Metrics
@@ -36,12 +37,12 @@ namespace OwnID.Server.Gigya.Metrics
 
             services.TryAddSingleton(awsConfig);
             services.TryAddSingleton(metricsConfig);
-            services.TryAddSingleton<AwsEventsMetricsService>();
+            services.TryAddSingleton<IEventsMetricsService, AwsEventsMetricsService>();
         }
 
         public static void UseMetrics(this IApplicationBuilder app)
         {
-            var metricsService = app.ApplicationServices.GetService<AwsEventsMetricsService>();
+            var metricsService = app.ApplicationServices.GetService<IEventsMetricsService>();
 
             if (metricsService == null)
                 return;
