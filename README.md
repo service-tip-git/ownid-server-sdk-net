@@ -24,7 +24,7 @@ to set specific urls.
 After that you need to find this cert. in Mac Keychain, open and trust ssl.  
 Sometimes you can face a problem that nothing was changed and you still see browser warnings. Try to remove all certificates in Mac Keychain label with `localhost` and repeat the last step.
 
-## Environment variables for applications (OwnIdSdk.NetCore3.Server.Gigya project)
+## Environment variables for applications (OwnID.Server.Gigya project)
 
 - *OWNID__WEB_APP_URL* - web application url (with relative path if needed)
 - *OWNID__CALLBACK_URL* - this(client-app) appliction url to call after user accepts login/register
@@ -40,9 +40,5 @@ Sometimes you can face a problem that nothing was changed and you still see brow
 ## Logging logs are available in Kibana
 
 Kibana link: https://search-ownid-logs-yjr6aqw5uk7ezojoejxr4tpeim.us-east-2.es.amazonaws.com/_plugin/kibana/
-
-Username: ownid
-
-Password: Ownid_321
 
 Dashboards: https://search-ownid-logs-yjr6aqw5uk7ezojoejxr4tpeim.us-east-2.es.amazonaws.com/_plugin/kibana/app/kibana#/dashboards?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now%2Fw,to:now%2Fw))
