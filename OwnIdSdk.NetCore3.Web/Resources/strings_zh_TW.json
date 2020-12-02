@@ -1,0 +1,12 @@
+{
+  "OwnIdSdkDefault" : {
+    "Email" : "電子郵件",
+    "First Name" : "名",
+    "Last Name" : "姓",
+    "Nickname" : "暱稱",
+    "Field {0} is required" : "需要欄位 {0}",
+    "Field {0} has incorrect format" : "欄位 {0} 格式不正確",
+    "The field {0} must be a string or array type with a maximum length of '{1}'" : "欄位 {0} 必須是最大長度為「{1}」的字串或陣列類型。",
+    "Error_PhoneAlreadyConnected" : "您的手機已與帳戶相關聯，請前往登入頁面"
+  }
+}
