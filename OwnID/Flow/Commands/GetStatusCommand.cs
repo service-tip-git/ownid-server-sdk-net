@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using OwnID.Cryptography;
 using OwnID.Flow.Adapters;
 using OwnID.Services;
 using OwnID.Extensibility.Cache;
@@ -16,14 +17,16 @@ namespace OwnID.Flow.Commands
     {
         private readonly ICacheItemService _cacheItemService;
         private readonly ILocalizationService _localizationService;
+        private readonly IJwtService _jwtService;
         private readonly IUserHandlerAdapter _userHandlerAdapter;
 
         public GetStatusCommand(IUserHandlerAdapter userHandlerAdapter, ICacheItemService cacheItemService,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService, IJwtService jwtService)
         {
             _userHandlerAdapter = userHandlerAdapter;
             _cacheItemService = cacheItemService;
             _localizationService = localizationService;
+            _jwtService = jwtService;
         }
 
         public async Task<List<GetStatusResponse>> ExecuteAsync(List<GetStatusRequest> request)
@@ -155,6 +158,17 @@ namespace OwnID.Flow.Commands
                         break;
                 }
             }
+
+            result.Metadata = _jwtService.GenerateDataJwt(new Dictionary<string, object>
+            {
+                {
+                    "data", new
+                    {
+                        action = cacheItem.ChallengeType.ToString(),
+                        authType = cacheItem.GetAuthType()
+                    }
+                }
+            });
 
             return result;
         }

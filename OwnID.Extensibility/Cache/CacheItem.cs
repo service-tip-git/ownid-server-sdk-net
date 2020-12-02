@@ -41,7 +41,7 @@ namespace OwnID.Extensibility.Cache
         public FlowType FlowType { get; set; }
 
         /// <summary>
-        ///     Indicate if current flow is Fido2 flow
+        ///     Indicate if current flow is Stateless flow
         /// </summary>
         public bool IsStateless =>
             FlowType == FlowType.Fido2Login
@@ -50,6 +50,23 @@ namespace OwnID.Extensibility.Cache
             || FlowType == FlowType.Fido2LinkWithPin
             || FlowType == FlowType.Fido2Recover
             || FlowType == FlowType.Fido2RecoverWithPin;
+
+        /// <summary>
+        ///     Get CacheItem auth type string representation
+        /// </summary>
+        /// <returns>auth type string representation</returns>
+        public string GetAuthType()
+        {
+            if (FlowType == FlowType.Fido2Login
+                || FlowType == FlowType.Fido2Register
+                || FlowType == FlowType.Fido2Link
+                || FlowType == FlowType.Fido2LinkWithPin
+                || FlowType == FlowType.Fido2Recover
+                || FlowType == FlowType.Fido2RecoverWithPin)
+                return "FIDO2";
+
+            return "Basic";
+        }
 
         /// <summary>
         ///     Request Token from Web App
