@@ -1,0 +1,12 @@
+{
+  "OwnIdSdkDefault" : {
+    "Email" : "อีเมล์",
+    "First Name" : "ชื่อ",
+    "Last Name" : "นามสกุล",
+    "Nickname" : "ชื่อเล่น",
+    "Field {0} is required" : "ต้องมีฟิลด์ {0} ",
+    "Field {0} has incorrect format" : "ฟิลด์ {0} มีรูปแบบที่ไม่ถูกต้อง",
+    "The field {0} must be a string or array type with a maximum length of '{1}'" : "ฟิลด์ {0} ต้องเป็นประเภทสตริงหรืออาร์เรย์ที่มีความยาวสูงสุด '{1}'",
+    "Error_PhoneAlreadyConnected" : "โทรศัพท์ของคุณเชื่อมโยงกับบัญชีแล้ว กรุณาไปที่หน้าการเข้าสู่ระบบ"
+  }
+}

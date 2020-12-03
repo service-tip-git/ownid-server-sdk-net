@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using OwnID.Extensibility.Cache;
 
 namespace OwnID.Extensibility.Flow.Contracts
@@ -21,5 +22,10 @@ namespace OwnID.Extensibility.Flow.Contracts
         ///     Custom payload
         /// </summary>
         public object Payload { get; set; }
+        
+        /// <summary>
+        ///     Metadata
+        /// </summary>
+        public string Metadata { get; set; }
     }
 }

@@ -36,6 +36,7 @@ namespace OwnID.Services
             await _cacheStore.SetAsync(context, new CacheItem
             {
                 ChallengeType = challengeType,
+                InitialChallengeType = challengeType,
                 Nonce = nonce,
                 Context = context,
                 DID = did,

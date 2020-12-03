@@ -15,7 +15,7 @@ namespace OwnID.Cryptography
         /// <exception cref="Exception">If something went wrong during token validation</exception>
         (string Context, TData Data) GetDataFromJwt<TData>(string jwt) where TData : ISignedData;
 
-        string GenerateDataJwt(Dictionary<string, object> data, DateTime? issuedAt);
+        string GenerateDataJwt(Dictionary<string, object> data, DateTime? issuedAt = null);
 
         /// <summary>
         ///     Gets hash of Base64 encoded JWT string

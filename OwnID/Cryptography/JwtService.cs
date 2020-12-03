@@ -67,7 +67,7 @@ namespace OwnID.Cryptography
             return (token.Id, data);
         }
 
-        public string GenerateDataJwt(Dictionary<string, object> data, DateTime? issuedAt)
+        public string GenerateDataJwt(Dictionary<string, object> data, DateTime? issuedAt = null)
         {
             var rsaSecurityKey = new RsaSecurityKey(_ownIdCoreConfiguration.JwtSignCredentials);
             var tokenHandler = new JwtSecurityTokenHandler();

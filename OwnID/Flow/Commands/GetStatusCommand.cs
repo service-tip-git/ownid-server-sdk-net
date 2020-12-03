@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using OwnID.Cryptography;
 using OwnID.Flow.Adapters;
 using OwnID.Services;
 using OwnID.Extensibility.Cache;
@@ -16,14 +17,16 @@ namespace OwnID.Flow.Commands
     {
         private readonly ICacheItemService _cacheItemService;
         private readonly ILocalizationService _localizationService;
+        private readonly IJwtService _jwtService;
         private readonly IUserHandlerAdapter _userHandlerAdapter;
 
         public GetStatusCommand(IUserHandlerAdapter userHandlerAdapter, ICacheItemService cacheItemService,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService, IJwtService jwtService)
         {
             _userHandlerAdapter = userHandlerAdapter;
             _cacheItemService = cacheItemService;
             _localizationService = localizationService;
+            _jwtService = jwtService;
         }
 
         public async Task<List<GetStatusResponse>> ExecuteAsync(List<GetStatusRequest> request)
@@ -85,6 +88,8 @@ namespace OwnID.Flow.Commands
                 return result;
             }
 
+            var action = cacheItem.ChallengeType.ToString();
+            
             if (cacheItem.FlowType == FlowType.Authorize)
             {
                 result.Payload = await _userHandlerAdapter.OnSuccessLoginAsync(cacheItem.DID, cacheItem.PublicKey);
@@ -117,6 +122,7 @@ namespace OwnID.Flow.Commands
                         break;
                     }
                     case ChallengeType.Login:
+                        action = ChallengeType.Link.ToString();
                         result.Payload = SetPartialRegisterResult(cacheItem);
                         break;
                     case ChallengeType.Register
@@ -142,6 +148,9 @@ namespace OwnID.Flow.Commands
                                 fido2CredentialId = cacheItem.Fido2CredentialId
                             }
                         };
+                        if (cacheItem.InitialChallengeType == ChallengeType.Login
+                            && cacheItem.ChallengeType == ChallengeType.Register)
+                            action = ChallengeType.Link.ToString();
                         break;
                     //
                     // TODO: fix needed at web-ui-sdk to avoid error in console if data is undefined
@@ -155,6 +164,17 @@ namespace OwnID.Flow.Commands
                         break;
                 }
             }
+
+            result.Metadata = _jwtService.GenerateDataJwt(new Dictionary<string, object>
+            {
+                {
+                    "data", new
+                    {
+                        action,
+                        authType = cacheItem.GetAuthType()
+                    }
+                }
+            });
 
             return result;
         }

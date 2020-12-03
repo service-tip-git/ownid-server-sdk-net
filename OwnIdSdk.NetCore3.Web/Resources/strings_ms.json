@@ -1,0 +1,12 @@
+{
+  "OwnIdSdkDefault" : {
+    "Email" : "E-mel",
+    "First Name" : "Nama Pertama",
+    "Last Name" : "Nama Keluarga",
+    "Nickname" : "Nama Pendek",
+    "Field {0} is required" : "Medan {0} diperlukan",
+    "Field {0} has incorrect format" : "Medan {0} mempunyai format yang tidak betul",
+    "The field {0} must be a string or array type with a maximum length of '{1}'" : "Medan {0} mestilah jenis rentetan atau tatasusunan dengan '{1}' panjang maksimum",
+    "Error_PhoneAlreadyConnected" : "Telefon anda telah dipautkan dengan akaun, sila pergi ke halaman log masuk"
+  }
+}
