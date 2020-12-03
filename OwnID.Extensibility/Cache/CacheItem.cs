@@ -176,6 +176,8 @@ namespace OwnID.Extensibility.Cache
         /// </summary>
         public string WebAppEncToken { get; set; }
 
+        public ChallengeType InitialChallengeType { get; set; }
+
         /// <summary>
         ///     Creates new instance of <see cref="CacheItem" /> based on <see cref="Nonce" /> and <see cref="DID" />
         /// </summary>
@@ -186,6 +188,7 @@ namespace OwnID.Extensibility.Cache
                 DID = DID,
                 Nonce = Nonce,
                 ChallengeType = ChallengeType,
+                InitialChallengeType = InitialChallengeType,
                 FlowType = FlowType,
                 Status = Status,
                 RequestToken = RequestToken,

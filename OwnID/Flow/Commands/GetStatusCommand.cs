@@ -88,6 +88,8 @@ namespace OwnID.Flow.Commands
                 return result;
             }
 
+            var action = cacheItem.ChallengeType.ToString();
+            
             if (cacheItem.FlowType == FlowType.Authorize)
             {
                 result.Payload = await _userHandlerAdapter.OnSuccessLoginAsync(cacheItem.DID, cacheItem.PublicKey);
@@ -120,6 +122,7 @@ namespace OwnID.Flow.Commands
                         break;
                     }
                     case ChallengeType.Login:
+                        action = ChallengeType.Link.ToString();
                         result.Payload = SetPartialRegisterResult(cacheItem);
                         break;
                     case ChallengeType.Register
@@ -145,6 +148,9 @@ namespace OwnID.Flow.Commands
                                 fido2CredentialId = cacheItem.Fido2CredentialId
                             }
                         };
+                        if (cacheItem.InitialChallengeType == ChallengeType.Login
+                            && cacheItem.ChallengeType == ChallengeType.Register)
+                            action = ChallengeType.Link.ToString();
                         break;
                     //
                     // TODO: fix needed at web-ui-sdk to avoid error in console if data is undefined
@@ -164,7 +170,7 @@ namespace OwnID.Flow.Commands
                 {
                     "data", new
                     {
-                        action = cacheItem.ChallengeType.ToString(),
+                        action,
                         authType = cacheItem.GetAuthType()
                     }
                 }
