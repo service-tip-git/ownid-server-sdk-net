@@ -157,7 +157,7 @@ namespace OwnID.Server.Gigya
 
                     var magicLinkSection = ownIdSection.GetSection("magic_link");
 
-                    if (magicLinkSection != null)
+                    if (magicLinkSection.Value != null)
                         builder.UseMagicLink(ml =>
                         {
                             ml.RedirectUrl = new Uri(magicLinkSection["redirect_url"]);
