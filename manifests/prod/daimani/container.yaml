@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-gigya
+spec:
+  template:
+    spec:
+      containers:
+        - name: server-gigya
+          env:
+            - name: OWNID__CALLBACK_URL
+              value: https://daimani.ownid.com
+            - name: OWNID__DID
+              value: did:daimani:CvnWmaDKdBLmSDbVDT8xHT
+            - name: OWNID__NAME
+              value: DAIMANI
+            - name: OWNID__DESCRIPTION
+              value: DAIMANI
+            - name: OWNID__ICON
+              value: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAACHUlEQVRogdXaP07DMBQG8K/QBbGXBakglkpZ2SASR8jKCai6wFaOQGckBLfIxMSAlDNE6oIEFVunngDkEpc2L3Fs51mxv/FZat+vzZ/WL3CdKE4eojiZuX6ffVJhjEAAmAK4GAxHB8vF/C04yBZC5tIlxgmkAiHjDMMOUSBknGBYIRoIGXYMG8QAIcOKaQ2J4qQ3GI6eANyRxeawYXqkYhCBACAQ45Z9nORZ+tXmBfZIRTOMCLT9QGELYUawxBhigfggla4hlogrUnUQbYgtIs/Sb7LSFcR3BHQgXSOiOLkuelBGCfHkm7gRPTRhaiGeHU7jJkwlxNNzQokhEM9P7FrMDiSEq1MdZgMJBCFDMGtIYAiZHUw/UITMuucoTib9gBEy697FobUiS+FltZdn6T0A3Z3AMwDvUZwck5XuMhOG9ckeMGZW9P5/+Q0Qs0GgfEMMCPO4jUDVT5QAMM8AbstFAoHfGIGY5Fn6U16ohMBPTC0CKgj8wigR0Pmr6wHmpQkBkx0+w03qnZ8yUZwomwBwmmfpp24vVdHeDvL9ama0QeczxnjL1AZDqg5itYltgfETAnOM81hDfMO0goAHI252raZV4BqGihmgmAWKmSBZVKfxjq0btqmuBYYNAe45uwGGFQEXTz4UmEPxIA1Z/As7Ahwne02mRcPlOEHA1UM1y8Ucg+HoFcARgPOi7Awh0nq+rcrWLqaIMwQA/AL0CDpROcnC1gAAAABJRU5ErkJggg==
+            - name: OWNID__PUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: daimani-secret
+                  key: public_key
+            - name: OWNID__PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: daimani-secret
+                  key: private_key
+            - name: GIGYA__DATA_CENTER
+              value: eu1.gigya.com
+            - name: GIGYA__SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: daimani-secret
+                  key: gigya_secret
+            - name: GIGYA__API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: daimani-secret
+                  key: gigya_api_key
+            - name: GIGYA__USER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: daimani-secret
+                  key: gigya_user_key
+            - name: OWNID__AUTHENTICATION_MODE
+              value: OwnIdOnly
+            - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
+              value: https://passwordless.daimani.ownid.com
+            - name: OWNID__TOP_DOMAIN
+              value: <company>.com
+            - name: SERVER_MODE
+              value: pilot
+            - name: Metrics__Enable
+              value: 'true'
+            - name: Metrics__Namespace
+              value: 'DAIMANI'
