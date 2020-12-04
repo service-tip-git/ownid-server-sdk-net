@@ -70,5 +70,3 @@ deploy:
     all_branches: true
     condition: $TRAVIS_BRANCH =~ ^release\/.*$
 
-after_deploy:
-  - bash scripts/test_runner.sh server-sdk $ENV
