@@ -37,10 +37,10 @@ namespace OwnID.Server.Gigya
         {
             var ownIdSection = Configuration.GetSection("ownid");
             var gigyaSection = Configuration.GetSection("gigya");
-            
+
             if (!Enum.TryParse(Configuration["server_mode"], true, out ServerMode serverMode))
                 serverMode = ServerMode.Production;
-            
+
             var topDomain = ownIdSection["top_domain"];
             var webAppUrl = new Uri(ownIdSection["web_app_url"] ?? Constants.OwinIdApplicationAddress);
 
@@ -78,7 +78,7 @@ namespace OwnID.Server.Gigya
                     builder.WithOrigins(originsList.ToArray());
                 });
             });
-            
+
             services.AddMetrics(Configuration);
 
             services.AddOwnId(
@@ -135,9 +135,10 @@ namespace OwnID.Server.Gigya
                             x.Fido2.UserName = ownIdSection["fido2_user_name"];
                             x.Fido2.UserDisplayName = ownIdSection["fido2_user_display_name"];
 
-                            if(!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
+                            if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
                                 x.Fido2.Origin = new Uri(ownIdSection["fido2_origin"]);
                         }
+
                         //for development cases
                         x.IsDevEnvironment = serverMode == ServerMode.Local;
                     });
@@ -187,9 +188,15 @@ namespace OwnID.Server.Gigya
 
             app.UseRequestLocalization(x =>
             {
-                x.AddSupportedCultures("ru", "es", "en");
+                var supportedCultures = new[]
+                {
+                    "ar", "de", "en", "en-GB", "es", "es-MX", "fr", "id", "ja", "ko", "ms", "pt", "pt-PT", "ru", "th",
+                    "tr", "vi", "zh-CN", "zh-TW"
+                };
+
+                x.AddSupportedCultures(supportedCultures);
                 x.DefaultRequestCulture = new RequestCulture("en", "en");
-                x.AddSupportedUICultures("ru", "en", "es");
+                x.AddSupportedUICultures(supportedCultures);
             });
             app.UseCors(CorsPolicyName);
 
@@ -203,7 +210,7 @@ namespace OwnID.Server.Gigya
             app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
                 .AddStrictTransportSecurityMaxAgeIncludeSubDomains()
                 .AddContentTypeOptionsNoSniff());
-            
+
             app.UseMetrics();
             app.UseOwnId();
         }

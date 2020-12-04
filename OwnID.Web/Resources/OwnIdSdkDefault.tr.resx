@@ -15,12 +15,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Email" xml:space="preserve">Email</data>
-  <data name="First Name" xml:space="preserve">First Name</data>
-  <data name="Last Name" xml:space="preserve">Last Name</data>
-  <data name="Nickname" xml:space="preserve">Nickname</data>
-  <data name="Field {0} is required" xml:space="preserve">Field {0} is required</data>
-  <data name="Field {0} has incorrect format" xml:space="preserve">Field {0} has incorrect format</data>
-  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">The field {0} must be a string or array type with a maximum length of '{1}'</data>
-  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Your phone is already associated with an account, please go to the login page</data>
+  <data name="Email" xml:space="preserve">E-posta</data>
+  <data name="First Name" xml:space="preserve">Ad</data>
+  <data name="Last Name" xml:space="preserve">Soyadı</data>
+  <data name="Nickname" xml:space="preserve">Takma ad</data>
+  <data name="Field {0} is required" xml:space="preserve">Alan {0} gerekli</data>
+  <data name="Field {0} has incorrect format" xml:space="preserve">Alan {0} yanlış biçim içeriyor</data>
+  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">{0} alanı, en fazla '{1}' uzunluğunda bir dizi veya dizilim türü olmalıdır</data>
+  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Telefonunuz zaten bir hesapla ilişkilendirilmiş, lütfen oturum açma sayfasına gidin</data>
 </root>

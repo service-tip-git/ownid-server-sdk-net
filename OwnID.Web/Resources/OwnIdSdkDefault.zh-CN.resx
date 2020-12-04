@@ -15,12 +15,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Email" xml:space="preserve">Email</data>
-  <data name="First Name" xml:space="preserve">First Name</data>
-  <data name="Last Name" xml:space="preserve">Last Name</data>
-  <data name="Nickname" xml:space="preserve">Nickname</data>
-  <data name="Field {0} is required" xml:space="preserve">Field {0} is required</data>
-  <data name="Field {0} has incorrect format" xml:space="preserve">Field {0} has incorrect format</data>
-  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">The field {0} must be a string or array type with a maximum length of '{1}'</data>
-  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Your phone is already associated with an account, please go to the login page</data>
+  <data name="Email" xml:space="preserve">电子邮件</data>
+  <data name="First Name" xml:space="preserve">名</data>
+  <data name="Last Name" xml:space="preserve">姓</data>
+  <data name="Nickname" xml:space="preserve">昵称</data>
+  <data name="Field {0} is required" xml:space="preserve">字段 {0} 为必填字段</data>
+  <data name="Field {0} has incorrect format" xml:space="preserve">字段 {0} 的格式不正确</data>
+  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">字段 {0} 必须为字符串或数组类型，且最大长度为 '{1}'</data>
+  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">您的手机已与某个账户相关联，请转到登录页面</data>
 </root>
