@@ -140,12 +140,20 @@ namespace OwnID.Extensibility.Configuration
         public int CookieExpiration => 1825;
 
         /// <summary>
-        ///     Determines authenticator provider
+        ///     Indicates if TFA is enabled
         /// </summary>
         /// <remarks>
-        ///     Default is OwnIdOnly
+        ///     Default : true
         /// </remarks>
-        public AuthenticationModeType AuthenticationMode { get; set; }
+        public bool TFAEnabled { get; set; }
+
+        /// <summary>
+        ///     The way how application should handle unavailability of FIDO2
+        /// </summary>
+        /// <remarks>
+        /// Default: <code>Fido2FallbackBehavior.Passcode</code>
+        /// </remarks>
+        public Fido2FallbackBehavior Fido2FallbackBehavior { get; set; }
 
         /// <summary>
         ///     FIDO2 configuration

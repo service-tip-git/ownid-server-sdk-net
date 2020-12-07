@@ -13,6 +13,8 @@ namespace OwnID.Flow.Steps
         Error,
         InternalConnectionRecovery,
         CheckUserExistence,
+        EnterPasscode,
+        ResetPasscode,
 
         Authorize,
         InstantAuthorize,

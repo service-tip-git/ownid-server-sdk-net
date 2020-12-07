@@ -70,7 +70,7 @@ namespace OwnID.Flow.Commands
             var startFlowUrl = _urlProvider.GetStartFlowUrl(challengeContext);
             var destinationUrl = _urlProvider.GetWebAppSignWithCallbackUrl(startFlowUrl, request.Language);
 
-            if (_configuration.AuthenticationMode.IsFido2Enabled()
+            if (_configuration.TFAEnabled
                 && (flowType == FlowType.PartialAuthorize
                     || request.Type == ChallengeType.Link
                     || request.Type == ChallengeType.Recover))

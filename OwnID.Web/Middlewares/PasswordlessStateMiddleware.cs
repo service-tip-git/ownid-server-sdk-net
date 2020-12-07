@@ -32,7 +32,7 @@ namespace OwnID.Web.Middlewares
         protected override async Task Execute(HttpContext httpContext)
         {
             var request = await OwnIdSerializer.DeserializeAsync<InitFido2Request>(httpContext.Request.Body);
-            var isFido2Only = _configuration.AuthenticationMode == AuthenticationModeType.Fido2Only;
+            var isFido2Only = _configuration.TFAEnabled && _configuration.Fido2FallbackBehavior == Fido2FallbackBehavior.Block;
             var isRegistration = request.FlowType == "r";
 
             var result = new InitFido2Response

@@ -41,8 +41,10 @@ spec:
               value: <website public key>
             - name: OWNID__PRIVATE_KEY # Website RSA private key 
               value: <website private key>
-            - name: OWNID__AUTHENTICATION_MODE # Authentication mode: All(OwnID or FIDO2), OwnIdOnly, Fido2Only
-              value: All
+            - name: OWNID__TFA_ENABLED # Two Factor Authentication enabled. Default is true
+              value: 'true'
+            - name: OWNID__FIDO2_FALLBACK_BEHAVIOR # Fallback behavior when FIDO2 is unavailable. Default is Passcode
+              value: Passcode
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL # Passwordless page subdomain (CNAME). Example: https://passwordless.my-company.com
               value: https://passwordless.<website domain>
             - name: OWNID__FIDO2_RELYING_PARTY_ID # Website domain name. Example: my-company.com 

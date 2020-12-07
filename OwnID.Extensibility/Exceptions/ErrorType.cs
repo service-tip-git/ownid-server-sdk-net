@@ -9,6 +9,7 @@ namespace OwnID.Extensibility.Exceptions
         ///     User not found
         /// </summary>
         UserAlreadyExists,
+        
         /// <summary>
         ///     Recover token expired
         /// </summary>

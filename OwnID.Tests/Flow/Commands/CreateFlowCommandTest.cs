@@ -44,8 +44,7 @@ namespace OwnID.Tests.Flow.Commands
             var linkAdapter = fixture.Freeze<Mock<IAccountLinkHandler>>();
             var language = fixture.Freeze<string>();
 
-            configuration.AuthenticationMode =
-                fido2Enabled ? AuthenticationModeType.All : AuthenticationModeType.OwnIdOnly;
+            configuration.TFAEnabled = fido2Enabled;
             configuration.MaximumNumberOfConnectedDevices = 99;
 
             var did = fixture.Create<string>();

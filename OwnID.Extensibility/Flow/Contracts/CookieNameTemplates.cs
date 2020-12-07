@@ -11,7 +11,5 @@ namespace OwnID.Extensibility.Flow.Contracts
         public const string WebAppRecovery = "sign-r-{0}";
         
         public const string WebAppEncryption = "sign-enc-{0}";
-        
-        public const string WebAppVector = "sign-vi-{0}";
     }
 }

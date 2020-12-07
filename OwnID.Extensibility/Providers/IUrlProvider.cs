@@ -67,5 +67,12 @@ namespace OwnID.Extensibility.Providers
         /// <param name="context">Process unique identifier</param>
         /// <returns>Well-formatted url to check user existence</returns>
         Uri GetUserExistenceUrl(string context);
+
+        /// <summary>
+        ///     Generates reset passcode url
+        /// </summary>
+        /// <param name="context">Process unique identifier</param>
+        /// <returns>Well-formatted url to reset passcode</returns>
+        Uri GetResetPasscodeUrl(string context);
     }
 }

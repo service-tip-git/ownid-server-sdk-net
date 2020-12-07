@@ -7,6 +7,7 @@ namespace OwnID.Flow.Steps
     {
         Polling,
         Callback,
-        Finish
+        Finish,
+        GoToNext
     }
 }

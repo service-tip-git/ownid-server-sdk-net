@@ -182,6 +182,9 @@ namespace OwnID.Flow
                     method = nextFrontendBehavior.Callback.Method
                 });
 
+            if(nextFrontendBehavior.NextBehavior != null)
+                stepDict.Add("nextBehavior", GetStepBehavior(nextFrontendBehavior.NextBehavior));
+            
             if (nextFrontendBehavior.AlternativeBehavior != null)
                 stepDict.Add("alternativeBehavior", GetStepBehavior(nextFrontendBehavior.AlternativeBehavior));
 

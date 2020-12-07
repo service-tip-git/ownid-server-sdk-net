@@ -25,10 +25,6 @@ namespace OwnID.Flow.Commands.Authorize
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
-            // var throwEx = true;
-            // if (throwEx)
-            //     throw new InternalLogicException("test exception");
-            
             if (relatedItem.HasFinalState)
                 throw new CommandValidationException(
                     "Cache item should be not Finished with Login or Register challenge type. " +

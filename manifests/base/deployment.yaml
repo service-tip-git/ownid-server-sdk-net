@@ -25,8 +25,6 @@ spec:
                 secretKeyRef:
                   name: demo-secret
                   key: private_key
-            - name: OWNID__AUTHENTICATION_MODE
-              value: All
             - name: GIGYA__DATA_CENTER
               value: us1.gigya.com
             - name: GIGYA__SECRET

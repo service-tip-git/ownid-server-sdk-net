@@ -67,7 +67,7 @@ namespace OwnID.Web.Features
 
             services.TryAddSingleton<CheckUserExistenceCommand>();
 
-            if (_configuration.AuthenticationMode.IsFido2Enabled())
+            if (_configuration.TFAEnabled)
             {
                 services.TryAddSingleton<Fido2RegisterCommand>();
                 services.TryAddSingleton<Fido2LoginCommand>();
@@ -104,7 +104,7 @@ namespace OwnID.Web.Features
             if (_configuration.MaximumNumberOfConnectedDevices == default)
                 _configuration.MaximumNumberOfConnectedDevices = 1;
 
-            if (_configuration.AuthenticationMode.IsFido2Enabled())
+            if (_configuration.TFAEnabled)
             {
                 if (string.IsNullOrWhiteSpace(_configuration.Fido2.RelyingPartyId))
                     _configuration.Fido2.RelyingPartyId = _configuration.Fido2.PasswordlessPageUrl?.Host;
@@ -120,7 +120,6 @@ namespace OwnID.Web.Features
 
                 if (_configuration.Fido2.Origin == null)
                     _configuration.Fido2.Origin = _configuration.Fido2.PasswordlessPageUrl;
-
             }
             
             return this;
