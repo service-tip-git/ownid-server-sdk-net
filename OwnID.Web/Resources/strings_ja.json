@@ -1,0 +1,12 @@
+{
+  "OwnIdSdkDefault" : {
+    "Email" : "電子メール",
+    "First Name" : "名",
+    "Last Name" : "姓",
+    "Nickname" : "ニックネーム",
+    "Field {0} is required" : "フィールド {0} は必須です",
+    "Field {0} has incorrect format" : "フィールド {0} の書式が不適切です",
+    "The field {0} must be a string or array type with a maximum length of '{1}'" : "フィールド {0} は最大長 '{1}' の文字列または配列である必要があります",
+    "Error_PhoneAlreadyConnected" : "電話とアカウントがすでに関連付けられています、ログインページに進んでください"
+  }
+}

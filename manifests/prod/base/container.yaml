@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-gigya
+spec:
+  template:
+    spec:
+      containers:
+        - name: server-gigya
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: prod
+            - name: AWS__Region
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: region
+            - name: AWS__AccessKeyId
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: access_key_id
+            - name: AWS__SecretAccessKey
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: secret_access_key

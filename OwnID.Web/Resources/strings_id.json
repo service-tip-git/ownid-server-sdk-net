@@ -1,0 +1,12 @@
+{
+  "OwnIdSdkDefault" : {
+    "Email" : "Email",
+    "First Name" : "Nama Depan",
+    "Last Name" : "Nama Belakang",
+    "Nickname" : "Nama Panggilan",
+    "Field {0} is required" : "Bidang {0} wajib diisi",
+    "Field {0} has incorrect format" : "Bidang {0} memiliki format yang salah",
+    "The field {0} must be a string or array type with a maximum length of '{1}'" : "Bidang {0} harus berupa tipe larik atau string dengan panjang maksimum '{1}'",
+    "Error_PhoneAlreadyConnected" : "Telepon Anda telah dikaitkan dengan akun, silakan buka halaman login"
+  }
+}

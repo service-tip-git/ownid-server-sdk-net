@@ -1,0 +1,12 @@
+{
+  "OwnIdSdkDefault" : {
+    "Email" : "E-mail",
+    "First Name" : "Prénom",
+    "Last Name" : "Nom de famille",
+    "Nickname" : "Pseudonyme",
+    "Field {0} is required" : "La zone {0} est obligatoire.",
+    "Field {0} has incorrect format" : "La zone {0} a un format incorrect.",
+    "The field {0} must be a string or array type with a maximum length of '{1}'" : "La zone {0} doit être de type Chaîne ou Tableau, avec une longueur maximale de '{1}'.",
+    "Error_PhoneAlreadyConnected" : "Votre téléphone est déjà associé à un compte, accédez à la page de connexion."
+  }
+}

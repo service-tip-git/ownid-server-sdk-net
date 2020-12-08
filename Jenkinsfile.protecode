@@ -1,0 +1,56 @@
+#!/usr/bin/env groovy
+
+pipeline {
+
+  agent any
+
+  //triggers {
+    //    cron('H H(0-1) * * *')
+    //}
+
+  options {
+    timeout(time: 30, unit: 'MINUTES')
+    timestamps()
+    buildDiscarder(logRotator(daysToKeepStr: '-1', numToKeepStr: '20', artifactDaysToKeepStr: '-1', artifactNumToKeepStr: '-1'))
+    disableConcurrentBuilds()
+  }
+
+  stages {
+    stage('Initializing') {
+      steps {
+        sh 'printenv'
+        dir('scripts') {
+          git url: 'git@github.wdf.sap.corp:io/io-scripts.git'
+        }
+      }
+    }
+
+    stage('Protecode Scan') {
+      steps {
+        script {
+          repository = "server-sdk-net"
+          branch = "master"
+          //sh "npm install"
+          //sh "npm run build -- --mode staging"
+          sh "docker build --no-cache  -t ${repository}-${branch}:protecode ."
+          tagName = "${repository}-${branch}:protecode"
+          dockerImageId = sh(returnStdout: true, script: "docker images -q ${tagName}").trim()
+          echo "Deleting old tar files"
+          sh "rm -rf ./image"
+          echo "Converting docker image to tar file"
+          sh "mkdir image"
+          echo "Converting docker image to gz format"
+          sh "docker save ${dockerImageId} | gzip > image/${repository}.tar.gz"
+          protecodesc credentialsId: "protecode-ownid", directoryToScan: "./image", protecodeScGroup: "1149", convertToSummary: true, failIfVulns: true, scanTimeout: 145
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      cleanWs()
+    }
+  }
+
+}
