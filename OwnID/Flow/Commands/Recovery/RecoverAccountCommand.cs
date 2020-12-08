@@ -50,7 +50,8 @@ namespace OwnID.Flow.Commands.Recovery
                 Locale = input.CultureInfo?.Name,
                 IncludeRequester = _needRequesterInfo,
                 EncToken = relatedItem.EncToken,
-                CanBeRecovered = !string.IsNullOrEmpty(relatedItem.RecoveryToken)
+                CanBeRecovered = !string.IsNullOrEmpty(relatedItem.RecoveryToken),
+                IncludeFido2FallbackBehavior = true
             };
 
             var jwt = _jwtComposer.GenerateBaseStepJwt(composeInfo, recoverResult.DID);

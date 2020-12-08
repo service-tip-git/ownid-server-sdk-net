@@ -39,5 +39,10 @@ namespace OwnID.Flow
         ///     Identifies if connection can be recovered
         /// </summary>
         public bool CanBeRecovered { get; set; }
+
+        /// <summary>
+        ///     Include FIDO2 fallback behavior configuration
+        /// </summary>
+        public bool IncludeFido2FallbackBehavior { get; set; }
     }
 }
