@@ -17,5 +17,11 @@ namespace OwnID.Server.WebApp
         /// </summary>
         /// <remarks>Default value is 5 years</remarks>
         public int CookieExpiration { get; set; } = 365 * 5;
+
+        /// <summary>
+        ///     Top domain
+        /// </summary>
+        /// <remarks>Default value is "ownid.com"</remarks>
+        public string TopDomain { get; set; } = "ownid.com";
     }
 }

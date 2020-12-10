@@ -39,8 +39,8 @@ namespace OwnID.Server.WebApp.Controllers
             {
                 Expires = DateTime.Now.AddDays(_webAppOptions.CookieExpiration),
                 Secure = !_webAppOptions.IsDevEnvironment,
-                HttpOnly = true,
                 Path = "/cookies",
+                HttpOnly = true,
                 SameSite = SameSiteMode.Strict
             });
 

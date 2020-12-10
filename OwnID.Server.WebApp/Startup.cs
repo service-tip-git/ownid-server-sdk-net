@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
@@ -12,6 +14,8 @@ namespace OwnID.Server.WebApp
 {
     public class Startup
     {
+        private const string CorsPolicyName = "AllowAll";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -22,6 +26,34 @@ namespace OwnID.Server.WebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var webAppOptions = Configuration.GetSection("WebApp").Get<WebAppOptions>();
+            
+            services.AddCors(corsOptions =>
+            {
+                corsOptions.AddPolicy(CorsPolicyName, builder =>
+                {
+                    builder.AllowAnyHeader();
+                    builder.AllowAnyMethod();
+                    builder.AllowCredentials();
+
+                    builder.SetIsOriginAllowedToAllowWildcardSubdomains();
+                    
+                    var originsList = new List<string>();
+
+                    if (webAppOptions.IsDevEnvironment)
+                    {
+                        builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost");
+                    }
+                    else
+                    {
+                        originsList.Add($"https://*.{webAppOptions.TopDomain}");
+                        originsList.Add($"https://{webAppOptions.TopDomain}");
+                    }
+
+                    builder.WithOrigins(originsList.ToArray());
+                });
+            });
+            
             services.AddOptions();
             services.Configure<WebAppOptions>(Configuration.GetSection(WebAppOptions.ConfigurationName));
             
@@ -45,6 +77,8 @@ namespace OwnID.Server.WebApp
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "OwnID.Server.WebApp v1"));
             }
+
+            app.UseCors(CorsPolicyName);
             
             app.UseRouting();
 
