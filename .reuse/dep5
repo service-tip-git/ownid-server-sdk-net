@@ -6,3 +6,7 @@ Source: https://github.com/sap/ownid-server-sdk-net
 Files: *
 Copyright: 2020 SAP SE or an SAP affiliate company and OwnID contributors
 License: Apache-2.0
+
+Files: OwnID.Server.Gigya/Middlewares/SecurityHeaders/SecurityHeadersBuilder.cs
+Copyright: andrewlock/blog-examples
+License: MIT
