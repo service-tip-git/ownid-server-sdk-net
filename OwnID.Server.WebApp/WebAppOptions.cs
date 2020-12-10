@@ -11,7 +11,7 @@ namespace OwnID.Server.WebApp
         ///     Is development environment
         /// </summary>
         public bool IsDevEnvironment { get; set; }
-        
+
         /// <summary>
         ///     Cookies expiration in days
         /// </summary>
@@ -23,5 +23,7 @@ namespace OwnID.Server.WebApp
         /// </summary>
         /// <remarks>Default value is "ownid.com"</remarks>
         public string TopDomain { get; set; } = "ownid.com";
+
+        public static WebAppOptions Default => new WebAppOptions();
     }
 }

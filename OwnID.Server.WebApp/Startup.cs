@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
@@ -26,8 +25,8 @@ namespace OwnID.Server.WebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var webAppOptions = Configuration.GetSection("WebApp").Get<WebAppOptions>();
-            
+            var webAppOptions = Configuration.GetSection("WebApp").Get<WebAppOptions>() ?? WebAppOptions.Default;
+
             services.AddCors(corsOptions =>
             {
                 corsOptions.AddPolicy(CorsPolicyName, builder =>
@@ -37,7 +36,7 @@ namespace OwnID.Server.WebApp
                     builder.AllowCredentials();
 
                     builder.SetIsOriginAllowedToAllowWildcardSubdomains();
-                    
+
                     var originsList = new List<string>();
 
                     if (webAppOptions.IsDevEnvironment)
@@ -53,15 +52,15 @@ namespace OwnID.Server.WebApp
                     builder.WithOrigins(originsList.ToArray());
                 });
             });
-            
+
             services.AddOptions();
             services.Configure<WebAppOptions>(Configuration.GetSection(WebAppOptions.ConfigurationName));
-            
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "OwnID.Server.WebApp", Version = "v1"});
-                
+
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
@@ -79,7 +78,7 @@ namespace OwnID.Server.WebApp
             }
 
             app.UseCors(CorsPolicyName);
-            
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
