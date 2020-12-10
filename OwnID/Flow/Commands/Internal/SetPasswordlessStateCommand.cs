@@ -43,7 +43,7 @@ namespace OwnID.Flow.Commands.Internal
                 HttpOnly = true,
                 Domain = _configuration.TopDomain,
                 Secure = !_configuration.IsDevEnvironment,
-                Expires = DateTimeOffset.Now.AddYears(_configuration.CookieExpiration),
+                Expires = DateTimeOffset.Now.AddDays(_configuration.CookieExpiration),
                 SameSite = SameSiteMode.Strict
             };
 

@@ -44,7 +44,8 @@ namespace OwnID.Flow.Commands.Authorize
                 Locale = input.CultureInfo?.Name,
                 IncludeRequester = true,
                 EncToken = relatedItem.EncToken,
-                CanBeRecovered = !string.IsNullOrEmpty(relatedItem.RecoveryToken)
+                CanBeRecovered = !string.IsNullOrEmpty(relatedItem.RecoveryToken),
+                IncludeFido2FallbackBehavior = true
             };
             
             var jwt = _jwtComposer.GenerateProfileConfigJwt(composeInfo, _identitiesProvider.GenerateUserId());

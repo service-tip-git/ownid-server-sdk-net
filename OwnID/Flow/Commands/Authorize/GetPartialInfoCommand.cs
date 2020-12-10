@@ -40,7 +40,8 @@ namespace OwnID.Flow.Commands.Authorize
                 ClientTime = input.ClientDate,
                 Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
                 Locale = input.CultureInfo?.Name,
-                IncludeRequester = true
+                IncludeRequester = true,
+                IncludeFido2FallbackBehavior = true
             };
 
             if (!relatedItem.IsStateless)

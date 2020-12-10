@@ -84,7 +84,10 @@ namespace OwnID.Flow
             }
 
             if (!string.IsNullOrEmpty(info.EncToken)) data.Add("encToken", info.EncToken);
-
+            
+            if(info.IncludeFido2FallbackBehavior && _ownIdCoreConfiguration.TFAEnabled)
+                data.Add("fido2FallbackBehavior", _ownIdCoreConfiguration.Fido2FallbackBehavior.ToString().ToLower());
+            
             data.Add("canBeRecovered", info.CanBeRecovered);
 
             var fields = GetBaseFlowFieldsDictionary(info, data);
