@@ -151,7 +151,7 @@ namespace OwnID.Extensibility.Configuration
         ///     The way how application should handle unavailability of FIDO2
         /// </summary>
         /// <remarks>
-        /// Default: <code>Fido2FallbackBehavior.Passcode</code>
+        ///     Default: <code>Fido2FallbackBehavior.Passcode</code>
         /// </remarks>
         public Fido2FallbackBehavior Fido2FallbackBehavior { get; set; }
 

@@ -18,7 +18,7 @@ namespace OwnID.Web.Middlewares
             _createFlowCommand = createFlowCommand;
         }
 
-        protected override async Task Execute(HttpContext httpContext)
+        protected override async Task ExecuteAsync(HttpContext httpContext)
         {
             var request = await OwnIdSerializer.DeserializeAsync<GenerateContextRequest>(httpContext.Request.Body);
 

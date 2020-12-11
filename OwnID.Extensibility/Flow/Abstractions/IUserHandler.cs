@@ -62,7 +62,7 @@ namespace OwnID.Extensibility.Flow.Abstractions
         /// <param name="fido2CredentialId">fido2 credential id</param>
         /// <param name="fido2SignCounter">fido2 sign counter</param>
         Task<AuthResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId, uint fido2SignCounter);
-        
+
         /// <summary>
         ///     Will be called to define if user with such did and public key exists.
         ///     During this method following checks should be preformed: user exists, public key exists in user data.
@@ -93,7 +93,7 @@ namespace OwnID.Extensibility.Flow.Abstractions
         ///     otherwise false
         /// </returns>
         Task<bool> IsFido2UserExists(string fido2CredentialId);
-        
+
         /// <summary>
         ///     Try find Fido2 public key by fido2 user id
         /// </summary>
@@ -115,7 +115,7 @@ namespace OwnID.Extensibility.Flow.Abstractions
             bool includingProfile = false);
 
         /// <summary>
-        /// Searches and returns user ID with provided email
+        ///     Searches and returns user ID with provided email
         /// </summary>
         /// <param name="email">Email to search</param>
         /// <returns>User ID if there is a user with such email or null if not</returns>

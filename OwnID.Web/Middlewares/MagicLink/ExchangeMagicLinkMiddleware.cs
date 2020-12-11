@@ -19,7 +19,7 @@ namespace OwnID.Web.Middlewares.MagicLink
             _exchangeMagicLinkCommand = exchangeMagicLinkCommand;
         }
 
-        protected override async Task Execute(HttpContext httpContext)
+        protected override async Task ExecuteAsync(HttpContext httpContext)
         {
             var request = await OwnIdSerializer.DeserializeAsync<ExchangeMagicLinkRequest>(httpContext.Request.Body);
             await Json(httpContext, await _exchangeMagicLinkCommand.ExecuteAsync(request),

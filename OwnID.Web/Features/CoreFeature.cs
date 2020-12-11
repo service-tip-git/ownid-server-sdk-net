@@ -61,6 +61,7 @@ namespace OwnID.Web.Features
             services.TryAddSingleton<InternalConnectionRecoveryCommand>();
             services.TryAddSingleton<SetPasswordlessStateCommand>();
             services.TryAddSingleton<SetWebAppStateCommand>();
+            services.TryAddSingleton<AddConnectionCommand>();
 
             services.TryAddSingleton<IFlowController, FlowController>();
             services.TryAddSingleton<IFlowRunner, FlowRunner>();

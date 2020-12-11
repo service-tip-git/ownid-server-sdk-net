@@ -47,7 +47,7 @@ namespace OwnID.Flow
             {
                 {
                     StepType.Starting,
-                    GetStartingStep(cacheItem =>
+                    GetFallbackStartingStep(cacheItem =>
                     {
                         var alternative = new FrontendBehavior(StepType.Authorize, cacheItem.ChallengeType,
                             new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType)));
@@ -75,7 +75,7 @@ namespace OwnID.Flow
             {
                 {
                     StepType.Starting,
-                    GetStartingStep(cacheItem =>
+                    GetFallbackStartingStep(cacheItem =>
                     {
                         var authorizeStep = new FrontendBehavior(
                             StepType.InstantAuthorize, cacheItem.ChallengeType,
@@ -118,7 +118,7 @@ namespace OwnID.Flow
             {
                 {
                     StepType.Starting,
-                    GetStartingStep(cacheItem => new FrontendBehavior(StepType.Link,
+                    GetFallbackStartingStep(cacheItem => new FrontendBehavior(StepType.Link,
                         cacheItem.ChallengeType,
                         new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType))))
                 },
@@ -131,7 +131,8 @@ namespace OwnID.Flow
             {
                 {
                     StepType.Starting,
-                    GetStartingStep(cacheItem => new FrontendBehavior(StepType.ApprovePin, cacheItem.ChallengeType,
+                    GetFallbackStartingStep(cacheItem => new FrontendBehavior(StepType.ApprovePin,
+                        cacheItem.ChallengeType,
                         new PollingAction(_urlProvider.GetSecurityApprovalStatusUrl(cacheItem.Context),
                             _coreConfiguration.PollingInterval)))
                 },
@@ -162,7 +163,7 @@ namespace OwnID.Flow
             {
                 {
                     StepType.Starting,
-                    GetStartingStep(cacheItem => new FrontendBehavior(StepType.Recover, cacheItem.ChallengeType,
+                    GetFallbackStartingStep(cacheItem => new FrontendBehavior(StepType.Recover, cacheItem.ChallengeType,
                         new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType))))
                 },
                 {
@@ -174,7 +175,8 @@ namespace OwnID.Flow
             {
                 {
                     StepType.Starting,
-                    GetStartingStep(cacheItem => new FrontendBehavior(StepType.ApprovePin, cacheItem.ChallengeType,
+                    GetFallbackStartingStep(cacheItem => new FrontendBehavior(StepType.ApprovePin,
+                        cacheItem.ChallengeType,
                         new PollingAction(_urlProvider.GetSecurityApprovalStatusUrl(cacheItem.Context),
                             _coreConfiguration.PollingInterval)))
                 },
@@ -204,7 +206,8 @@ namespace OwnID.Flow
             {
                 {
                     StepType.Starting,
-                    GetStartingStep(cacheItem => new FrontendBehavior(StepType.Fido2Authorize, cacheItem.ChallengeType,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Fido2Authorize,
+                        cacheItem.ChallengeType,
                         new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
                             "/fido2"))))
                 },
@@ -217,7 +220,8 @@ namespace OwnID.Flow
             {
                 {
                     StepType.Starting,
-                    GetStartingStep(cacheItem => new FrontendBehavior(StepType.Fido2Authorize, cacheItem.ChallengeType,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Fido2Authorize,
+                        cacheItem.ChallengeType,
                         new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
                             "/fido2"))))
                 },
@@ -230,7 +234,8 @@ namespace OwnID.Flow
             {
                 {
                     StepType.Starting,
-                    GetStartingStep(cacheItem => new FrontendBehavior(StepType.Fido2Authorize, cacheItem.ChallengeType,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Fido2Authorize,
+                        cacheItem.ChallengeType,
                         new CallAction(
                             _urlProvider.GetChallengeUrl(cacheItem.Context, ChallengeType.Register, "/fido2"))))
                 },
@@ -244,7 +249,8 @@ namespace OwnID.Flow
             {
                 {
                     StepType.Starting,
-                    GetStartingStep(cacheItem => new FrontendBehavior(StepType.Fido2Authorize, cacheItem.ChallengeType,
+                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Fido2Authorize,
+                        cacheItem.ChallengeType,
                         new CallAction(
                             _urlProvider.GetChallengeUrl(cacheItem.Context, ChallengeType.Register, "/fido2"))))
                 },
@@ -317,7 +323,7 @@ namespace OwnID.Flow
             });
         }
 
-        private Step<StartFlowCommand> GetStartingStep(Func<CacheItem, FrontendBehavior> frontBehaviorGenerator)
+        private Step<StartFlowCommand> GetFallbackStartingStep(Func<CacheItem, FrontendBehavior> frontBehaviorGenerator)
         {
             if (!_coreConfiguration.TFAEnabled
                 || _coreConfiguration.Fido2FallbackBehavior != Fido2FallbackBehavior.Passcode)

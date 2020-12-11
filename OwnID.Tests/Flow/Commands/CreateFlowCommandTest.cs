@@ -18,10 +18,10 @@ namespace OwnID.Tests.Flow.Commands
     public class CreateFlowCommandTest
     {
         [Theory]
-        [InlineData(ChallengeType.Register, false, false, null, false, FlowType.Authorize)]
+        [InlineData(ChallengeType.Register, false, false, null, false, FlowType.Authorize, Skip = "Flow is abandoned")]
         [InlineData(ChallengeType.Register, false, true, null, false, FlowType.PartialAuthorize)]
         [InlineData(ChallengeType.Register, false, true, null, true, FlowType.PartialAuthorize)]
-        [InlineData(ChallengeType.Login, false, false, null, false, FlowType.Authorize)]
+        [InlineData(ChallengeType.Login, false, false, null, false, FlowType.Authorize, Skip = "Flow is abandoned")]
         [InlineData(ChallengeType.Login, false, true, null, false, FlowType.PartialAuthorize)]
         [InlineData(ChallengeType.Login, false, true, null, true, FlowType.PartialAuthorize)]
         [InlineData(ChallengeType.Recover, false, false, "test", false, FlowType.Recover)]

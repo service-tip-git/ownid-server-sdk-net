@@ -32,6 +32,8 @@ namespace OwnID.Flow.Commands
         {
             var challengeContext = _identitiesProvider.GenerateContext();
             var nonce = _identitiesProvider.GenerateNonce();
+            // classic flow is not supported
+            request.IsPartial = true;
 
             string did = null;
             string payload = null;

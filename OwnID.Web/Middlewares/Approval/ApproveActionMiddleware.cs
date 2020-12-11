@@ -21,7 +21,7 @@ namespace OwnID.Web.Middlewares.Approval
             _approveActionCommand = approveActionCommand;
         }
 
-        protected override async Task Execute(HttpContext httpContext)
+        protected override async Task ExecuteAsync(HttpContext httpContext)
         {
             var request = await OwnIdSerializer.DeserializeAsync<ApproveActionRequest>(httpContext.Request.Body);
 

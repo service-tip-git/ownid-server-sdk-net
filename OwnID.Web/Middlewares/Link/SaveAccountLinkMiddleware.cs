@@ -22,7 +22,7 @@ namespace OwnID.Web.Middlewares.Link
             _flowRunner = flowRunner;
         }
 
-        protected override async Task Execute(HttpContext httpContext)
+        protected override async Task ExecuteAsync(HttpContext httpContext)
         {
             var jwtContainer = await GetRequestJwtContainerAsync(httpContext);
             var result = await _flowRunner.RunAsync(

@@ -20,7 +20,7 @@ namespace OwnID.Web.Middlewares
             _getStatusCommand = getStatusCommand;
         }
 
-        protected override async Task Execute(HttpContext context)
+        protected override async Task ExecuteAsync(HttpContext context)
         {
             List<GetStatusRequest> request;
             try

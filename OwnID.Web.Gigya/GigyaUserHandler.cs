@@ -37,12 +37,12 @@ namespace OwnID.Web.Gigya
 
         public async Task<AuthResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)
         {
-            var did = await _restApiClient.SearchForDid(publicKey);
+            var user = await _restApiClient.SearchByPublicKey(publicKey);
 
-            if (string.IsNullOrEmpty(did))
+            if (string.IsNullOrEmpty(user?.UID))
                 return new AuthResult<object>("Can not find user in Gigya search result with provided public key");
 
-            return await OnSuccessLoginInternalAsync(did);
+            return await OnSuccessLoginInternalAsync(user.UID);
         }
 
         public async Task<AuthResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId,
@@ -94,8 +94,8 @@ namespace OwnID.Web.Gigya
 
         public async Task<bool> IsUserExists(string publicKey)
         {
-            var did = await _restApiClient.SearchForDid(publicKey);
-            return !string.IsNullOrWhiteSpace(did);
+            var user = await _restApiClient.SearchByPublicKey(publicKey);
+            return !string.IsNullOrWhiteSpace(user?.UID);
         }
 
         public async Task<bool> IsFido2UserExists(string fido2CredentialId)
@@ -153,7 +153,7 @@ namespace OwnID.Web.Gigya
         public async Task<string> GetUserIdByEmail(string email)
         {
             var result = await _restApiClient.SearchByEmailAsync(email);
-            return result?.DID;
+            return result?.UID;
         }
 
         public async Task CreateProfileAsync(IUserProfileFormContext<TProfile> context, string recoveryToken = null,

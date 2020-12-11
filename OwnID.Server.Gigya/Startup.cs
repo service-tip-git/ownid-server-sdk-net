@@ -139,7 +139,7 @@ namespace OwnID.Server.Gigya
                         if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
                             x.Fido2.Origin = new Uri(ownIdSection["fido2_origin"]);
                     }
-
+                    
                     //for development cases
                     x.IsDevEnvironment = serverMode == ServerMode.Local;
                 });

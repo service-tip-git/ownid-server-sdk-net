@@ -34,8 +34,8 @@ namespace OwnID.Web
                 builder => builder.UseMiddleware<CheckUserExistenceMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/conn-recovery",
                 builder => builder.UseMiddleware<InternalConnectionRecoveryMiddleware>());
-            routeBuilder.MapMiddlewarePost("ownid/{context}/challenge",
-                builder => builder.UseMiddleware<SaveProfileMiddleware>());
+            // routeBuilder.MapMiddlewarePost("ownid/{context}/challenge",
+            //     builder => builder.UseMiddleware<SaveProfileMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/challenge/partial",
                 builder => builder.UseMiddleware<SavePartialProfileMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/challenge/fido2",
@@ -46,6 +46,8 @@ namespace OwnID.Web
                 builder => builder.UseMiddleware<GetActionApprovalStatusMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/status",
                 builder => builder.UseMiddleware<GetChallengeStatusMiddleware>());
+            routeBuilder.MapMiddlewarePost("ownid/connections",
+                builder => builder.UseMiddleware<AddConnectionMiddleware>());
 
             if (configuration.HasFeature<AccountLinkFeature>())
                 routeBuilder.MapMiddlewarePost("ownid/{context}/link",
