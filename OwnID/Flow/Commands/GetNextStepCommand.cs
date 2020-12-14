@@ -42,6 +42,7 @@ namespace OwnID.Flow.Commands
                 Behavior = step,
                 Locale = input.CultureInfo?.Name,
                 IncludeRequester = _needRequesterInfo,
+                IncludeFido2FallbackBehavior = true
             };
 
             if (!relatedItem.IsStateless)

@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnID.Redis", "OwnID.Redis\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnID.Extensibility", "OwnID.Extensibility\OwnID.Extensibility.csproj", "{22539891-DC0F-42DC-8279-019EDF0C2583}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnID.Server.WebApp", "OwnID.Server.WebApp\OwnID.Server.WebApp.csproj", "{EA04C4E8-6765-4404-BB55-1A32AB4A9E8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +56,9 @@ Global
 		{22539891-DC0F-42DC-8279-019EDF0C2583}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22539891-DC0F-42DC-8279-019EDF0C2583}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22539891-DC0F-42DC-8279-019EDF0C2583}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA04C4E8-6765-4404-BB55-1A32AB4A9E8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA04C4E8-6765-4404-BB55-1A32AB4A9E8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA04C4E8-6765-4404-BB55-1A32AB4A9E8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA04C4E8-6765-4404-BB55-1A32AB4A9E8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

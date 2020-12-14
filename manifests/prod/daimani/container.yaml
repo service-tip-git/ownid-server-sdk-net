@@ -45,8 +45,8 @@ spec:
                 secretKeyRef:
                   name: daimani-secret
                   key: gigya_user_key
-            - name: OWNID__AUTHENTICATION_MODE
-              value: OwnIdOnly
+            - name: OWNID__TFA_ENABLED
+              value: 'false'
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.daimani.ownid.com
             - name: OWNID__TOP_DOMAIN

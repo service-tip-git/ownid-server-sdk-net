@@ -46,7 +46,8 @@ namespace OwnID.Flow.Commands
                 Context = relatedItem.Context,
                 Behavior = step,
                 ClientTime = input.ClientDate,
-                Locale = input.CultureInfo?.Name
+                Locale = input.CultureInfo?.Name,
+                IncludeFido2FallbackBehavior = true
             };
 
             if (!relatedItem.IsStateless)

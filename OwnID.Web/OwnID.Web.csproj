@@ -9,60 +9,77 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Fido2" Version="2.0.0-preview2" />
-      <PackageReference Include="Fido2.AspNet" Version="2.0.0-preview2" />
-      <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
-      <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Localization" Version="2.2.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
-      <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.5" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Localization" Version="3.1.4" />
-      <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="3.1.4" />
+        <PackageReference Include="Fido2" Version="2.0.0-preview2" />
+        <PackageReference Include="Fido2.AspNet" Version="2.0.0-preview2" />
+        <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Localization" Version="2.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.5" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Localization" Version="3.1.4" />
+        <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="3.1.4" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\OwnID.Web.Extensibility\OwnID.Web.Extensibility.csproj" />
-      <ProjectReference Include="..\OwnID\OwnID.csproj" />
+        <ProjectReference Include="..\OwnID.Web.Extensibility\OwnID.Web.Extensibility.csproj" />
+        <ProjectReference Include="..\OwnID\OwnID.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Update="Resources\OwnIdSdkDefault.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>OwnIdSdkDefault.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\OwnIdSdkDefault.es.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>OwnIdSdkDefault.es.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\OwnIdSdkDefault.ru.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>OwnIdSdkDefault.ru.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
+        <EmbeddedResource Update="Resources\OwnIdSdkDefault.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>OwnIdSdkDefault.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\OwnIdSdkDefault.es.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>OwnIdSdkDefault.es.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\OwnIdSdkDefault.ru.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>OwnIdSdkDefault.ru.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Resources\OwnIdSdkDefault.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>OwnIdSdkDefault.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\OwnIdSdkDefault.es.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>OwnIdSdkDefault.es.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\OwnIdSdkDefault.ru.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>OwnIdSdkDefault.ru.resx</DependentUpon>
-      </Compile>
+        <Compile Update="Resources\OwnIdSdkDefault.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>OwnIdSdkDefault.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\OwnIdSdkDefault.es.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>OwnIdSdkDefault.es.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\OwnIdSdkDefault.ru.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>OwnIdSdkDefault.ru.resx</DependentUpon>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="translation_v2.json" />
-      <None Remove="Resources\strings.json" />
-      <None Remove="Resources\strings_es.json" />
-      <None Remove="Resources\strings_ru.json" />
+        <None Remove="translation_v2.json" />
+        <None Remove="Resources\strings.json" />
+        <None Remove="Resources\strings_ar.json" />
+        <None Remove="Resources\strings_de.json" />
+        <None Remove="Resources\strings_en.json" />
+        <None Remove="Resources\strings_en_GB.json" />
+        <None Remove="Resources\strings_es.json" />
+        <None Remove="Resources\strings_es_MX.json" />
+        <None Remove="Resources\strings_fr.json" />
+        <None Remove="Resources\strings_id.json" />
+        <None Remove="Resources\strings_ja.json" />
+        <None Remove="Resources\strings_ko.json" />
+        <None Remove="Resources\strings_ms.json" />
+        <None Remove="Resources\strings_pt.json" />
+        <None Remove="Resources\strings_pt_PT.json" />
+        <None Remove="Resources\strings_ru.json" />
+        <None Remove="Resources\strings_th.json" />
+        <None Remove="Resources\strings_tr.json" />
+        <None Remove="Resources\strings_vi.json" />
+        <None Remove="Resources\strings_zh_CN.json" />
+        <None Remove="Resources\strings_zh_TW.json" />
     </ItemGroup>
 </Project>

@@ -108,7 +108,6 @@ namespace OwnID.Tests.Configuration
         public void Validate_Invalid_Fido2Url(bool isDev, string fido2Url, string errorMessage)
         {
             var config = GetValidConfiguration();
-            config.AuthenticationMode = AuthenticationModeType.All;
 
             config.IsDevEnvironment = isDev;
             config.Fido2.PasswordlessPageUrl = !string.IsNullOrEmpty(fido2Url) ? new Uri(fido2Url) : null;
@@ -126,7 +125,6 @@ namespace OwnID.Tests.Configuration
         public void Validate_Valid_Fido2Url(bool isDev, string fido2Url)
         {
             var config = GetValidConfiguration();
-            config.AuthenticationMode = AuthenticationModeType.All;
 
             config.Fido2.PasswordlessPageUrl = new Uri(fido2Url);
             config.IsDevEnvironment = isDev;
@@ -145,7 +143,6 @@ namespace OwnID.Tests.Configuration
         public void Validate_Invalid_Origin(bool isDev, string originUrl, string errorMessage)
         {
             var config = GetValidConfiguration();
-            config.AuthenticationMode = AuthenticationModeType.All;
 
             config.IsDevEnvironment = isDev;
             config.Fido2.Origin = !string.IsNullOrEmpty(originUrl) ? new Uri(originUrl) : null;
@@ -163,7 +160,6 @@ namespace OwnID.Tests.Configuration
         public void Validate_Valid_Origin(bool isDev, string fido2Url)
         {
             var config = GetValidConfiguration();
-            config.AuthenticationMode = AuthenticationModeType.All;
 
             config.Fido2.Origin = new Uri(fido2Url);
             config.IsDevEnvironment = isDev;

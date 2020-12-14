@@ -138,36 +138,20 @@ namespace OwnID.Web.Gigya.ApiClient
                 await responseMessage.Content.ReadAsStreamAsync());
         }
 
-        public async Task<string> SearchForDid(string publicKey)
+        public async Task<UidContainer> SearchByPublicKey(string publicKey)
         {
-            var parameters = ParametersFactory.CreateAuthParameters(_configuration).AddParameter("query",
-                $"SELECT UID, data.ownIdConnections FROM accounts WHERE data.ownIdConnections.keyHsh = \"{publicKey.GetSha256()}\" LIMIT 1");
-            var responseMessage = await _httpClient.PostAsync(
-                new Uri($"https://accounts.{_configuration.DataCenter}/accounts.search"),
-                new FormUrlEncodedContent(parameters));
-
-            var result = await OwnIdSerializer.DeserializeAsync<UidResponse>(
-                await responseMessage.Content.ReadAsStreamAsync());
-
+            var result = await SearchAsync<UidResponse>("data.ownIdConnections.keyHsh", publicKey.GetSha256());
             var user = result.Results?.FirstOrDefault();
 
             if (result.ErrorCode != 0 || (user?.Data?.Connections?.All(x => x.PublicKey != publicKey) ?? true))
                 return null;
 
-            return user.UID;
+            return user;
         }
 
         public async Task<UidContainer> SearchByFido2CredentialId(string fido2CredentialId)
         {
-            var parameters = ParametersFactory.CreateAuthParameters(_configuration).AddParameter("query",
-                $"SELECT UID, data.ownIdConnections FROM accounts WHERE data.ownIdConnections.fido2CredentialId = \"{fido2CredentialId}\" LIMIT 1");
-            var responseMessage = await _httpClient.PostAsync(
-                new Uri($"https://accounts.{_configuration.DataCenter}/accounts.search"),
-                new FormUrlEncodedContent(parameters));
-
-            var result = await OwnIdSerializer.DeserializeAsync<UidResponse>(
-                await responseMessage.Content.ReadAsStreamAsync());
-
+            var result = await SearchAsync<UidResponse>("data.ownIdConnections.fido2CredentialId", fido2CredentialId);
             var user = result.Results?.FirstOrDefault();
 
             if (result.ErrorCode != 0
@@ -179,30 +163,15 @@ namespace OwnID.Web.Gigya.ApiClient
 
         public async Task<GetAccountInfoResponse<TProfile>> SearchByRecoveryTokenAsync(string recoveryToken)
         {
-            var parameters = ParametersFactory.CreateAuthParameters(_configuration).AddParameter("query",
-                $"SELECT UID, data.ownIdConnections, profile FROM accounts WHERE data.ownIdConnections.recoveryId = \"{recoveryToken}\" LIMIT 1");
-            var responseMessage = await _httpClient.PostAsync(
-                new Uri($"https://accounts.{_configuration.DataCenter}/accounts.search"),
-                new FormUrlEncodedContent(parameters));
-
-            var result = await OwnIdSerializer.DeserializeAsync<GetAccountInfoResponseList<TProfile>>(
-                await responseMessage.Content.ReadAsStreamAsync());
-
-            return result.Results.FirstOrDefault();
+            var result = await SearchAsync<GetAccountInfoResponseList<TProfile>>("data.ownIdConnections.recoveryId",
+                recoveryToken, new[] {"UID", "data.ownIdConnections", "profile"});
+            return result.Results?.FirstOrDefault();
         }
 
-        public async Task<GetAccountInfoResponse<TProfile>> SearchByEmailAsync(string email)
+        public async Task<UidContainer> SearchByEmailAsync(string email)
         {
-            var parameters = ParametersFactory.CreateAuthParameters(_configuration).AddParameter("query",
-                $"SELECT UID FROM accounts WHERE profile.email = \"{email}\" LIMIT 1");
-            var responseMessage = await _httpClient.PostAsync(
-                new Uri($"https://accounts.{_configuration.DataCenter}/accounts.search"),
-                new FormUrlEncodedContent(parameters));
-
-            var result = await OwnIdSerializer.DeserializeAsync<GetAccountInfoResponseList<TProfile>>(
-                await responseMessage.Content.ReadAsStreamAsync());
-
-            return result.Results.FirstOrDefault();
+            var result = await SearchAsync<UidResponse>("profile.email", email, new[] {"UID"});
+            return result.Results?.FirstOrDefault();
         }
 
         private async Task<GetAccountInfoResponse<TProfile>> GetUserProfile(string uid = null, string regToken = null)
@@ -221,6 +190,24 @@ namespace OwnID.Web.Gigya.ApiClient
             return
                 await OwnIdSerializer.DeserializeAsync<GetAccountInfoResponse<TProfile>>(await getAccountMessage.Content
                     .ReadAsStreamAsync());
+        }
+
+        private async Task<TResult> SearchAsync<TResult>(string searchKey, string searchValue,
+            string[] objectsToGet = null)
+            where TResult : BaseGigyaResponse
+        {
+            objectsToGet ??= new[] {"UID", "data.ownIdConnections"};
+
+            var parameters = ParametersFactory.CreateAuthParameters(_configuration).AddParameter("query",
+                $"SELECT {string.Join(", ", objectsToGet)} FROM accounts WHERE {searchKey} = \"{searchValue}\" LIMIT 1");
+            var responseMessage = await _httpClient.PostAsync(
+                new Uri($"https://accounts.{_configuration.DataCenter}/accounts.search"),
+                new FormUrlEncodedContent(parameters));
+
+            var result = await OwnIdSerializer.DeserializeAsync<TResult>(
+                await responseMessage.Content.ReadAsStreamAsync());
+
+            return result;
         }
     }
 }

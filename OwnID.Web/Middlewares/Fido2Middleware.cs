@@ -21,7 +21,7 @@ namespace OwnID.Web.Middlewares
             _flowRunner = flowRunner;
         }
 
-        protected override async Task Execute(HttpContext httpContext)
+        protected override async Task ExecuteAsync(HttpContext httpContext)
         {
             using var bodyReader = new StreamReader(httpContext.Request.Body);
             var bodyStr = await bodyReader.ReadToEndAsync();

@@ -1,11 +1,12 @@
 {
-  "OwnIdSdkDefault": {
-    "Email": "Email",
-    "First Name": "Primer nombre",
-    "Last Name": "Apellido",
-    "Nickname": "Apodo",
-    "Field {0} is required": "El campo {0} es obligatorio",
-    "Field {0} has incorrect format": "El campo {0} tiene un formato incorrecto"б
-    "The field {0} must be a string or array type with a maximum length of '{1}'": "The field {0} must be a string or array type with a maximum length of '{1}'"
+  "OwnIdSdkDefault" : {
+    "Email" : "Correo electrónico",
+    "First Name" : "Nombre",
+    "Last Name" : "Apellido",
+    "Nickname" : "Apodo",
+    "Field {0} is required" : "El campo {0} es obligatorio",
+    "Field {0} has incorrect format" : "El campo {0} tiene un formato incorrecto",
+    "The field {0} must be a string or array type with a maximum length of '{1}'" : "El campo {0} debe ser un string o un tipo de matriz con una longitud máxima de \"{1}\"",
+    "Error_PhoneAlreadyConnected" : "Su teléfono ya se ha vinculado con una cuenta. Vaya a la página de inicio de sesión"
   }
 }

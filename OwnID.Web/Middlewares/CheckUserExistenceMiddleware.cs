@@ -21,7 +21,7 @@ namespace OwnID.Web.Middlewares
             _flowRunner = flowRunner;
         }
 
-        protected override async Task Execute(HttpContext httpContext)
+        protected override async Task ExecuteAsync(HttpContext httpContext)
         {
             var request = await OwnIdSerializer.DeserializeAsync<UserExistsRequest>(httpContext.Request.Body);
 

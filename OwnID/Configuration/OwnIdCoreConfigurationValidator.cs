@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.Options;
-using OwnID.Extensibility.Configuration;
 
 namespace OwnID.Configuration
 {
@@ -35,11 +34,9 @@ namespace OwnID.Configuration
             if (options.JwtExpirationTimeout == 0)
                 return ValidateOptionsResult.Fail(
                     $"{nameof(options.JwtExpirationTimeout)} can not be equal to 0");
-
-            var fido2Enabled = options.AuthenticationMode.IsFido2Enabled();
             
             // Validate Fido2Url
-            if (fido2Enabled 
+            if (options.TFAEnabled 
                 && !IsUriValid(nameof(options.Fido2.PasswordlessPageUrl), options.Fido2.PasswordlessPageUrl,
                     options.IsDevEnvironment,
                     out var fido2ValidationError))
@@ -48,7 +45,7 @@ namespace OwnID.Configuration
             }
 
             // Validate Fido2Origin
-            if (fido2Enabled
+            if (options.TFAEnabled 
                 && !IsUriValid(nameof(options.Fido2.Origin), options.Fido2.Origin, options.IsDevEnvironment,
                     out var fido2OriginValidationError))
             {

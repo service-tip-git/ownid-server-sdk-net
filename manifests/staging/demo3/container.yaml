@@ -16,8 +16,8 @@ spec:
               value: Noted (OwnID Demo 3)
             - name: OWNID__DESCRIPTION
               value: Noted (OwnID Demo 3)
-            - name: OWNID__AUTHENTICATION_MODE
-              value: Fido2Only
+            - name: OWNID__FIDO2_FALLBACK_BEHAVIOR
+              value: Block
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.demo3.staging.ownid.com
             - name: OWNID__TOP_DOMAIN

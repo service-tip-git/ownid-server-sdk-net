@@ -14,7 +14,6 @@ using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Flow.Contracts.Jwt;
 using OwnID.Extensibility.Json;
 using OwnID.Extensibility.Metrics;
-using OwnID.Extensibility.Services;
 using OwnID.Extensions;
 
 namespace OwnID.Flow.Commands
@@ -84,7 +83,7 @@ namespace OwnID.Flow.Commands
 
         private async Task SwitchToFido2FlowIfNeededAsync(string requestBody, CacheItem cacheItem)
         {
-            if (!_configuration.AuthenticationMode.IsFido2Enabled())
+            if (!_configuration.TFAEnabled)
                 return;
 
             // If this is second attempt to call same start endpoint

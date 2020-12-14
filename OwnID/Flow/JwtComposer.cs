@@ -84,7 +84,10 @@ namespace OwnID.Flow
             }
 
             if (!string.IsNullOrEmpty(info.EncToken)) data.Add("encToken", info.EncToken);
-
+            
+            if(info.IncludeFido2FallbackBehavior && _ownIdCoreConfiguration.TFAEnabled)
+                data.Add("fido2FallbackBehavior", _ownIdCoreConfiguration.Fido2FallbackBehavior.ToString().ToLower());
+            
             data.Add("canBeRecovered", info.CanBeRecovered);
 
             var fields = GetBaseFlowFieldsDictionary(info, data);
@@ -182,6 +185,9 @@ namespace OwnID.Flow
                     method = nextFrontendBehavior.Callback.Method
                 });
 
+            if(nextFrontendBehavior.NextBehavior != null)
+                stepDict.Add("nextBehavior", GetStepBehavior(nextFrontendBehavior.NextBehavior));
+            
             if (nextFrontendBehavior.AlternativeBehavior != null)
                 stepDict.Add("alternativeBehavior", GetStepBehavior(nextFrontendBehavior.AlternativeBehavior));
 

@@ -8,16 +8,6 @@ namespace OwnID.Flow.Steps
     /// </summary>
     public class FrontendBehavior
     {
-        public static FrontendBehavior CreateError(ErrorType errorType)
-        {
-            return new FrontendBehavior
-            {
-                ActionType = ActionType.Finish,
-                Type = StepType.Error,
-                Error = errorType
-            };
-        }
-        
         public FrontendBehavior()
         {
         }
@@ -38,6 +28,14 @@ namespace OwnID.Flow.Steps
             ActionType = ActionType.Polling;
             Polling = polling;
             ChallengeType = challengeType;
+        }
+
+        public FrontendBehavior(StepType type, ChallengeType challengeType, FrontendBehavior nextBehavior)
+        {
+            Type = type;
+            ActionType = ActionType.GoToNext;
+            ChallengeType = challengeType;
+            NextBehavior = nextBehavior;
         }
 
         /// <summary>
@@ -67,16 +65,31 @@ namespace OwnID.Flow.Steps
         public CallAction Callback { get; set; }
 
         /// <summary>
+        ///     Next expected behavior
+        /// </summary>
+        public FrontendBehavior NextBehavior { get; set; }
+
+        /// <summary>
         ///     Alternative behavior
         /// </summary>
         public FrontendBehavior AlternativeBehavior { get; set; }
-        
+
         /// <summary>
         ///     Error code
         /// </summary>
         /// <remarks>
-        ///    Has value only if <see cref="Type"/> is <see cref="StepType.Error"/>
+        ///     Has value only if <see cref="Type" /> is <see cref="StepType.Error" />
         /// </remarks>
         public ErrorType? Error { get; set; }
+
+        public static FrontendBehavior CreateError(ErrorType errorType)
+        {
+            return new FrontendBehavior
+            {
+                ActionType = ActionType.Finish,
+                Type = StepType.Error,
+                Error = errorType
+            };
+        }
     }
 }

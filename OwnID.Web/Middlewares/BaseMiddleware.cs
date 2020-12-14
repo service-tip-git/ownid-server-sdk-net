@@ -65,7 +65,7 @@ namespace OwnID.Web.Middlewares
             await InterceptErrors(InternalExecuteAsync, httpContext);
         }
 
-        protected abstract Task Execute(HttpContext httpContext);
+        protected abstract Task ExecuteAsync(HttpContext httpContext);
 
         protected async Task<JwtContainer> GetRequestJwtContainerAsync(HttpContext httpContext)
         {
@@ -111,7 +111,7 @@ namespace OwnID.Web.Middlewares
                 }
             }
 
-            await Execute(httpContext);
+            await ExecuteAsync(httpContext);
         }
 
         private async Task InterceptErrors(Func<HttpContext, Task> functionToInvoke, HttpContext httpContext)

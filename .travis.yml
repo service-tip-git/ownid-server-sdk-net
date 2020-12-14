@@ -39,6 +39,8 @@ script:
   - bash scripts/set-build-num.sh $TRAVIS_BUILD_NUMBER
   - dotnet test /p:CollectCoverage=true /p:Threshold=20
   - docker build -t ownid-server-gigya:latest . --network=host
+  - (cd OwnID.Server.WebApp && docker build -t ownid-server-webapp:latest . --network=host)
+
 
 before_deploy:
   - pyenv install 3.6.3
@@ -58,17 +60,17 @@ before_deploy:
 
 deploy:
 - provider: script
-  script: bash scripts/deploy.sh $ENV
+  script: bash scripts/deploy/not-prod.sh $ENV
   skip_cleanup: true
   on:
     all_branches: true
     condition: $TRAVIS_BRANCH =~ ^(develop|master)$
 - provider: script
-  script: bash scripts/deploy-prod.sh
+  script: bash scripts/deploy/prod.sh
   skip_cleanup: true
   on:
     all_branches: true
     condition: $TRAVIS_BRANCH =~ ^release\/.*$
 
-after_deploy:
-  - bash scripts/test_runner.sh server-sdk $ENV
+
+

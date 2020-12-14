@@ -91,8 +91,10 @@ namespace OwnID.Configuration
         
         public string TopDomain { get; set; }
 
-        public AuthenticationModeType AuthenticationMode { get; set; }
-        
+        public bool TFAEnabled { get; set; } = true;
+
+        public Fido2FallbackBehavior Fido2FallbackBehavior { get; set; } = Fido2FallbackBehavior.Passcode;
+
         public IFido2Configuration Fido2 { get; } = new Fido2Configuration();
 
         /// <summary>

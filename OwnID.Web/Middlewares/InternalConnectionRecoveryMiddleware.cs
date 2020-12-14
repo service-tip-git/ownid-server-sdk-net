@@ -21,7 +21,7 @@ namespace OwnID.Web.Middlewares
             _flowRunner = flowRunner;
         }
 
-        protected override async Task Execute(HttpContext httpContext)
+        protected override async Task ExecuteAsync(HttpContext httpContext)
         {
             var input = new CommandInput(RequestIdentity, GetRequestCulture(httpContext), ClientDate);
 

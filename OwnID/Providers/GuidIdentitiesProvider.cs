@@ -1,5 +1,4 @@
 using System;
-using System.Text.RegularExpressions;
 using OwnID.Extensibility.Providers;
 using OwnID.Extensions;
 
@@ -19,11 +18,6 @@ namespace OwnID.Providers
         public string GenerateNonce()
         {
             return Guid.NewGuid().ToString();
-        }
-
-        public bool IsContextFormatValid(string context)
-        {
-            return Regex.IsMatch(context, "^([a-zA-Z0-9_-]{22})$");
         }
 
         public string GenerateUserId()

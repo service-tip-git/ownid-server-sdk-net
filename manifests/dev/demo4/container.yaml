@@ -16,8 +16,8 @@ spec:
               value: Noted (OwnID Demo 4)
             - name: OWNID__DESCRIPTION
               value: Noted (OwnID Demo 4)
-            - name: OWNID__AUTHENTICATION_MODE
-              value: OwnIdOnly
+            - name: OWNID__TFA_ENABLED
+              value: 'false'
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.demo4.dev.ownid.com
             - name: OWNID__TOP_DOMAIN

@@ -89,6 +89,11 @@ namespace OwnID.Providers
             return GetBaseActionUrl(context, "users/existence");
         }
 
+        public Uri GetResetPasscodeUrl(string context)
+        {
+            return GetBaseActionUrl(context, "passcode");
+        }
+
         public Uri GetWebAppConnectionsUrl()
         {
             return new Uri(_coreConfiguration.OwnIdApplicationUrl, "account");

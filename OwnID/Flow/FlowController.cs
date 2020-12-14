@@ -1,4 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using OwnID.Extensibility.Cache;
+using OwnID.Extensibility.Configuration;
+using OwnID.Extensibility.Flow;
+using OwnID.Extensibility.Providers;
 using OwnID.Flow.Commands;
 using OwnID.Flow.Commands.Approval;
 using OwnID.Flow.Commands.Authorize;
@@ -8,10 +14,6 @@ using OwnID.Flow.Commands.Link;
 using OwnID.Flow.Commands.Recovery;
 using OwnID.Flow.Interfaces;
 using OwnID.Flow.Steps;
-using OwnID.Extensibility.Cache;
-using OwnID.Extensibility.Configuration;
-using OwnID.Extensibility.Flow;
-using OwnID.Extensibility.Providers;
 
 namespace OwnID.Flow
 {
@@ -45,7 +47,7 @@ namespace OwnID.Flow
             {
                 {
                     StepType.Starting,
-                    new Step<StartFlowCommand>(cacheItem =>
+                    GetFallbackStartingStep(cacheItem =>
                     {
                         var alternative = new FrontendBehavior(StepType.Authorize, cacheItem.ChallengeType,
                             new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType)));
@@ -65,12 +67,7 @@ namespace OwnID.Flow
                             new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType))))
                 },
                 {
-                    StepType.Authorize, new Step<SaveProfileCommand>(cacheItem => new FrontendBehavior
-                    {
-                        Type = StepType.Success,
-                        ActionType = ActionType.Finish,
-                        ChallengeType = cacheItem.ChallengeType
-                    })
+                    StepType.Authorize, GetFinishStep<SaveProfileCommand>()
                 }
             };
 
@@ -78,27 +75,22 @@ namespace OwnID.Flow
             {
                 {
                     StepType.Starting,
-                    new Step<StartFlowCommand>(cacheItem =>
+                    GetFallbackStartingStep(cacheItem =>
                     {
                         var authorizeStep = new FrontendBehavior(
                             StepType.InstantAuthorize, cacheItem.ChallengeType,
                             new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType,
                                 "/partial")));
-
                         var internalRecovery = new FrontendBehavior(StepType.InternalConnectionRecovery,
                             cacheItem.ChallengeType,
                             new CallAction(_urlProvider.GetConnectionRecoveryUrl(cacheItem.Context)),
                             authorizeStep);
-
                         if (cacheItem.ChallengeType != ChallengeType.Register)
                             return internalRecovery;
-
                         var checkUser = new FrontendBehavior(StepType.CheckUserExistence, cacheItem.ChallengeType,
                             new CallAction(_urlProvider.GetUserExistenceUrl(cacheItem.Context)), authorizeStep);
-
                         if (!string.IsNullOrEmpty(cacheItem.RecoveryToken))
                             checkUser.AlternativeBehavior = internalRecovery;
-
                         return checkUser;
                     })
                 },
@@ -118,29 +110,20 @@ namespace OwnID.Flow
                 },
                 {
                     StepType.InstantAuthorize,
-                    new Step<SavePartialProfileCommand>(cacheItem => new FrontendBehavior
-                    {
-                        Type = StepType.Success,
-                        ActionType = ActionType.Finish,
-                        ChallengeType = cacheItem.ChallengeType
-                    })
+                    GetFinishStep<SavePartialProfileCommand>()
                 }
             };
 
             var link = new Dictionary<StepType, IStep>
             {
                 {
-                    StepType.Starting, new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Link,
+                    StepType.Starting,
+                    GetFallbackStartingStep(cacheItem => new FrontendBehavior(StepType.Link,
                         cacheItem.ChallengeType,
                         new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType))))
                 },
                 {
-                    StepType.Link, new Step<SaveAccountLinkCommand>(cacheItem => new FrontendBehavior
-                    {
-                        Type = string.IsNullOrEmpty(cacheItem.Error) ? StepType.Success : StepType.Error,
-                        ActionType = ActionType.Finish,
-                        ChallengeType = cacheItem.ChallengeType
-                    })
+                    StepType.Link, GetFinishStep<SaveAccountLinkCommand>()
                 }
             };
 
@@ -148,7 +131,7 @@ namespace OwnID.Flow
             {
                 {
                     StepType.Starting,
-                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.ApprovePin,
+                    GetFallbackStartingStep(cacheItem => new FrontendBehavior(StepType.ApprovePin,
                         cacheItem.ChallengeType,
                         new PollingAction(_urlProvider.GetSecurityApprovalStatusUrl(cacheItem.Context),
                             _coreConfiguration.PollingInterval)))
@@ -172,12 +155,7 @@ namespace OwnID.Flow
                 },
                 {
                     StepType.Link,
-                    new Step<SaveAccountLinkCommand>(cacheItem => new FrontendBehavior
-                    {
-                        Type = string.IsNullOrEmpty(cacheItem.Error) ? StepType.Success : StepType.Error,
-                        ChallengeType = cacheItem.ChallengeType,
-                        ActionType = ActionType.Finish
-                    })
+                    GetFinishStep<SaveAccountLinkCommand>()
                 }
             };
 
@@ -185,17 +163,11 @@ namespace OwnID.Flow
             {
                 {
                     StepType.Starting,
-                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Recover,
-                        cacheItem.ChallengeType,
+                    GetFallbackStartingStep(cacheItem => new FrontendBehavior(StepType.Recover, cacheItem.ChallengeType,
                         new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType))))
                 },
                 {
-                    StepType.Recover, new Step<SaveAccountPublicKeyCommand>(cacheItem => new FrontendBehavior
-                    {
-                        Type = string.IsNullOrEmpty(cacheItem.Error) ? StepType.Success : StepType.Error,
-                        ActionType = ActionType.Finish,
-                        ChallengeType = cacheItem.ChallengeType
-                    })
+                    StepType.Recover, GetFinishStep<SaveAccountPublicKeyCommand>()
                 }
             };
 
@@ -203,7 +175,7 @@ namespace OwnID.Flow
             {
                 {
                     StepType.Starting,
-                    new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.ApprovePin,
+                    GetFallbackStartingStep(cacheItem => new FrontendBehavior(StepType.ApprovePin,
                         cacheItem.ChallengeType,
                         new PollingAction(_urlProvider.GetSecurityApprovalStatusUrl(cacheItem.Context),
                             _coreConfiguration.PollingInterval)))
@@ -226,12 +198,7 @@ namespace OwnID.Flow
                     })
                 },
                 {
-                    StepType.Recover, new Step<SaveAccountPublicKeyCommand>(cacheItem => new FrontendBehavior
-                    {
-                        Type = string.IsNullOrEmpty(cacheItem.Error) ? StepType.Success : StepType.Error,
-                        ActionType = ActionType.Finish,
-                        ChallengeType = cacheItem.ChallengeType
-                    })
+                    StepType.Recover, GetFinishStep<SaveAccountPublicKeyCommand>()
                 }
             };
 
@@ -245,13 +212,7 @@ namespace OwnID.Flow
                             "/fido2"))))
                 },
                 {
-                    StepType.Fido2Authorize,
-                    new Step<Fido2RegisterCommand>(cacheItem => new FrontendBehavior
-                    {
-                        Type = StepType.Success,
-                        ActionType = ActionType.Finish,
-                        ChallengeType = cacheItem.ChallengeType
-                    })
+                    StepType.Fido2Authorize, GetFinishStep<Fido2RegisterCommand>()
                 }
             };
 
@@ -265,13 +226,7 @@ namespace OwnID.Flow
                             "/fido2"))))
                 },
                 {
-                    StepType.Fido2Authorize,
-                    new Step<Fido2LoginCommand>(cacheItem => new FrontendBehavior
-                    {
-                        Type = StepType.Success,
-                        ActionType = ActionType.Finish,
-                        ChallengeType = cacheItem.ChallengeType
-                    })
+                    StepType.Fido2Authorize, GetFinishStep<Fido2LoginCommand>()
                 }
             };
 
@@ -281,17 +236,12 @@ namespace OwnID.Flow
                     StepType.Starting,
                     new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Fido2Authorize,
                         cacheItem.ChallengeType,
-                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, ChallengeType.Register,
-                            "/fido2"))))
+                        new CallAction(
+                            _urlProvider.GetChallengeUrl(cacheItem.Context, ChallengeType.Register, "/fido2"))))
                 },
                 {
                     StepType.Fido2Authorize,
-                    new Step<Fido2LinkCommand>(cacheItem => new FrontendBehavior
-                    {
-                        Type = StepType.Success,
-                        ActionType = ActionType.Finish,
-                        ChallengeType = cacheItem.ChallengeType
-                    })
+                    GetFinishStep<Fido2LinkCommand>()
                 }
             };
 
@@ -301,17 +251,12 @@ namespace OwnID.Flow
                     StepType.Starting,
                     new Step<StartFlowCommand>(cacheItem => new FrontendBehavior(StepType.Fido2Authorize,
                         cacheItem.ChallengeType,
-                        new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, ChallengeType.Register,
-                            "/fido2"))))
+                        new CallAction(
+                            _urlProvider.GetChallengeUrl(cacheItem.Context, ChallengeType.Register, "/fido2"))))
                 },
                 {
                     StepType.Fido2Authorize,
-                    new Step<Fido2RecoverCommand>(cacheItem => new FrontendBehavior
-                    {
-                        Type = string.IsNullOrEmpty(cacheItem.Error) ? StepType.Success : StepType.Error,
-                        ActionType = ActionType.Finish,
-                        ChallengeType = cacheItem.ChallengeType
-                    })
+                    GetFinishStep<Fido2RecoverCommand>()
                 }
             };
 
@@ -363,14 +308,34 @@ namespace OwnID.Flow
                 },
                 {
                     StepType.Fido2Authorize,
-                    new Step<TFido2FinishCommand>(cacheItem => new FrontendBehavior
-                    {
-                        Type = string.IsNullOrEmpty(cacheItem.Error) ? StepType.Success : StepType.Error,
-                        ChallengeType = cacheItem.ChallengeType,
-                        ActionType = ActionType.Finish
-                    })
+                    GetFinishStep<TFido2FinishCommand>()
                 }
             };
+        }
+
+        private Step<TCommand> GetFinishStep<TCommand>() where TCommand : BaseFlowCommand
+        {
+            return new Step<TCommand>(cacheItem => new FrontendBehavior
+            {
+                Type = string.IsNullOrEmpty(cacheItem.Error) ? StepType.Success : StepType.Error,
+                ChallengeType = cacheItem.ChallengeType,
+                ActionType = ActionType.Finish
+            });
+        }
+
+        private Step<StartFlowCommand> GetFallbackStartingStep(Func<CacheItem, FrontendBehavior> frontBehaviorGenerator)
+        {
+            if (!_coreConfiguration.TFAEnabled
+                || _coreConfiguration.Fido2FallbackBehavior != Fido2FallbackBehavior.Passcode)
+                return new Step<StartFlowCommand>(frontBehaviorGenerator);
+
+            return new Step<StartFlowCommand>(cacheItem =>
+                new FrontendBehavior(StepType.EnterPasscode, cacheItem.ChallengeType, frontBehaviorGenerator(cacheItem))
+                {
+                    AlternativeBehavior = new FrontendBehavior(StepType.ResetPasscode, cacheItem.ChallengeType,
+                        new CallAction(_urlProvider.GetResetPasscodeUrl(cacheItem.Context),
+                            HttpMethod.Delete.ToString()))
+                });
         }
     }
 }

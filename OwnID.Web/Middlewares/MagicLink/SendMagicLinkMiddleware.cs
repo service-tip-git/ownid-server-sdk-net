@@ -17,7 +17,7 @@ namespace OwnID.Web.Middlewares.MagicLink
             _sendMagicLinkCommand = sendMagicLinkCommand;
         }
 
-        protected override async Task Execute(HttpContext httpContext)
+        protected override async Task ExecuteAsync(HttpContext httpContext)
         {
             var email = httpContext.Request.Query["email"];
 

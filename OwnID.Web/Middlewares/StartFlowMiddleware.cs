@@ -25,7 +25,7 @@ namespace OwnID.Web.Middlewares
             _stateCommand = stateCommand;
         }
 
-        protected override async Task Execute(HttpContext httpContext)
+        protected override async Task ExecuteAsync(HttpContext httpContext)
         {
             bool.TryParse(httpContext.Request.Query["recovery"], out var requiresRecovery);
             var request = new StateRequest

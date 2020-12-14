@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using OwnID.Extensibility.Configuration;
 using OwnID.Redis;
 using OwnID.Server.Gigya.Metrics;
+using OwnID.Server.Gigya.Middlewares;
 using OwnID.Server.Gigya.Middlewares.SecurityHeaders;
 using OwnID.Web;
 using OwnID.Web.Gigya;
@@ -37,10 +39,10 @@ namespace OwnID.Server.Gigya
         {
             var ownIdSection = Configuration.GetSection("ownid");
             var gigyaSection = Configuration.GetSection("gigya");
-            
+
             if (!Enum.TryParse(Configuration["server_mode"], true, out ServerMode serverMode))
                 serverMode = ServerMode.Production;
-            
+
             var topDomain = ownIdSection["top_domain"];
             var webAppUrl = new Uri(ownIdSection["web_app_url"] ?? Constants.OwinIdApplicationAddress);
 
@@ -78,94 +80,95 @@ namespace OwnID.Server.Gigya
                     builder.WithOrigins(originsList.ToArray());
                 });
             });
-            
+
             services.AddMetrics(Configuration);
 
-            services.AddOwnId(
-                builder =>
+            services.AddOwnId(builder =>
+            {
+                var loginTypeString = gigyaSection["login_type"];
+
+                if (string.IsNullOrEmpty(loginTypeString) || !Enum.TryParse(gigyaSection["login_type"], true,
+                    out GigyaLoginType loginType)) loginType = GigyaLoginType.Session;
+
+                builder.UseGigya(gigyaSection["data_center"], gigyaSection["api_key"], gigyaSection["secret"],
+                    gigyaSection["user_key"], loginType);
+                builder.SetKeys(ownIdSection["pub_key"], ownIdSection["private_key"]);
+
+                switch (ownIdSection["cache_type"])
                 {
-                    var loginTypeString = gigyaSection["login_type"];
+                    case "web-cache":
+                        builder.UseWebCacheStore();
+                        break;
+                    case "redis":
+                        builder.UseCacheStore<RedisCacheStore>(ServiceLifetime.Singleton);
+                        break;
+                }
 
-                    if (string.IsNullOrEmpty(loginTypeString) || !Enum.TryParse(gigyaSection["login_type"], true,
-                        out GigyaLoginType loginType)) loginType = GigyaLoginType.Session;
+                builder.WithBaseSettings(x =>
+                {
+                    x.DID = ownIdSection["did"];
+                    x.Name = ownIdSection["name"];
+                    x.Description = ownIdSection["description"];
+                    x.Icon = ownIdSection["icon"];
+                    x.CallbackUrl = new Uri(ownIdSection["callback_url"]);
+                    x.TopDomain = topDomain;
 
-                    builder.UseGigya(gigyaSection["data_center"], gigyaSection["api_key"], gigyaSection["secret"],
-                        gigyaSection["user_key"], loginType);
-                    builder.SetKeys(ownIdSection["pub_key"], ownIdSection["private_key"]);
+                    x.CacheExpirationTimeout = ownIdSection.GetValue("cache_expiration",
+                        (uint) TimeSpan.FromMinutes(10).TotalMilliseconds);
 
-                    switch (ownIdSection["cache_type"])
+                    if (ownIdSection.Key.Contains("maximum_number_of_connected_devices"))
+                        x.MaximumNumberOfConnectedDevices =
+                            ownIdSection.GetValue<uint>("maximum_number_of_connected_devices");
+
+                    x.OwnIdApplicationUrl = webAppUrl;
+                    x.OverwriteFields = ownIdSection.GetValue<bool>("overwrite_fields");
+
+                    x.TFAEnabled = ownIdSection.GetValue("tfa_enabled", true);
+                    x.Fido2FallbackBehavior =
+                        ownIdSection.GetValue("fido2_fallback_behavior", Fido2FallbackBehavior.Passcode);
+
+                    if (x.TFAEnabled)
                     {
-                        case "web-cache":
-                            builder.UseWebCacheStore();
-                            break;
-                        case "redis":
-                            builder.UseCacheStore<RedisCacheStore>(ServiceLifetime.Singleton);
-                            break;
+                        if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_passwordless_page_url"]))
+                            x.Fido2.PasswordlessPageUrl = new Uri(ownIdSection["fido2_passwordless_page_url"]);
+
+                        x.Fido2.RelyingPartyId = ownIdSection["fido2_relying_party_id"];
+                        x.Fido2.RelyingPartyName = ownIdSection["fido2_relying_party_name"];
+                        x.Fido2.UserName = ownIdSection["fido2_user_name"];
+                        x.Fido2.UserDisplayName = ownIdSection["fido2_user_display_name"];
+
+                        if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
+                            x.Fido2.Origin = new Uri(ownIdSection["fido2_origin"]);
                     }
 
-                    builder.WithBaseSettings(x =>
-                    {
-                        x.DID = ownIdSection["did"];
-                        x.Name = ownIdSection["name"];
-                        x.Description = ownIdSection["description"];
-                        x.Icon = ownIdSection["icon"];
-                        x.CallbackUrl = new Uri(ownIdSection["callback_url"]);
-                        x.TopDomain = topDomain;
-
-                        x.CacheExpirationTimeout = ownIdSection.GetValue("cache_expiration",
-                            (uint) TimeSpan.FromMinutes(10).TotalMilliseconds);
-
-                        if (ownIdSection.Key.Contains("maximum_number_of_connected_devices"))
-                            x.MaximumNumberOfConnectedDevices =
-                                ownIdSection.GetValue<uint>("maximum_number_of_connected_devices");
-
-                        x.OwnIdApplicationUrl = webAppUrl;
-                        x.OverwriteFields = ownIdSection.GetValue<bool>("overwrite_fields");
-
-                        x.AuthenticationMode =
-                            ownIdSection.GetValue("authentication_mode", AuthenticationModeType.OwnIdOnly);
-
-                        if (x.AuthenticationMode.IsFido2Enabled())
-                        {
-                            if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_passwordless_page_url"]))
-                                x.Fido2.PasswordlessPageUrl = new Uri(ownIdSection["fido2_passwordless_page_url"]);
-
-                            x.Fido2.RelyingPartyId = ownIdSection["fido2_relying_party_id"];
-                            x.Fido2.RelyingPartyName = ownIdSection["fido2_relying_party_name"];
-                            x.Fido2.UserName = ownIdSection["fido2_user_name"];
-                            x.Fido2.UserDisplayName = ownIdSection["fido2_user_display_name"];
-
-                            if(!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
-                                x.Fido2.Origin = new Uri(ownIdSection["fido2_origin"]);
-                        }
-                        //for development cases
-                        x.IsDevEnvironment = serverMode == ServerMode.Local;
-                    });
-                    
-                    var smtpSection = Configuration.GetSection("smtp");
-                    
-                    if(smtpSection.Exists())
-                        builder.UseSmtp(smtp =>
-                        {
-                            smtp.FromAddress = smtpSection["from_address"];
-                            smtp.FromName = smtpSection["from_name"];
-                            smtp.UserName = smtpSection["user_name"];
-                            smtp.Password = smtpSection["password"];
-                            smtp.Host = smtpSection["host"];
-                            smtp.UseSsl = smtpSection.GetValue("ssl", false);
-                            smtp.Port = smtpSection.GetValue("port", 0);
-                        });
-
-                    var magicLinkSection = ownIdSection.GetSection("magic_link");
-
-                    if (magicLinkSection.Exists())
-                        builder.UseMagicLink(ml =>
-                        {
-                            ml.RedirectUrl = new Uri(magicLinkSection["redirect_url"]);
-                            ml.TokenLifetime = magicLinkSection.GetValue<uint>("token_lifetime", 0);
-                            ml.SameBrowserUsageOnly = magicLinkSection.GetValue("same_browser", true);
-                        });
+                    //for development cases
+                    x.IsDevEnvironment = serverMode == ServerMode.Local;
                 });
+
+                var smtpSection = Configuration.GetSection("smtp");
+
+                if (smtpSection.Exists())
+                    builder.UseSmtp(smtp =>
+                    {
+                        smtp.FromAddress = smtpSection["from_address"];
+                        smtp.FromName = smtpSection["from_name"];
+                        smtp.UserName = smtpSection["user_name"];
+                        smtp.Password = smtpSection["password"];
+                        smtp.Host = smtpSection["host"];
+                        smtp.UseSsl = smtpSection.GetValue("ssl", false);
+                        smtp.Port = smtpSection.GetValue("port", 0);
+                    });
+
+                var magicLinkSection = ownIdSection.GetSection("magic_link");
+
+                if (magicLinkSection.Exists())
+                    builder.UseMagicLink(ml =>
+                    {
+                        ml.RedirectUrl = new Uri(magicLinkSection["redirect_url"]);
+                        ml.TokenLifetime = magicLinkSection.GetValue<uint>("token_lifetime", 0);
+                        ml.SameBrowserUsageOnly = magicLinkSection.GetValue("same_browser", true);
+                    });
+            });
 
             // TODO: not for prod
             services.AddHostedService<TelemetryLogService>();
@@ -187,25 +190,36 @@ namespace OwnID.Server.Gigya
 
             app.UseRequestLocalization(x =>
             {
-                x.AddSupportedCultures("ru", "es", "en");
+                var supportedCultures = new[]
+                {
+                    "ar", "de", "en", "en-GB", "es", "es-MX", "fr", "id", "ja", "ko", "ms", "pt", "pt-PT", "ru", "th",
+                    "tr", "vi", "zh-CN", "zh-TW"
+                };
+
+                x.AddSupportedCultures(supportedCultures);
                 x.DefaultRequestCulture = new RequestCulture("en", "en");
-                x.AddSupportedUICultures("ru", "en", "es");
+                x.AddSupportedUICultures(supportedCultures);
             });
             app.UseCors(CorsPolicyName);
+
+            app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
+                .AddStrictTransportSecurityMaxAgeIncludeSubDomains()
+                .AddContentTypeOptionsNoSniff());
+
+            app.UseMetrics();
+            app.UseOwnId();
 
             // TODO: not for prod
             app.UseMiddleware<LogRequestMiddleware>();
             var routeBuilder = new RouteBuilder(app);
             routeBuilder.MapMiddlewarePost("ownid/log",
                 builder => builder.UseMiddleware<LogMiddleware>());
-            app.UseRouter(routeBuilder.Build());
 
-            app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
-                .AddStrictTransportSecurityMaxAgeIncludeSubDomains()
-                .AddContentTypeOptionsNoSniff());
-            
-            app.UseMetrics();
-            app.UseOwnId();
+            if (Configuration.GetValue("ASPNETCORE_ENVIRONMENT", string.Empty) == "dev")
+                routeBuilder.MapMiddlewarePut("/ownid/config-injection",
+                    builder => builder.UseMiddleware<ConfigInjectionMiddleware>());
+
+            app.UseRouter(routeBuilder.Build());
         }
 
         private void ConfigureLogging()
@@ -235,11 +249,17 @@ namespace OwnID.Server.Gigya
 
         private ElasticsearchSinkOptions ConfigureElasticSink(IConfigurationSection configuration, string environment)
         {
+            var env = (environment ?? "development").ToLower().Replace(".", "-");
+            
             return new ElasticsearchSinkOptions(new Uri(configuration["Uri"]))
             {
                 AutoRegisterTemplate = true,
-                IndexFormat =
-                    $"ownid-{(environment ?? "development").ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
+                IndexDecider = (ev, offset) =>
+                {
+                    var sunday = DateTime.UtcNow.Date.AddDays(0 - (int) DateTime.UtcNow.DayOfWeek);
+                    var saturday = sunday.AddDays(6);
+                    return $"ownid-{env}-{sunday:yyyy-MM-dd}-{saturday:yyyy:MM:dd}";
+                },
                 ModifyConnectionSettings = x =>
                     x.BasicAuthentication(configuration["Username"], configuration["Password"]),
                 InlineFields = true,

@@ -15,14 +15,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Email" xml:space="preserve">Email</data>
-  <data name="First Name" xml:space="preserve">Primer nombre</data>
+  <data name="Email" xml:space="preserve">Correo electrónico</data>
+  <data name="First Name" xml:space="preserve">Nombre</data>
   <data name="Last Name" xml:space="preserve">Apellido</data>
   <data name="Nickname" xml:space="preserve">Apodo</data>
   <data name="Field {0} is required" xml:space="preserve">El campo {0} es obligatorio</data>
   <data name="Field {0} has incorrect format" xml:space="preserve">El campo {0} tiene un formato incorrecto</data>
-  <data name="The field {0} must be a string or array type with a maximum length of &apos;{1}&apos;" xml:space="preserve">The field {0} must be a string or array type with a maximum length of '{1}'</data>
-  <data name="Error_UserNotFound" xml:space="preserve">
-    <value>El usuario no fue encontrado</value>
-  </data>
+  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">El campo {0} debe ser un string o un tipo de matriz con una longitud máxima de "{1}"</data>
+  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Su teléfono ya se ha vinculado con una cuenta. Vaya a la página de inicio de sesión</data>
 </root>

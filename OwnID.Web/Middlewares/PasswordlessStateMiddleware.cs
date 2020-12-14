@@ -29,15 +29,15 @@ namespace OwnID.Web.Middlewares
             _configuration = configuration;
         }
 
-        protected override async Task Execute(HttpContext httpContext)
+        protected override async Task ExecuteAsync(HttpContext httpContext)
         {
             var request = await OwnIdSerializer.DeserializeAsync<InitFido2Request>(httpContext.Request.Body);
-            var isFido2Only = _configuration.AuthenticationMode == AuthenticationModeType.Fido2Only;
+            var isFido2Only = _configuration.TFAEnabled && _configuration.Fido2FallbackBehavior == Fido2FallbackBehavior.Block;
             var isRegistration = request.FlowType == "r";
 
             var result = new InitFido2Response
             {
-                IsFido2Only = isFido2Only
+                Fido2FallbackBehavior = _configuration.Fido2FallbackBehavior
             };
 
             if (request.IsIncompatible && isFido2Only)

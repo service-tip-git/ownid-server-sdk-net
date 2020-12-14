@@ -25,10 +25,6 @@ namespace OwnID.Flow.Commands.Authorize
 
         protected override void Validate(ICommandInput input, CacheItem relatedItem)
         {
-            // var throwEx = true;
-            // if (throwEx)
-            //     throw new InternalLogicException("test exception");
-            
             if (relatedItem.HasFinalState)
                 throw new CommandValidationException(
                     "Cache item should be not Finished with Login or Register challenge type. " +
@@ -44,7 +40,8 @@ namespace OwnID.Flow.Commands.Authorize
                 ClientTime = input.ClientDate,
                 Behavior = _flowController.GetExpectedFrontendBehavior(relatedItem, currentStepType),
                 Locale = input.CultureInfo?.Name,
-                IncludeRequester = true
+                IncludeRequester = true,
+                IncludeFido2FallbackBehavior = true
             };
 
             if (!relatedItem.IsStateless)
