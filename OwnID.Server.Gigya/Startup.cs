@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
@@ -139,7 +140,7 @@ namespace OwnID.Server.Gigya
                         if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
                             x.Fido2.Origin = new Uri(ownIdSection["fido2_origin"]);
                     }
-                    
+
                     //for development cases
                     x.IsDevEnvironment = serverMode == ServerMode.Local;
                 });
@@ -207,7 +208,7 @@ namespace OwnID.Server.Gigya
 
             app.UseMetrics();
             app.UseOwnId();
-            
+
             // TODO: not for prod
             app.UseMiddleware<LogRequestMiddleware>();
             var routeBuilder = new RouteBuilder(app);
@@ -217,7 +218,7 @@ namespace OwnID.Server.Gigya
             if (Configuration.GetValue("ASPNETCORE_ENVIRONMENT", string.Empty) == "dev")
                 routeBuilder.MapMiddlewarePut("/ownid/config-injection",
                     builder => builder.UseMiddleware<ConfigInjectionMiddleware>());
-           
+
             app.UseRouter(routeBuilder.Build());
         }
 
@@ -248,11 +249,17 @@ namespace OwnID.Server.Gigya
 
         private ElasticsearchSinkOptions ConfigureElasticSink(IConfigurationSection configuration, string environment)
         {
+            var env = (environment ?? "development").ToLower().Replace(".", "-");
+            
             return new ElasticsearchSinkOptions(new Uri(configuration["Uri"]))
             {
                 AutoRegisterTemplate = true,
-                IndexFormat =
-                    $"ownid-{(environment ?? "development").ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
+                IndexDecider = (ev, offset) =>
+                {
+                    var sunday = DateTime.UtcNow.Date.AddDays(0 - (int) DateTime.UtcNow.DayOfWeek);
+                    var saturday = sunday.AddDays(6);
+                    return $"ownid-{env}-{sunday:yyyy-MM-dd}-{saturday:yyyy:MM:dd}";
+                },
                 ModifyConnectionSettings = x =>
                     x.BasicAuthentication(configuration["Username"], configuration["Password"]),
                 InlineFields = true,
