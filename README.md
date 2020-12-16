@@ -18,20 +18,9 @@ Use
 dotnet run
 ```
 
-or 
+or to set specific urls:  
 
 ```shell
 dotnet run --urls http://0.0.0.0.:5002
 ``` 
-
-to set specific urls.  
-
-
-### Development certificates for HTTPS binding
-#### On Mac (run in terminal):  
-`dotnet dev-certs https --check` to check if you have a valid installed certiciate. If nothing was return or you faced a massage that cetificate was not found you need to run next steps.
-*Ensure you have enabled privileges*  
-`dotnet dev-certs https` then put your keychain password if everything is ok you will see "The HTTPS developer certificate was generated successfully." message.
-After that you need to find this cert. in Mac Keychain, open and trust ssl.  
-Sometimes you can face a problem that nothing was changed and you still see browser warnings. Try to remove all certificates in Mac Keychain label with `localhost` and repeat the last step.
 
