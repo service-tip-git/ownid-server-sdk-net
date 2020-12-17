@@ -4,7 +4,8 @@ WORKDIR /app
 EXPOSE 5002
 
 # Copy csproj and restore as distinct layers
-COPY ./ ./OwnID.Server.WebApp
+COPY ./OwnID.Server.WebApp ./OwnID.Server.WebApp
+COPY ./OwnID.Extensibility ./OwnID.Extensibility
 
 RUN dotnet publish ./OwnID.Server.WebApp/OwnID.Server.WebApp.csproj -c Release -o out
 

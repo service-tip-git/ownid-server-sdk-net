@@ -12,4 +12,11 @@ namespace OwnID.Extensibility.Flow.Contracts
         
         public const string WebAppEncryption = "sign-enc-{0}";
     }
+
+    public static class CookieValuesConstants
+    {
+        public const string SubValueSeparator = ":::";
+
+        public const string PasscodeEnding = SubValueSeparator + "passcode";
+    }
 }

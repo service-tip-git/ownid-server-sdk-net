@@ -38,8 +38,8 @@ jobs:
 script:
   - bash scripts/set-build-num.sh $TRAVIS_BUILD_NUMBER
   - dotnet test /p:CollectCoverage=true /p:Threshold=20
-  - docker build -t ownid-server-gigya:latest . --network=host
-  - (cd OwnID.Server.WebApp && docker build -t ownid-server-webapp:latest . --network=host)
+  - docker build -f gigya-server.Dockerfile -t ownid-server-gigya:latest . --network=host
+  - docker build -f webapp-server.Dockerfile -t ownid-server-webapp:latest . --network=host
 
 
 before_deploy:

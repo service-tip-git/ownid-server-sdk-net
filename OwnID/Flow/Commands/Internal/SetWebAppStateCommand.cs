@@ -2,11 +2,11 @@ using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using OwnID.Services;
 using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Flow.Contracts.Internal;
 using OwnID.Extensions;
+using OwnID.Services;
 
 namespace OwnID.Flow.Commands.Internal
 {
@@ -40,8 +40,8 @@ namespace OwnID.Flow.Commands.Internal
                 HttpOnly = true,
                 Domain = _domain,
                 Secure = !_configuration.IsDevEnvironment,
-                Expires = DateTimeOffset.Now.AddDays(_configuration.CookieExpiration),
-                SameSite = SameSiteMode.Lax
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTimeOffset.Now.AddDays(_configuration.CookieExpiration)
             };
 
             if (string.IsNullOrWhiteSpace(request.EncryptionToken))
@@ -51,7 +51,10 @@ namespace OwnID.Flow.Commands.Internal
                 var vector = new byte[16];
                 rng.GetBytes(vector);
                 var vectorValue = Convert.ToBase64String(vector);
-                encryptionToken = $"{encryptionToken}:::{vectorValue}";
+                encryptionToken = $"{encryptionToken}{CookieValuesConstants.SubValueSeparator}{vectorValue}";
+
+                if (_configuration.TFAEnabled && _configuration.Fido2FallbackBehavior == Fido2FallbackBehavior.Passcode)
+                    encryptionToken = $"{encryptionToken}{CookieValuesConstants.PasscodeEnding}";
 
                 result.Cookies.Add(new CookieInfo
                 {
@@ -60,13 +63,18 @@ namespace OwnID.Flow.Commands.Internal
                     Options = cookieOptions
                 });
             }
+            else if (encryptionToken.EndsWith(CookieValuesConstants.PasscodeEnding))
+            {
+                encryptionToken = encryptionToken.Substring(0,
+                    encryptionToken.Length - CookieValuesConstants.PasscodeEnding.Length);
+            }
 
             if (request.RequiresRecovery)
             {
                 recoveryToken = string.IsNullOrWhiteSpace(request.RecoveryToken)
                     ? Guid.NewGuid().ToString("n")
                     : request.RecoveryToken;
-                
+
                 if (request.RecoveryToken != recoveryToken)
                     result.Cookies.Add(new CookieInfo
                     {

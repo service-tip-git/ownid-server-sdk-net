@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace OwnID.Extensibility.Flow.Contracts.Internal
 {
@@ -9,6 +10,7 @@ namespace OwnID.Extensibility.Flow.Contracts.Internal
             Cookies = new List<CookieInfo>();
         }
 
+        [JsonIgnore]
         public List<CookieInfo> Cookies { get; set; }
     }
 }

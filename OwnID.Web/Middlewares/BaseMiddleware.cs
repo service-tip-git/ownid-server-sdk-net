@@ -163,7 +163,10 @@ namespace OwnID.Web.Middlewares
         {
             foreach (var cookie in cookies)
             {
-                httpResponse.Cookies.Append(cookie.Name, cookie.Value, cookie.Options);
+                if(!cookie.Remove)
+                    httpResponse.Cookies.Append(cookie.Name, cookie.Value, cookie.Options);
+                else
+                    httpResponse.Cookies.Delete(cookie.Name, cookie.Options);
             }
         }
 
