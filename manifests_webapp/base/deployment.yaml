@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-webapp
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+        - name: regcred      
+      containers:
+        - name: server-webapp
+          image: server-webapp:latest
+          ports:
+            - containerPort: 5002

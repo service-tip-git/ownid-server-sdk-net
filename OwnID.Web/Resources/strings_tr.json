@@ -1,0 +1,12 @@
+{
+  "OwnIdSdkDefault" : {
+    "Email" : "E-posta",
+    "First Name" : "Ad",
+    "Last Name" : "Soyadı",
+    "Nickname" : "Takma ad",
+    "Field {0} is required" : "Alan {0} gerekli",
+    "Field {0} has incorrect format" : "Alan {0} yanlış biçim içeriyor",
+    "The field {0} must be a string or array type with a maximum length of '{1}'" : "{0} alanı, en fazla '{1}' uzunluğunda bir dizi veya dizilim türü olmalıdır",
+    "Error_PhoneAlreadyConnected" : "Telefonunuz zaten bir hesapla ilişkilendirilmiş, lütfen oturum açma sayfasına gidin"
+  }
+}

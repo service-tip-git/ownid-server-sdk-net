@@ -1,0 +1,12 @@
+{
+  "OwnIdSdkDefault" : {
+    "Email" : "Электронная почта",
+    "First Name" : "Имя",
+    "Last Name" : "Фамилия",
+    "Nickname" : "Псевдоним",
+    "Field {0} is required" : "Поле {0} обязательное",
+    "Field {0} has incorrect format" : "Поле {0} имеет неправильный формат",
+    "The field {0} must be a string or array type with a maximum length of '{1}'" : "Поле {0} должно быть строкой или массивом с максимальной длиной '{1}'",
+    "Error_PhoneAlreadyConnected" : "Ваш телефон уже привязан к учетной записи, перейдите на страницу входа"
+  }
+}

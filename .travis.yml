@@ -9,7 +9,7 @@ notifications:
 dist: bionic
 language: csharp
 mono: none
-dotnet: 3.1
+dotnet: 5.0
 services:
   - docker
 
@@ -17,36 +17,31 @@ branches:
   only:
   - master
   - develop
-  - alpha-rti
   - andrii/169-FOR-TEST-ONLY-Security_-_WebApp_to_validate_context_on_response
+  - /^release\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$/
 
 env:
   global:
     - secure: AMLcgd4W7YkWntUq9dYJgVyIlLeUh5s8p8KK+oiJGDSoU45nTC48t6tMhtayPyllEkYBNL4MxlFMRw4BVJgTL9vExuWgRJBdPBKDJUrKpSuZv5s5FQ5vN2ofN0P6j9dGEJVHSesyfnQQij1I6zzYLGgujA2x5E6xmx0t3W9zrfVJx8vPq8nkBqt8xUbTOFjLVEQJMVUeA/sQtjL7PoZhA7SlXma+G0eobWZrLntWcggO1VQuJuexJZqsoL3/WTYCbMqeOJXX4UD7lRaDCn+dVQFGF9nUmsEQi46a7GSnaGhZt2RpBKCyNRchVVSVvtRs/q+oXGqFGE2nUDs1Oj/jpJ52ywMdlLSTjHPNZ8cDPtvQoYenhMpHw6MT+GQ9nHBir/oAYQWkU+4ddnYTzh7u7wdk4HIcs7iOye6+xhAorjVjrJ+nVlCVbIhQniag4ejn6WlXnxpZUTNZsIg3PBdQWv87zLDZANXPtVFMSkD2DtqzxuAvoxpkbGBDhc2UN39CWbu0gfYixyCHEdjA6jX1g8ndeMZmUFiz3GtJwz8Fb1VSBiqJ2TUvwacdSnefajnj3UGROJP/L0zP0fegZY5vUVQwX4Zxz72GweLdNq1ZZJuV1KCqr9OldetkyndCMOgfJuiv+OFQeGvB3OZJo7+kJJDFVfxXN1Rv/FJJ4wdBUzQ=
-    - secure: am3WB67aY9pj6ukZWu3KprFcge89kO8R1cn9+473u5bBaXZPzItc2vUZ8hdA6wpRwkZM6+qBggmgFBYWHP2y3aIBwG4cczdqXdGSGtYn0AlyDdEuMY/v0nHtxITieO2bo5kTPIPF0GOcc87ZO7m36F/5pNeG8ykE9/z4V3glemfB5RIwShdl0ZY7AgImn+3dOqCqFLZRk2H9MT0evJupGAbvE3R+nAwEr+JM3rBnpSn8Yzy+LHRHuVuKq0WICNRPZ2Q+kp0LVtPZH4r/T6Fi2SMjYCX9+31+5sP2jBL07V5mikFwBN5jATXdXcprgTQkmjbVMvCgsezVvTIcOa0l/HiGt5HQI+RnESzJaSlejr+yh7OwY+7OIDWJKX9p8EUBEHpOjhg8a+w46O0tzQiVQQXSZgTc1pjsnLuh2ezx47sC2cpilYn6dpcgtwR7YID/OWPQOPsZiuQ1bj67BHnMmI5JdiyYLQbWuyqB7R0UH+B8cQc4kJKOYK8fTrz1z4sdykfexbcrUcaY85wQr+g3wggnqL59edqFa39ctdHo18g8X5tV2bbaElLeACnfGeo57nJ6DCvHpZmff+FgIDvDZWLQG0+SF31yj5LBxEbQ3BIuuVyoaO10mMLs/9e9TO6G1Rzerc2/12NK6P7AM8gqYloKiF8f4VRFSDWxgy2fb3c=
-    - secure: Dg7nv0ymO5pPVZFFyqjD2wajouRuwem8E0qt58mzPZ7zqPRD3xDEAAINXTU/S6qlq2G2ug0VcYNHLPVY7YtVRU13gjgiUkwXJSkIp7RskIbT/gTXi4qbHDxQiYhoS/OQCn/bNK6IrcMkVXxWpuZW7P+yLm10taZnrHb4+cdnhu2BbtY4DPPyzguZC6uOZtlNxpZiqXKp3now13XP1cyrPvXLRueWOSGA1Cmys4Yx30MrKER50Xse7A222XTxd409ntxO1cfhVNKAAoBlqY+mEQuNh9Q1YBPpjz/AbuYewuuQf1ssuBmpz0XGPjfwzwOLz+wusqzoKMyM1uoSsIjb4IiQqddi3X5ZRmoPD3ej86azgv5ASBzjkNvIEArTHkBwX+dt3Q0pueICznRf9W4gmV9Te7SZt8ke29z2UHZLqqlwqqsUWYnp8Cn9JH0I4DKpswkwyo/YC6DSWWETXM6siuJXiywTZLljV93xVEORNiU4/LUaosBgff3E6EXJHPzFLoJZTNyKbhUMWlPDCB2OTvrkAGTaM20xrlSEnm5lxkzCKGaki38lSIzf8IBQLkcTa0Ohs53Gw/WKktTdrw5vGKBdnWRCBTuU4aLNX2vF0oMYP2XqJMHwNhmNJ2qIC26HJluI4ZYS9mBg/Dg3eCF9wJlZDh3haHLBBNVLNdgRz34=
-    - IMAGE_TAG=$TRAVIS_COMMIT
 
 jobs:
   include:
     - if: branch=master
       env:
         ENV=staging
-        REPOSITORY_URI=571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging
     - if: branch=andrii/169-FOR-TEST-ONLY-Security_-_WebApp_to_validate_context_on_response
       env:
         ENV=dev
-        REPOSITORY_URI=571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-develop
-    - if: branch=alpha-rti
+    - if: branch =~ ^release\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$
       env:
-        ENV=staging
-        REPOSITORY_URI=571861302935.dkr.ecr.us-east-2.amazonaws.com/ownid-server-netcore3-gigya-staging
+        ENV=prod
 
 script:
-  - sh scripts/set-build-num.sh $TRAVIS_BUILD_NUMBER
-  - dotnet restore
+  - bash scripts/set-build-num.sh $TRAVIS_BUILD_NUMBER
   - dotnet test /p:CollectCoverage=true /p:Threshold=20
-  - docker build -t ownid-server-netcore3-gigya:latest . --network=host
+  - docker build -f gigya-server.Dockerfile -t ownid-server-gigya:latest . --network=host
+  - docker build -f webapp-server.Dockerfile -t ownid-server-webapp:latest . --network=host
+
 
 before_deploy:
   - pyenv install 3.6.3
@@ -55,25 +50,28 @@ before_deploy:
   - pip install awscli
   - aws --version
   - sudo apt-get install libxml2-utils
-  - "$(aws ecr get-login --region us-east-2 --no-include-email)"
   - curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/kubectl
   - chmod +x ./kubectl
   - sudo mv kubectl /usr/local/bin
   - kubectl version --short --client
-  - aws eks --region us-east-2 update-kubeconfig --name ownid-eks
+  - curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+  - chmod +x ./kustomize
+  - sudo mv kustomize /usr/local/bin
+  - docker login -u $ARTIFACTORY_USERNAME -p $ARTIFACTORY_PASSWORD $ARTIFACTORY_URL
 
 deploy:
 - provider: script
-  script: sh scripts/publish.sh $REPOSITORY_URI $IMAGE_TAG $ENV
+  script: bash scripts/deploy/not-prod.sh $ENV
   skip_cleanup: true
   on:
       all_branches: true
       condition: $TRAVIS_BRANCH =~ ^(develop|master|andrii\/169-FOR-TEST-ONLY-Security_-_WebApp_to_validate_context_on_response)$
 - provider: script
-  script: sh scripts/alpha-deploy.sh $REPOSITORY_URI $IMAGE_TAG alpha
+  script: bash scripts/deploy/prod.sh
   skip_cleanup: true
   on:
-    branch: alpha-rti
+    all_branches: true
+    condition: $TRAVIS_BRANCH =~ ^release\/.*$
 
-after_deploy:
-  - bash scripts/test_runner.sh serversdk $ENV
+
+

@@ -1,0 +1,12 @@
+{
+  "OwnIdSdkDefault" : {
+    "Email" : "Thư điện tử",
+    "First Name" : "Tên",
+    "Last Name" : "Họ",
+    "Nickname" : "Biệt danh",
+    "Field {0} is required" : "Trường {0} được yêu cầu",
+    "Field {0} has incorrect format" : "Trường {0} có định dạng không chính xác",
+    "The field {0} must be a string or array type with a maximum length of '{1}'" : "Trường {0} phải là kiểu chuỗi hoặc mảng với độ dài tối đa '{1}'",
+    "Error_PhoneAlreadyConnected" : "Điện thoại của bạn đã liên kết với một tài khoản, vui lòng đi đến trang đăng nhập"
+  }
+}
