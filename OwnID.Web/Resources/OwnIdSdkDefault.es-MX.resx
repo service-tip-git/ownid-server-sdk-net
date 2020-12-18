@@ -19,8 +19,8 @@
   <data name="First Name" xml:space="preserve">Nombre</data>
   <data name="Last Name" xml:space="preserve">Apellido</data>
   <data name="Nickname" xml:space="preserve">Apodo</data>
-  <data name="Field {0} is required" xml:space="preserve">El campo {0} es obligatorio</data>
+  <data name="Field {0} is required" xml:space="preserve">Se requiere el campo {0}</data>
   <data name="Field {0} has incorrect format" xml:space="preserve">El campo {0} tiene un formato incorrecto</data>
-  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">El campo {0} debe ser un string o un tipo de matriz con una longitud máxima de "{1}"</data>
-  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Su teléfono ya se ha vinculado con una cuenta. Vaya a la página de inicio de sesión</data>
+  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">El campo {0} debe ser una string o un arreglo con una longitud máxima de '{1}'</data>
+  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Su teléfono ya está asociado con una cuenta; vaya a la página de página de inicio</data>
 </root>
