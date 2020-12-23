@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PKG_VERSION=`xmllint --xpath "string(//Project/PropertyGroup/AssemblyVersion)" ./OwnID.Server.Gigya/OwnID.Server.Gigya.csproj`
-IMAGE_URI=$ARTIFACTORY_URL/prod/server/ownid-server-gigya_${PKG_VERSION-}:$TRAVIS_COMMIT
+IMAGE_URI=$DOCKER_URL/prod/server/ownid-server-gigya:${PKG_VERSION-}
 
 echo Docker push to $IMAGE_URI
 docker tag ownid-server-gigya:latest $IMAGE_URI
@@ -45,7 +45,7 @@ done
 # OwnID.Server.WebApp
 #
 PKG_VERSION=`xmllint --xpath "string(//Project/PropertyGroup/AssemblyVersion)" ./OwnID.Server.WebApp/OwnID.Server.WebApp.csproj`
-IMAGE_URI=$ARTIFACTORY_URL/prod/server/ownid-server-webapp:${PKG_VERSION-}
+IMAGE_URI=$DOCKER_URL/prod/server/ownid-server-webapp:${PKG_VERSION-}
 
 echo Docker push to $IMAGE_URI
 docker tag ownid-server-webapp:latest $IMAGE_URI

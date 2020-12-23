@@ -1,0 +1,74 @@
+name: Server Deploy
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+      - /^release\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$/
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      DOCKER_USER: ${{ secrets.DOCKER_USER }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      DOCKER_URL: ${{ secrets.DOCKER_URL }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+
+    - name: Generate build number
+      uses: einaregilsson/build-number@v3
+      with:
+        token: ${{secrets.github_token}}
+
+    - name: Version update
+      run: bash scripts/set-build-num.sh $BUILD_NUMBER
+    
+    - name: Docker login
+      run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD $DOCKER_URL
+
+    - name: Test
+      run: dotnet test /p:CollectCoverage=true /p:Threshold=20
+
+    - name: Build
+      run: docker build -f gigya-server.Dockerfile -t ownid-server-gigya:latest . --network=host
+
+    - name: Build Webapp Server
+      run: docker build -f webapp-server.Dockerfile -t ownid-server-webapp:latest . --network=host
+
+    - name: Install XMLLINT
+      run: sudo apt-get install libxml2-utils
+
+    - name: Deploy DEV
+      if: github.ref == 'refs/heads/develop'
+      run: bash scripts/deploy/not-prod.sh dev
+
+    - name: Deploy STAGING
+      if: github.ref == 'refs/heads/master'
+      run: bash scripts/deploy/not-prod.sh staging
+
+    - name: Deploy PROD
+      if: startsWith(github.ref,'ref/heads/release')
+      run: bash scripts/deploy/prod.sh
+
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      if: failure()
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_ICON: https://ownid.com/images/favicon.png
+        SLACK_COLOR: '#FF0000'
+        SLACK_TITLE: Merge failed
+        SLACK_FOOTER: OwnID by SAP
+        SLACK_USERNAME: SAP/ownid-server-sdk-net
