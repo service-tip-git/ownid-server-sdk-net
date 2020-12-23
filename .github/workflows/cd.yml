@@ -47,6 +47,9 @@ jobs:
     - name: Build Webapp Server
       run: docker build -f webapp-server.Dockerfile -t ownid-server-webapp:latest . --network=host
 
+    - name: Install XMLLINT
+      run: sudo apt-get install libxml2-utils
+
     - name: Deploy DEV
       if: github.ref == 'refs/heads/develop'
       run: bash scripts/deploy/not-prod.sh dev
