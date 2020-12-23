@@ -4,7 +4,7 @@ ENV=$1
 
 #Deploy Netcore3 Server-Gigya
 PKG_VERSION=$(xmllint --xpath "string(//Project/PropertyGroup/AssemblyVersion)" ./OwnID.Server.Gigya/OwnID.Server.Gigya.csproj)
-IMAGE_URI=$ARTIFACTORY_URL/$ENV/server/ownid-server-gigya_${PKG_VERSION-}:$TRAVIS_COMMIT
+IMAGE_URI=$DOCKER_URL/$ENV/server/ownid-server-gigya:${PKG_VERSION-}
 
 echo Docker push to $IMAGE_URI
 docker tag ownid-server-gigya:latest $IMAGE_URI

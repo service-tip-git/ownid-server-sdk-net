@@ -1,0 +1,35 @@
+name: Server PR Build
+
+on: [pull_request]
+
+jobs:
+  buildAndTest:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '5.0.x'
+
+      - name: Test
+        run: dotnet test /p:CollectCoverage=true /p:Threshold=20
+
+      - name: Build
+        run: docker build -t ownid-server-gigya:latest . --network=host
+
+      - name: Build Webapp Server
+        run: (cd OwnID.Server.WebApp && docker build -t ownid-server-webapp:latest . --network=host)
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        if: failure()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_ICON: https://ownid.com/images/favicon.png
+          SLACK_COLOR: '#FF0000'
+          SLACK_TITLE: PR build failed
+          SLACK_FOOTER: OwnID by SAP
+          SLACK_USERNAME: SAP/ownid-server-sdk-net
