@@ -59,7 +59,7 @@ jobs:
       run: bash scripts/deploy/not-prod.sh staging
 
     - name: Deploy PROD
-      if: startsWith(github.ref,'ref/heads/release')
+      if: startsWith(github.ref,'refs/heads/release')
       run: bash scripts/deploy/prod.sh
 
     - name: Slack Notification
