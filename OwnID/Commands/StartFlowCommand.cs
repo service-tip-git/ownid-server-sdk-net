@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using OwnID.Cryptography;
 using OwnID.Extensibility.Cache;
+using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensions;
 using OwnID.Services;
@@ -42,7 +43,9 @@ namespace OwnID.Commands
                     cacheItem.EncToken = encToken;
                 }
 
-                cacheItem.Fido2CredentialId = input.CredId;
+                // ignore fido2 credential for recover because it will be recreated
+                if(cacheItem.ChallengeType != ChallengeType.Recover) 
+                    cacheItem.Fido2CredentialId = input.CredId;
             });
 
             return respToken;

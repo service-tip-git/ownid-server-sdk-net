@@ -44,6 +44,11 @@ namespace OwnID.Flow.TransitionHandlers
 
         protected override void Validate(TransitionInput<AcceptStartRequest> input, CacheItem relatedItem)
         {
+            if (!relatedItem.IsFido2Flow && string.IsNullOrEmpty(relatedItem.EncToken)
+                                         && string.IsNullOrEmpty(relatedItem.Fido2CredentialId)
+                                         && relatedItem.ChallengeType == ChallengeType.Login
+                                         && (!_coreConfiguration.TFAEnabled || !input.Data.SupportsFido2))
+                throw new OwnIdException(ErrorType.UserNotFound);
         }
 
         protected override async Task<ITransitionResult> ExecuteInternalAsync(TransitionInput<AcceptStartRequest> input,
