@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using OwnID.Commands;
 using OwnID.Extensibility.Flow.Contracts;
-using OwnID.Flow.Commands;
+using OwnID.Flow;
 using OwnID.Flow.Interfaces;
-using OwnID.Flow.Steps;
 using OwnID.Web.Attributes;
 
 namespace OwnID.Web.Middlewares.Approval
@@ -15,8 +15,7 @@ namespace OwnID.Web.Middlewares.Approval
         private readonly IFlowRunner _flowRunner;
 
         public GetActionApprovalStatusMiddleware(RequestDelegate next, IFlowRunner flowRunner,
-            ILogger<GetActionApprovalStatusMiddleware> logger, StopFlowCommand stopFlowCommand) : base(next, logger,
-            stopFlowCommand)
+            ILogger<GetActionApprovalStatusMiddleware> logger) : base(next, logger)
         {
             _flowRunner = flowRunner;
         }
@@ -24,10 +23,10 @@ namespace OwnID.Web.Middlewares.Approval
         protected override async Task ExecuteAsync(HttpContext httpContext)
         {
             var result = await _flowRunner.RunAsync(
-                new CommandInput(RequestIdentity, GetRequestCulture(httpContext), ClientDate),
+                new TransitionInput(RequestIdentity, GetRequestCulture(httpContext), ClientDate),
                 StepType.ApprovePin);
 
-            await Json(httpContext, result, StatusCodes.Status200OK);
+            await JsonAsync(httpContext, result, StatusCodes.Status200OK);
         }
     }
 }

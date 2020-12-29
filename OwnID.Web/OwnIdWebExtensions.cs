@@ -7,6 +7,7 @@ using OwnID.Web.Features;
 using OwnID.Web.Middlewares;
 using OwnID.Web.Middlewares.Approval;
 using OwnID.Web.Middlewares.Authorize;
+using OwnID.Web.Middlewares.Fido2;
 using OwnID.Web.Middlewares.Link;
 using OwnID.Web.Middlewares.MagicLink;
 using OwnID.Web.Middlewares.Recover;
@@ -28,8 +29,8 @@ namespace OwnID.Web
                 builder => builder.UseMiddleware<GenerateContextMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/start",
                 builder => builder.UseMiddleware<StartFlowMiddleware>());
-            routeBuilder.MapMiddlewarePost("ownid/{context}/start/state",
-                builder => builder.UseMiddleware<PasswordlessStateMiddleware>());
+            routeBuilder.MapMiddlewarePost("ownid/{context}/start/accept",
+                builder => builder.UseMiddleware<AcceptStartFlowMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/users/existence",
                 builder => builder.UseMiddleware<CheckUserExistenceMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/conn-recovery",
@@ -39,7 +40,9 @@ namespace OwnID.Web
             routeBuilder.MapMiddlewarePost("ownid/{context}/challenge/partial",
                 builder => builder.UseMiddleware<SavePartialProfileMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/challenge/fido2",
-                builder => builder.UseMiddleware<Fido2Middleware>());
+                builder => builder.UseMiddleware<Fido2AuthMiddleware>());
+            routeBuilder.MapMiddlewareGet("ownid/{context}/fido2/settings",
+                builder => builder.UseMiddleware<Fido2SettingsMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/approve",
                 builder => builder.UseMiddleware<ApproveActionMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/approval-status",

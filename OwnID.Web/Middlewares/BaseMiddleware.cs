@@ -8,12 +8,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
+using OwnID.Commands;
 using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Flow.Contracts.Jwt;
+using OwnID.Extensibility.Flow.Contracts.Start;
 using OwnID.Extensibility.Json;
 using OwnID.Extensions;
-using OwnID.Flow.Commands;
+using OwnID.Flow;
 using OwnID.Web.Attributes;
 
 namespace OwnID.Web.Middlewares
@@ -28,14 +30,12 @@ namespace OwnID.Web.Middlewares
         protected readonly ILogger Logger;
         protected readonly RequestDelegate Next;
         protected DateTime ClientDate { get; private set; }
-        private readonly StopFlowCommand _stopFlowCommand;
 
 
-        protected BaseMiddleware(RequestDelegate next, ILogger logger, StopFlowCommand stopFlowCommand)
+        protected BaseMiddleware(RequestDelegate next, ILogger logger)
         {
             Next = next;
             Logger = logger;
-            _stopFlowCommand = stopFlowCommand;
 
             var attrs = GetType().GetCustomAttribute(typeof(RequestDescriptorAttribute));
 
@@ -120,13 +120,6 @@ namespace OwnID.Web.Middlewares
             {
                 await functionToInvoke(httpContext);
             }
-            catch (OwnIdException e)
-            {
-                var input = new CommandInput(RequestIdentity, GetRequestCulture(httpContext), ClientDate);
-
-                var result = await _stopFlowCommand.ExecuteAsync(input, e.ErrorType, e.Message);
-                await Json(httpContext, result, StatusCodes.Status200OK);
-            }
             catch (InternalLogicException e)
             {
                 Logger.LogError(e, e.Message);
@@ -147,7 +140,7 @@ namespace OwnID.Web.Middlewares
                     GeneralErrors = e.FormContext.GeneralErrors
                 };
                 httpContext.Response.Clear();
-                await Json(httpContext, response, StatusCodes.Status400BadRequest);
+                await JsonAsync(httpContext, response, StatusCodes.Status400BadRequest);
             }
             catch (Exception e)
             {
@@ -159,8 +152,13 @@ namespace OwnID.Web.Middlewares
             }
         }
 
-        protected void SetCookies(HttpResponse httpResponse, List<CookieInfo> cookies)
+        protected void SetCookies(HttpResponse httpResponse, ITransitionResult result)
         {
+            if(!(result is StateResult))
+                return;
+
+            var cookies = ((StateResult) result).Cookies;
+            
             foreach (var cookie in cookies)
             {
                 if(!cookie.Remove)
@@ -177,7 +175,7 @@ namespace OwnID.Web.Middlewares
             response.StatusCode = (int) HttpStatusCode.NoContent;
         }
 
-        protected async Task Json<T>(HttpContext context, T responseBody, int statusCode, bool addLocaleHeader = true)
+        protected async Task JsonAsync<T>(HttpContext context, T responseBody, int statusCode, bool addLocaleHeader = true)
             where T : class
         {
             context.Response.StatusCode = statusCode;

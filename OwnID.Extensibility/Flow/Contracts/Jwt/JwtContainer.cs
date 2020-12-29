@@ -3,7 +3,7 @@ namespace OwnID.Extensibility.Flow.Contracts.Jwt
     /// <summary>
     ///     Wrapper for JWT base64 encoded string for transferring to OwnId application
     /// </summary>
-    public class JwtContainer : ICommandResult
+    public class JwtContainer : ITransitionResult
     {
         public JwtContainer()
         {

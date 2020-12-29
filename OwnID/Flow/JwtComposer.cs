@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using OwnID.Cryptography;
-using OwnID.Flow.Interfaces;
-using OwnID.Flow.Steps;
 using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Flow.Contracts.Internal;
 using OwnID.Extensibility.Services;
 using OwnID.Extensions;
+using OwnID.Flow.Interfaces;
+using OwnID.Flow.ResultActions;
 
 namespace OwnID.Flow
 {
@@ -74,15 +74,18 @@ namespace OwnID.Flow
             return _jwtService.GenerateDataJwt(fields, info.ClientTime);
         }
 
-        public string GenerateBaseStepJwt(BaseJwtComposeInfo info, string did)
+        public string GenerateBaseStepJwt(BaseJwtComposeInfo info, string did = null)
         {
-            var (didKey, didValue) = GetDid(did);
-
             var data = new Dictionary<string, object>
             {
-                {didKey, didValue},
                 {"requestedFields", new object[0]}
             };
+
+            if (!string.IsNullOrEmpty(did))
+            {
+                var (didKey, didValue) = GetDid(did);
+                data.Add(didKey, didValue);
+            }
 
             if (info.IncludeRequester)
             {
@@ -91,10 +94,10 @@ namespace OwnID.Flow
             }
 
             if (!string.IsNullOrEmpty(info.EncToken)) data.Add("encToken", info.EncToken);
-            
-            if(info.IncludeFido2FallbackBehavior && _ownIdCoreConfiguration.TFAEnabled)
+
+            if (info.IncludeFido2FallbackBehavior && _ownIdCoreConfiguration.TFAEnabled)
                 data.Add("fido2FallbackBehavior", _ownIdCoreConfiguration.Fido2FallbackBehavior.ToString().ToLower());
-            
+
             data.Add("canBeRecovered", info.CanBeRecovered);
 
             var fields = GetBaseFlowFieldsDictionary(info, data);
@@ -151,25 +154,21 @@ namespace OwnID.Flow
         private Dictionary<string, object> GetStepBehavior(FrontendBehavior nextFrontendBehavior)
         {
             if (nextFrontendBehavior.Error != null && nextFrontendBehavior.Type != StepType.Error)
-            {
                 throw new ArgumentException(
                     $"{nameof(nextFrontendBehavior.Error)} can be supplied only if {nameof(nextFrontendBehavior.Type)} is '{nameof(StepType.Error)}'",
                     nameof(nextFrontendBehavior));
-            }
 
             if (nextFrontendBehavior.Error == null && nextFrontendBehavior.Type == StepType.Error)
-            {
                 throw new ArgumentException(
                     $"{nameof(nextFrontendBehavior.Error)} must be provided if {nameof(nextFrontendBehavior.Type)} is '{nameof(StepType.Error)}'",
                     nameof(nextFrontendBehavior));
-            }
 
             var stepType = nextFrontendBehavior.Type.ToString();
             var actionType = nextFrontendBehavior.ActionType.ToString();
             var stepDict = new Dictionary<string, object>
             {
                 {"type", stepType.First().ToString().ToLowerInvariant() + stepType.Substring(1)},
-                {"actionType", actionType.First().ToString().ToLowerInvariant() + actionType.Substring(1)},
+                {"actionType", actionType.First().ToString().ToLowerInvariant() + actionType.Substring(1)}
             };
 
             if (nextFrontendBehavior.Error != null)
@@ -192,9 +191,9 @@ namespace OwnID.Flow
                     method = nextFrontendBehavior.Callback.Method
                 });
 
-            if(nextFrontendBehavior.NextBehavior != null)
+            if (nextFrontendBehavior.NextBehavior != null)
                 stepDict.Add("nextBehavior", GetStepBehavior(nextFrontendBehavior.NextBehavior));
-            
+
             if (nextFrontendBehavior.AlternativeBehavior != null)
                 stepDict.Add("alternativeBehavior", GetStepBehavior(nextFrontendBehavior.AlternativeBehavior));
 
@@ -239,12 +238,12 @@ namespace OwnID.Flow
 
         private KeyValuePair<string, string> GetDid(string did)
         {
-            return new KeyValuePair<string, string>("did", did);
+            return new("did", did);
         }
 
         private KeyValuePair<string, object> GetRequester()
         {
-            return new KeyValuePair<string, object>("requester", new
+            return new("requester", new
             {
                 did = _ownIdCoreConfiguration.DID,
                 pubKey = RsaHelper.ExportPublicKeyToPkcsFormattedString(_ownIdCoreConfiguration

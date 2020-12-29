@@ -1,5 +1,5 @@
 using System;
-using OwnID.Flow.Steps;
+using OwnID.Flow.ResultActions;
 
 namespace OwnID.Flow
 {

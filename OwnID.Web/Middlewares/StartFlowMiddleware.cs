@@ -1,13 +1,11 @@
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnID.Extensibility.Flow.Contracts;
-using OwnID.Extensibility.Flow.Contracts.Internal;
-using OwnID.Flow.Commands;
-using OwnID.Flow.Commands.Internal;
+using OwnID.Extensibility.Flow.Contracts.Start;
+using OwnID.Flow;
 using OwnID.Flow.Interfaces;
-using OwnID.Flow.Steps;
+using OwnID.Services;
 using OwnID.Web.Attributes;
 
 namespace OwnID.Web.Middlewares
@@ -15,39 +13,33 @@ namespace OwnID.Web.Middlewares
     [RequestDescriptor(BaseRequestFields.Context | BaseRequestFields.RequestToken)]
     public class StartFlowMiddleware : BaseMiddleware
     {
+        private readonly ICookieService _cookieService;
         private readonly IFlowRunner _flowRunner;
-        private readonly SetWebAppStateCommand _stateCommand;
 
         public StartFlowMiddleware(RequestDelegate next, IFlowRunner flowRunner, ILogger<StartFlowMiddleware> logger,
-            SetWebAppStateCommand stateCommand, StopFlowCommand stopFlowCommand) : base(next, logger, stopFlowCommand)
+            ICookieService cookieService) : base(next, logger)
         {
             _flowRunner = flowRunner;
-            _stateCommand = stateCommand;
+            _cookieService = cookieService;
         }
 
         protected override async Task ExecuteAsync(HttpContext httpContext)
         {
-            bool.TryParse(httpContext.Request.Query["recovery"], out var requiresRecovery);
-            var request = new StateRequest
+            var request = new StartRequest
             {
-                EncryptionToken = httpContext.Request.Cookies[_stateCommand.EncryptionCookieName],
-                RecoveryToken = httpContext.Request.Cookies[_stateCommand.RecoveryCookieName],
-                RequiresRecovery = requiresRecovery
+                EncryptionToken = httpContext.Request.Cookies[_cookieService.EncryptionCookieName],
+                RecoveryToken = httpContext.Request.Cookies[_cookieService.RecoveryCookieName],
+                CredId = httpContext.Request.Cookies[_cookieService.CredIdCookieName]
             };
 
-            var stateResult = await _stateCommand.ExecuteAsync(RequestIdentity.Context, request);
+            if (httpContext.Request.Query.TryGetValue("rst", out var responseToken))
+                RequestIdentity.ResponseToken = responseToken;
 
-            using var requestBodyStreamReader = new StreamReader(httpContext.Request.Body);
-            var requestBody = await requestBodyStreamReader.ReadToEndAsync();
-
-            var commandInput = new CommandInput<string>(RequestIdentity, GetRequestCulture(httpContext), requestBody,
-                ClientDate);
+            var commandInput = new TransitionInput<StartRequest>(RequestIdentity, GetRequestCulture(httpContext),
+                request, ClientDate);
 
             var commandResult = await _flowRunner.RunAsync(commandInput, StepType.Starting);
-
-            SetCookies(httpContext.Response, stateResult.Cookies);
-
-            await Json(httpContext, commandResult, StatusCodes.Status200OK);
+            await JsonAsync(httpContext, commandResult, StatusCodes.Status200OK);
         }
     }
 }

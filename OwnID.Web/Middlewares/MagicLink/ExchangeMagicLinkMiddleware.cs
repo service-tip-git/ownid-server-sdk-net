@@ -1,10 +1,9 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using OwnID.Commands.MagicLink;
 using OwnID.Extensibility.Flow.Contracts.MagicLink;
 using OwnID.Extensibility.Json;
-using OwnID.Flow.Commands;
-using OwnID.Flow.Commands.MagicLink;
 
 namespace OwnID.Web.Middlewares.MagicLink
 {
@@ -13,8 +12,7 @@ namespace OwnID.Web.Middlewares.MagicLink
         private readonly ExchangeMagicLinkCommand _exchangeMagicLinkCommand;
 
         public ExchangeMagicLinkMiddleware(RequestDelegate next, ILogger<ExchangeMagicLinkMiddleware> logger,
-            StopFlowCommand stopFlowCommand, ExchangeMagicLinkCommand exchangeMagicLinkCommand) : base(next, logger,
-            stopFlowCommand)
+            ExchangeMagicLinkCommand exchangeMagicLinkCommand) : base(next, logger)
         {
             _exchangeMagicLinkCommand = exchangeMagicLinkCommand;
         }
@@ -22,7 +20,7 @@ namespace OwnID.Web.Middlewares.MagicLink
         protected override async Task ExecuteAsync(HttpContext httpContext)
         {
             var request = await OwnIdSerializer.DeserializeAsync<ExchangeMagicLinkRequest>(httpContext.Request.Body);
-            await Json(httpContext, await _exchangeMagicLinkCommand.ExecuteAsync(request),
+            await JsonAsync(httpContext, await _exchangeMagicLinkCommand.ExecuteAsync(request),
                 StatusCodes.Status200OK);
         }
     }

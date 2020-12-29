@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using OwnID.Commands;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Json;
-using OwnID.Flow.Commands;
 
 namespace OwnID.Web.Middlewares
 {
@@ -12,8 +12,7 @@ namespace OwnID.Web.Middlewares
         private readonly CreateFlowCommand _createFlowCommand;
 
         public GenerateContextMiddleware(RequestDelegate next, CreateFlowCommand createFlowCommand,
-            ILogger<GenerateContextMiddleware> logger, StopFlowCommand stopFlowCommand) : base(next, logger,
-            stopFlowCommand)
+            ILogger<GenerateContextMiddleware> logger) : base(next, logger)
         {
             _createFlowCommand = createFlowCommand;
         }
@@ -23,7 +22,7 @@ namespace OwnID.Web.Middlewares
             var request = await OwnIdSerializer.DeserializeAsync<GenerateContextRequest>(httpContext.Request.Body);
 
             var result = await _createFlowCommand.ExecuteAsync(request);
-            await Json(httpContext, result, StatusCodes.Status200OK, false);
+            await JsonAsync(httpContext, result, StatusCodes.Status200OK, false);
         }
     }
 }

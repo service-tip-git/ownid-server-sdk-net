@@ -1,8 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using OwnID.Flow.Commands;
-using OwnID.Flow.Commands.MagicLink;
+using OwnID.Commands.MagicLink;
 
 namespace OwnID.Web.Middlewares.MagicLink
 {
@@ -11,8 +10,7 @@ namespace OwnID.Web.Middlewares.MagicLink
         private readonly SendMagicLinkCommand _sendMagicLinkCommand;
 
         public SendMagicLinkMiddleware(RequestDelegate next, ILogger<SendMagicLinkMiddleware> logger,
-            StopFlowCommand stopFlowCommand, SendMagicLinkCommand sendMagicLinkCommand) : base(next, logger,
-            stopFlowCommand)
+            SendMagicLinkCommand sendMagicLinkCommand) : base(next, logger)
         {
             _sendMagicLinkCommand = sendMagicLinkCommand;
         }
@@ -21,7 +19,7 @@ namespace OwnID.Web.Middlewares.MagicLink
         {
             var email = httpContext.Request.Query["email"];
 
-            await Json(httpContext, await _sendMagicLinkCommand.ExecuteAsync(email), StatusCodes.Status200OK);
+            await JsonAsync(httpContext, await _sendMagicLinkCommand.ExecuteAsync(email), StatusCodes.Status200OK);
         }
     }
 }

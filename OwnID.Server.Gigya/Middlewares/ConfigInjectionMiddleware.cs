@@ -10,13 +10,10 @@ namespace OwnID.Server.Gigya.Middlewares
     public class ConfigInjectionMiddleware
     {
         private readonly IOwnIdCoreConfiguration _configuration;
-        private readonly IFlowController _flowController;
 
-        public ConfigInjectionMiddleware(RequestDelegate next, IOwnIdCoreConfiguration configuration,
-            IFlowController flowController)
+        public ConfigInjectionMiddleware(RequestDelegate next, IOwnIdCoreConfiguration configuration)
         {
             _configuration = configuration;
-            _flowController = flowController;
         }
 
         public async Task Invoke(HttpContext context)
@@ -25,10 +22,6 @@ namespace OwnID.Server.Gigya.Middlewares
 
             _configuration.TFAEnabled = config.TFAEnabled;
             _configuration.Fido2FallbackBehavior = config.Fido2FallbackBehavior;
-
-            var initFlowControllerMethod = _flowController.GetType()
-                .GetMethod("InitMap", BindingFlags.NonPublic | BindingFlags.Instance);
-            initFlowControllerMethod!.Invoke(_flowController, null);
 
             context.Response.StatusCode = StatusCodes.Status204NoContent;
         }

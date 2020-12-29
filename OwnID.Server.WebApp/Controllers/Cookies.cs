@@ -20,7 +20,7 @@ namespace OwnID.Server.WebApp.Controllers
         public Cookies(IOptions<WebAppOptions> webAppOptions)
         {
             _webAppOptions = webAppOptions.Value;
-            _connectionIdRegex = new Regex(string.Format(CookieNameTemplates.WebAppEncryption, "(.*)"),
+            _connectionIdRegex = new Regex(string.Format(CookieNameTemplates.Encryption, "(.*)"),
                 RegexOptions.Compiled);
         }
 
@@ -101,9 +101,9 @@ namespace OwnID.Server.WebApp.Controllers
                 if (string.IsNullOrEmpty(connectionId))
                     continue;
 
-                Response.Cookies.Delete(string.Format(CookieNameTemplates.WebAppEncryption, connectionId),
+                Response.Cookies.Delete(string.Format(CookieNameTemplates.Encryption, connectionId),
                     cookiesOptions);
-                Response.Cookies.Delete(string.Format(CookieNameTemplates.WebAppRecovery, connectionId),
+                Response.Cookies.Delete(string.Format(CookieNameTemplates.Recovery, connectionId),
                     cookiesOptions);
             }
 

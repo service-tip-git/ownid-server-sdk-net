@@ -5,5 +5,7 @@ namespace OwnID.Extensibility.Flow.Contracts
         public ExtAuthenticatorType Authenticator { get; set; }
         
         public string Type { get; set; }
+        
+        public string Error { get; set; }
     }
 }

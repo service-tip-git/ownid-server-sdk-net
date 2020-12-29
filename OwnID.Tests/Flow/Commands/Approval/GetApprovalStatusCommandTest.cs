@@ -6,10 +6,8 @@ using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Flow.Abstractions;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Flow;
-using OwnID.Flow.Commands;
-using OwnID.Flow.Commands.Approval;
 using OwnID.Flow.Interfaces;
-using OwnID.Flow.Steps;
+using OwnID.Flow.ResultActions;
 using OwnID.Tests.TestUtils;
 using Xunit;
 
@@ -36,7 +34,7 @@ namespace OwnID.Tests.Flow.Commands.Approval
                 .Setup(x => x.GetExpectedFrontendBehavior(It.Is<CacheItem>(y => y.Context == cacheItem.Context),
                     It.Is<StepType>(y => y == currentStepType))).Returns(frontendBehavior);
 
-            var commandInput = new CommandInput(requestIdentity, CultureInfo.CurrentCulture, DateTime.Now);
+            var commandInput = new TransitionInput(requestIdentity, CultureInfo.CurrentCulture, DateTime.Now);
             var command = new GetApprovalStatusCommand(jwtComposer.Object, flowController.Object, recoveryHandler);
             await command.ExecuteAsync(commandInput, cacheItem, currentStepType);
 
