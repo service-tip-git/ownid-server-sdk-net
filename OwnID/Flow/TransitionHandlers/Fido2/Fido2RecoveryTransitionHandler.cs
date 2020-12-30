@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using OwnID.Commands;
 using OwnID.Commands.Fido2;
 using OwnID.Extensibility.Cache;
+using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Providers;
 using OwnID.Flow.Interfaces;
@@ -18,6 +19,14 @@ namespace OwnID.Flow.TransitionHandlers.Fido2
             cookieService)
         {
             _fido2RecoveryCommand = fido2RecoveryCommand;
+        }
+
+        protected override void Validate(TransitionInput<string> input, CacheItem relatedItem)
+        {
+            base.Validate(input, relatedItem);
+
+            if (string.IsNullOrEmpty(relatedItem.DID))
+                throw new CommandValidationException("No user DID was found for recovery");
         }
 
         protected override async Task<ITransitionResult> ExecuteInternalAsync(TransitionInput<string> input,

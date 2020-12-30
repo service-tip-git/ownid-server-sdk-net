@@ -40,7 +40,11 @@ namespace OwnID.Flow.TransitionHandlers.Partial
         protected override async Task<ITransitionResult> ExecuteInternalAsync(TransitionInput<AcceptStartRequest> input,
             CacheItem relatedItem)
         {
-            return await base.ExecuteInternalAsync(input, await _recoverAccountCommand.ExecuteAsync(relatedItem));
+            // TODO: rework preventing fido2 to use recovery link second time
+            if (!input.Data.SupportsFido2 || string.IsNullOrEmpty(input.Data.ExtAuthPayload) || string.IsNullOrEmpty(relatedItem.DID))
+                relatedItem = await _recoverAccountCommand.ExecuteAsync(relatedItem);
+            
+            return await base.ExecuteInternalAsync(input, relatedItem);
         }
     }
 }

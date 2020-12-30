@@ -1,6 +1,7 @@
 using System;
 using OwnID.Commands;
 using OwnID.Extensibility.Cache;
+using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Contracts.Start;
 using OwnID.Extensibility.Providers;
@@ -32,12 +33,12 @@ namespace OwnID.Flow.TransitionHandlers.Fido2
             if (relatedItem.FlowType != FlowType.Fido2Login && relatedItem.FlowType != FlowType.Fido2Register
                                                             && relatedItem.FlowType != FlowType.Fido2LinkWithPin
                                                             && relatedItem.FlowType != FlowType.Fido2RecoverWithPin)
-                throw new ArgumentException(
+                throw new CommandValidationException(
                     $"Can not set Fido2 information for the flow not related to Fido2. Current flow: {relatedItem.FlowType} Context: '{relatedItem.Context}'");
 
             if (relatedItem.Status != CacheItemStatus.Initiated && relatedItem.Status != CacheItemStatus.Started
                                                                 && relatedItem.Status != CacheItemStatus.Approved)
-                throw new ArgumentException(
+                throw new CommandValidationException(
                     $"Incorrect status={relatedItem.Status.ToString()} for setting public key for context '{relatedItem.Context}'");
         }
 
