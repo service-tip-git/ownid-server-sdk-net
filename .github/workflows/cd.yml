@@ -5,7 +5,7 @@ on:
     branches:
       - master
       - develop
-      - 'release/**'
+      - /^release\/([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])).*$/
 
 jobs:
   deploy:
@@ -27,8 +27,13 @@ jobs:
       with:
         dotnet-version: '5.0.x'
 
+    - name: Generate build number
+      uses: einaregilsson/build-number@v3
+      with:
+        token: ${{secrets.github_token}}
+
     - name: Version update
-      run: echo BUILD_NUMBER=$GITHUB_RUN_ID && bash scripts/set-build-num.sh $GITHUB_RUN_ID
+      run: bash scripts/set-build-num.sh $BUILD_NUMBER
     
     - name: Docker login
       run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD $DOCKER_URL
