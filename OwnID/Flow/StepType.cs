@@ -16,6 +16,8 @@ namespace OwnID.Flow
         CheckUserExistence,
         EnterPasscode,
         ResetPasscode,
+        Fido2Disclaimer,
+        Stopped,
 
         Authorize,
         InstantAuthorize,

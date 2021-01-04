@@ -33,11 +33,11 @@ namespace OwnID.Flow.Setups
 
         protected void AddStartingTransitions(StepType nextStep)
         {
-            AddStartingTransitions((input, item) =>
+            AddStartingTransitions((_, item) =>
                 GetReferenceToExistingStep(nextStep, item.Context, item.ChallengeType));
         }
 
-        protected void AddStartingTransitions(
+        protected virtual void AddStartingTransitions(
             Func<TransitionInput<AcceptStartRequest>, CacheItem, FrontendBehavior> nextStepDecider)
         {
             // 1. Starting
@@ -46,29 +46,6 @@ namespace OwnID.Flow.Setups
 
             // 2. AcceptStart
             AddHandler<AcceptStartTransitionHandler, TransitionInput<AcceptStartRequest>>(nextStepDecider);
-        }
-
-        protected void AddStartingTransitionsWithPin<TAcceptStart>(StepType nextStep)
-            where TAcceptStart : AcceptStartTransitionHandler
-        {
-            // 1. Starting
-            AddHandler<StartFlowWithPinTransition, TransitionInput<StartRequest>>((input, item) =>
-                GetReferenceToExistingStep(
-                    item.Status == CacheItemStatus.Approved ? StepType.AcceptStart : StepType.ApprovePin, input.Context,
-                    item.ChallengeType));
-
-            // 2. PinApprovalStatus
-            AddHandler<PinApprovalStatusTransitionHandler, TransitionInput>((input, item) =>
-                GetReferenceToExistingStep(StepType.AcceptStart, input.Context, item.ChallengeType));
-
-            // 3. AcceptStart
-            AddHandler<TAcceptStart, TransitionInput<AcceptStartRequest>>((input, item) =>
-                GetReferenceToExistingStep(nextStep, item.Context, item.ChallengeType));
-        }
-
-        protected void AddStartingTransitionsWithPin(StepType nextStep)
-        {
-            AddStartingTransitionsWithPin<AcceptStartTransitionHandler>(nextStep);
         }
 
         protected void AddHandler<THandler, TTransitionInput>(

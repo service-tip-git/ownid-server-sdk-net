@@ -80,5 +80,12 @@ namespace OwnID.Extensibility.Providers
         /// <param name="context">Process unique identifier</param>
         /// <returns>Well-formatted url to reset passcode</returns>
         Uri GetResetPasscodeUrl(string context);
+
+        /// <summary>
+        ///     Generates stop flow url
+        /// </summary>
+        /// <param name="context">Process unique identifier</param>
+        /// <returns>Well-formatted url to stop flow</returns>
+        Uri GetStopFlowUrl(string context);
     }
 }

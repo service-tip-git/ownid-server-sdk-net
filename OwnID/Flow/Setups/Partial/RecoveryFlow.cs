@@ -1,4 +1,5 @@
 using System;
+using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Contracts.Jwt;
 using OwnID.Extensibility.Flow.Contracts.Start;
@@ -8,9 +9,10 @@ using OwnID.Flow.TransitionHandlers.Partial;
 
 namespace OwnID.Flow.Setups.Partial
 {
-    public class RecoveryFlow : BaseFlow
+    public class RecoveryFlow : BasePartialFlow
     {
-        public RecoveryFlow(IServiceProvider serviceProvider) : base(serviceProvider, FlowType.Recover)
+        public RecoveryFlow(IServiceProvider serviceProvider, IOwnIdCoreConfiguration coreConfiguration) : base(
+            serviceProvider, FlowType.Recover, coreConfiguration)
         {
             // 1. Starting
             AddHandler<StartFlowTransitionHandler, TransitionInput<StartRequest>>((input, item) =>
@@ -18,7 +20,10 @@ namespace OwnID.Flow.Setups.Partial
 
             // 2. AcceptStart
             AddHandler<RecoverAcceptStartTransitionHandler, TransitionInput<AcceptStartRequest>>((input, item) =>
-                GetReferenceToExistingStep(StepType.Recover, input.Context, item.ChallengeType));
+            {
+                var next = GetReferenceToExistingStep(StepType.Recover, input.Context, item.ChallengeType);
+                return TryAddFido2DisclaimerToBehavior(input, item, next);
+            });
 
             // 3. Recover
             AddHandler<RecoveryTransitionHandler, TransitionInput<JwtContainer>>((_, item) =>

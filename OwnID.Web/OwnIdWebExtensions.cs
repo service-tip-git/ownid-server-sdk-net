@@ -29,6 +29,8 @@ namespace OwnID.Web
                 builder => builder.UseMiddleware<GenerateContextMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/start",
                 builder => builder.UseMiddleware<StartFlowMiddleware>());
+            routeBuilder.MapMiddlewarePost("ownid/{context}/stop",
+                builder => builder.UseMiddleware<StopFlowMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/start/accept",
                 builder => builder.UseMiddleware<AcceptStartFlowMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/users/existence",

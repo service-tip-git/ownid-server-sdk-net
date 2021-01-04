@@ -77,6 +77,11 @@ namespace OwnID.Providers
             return GetBaseActionUrl(context, "passcode");
         }
 
+        public Uri GetStopFlowUrl(string context)
+        {
+            return GetBaseActionUrl(context, "stop");
+        }
+
         public Uri GetWebAppConnectionsUrl()
         {
             return new(_coreConfiguration.OwnIdApplicationUrl, "account");

@@ -1,5 +1,6 @@
 using System;
 using OwnID.Extensibility.Cache;
+using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Contracts;
@@ -11,9 +12,10 @@ using OwnID.Flow.TransitionHandlers.Partial;
 
 namespace OwnID.Flow.Setups.Partial
 {
-    public class PartialAuthorizeFlow : BaseFlow
+    public class PartialAuthorizeFlow : BasePartialFlow
     {
-        public PartialAuthorizeFlow(IServiceProvider serviceProvider) : base(serviceProvider, FlowType.PartialAuthorize)
+        public PartialAuthorizeFlow(IServiceProvider serviceProvider, IOwnIdCoreConfiguration ownIdCoreConfiguration) :
+            base(serviceProvider, FlowType.PartialAuthorize, ownIdCoreConfiguration)
         {
             // 1.Starting 2.AcceptStart
             AddStartingTransitions(GetOnStartAcceptBehavior);
@@ -51,7 +53,7 @@ namespace OwnID.Flow.Setups.Partial
         private FrontendBehavior GetOnRecoveryConnectionPassedBehavior(CacheItem cacheItem)
         {
             var authorize = GetOnInstantAuthorizeBehavior(cacheItem);
-            
+
             if (cacheItem.ChallengeType == ChallengeType.Register && !string.IsNullOrEmpty(cacheItem.EncToken))
             {
                 var checkUserExistence = GetReferenceToExistingStep(StepType.CheckUserExistence, cacheItem.Context,

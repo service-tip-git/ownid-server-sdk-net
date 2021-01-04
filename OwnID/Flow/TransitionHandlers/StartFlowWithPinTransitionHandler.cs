@@ -11,11 +11,11 @@ using OwnID.Flow.Interfaces;
 
 namespace OwnID.Flow.TransitionHandlers
 {
-    public class StartFlowWithPinTransition : StartFlowTransitionHandler
+    public class StartFlowWithPinTransitionHandler : StartFlowTransitionHandler
     {
         private readonly SetPinCommand _setPinCommand;
 
-        public StartFlowWithPinTransition(StartFlowCommand startFlowCommand, StopFlowCommand stopFlowCommand,
+        public StartFlowWithPinTransitionHandler(StartFlowCommand startFlowCommand, StopFlowCommand stopFlowCommand,
             IJwtComposer jwtComposer, IIdentitiesProvider identitiesProvider, IUrlProvider urlProvider,
             SetPinCommand setPinCommand) : base(startFlowCommand, stopFlowCommand, jwtComposer, identitiesProvider,
             urlProvider)

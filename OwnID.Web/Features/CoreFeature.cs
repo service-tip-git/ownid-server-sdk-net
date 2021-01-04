@@ -71,21 +71,22 @@ namespace OwnID.Web.Features
             services.TryAddTransient<CheckUserExistenceBaseTransitionHandler>();
             services.TryAddTransient<PinApprovalStatusTransitionHandler>();
             services.TryAddTransient<StartFlowTransitionHandler>();
-            services.TryAddTransient<StartFlowWithPinTransition>();
+            services.TryAddTransient<StartFlowWithPinTransitionHandler>();
             
             services.TryAddTransient<ConnectionRestoreBaseTransitionHandler>();
             services.TryAddTransient<InstantAuthorizeBaseTransitionHandler>();
             services.TryAddTransient<LinkBaseTransitionHandler>();
             services.TryAddTransient<RecoverAcceptStartTransitionHandler>();
             services.TryAddTransient<RecoveryTransitionHandler>();
-            
+            services.TryAddTransient<StopFlowTransitionHandler>();
+
             services.TryAddSingleton<LinkFlow>();
             services.TryAddSingleton<LinkWithPinFlow>();
             services.TryAddSingleton<PartialAuthorizeFlow>();
             services.TryAddSingleton<RecoveryFlow>();
             services.TryAddSingleton<RecoveryWithPinFlow>();
             services.TryAddSingleton<IFlowRunner, FlowRunner>();
-            
+
             if (_configuration.TFAEnabled)
             {
                 services.TryAddSingleton<Fido2RegisterCommand>();
