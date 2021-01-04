@@ -27,13 +27,8 @@ jobs:
       with:
         dotnet-version: '5.0.x'
 
-    - name: Generate build number
-      uses: einaregilsson/build-number@v3
-      with:
-        token: ${{secrets.github_token}}
-
     - name: Version update
-      run: bash scripts/set-build-num.sh $BUILD_NUMBER
+      run: echo BUILD_NUMBER=$GITHUB_RUN_ID && bash scripts/set-build-num.sh $GITHUB_RUN_ID
     
     - name: Docker login
       run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD $DOCKER_URL
