@@ -1,9 +1,7 @@
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Json;
-using OwnID.Flow.Interfaces;
 
 namespace OwnID.Server.Gigya.Middlewares
 {
@@ -29,7 +27,6 @@ namespace OwnID.Server.Gigya.Middlewares
         private class ConfigToInject
         {
             public bool TFAEnabled { get; set; }
-
             public Fido2FallbackBehavior Fido2FallbackBehavior { get; set; }
         }
     }

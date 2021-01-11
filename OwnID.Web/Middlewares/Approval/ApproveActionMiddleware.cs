@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using OwnID.Commands;
 using OwnID.Commands.Pin;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Json;

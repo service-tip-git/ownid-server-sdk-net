@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using OwnID.Cryptography;
-using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensions;

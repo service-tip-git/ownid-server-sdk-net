@@ -31,7 +31,7 @@ namespace OwnID.Web.Gigya
         {
             if (string.IsNullOrEmpty(publicKey))
                 return await OnSuccessLoginInternalAsync(did);
-            
+
             return await OnSuccessLoginByPublicKeyAsync(publicKey);
         }
 
@@ -64,6 +64,29 @@ namespace OwnID.Web.Gigya
                     $"Gigya.setAccountInfo for EXISTING user error -> {setAccountResponse.GetFailureMessage()}");
 
             return await OnSuccessLoginInternalAsync(user.UID);
+        }
+
+        public async Task UpgradeConnectionAsync(string publicKey, OwnIdConnection newConnection)
+        {
+            var user = await _restApiClient.SearchByPublicKey(publicKey);
+            if (user == null)
+                return;
+
+            // Remove old connection
+            var connectionToRemove = user.Data.Connections.First(x => x.PublicKey == publicKey);
+            user.Data.Connections.Remove(connectionToRemove);
+
+            // Add new one
+            user.Data.Connections.Add(new GigyaOwnIdConnection(newConnection));
+
+            var setAccountResponse = await _restApiClient.SetAccountInfo(user.UID, (TProfile) null, user.Data);
+            if (setAccountResponse.ErrorCode > 0)
+                throw new Exception(
+                    $"did: {user.UID} " +
+                    $"Gigya.setAccountInfo for EXISTING user error -> {setAccountResponse.GetFailureMessage()}");
+
+            // Fix update delay withing Gigya
+            await Task.Delay(500);
         }
 
         public async Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey)
@@ -156,6 +179,13 @@ namespace OwnID.Web.Gigya
             return result?.UID;
         }
 
+        public async Task<UserSettings> GetUserSettingsAsync(string publicKey)
+        {
+            var user = await _restApiClient.SearchByPublicKey(publicKey);
+
+            return user?.Data?.UserSettings;
+        }
+        
         public async Task CreateProfileAsync(IUserProfileFormContext<TProfile> context, string recoveryToken = null,
             string recoveryData = null)
         {

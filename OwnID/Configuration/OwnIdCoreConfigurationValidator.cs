@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.Options;
+using OwnID.Extensibility.Configuration;
 
 namespace OwnID.Configuration
 {
@@ -34,27 +35,21 @@ namespace OwnID.Configuration
             if (options.JwtExpirationTimeout == 0)
                 return ValidateOptionsResult.Fail(
                     $"{nameof(options.JwtExpirationTimeout)} can not be equal to 0");
-            
-            // Validate Fido2Url
-            if (options.TFAEnabled 
-                && !IsUriValid(nameof(options.Fido2.PasswordlessPageUrl), options.Fido2.PasswordlessPageUrl,
-                    options.IsDevEnvironment,
-                    out var fido2ValidationError))
-            {
-                return ValidateOptionsResult.Fail(fido2ValidationError);
-            }
 
-            // Validate Fido2Origin
-            if (options.TFAEnabled 
-                && !IsUriValid(nameof(options.Fido2.Origin), options.Fido2.Origin, options.IsDevEnvironment,
-                    out var fido2OriginValidationError))
+            if (string.IsNullOrWhiteSpace(options.TopDomain))
+                return ValidateOptionsResult.Fail($"{nameof(options.TopDomain)} is required");
+
+            // Validate Fido2 configuration
+            var fido2Validator = new Fido2ConfigurationValidator();
+            var fido2ValidationResult = fido2Validator.Validate(options.Fido2, options.IsDevEnvironment);
+            if (fido2ValidationResult.Failed)
+                return fido2ValidationResult;
+
+            if (!options.Fido2.IsEnabled && options.Fido2FallbackBehavior == Fido2FallbackBehavior.Block)
             {
-                return ValidateOptionsResult.Fail(fido2OriginValidationError);
-            }
-            
-            if(string.IsNullOrWhiteSpace(options.TopDomain))
                 return ValidateOptionsResult.Fail(
-                    $"{nameof(options.TopDomain)} is required");
+                    $"FIDO2 is disabled, but '{nameof(options.Fido2FallbackBehavior)}' is set to '{nameof(Fido2FallbackBehavior.Block)}'");
+            }
 
             return options.ProfileConfiguration.Validate();
         }

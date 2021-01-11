@@ -1,5 +1,6 @@
 using System;
 using OwnID.Extensibility.Flow;
+using OwnID.Extensibility.Flow.Contracts.Start;
 
 namespace OwnID.Extensibility.Providers
 {
@@ -87,5 +88,13 @@ namespace OwnID.Extensibility.Providers
         /// <param name="context">Process unique identifier</param>
         /// <returns>Well-formatted url to stop flow</returns>
         Uri GetStopFlowUrl(string context);
+
+        /// <summary>
+        ///     Get switch auth type url
+        /// </summary>
+        /// <param name="context">Process unique identifier</param>
+        /// <param name="authType">new auth type</param>
+        /// <returns>Well-formatted url to switch auth type</returns>
+        Uri GetSwitchAuthTypeUrl(string context, ConnectionAuthType authType);
     }
 }

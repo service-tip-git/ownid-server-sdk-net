@@ -98,5 +98,15 @@ namespace OwnID.Flow.Adapters
         {
             return _adaptee.GetUserIdByEmail(email);
         }
+
+        public Task<UserSettings> GetUserSettingsAsync(string publicKey)
+        {
+            return _adaptee.GetUserSettingsAsync(publicKey);
+        }
+
+        public Task UpgradeConnectionAsync(string publicKey, OwnIdConnection newConnection)
+        {
+            return _adaptee.UpgradeConnectionAsync(publicKey, newConnection);
+        }
     }
 }

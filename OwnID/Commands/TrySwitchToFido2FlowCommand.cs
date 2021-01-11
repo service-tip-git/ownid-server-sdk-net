@@ -35,7 +35,7 @@ namespace OwnID.Commands
 
         public async Task<FrontendBehavior> ExecuteAsync(CacheItem cacheItem, string routingPayload)
         {
-            if (!_coreConfiguration.TFAEnabled)
+            if (!_coreConfiguration.Fido2.IsEnabled)
                 return null;
 
             // If this is second attempt to call same start endpoint
@@ -113,8 +113,8 @@ namespace OwnID.Commands
             }
 
             // TODO: rework to exclude explicit url creation 
-            return new FrontendBehavior(StepType.Fido2Authorize, ChallengeType.Register,
-                new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, ChallengeType.Register, "/fido2")));
+            return new FrontendBehavior(StepType.Fido2Authorize, cacheItem.ChallengeType,
+                new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType, "/fido2")));
         }
     }
 }

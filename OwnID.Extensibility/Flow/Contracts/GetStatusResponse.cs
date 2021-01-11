@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using OwnID.Extensibility.Cache;
 
 namespace OwnID.Extensibility.Flow.Contracts

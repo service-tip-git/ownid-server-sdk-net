@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using OwnID.Extensibility.Flow;
+using OwnID.Extensibility.Flow.Contracts.Start;
 
 namespace OwnID.Extensibility.Cache
 {
@@ -143,6 +144,18 @@ namespace OwnID.Extensibility.Cache
         public string EncToken { get; set; }
 
         public ChallengeType InitialChallengeType { get; set; }
+        
+        /// <summary>
+        ///     New auth type
+        /// </summary>
+        /// <remarks>Used during connection upgrade process (for example, from basic to fido2)</remarks>
+        public ConnectionAuthType NewAuthType { get; set; }
+        
+        /// <summary>
+        ///     Old public key
+        /// </summary>
+        /// <remarks>Used during connection upgrade process (for example, from basic to fido2)</remarks>
+        public string OldPublicKey { get; set; }
 
         /// <summary>
         ///     Creates new instance of <see cref="CacheItem" /> based on <see cref="Nonce" /> and <see cref="DID" />
@@ -169,7 +182,9 @@ namespace OwnID.Extensibility.Cache
                 Error = Error,
                 RecoveryData = RecoveryData,
                 RecoveryToken = RecoveryToken,
-                EncToken = EncToken
+                EncToken = EncToken,
+                NewAuthType = NewAuthType,
+                OldPublicKey = OldPublicKey
             };
         }
 

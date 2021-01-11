@@ -18,6 +18,9 @@ namespace OwnID.Flow
         ResetPasscode,
         Fido2Disclaimer,
         Stopped,
+        
+        UpgradeToPasscode,
+        UpgradeToFido2,
 
         Authorize,
         InstantAuthorize,

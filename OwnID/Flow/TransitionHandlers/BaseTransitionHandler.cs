@@ -56,7 +56,10 @@ namespace OwnID.Flow.TransitionHandlers
             }
         }
 
-        public StepType StepType { get; }
+        //
+        // TODO: Rewrite to abstract
+        //
+        public virtual StepType StepType { get; }
 
         protected abstract void Validate(TInput input, CacheItem relatedItem);
 

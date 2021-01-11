@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using OwnID.Commands;
@@ -62,25 +63,62 @@ namespace OwnID.Flow.TransitionHandlers
                 IncludeFido2FallbackBehavior = true
             };
 
-            if (_coreConfiguration.TFAEnabled)
+            if (input.Data.AuthType.HasValue)
             {
-                if (input.Data.SupportsFido2)
+                switch (input.Data.AuthType)
+                {
+                    case ConnectionAuthType.Basic:
+                        if (String.IsNullOrEmpty(input.Data.ExtAuthPayload))
+                            composeInfo.Behavior = GetNextBehaviorFunc(input, relatedItem);
+                        else
+                            composeInfo.Behavior = new FrontendBehavior(StepType.UpgradeToFido2, ChallengeType.Login,
+                                new CallAction(UrlProvider.GetSwitchAuthTypeUrl(relatedItem.Context,
+                                    ConnectionAuthType.Fido2)));
+                        break;
+                    case ConnectionAuthType.Passcode:
+                        composeInfo.Behavior = NavigateToEnterPasscode(input, relatedItem);
+                        break;
+                    case ConnectionAuthType.Fido2:
+                        if (string.IsNullOrEmpty(input.Data.ExtAuthPayload))
+                        {
+                            composeInfo.Behavior = await NavigateToPasswordlessPageAsync(input, relatedItem);
+                        }
+                        else
+                        {
+                            var switchResult =
+                                await _trySwitchToFido2FlowCommand.ExecuteAsync(relatedItem, input.Data.ExtAuthPayload);
+
+                            if (switchResult == null
+                                && _coreConfiguration.Fido2FallbackBehavior == Fido2FallbackBehavior.Block)
+                                return CreateErrorResponse(input, ErrorType.RequiresBiometricInput);
+
+                            composeInfo.Behavior = switchResult ?? GetNextBehaviorFunc(input, relatedItem);
+                        }
+
+                        return new JwtContainer(JwtComposer.GenerateBaseStepJwt(composeInfo));
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            else if (_coreConfiguration.TFAEnabled)
+            {
+                if (input.Data.SupportsFido2 && _coreConfiguration.Fido2.IsEnabled)
                 {
                     // check if fido2 page response available
                     if (string.IsNullOrWhiteSpace(input.Data.ExtAuthPayload))
                     {
-                        await _verifyFido2CredentialIdCommand.ExecuteAsync(relatedItem);
-                        var fido2Url = UrlProvider.GetFido2Url(relatedItem.Context, relatedItem.RequestToken,input.CultureInfo?.Name);
-                        composeInfo.Behavior = FrontendBehavior.CreateRedirect(fido2Url);
+                        composeInfo.Behavior = await NavigateToPasswordlessPageAsync(input, relatedItem);
                     }
                     else
                     {
                         var switchResult =
                             await _trySwitchToFido2FlowCommand.ExecuteAsync(relatedItem, input.Data.ExtAuthPayload);
-                        
-                        if(switchResult == null && _coreConfiguration.Fido2FallbackBehavior == Fido2FallbackBehavior.Block)
+
+                        if (switchResult == null
+                            && _coreConfiguration.Fido2FallbackBehavior == Fido2FallbackBehavior.Block)
                             return CreateErrorResponse(input, ErrorType.RequiresBiometricInput);
-                        
+
                         composeInfo.Behavior = switchResult ?? GetNextBehaviorFunc(input, relatedItem);
                     }
 
@@ -99,13 +137,16 @@ namespace OwnID.Flow.TransitionHandlers
                 if (_coreConfiguration.Fido2FallbackBehavior == Fido2FallbackBehavior.Passcode
                     && (relatedItem.EncTokenEnding == CookieValuesConstants.PasscodeEnding
                         || relatedItem.ChallengeType != ChallengeType.Login))
-                    composeInfo.Behavior = new FrontendBehavior(StepType.EnterPasscode, relatedItem.ChallengeType,
-                        GetNextBehaviorFunc(input, relatedItem))
-                    {
-                        AlternativeBehavior = new FrontendBehavior(StepType.ResetPasscode, relatedItem.ChallengeType,
-                            new CallAction(UrlProvider.GetResetPasscodeUrl(relatedItem.Context),
-                                HttpMethod.Delete.ToString()))
-                    };
+                {
+                    composeInfo.Behavior = NavigateToEnterPasscode(input, relatedItem);
+                }
+            }
+
+            if (composeInfo.Behavior == null && (!_coreConfiguration.TFAEnabled
+                                                 || _coreConfiguration.Fido2FallbackBehavior
+                                                 == Fido2FallbackBehavior.Basic))
+            {
+                composeInfo.Behavior = GetNextBehaviorFunc(input, relatedItem);
             }
 
             if (!string.IsNullOrWhiteSpace(relatedItem.EncToken))
@@ -122,12 +163,30 @@ namespace OwnID.Flow.TransitionHandlers
 
             composeInfo.CanBeRecovered = !string.IsNullOrEmpty(relatedItem.RecoveryToken);
 
-            if (!_coreConfiguration.TFAEnabled
-                || _coreConfiguration.Fido2FallbackBehavior == Fido2FallbackBehavior.Basic)
-                composeInfo.Behavior = GetNextBehaviorFunc(input, relatedItem);
 
             return new JwtContainer(JwtComposer.GenerateBaseStepJwt(composeInfo,
                 relatedItem.DID ?? _identitiesProvider.GenerateUserId()));
+        }
+
+        private async Task<FrontendBehavior> NavigateToPasswordlessPageAsync(TransitionInput<AcceptStartRequest> input,
+            CacheItem relatedItem)
+        {
+            await _verifyFido2CredentialIdCommand.ExecuteAsync(relatedItem);
+            var fido2Url = UrlProvider.GetFido2Url(relatedItem.Context, relatedItem.RequestToken,
+                input.CultureInfo?.Name);
+            return FrontendBehavior.CreateRedirect(fido2Url);
+        }
+
+        private FrontendBehavior NavigateToEnterPasscode(TransitionInput<AcceptStartRequest> input,
+            CacheItem relatedItem)
+        {
+            return new(StepType.EnterPasscode, relatedItem.ChallengeType,
+                GetNextBehaviorFunc(input, relatedItem))
+            {
+                AlternativeBehavior = new FrontendBehavior(StepType.ResetPasscode, relatedItem.ChallengeType,
+                    new CallAction(UrlProvider.GetResetPasscodeUrl(relatedItem.Context),
+                        HttpMethod.Delete.ToString()))
+            };
         }
     }
 }

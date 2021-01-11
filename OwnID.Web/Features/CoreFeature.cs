@@ -64,15 +64,15 @@ namespace OwnID.Web.Features
             services.TryAddSingleton<SaveRecoveredAccountConnectionCommand>();
             services.TryAddSingleton<VerifyFido2CredentialIdCommand>();
             services.TryAddSingleton<GetFido2SettingsCommand>();
-            
-            // services.TryAddImplementors<ITransitionHandler>();
-            
+
             services.TryAddTransient<AcceptStartTransitionHandler>();
             services.TryAddTransient<CheckUserExistenceBaseTransitionHandler>();
+            services.TryAddTransient<UpgradeToFido2TransitionHandler>();
+            services.TryAddTransient<UpgradeToPasscodeTransitionHandler>();
             services.TryAddTransient<PinApprovalStatusTransitionHandler>();
             services.TryAddTransient<StartFlowTransitionHandler>();
             services.TryAddTransient<StartFlowWithPinTransitionHandler>();
-            
+
             services.TryAddTransient<ConnectionRestoreBaseTransitionHandler>();
             services.TryAddTransient<InstantAuthorizeBaseTransitionHandler>();
             services.TryAddTransient<LinkBaseTransitionHandler>();
@@ -87,28 +87,27 @@ namespace OwnID.Web.Features
             services.TryAddSingleton<RecoveryWithPinFlow>();
             services.TryAddSingleton<IFlowRunner, FlowRunner>();
 
-            if (_configuration.TFAEnabled)
+            services.TryAddSingleton<Fido2RegisterCommand>();
+            services.TryAddSingleton<Fido2LoginCommand>();
+            services.TryAddSingleton<Fido2LinkCommand>();
+            services.TryAddSingleton<Fido2RecoveryCommand>();
+            services.TryAddSingleton<Fido2UpgradeConnectionCommand>();
+
+            services.TryAddTransient<Fido2LinkTransitionHandler>();
+            services.TryAddTransient<Fido2LoginTransitionHandler>();
+            services.TryAddTransient<Fido2RecoveryTransitionHandler>();
+            services.TryAddTransient<Fido2RegisterTransitionHandler>();
+
+            services.TryAddSingleton<Fido2LinkFlow>();
+            services.TryAddSingleton<Fido2RecoveryFlow>();
+            services.TryAddSingleton<Fido2LoginFlow>();
+            services.TryAddSingleton<Fido2RegisterFlow>();
+
+            services.AddFido2(fido2Config =>
             {
-                services.TryAddSingleton<Fido2RegisterCommand>();
-                services.TryAddSingleton<Fido2LoginCommand>();
-                services.TryAddSingleton<Fido2LinkCommand>();
-                services.TryAddSingleton<Fido2RecoveryCommand>();
-                
-                services.TryAddTransient<Fido2LinkTransitionHandler>();
-                services.TryAddTransient<Fido2LoginTransitionHandler>();
-                services.TryAddTransient<Fido2RecoveryTransitionHandler>();
-                services.TryAddTransient<Fido2RegisterTransitionHandler>();
-
-                services.TryAddSingleton<Fido2LinkFlow>();
-                services.TryAddSingleton<Fido2RecoveryFlow>();
-                services.TryAddSingleton<Fido2LoginFlow>();
-                services.TryAddSingleton<Fido2RegisterFlow>();
-
-                services.AddFido2(fido2Config =>
-                {
+                if (_configuration.Fido2.IsEnabled)
                     fido2Config.Origin = _configuration.Fido2.Origin.ToString().TrimEnd('/').Trim();
-                });
-            }
+            });
         }
 
         public IFeatureConfiguration FillEmptyWithOptional()
@@ -127,23 +126,20 @@ namespace OwnID.Web.Features
             if (_configuration.MaximumNumberOfConnectedDevices == default)
                 _configuration.MaximumNumberOfConnectedDevices = 1;
 
-            if (_configuration.TFAEnabled)
-            {
-                if (string.IsNullOrWhiteSpace(_configuration.Fido2.RelyingPartyId))
-                    _configuration.Fido2.RelyingPartyId = _configuration.Fido2.PasswordlessPageUrl?.Host;
+            if (string.IsNullOrWhiteSpace(_configuration.Fido2.RelyingPartyId))
+                _configuration.Fido2.RelyingPartyId = _configuration.Fido2.PasswordlessPageUrl?.Host;
 
-                if (string.IsNullOrWhiteSpace(_configuration.Fido2.RelyingPartyName))
-                    _configuration.Fido2.RelyingPartyName = _configuration.Name;
+            if (string.IsNullOrWhiteSpace(_configuration.Fido2.RelyingPartyName))
+                _configuration.Fido2.RelyingPartyName = _configuration.Name;
 
-                if (string.IsNullOrWhiteSpace(_configuration.Fido2.UserName))
-                    _configuration.Fido2.UserName = "Skip the password";
+            if (string.IsNullOrWhiteSpace(_configuration.Fido2.UserName))
+                _configuration.Fido2.UserName = "Skip the password";
 
-                if (string.IsNullOrWhiteSpace(_configuration.Fido2.UserDisplayName))
-                    _configuration.Fido2.UserDisplayName = _configuration.Fido2.UserName;
+            if (string.IsNullOrWhiteSpace(_configuration.Fido2.UserDisplayName))
+                _configuration.Fido2.UserDisplayName = _configuration.Fido2.UserName;
 
-                if (_configuration.Fido2.Origin == null)
-                    _configuration.Fido2.Origin = _configuration.Fido2.PasswordlessPageUrl;
-            }
+            if (_configuration.Fido2.Origin == null)
+                _configuration.Fido2.Origin = _configuration.Fido2.PasswordlessPageUrl;
 
             return this;
         }
@@ -156,6 +152,9 @@ namespace OwnID.Web.Features
 
             if (result.Failed)
                 throw new InvalidOperationException(result.FailureMessage);
+
+            if (_configuration.Fido2.PasswordlessPageUrl != null)
+                _configuration.Fido2.IsEnabled = true;
         }
 
         public CoreFeature WithConfiguration(Action<IOwnIdCoreConfiguration> setupAction)

@@ -31,7 +31,7 @@ namespace OwnID.Flow
             AddFlow<RecoveryFlow>();
             AddFlow<RecoveryWithPinFlow>();
 
-            if (coreConfiguration.TFAEnabled)
+            if (coreConfiguration.Fido2.IsEnabled)
             {
                 AddFlow<Fido2RegisterFlow>();
                 AddFlow<Fido2LoginFlow>();

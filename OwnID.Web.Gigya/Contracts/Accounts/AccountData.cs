@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
+using OwnID.Extensibility.Flow.Contracts;
 
 namespace OwnID.Web.Gigya.Contracts.Accounts
 {
@@ -47,5 +48,11 @@ namespace OwnID.Web.Gigya.Contracts.Accounts
         /// </summary>
         [JsonPropertyName("ownIdConnections")]
         public List<GigyaOwnIdConnection> Connections { get; set; } = new List<GigyaOwnIdConnection>(0);
+        
+        /// <summary>
+        ///     Contains user settings if any defined
+        /// </summary>
+        [JsonPropertyName("userSettings")]
+        public UserSettings UserSettings { get; set; }
     }
 }

@@ -5,6 +5,8 @@ namespace OwnID.Configuration
 {
     public class Fido2Configuration : IFido2Configuration
     {
+        public bool IsEnabled { get; set; }
+        
         public Uri Origin { get; set; }
 
         public Uri PasswordlessPageUrl { get; set; }

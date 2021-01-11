@@ -30,6 +30,14 @@ namespace OwnID.Flow.Setups.Partial
 
             // 5. InstantAuthorize
             AddHandler<InstantAuthorizeBaseTransitionHandler, TransitionInput<JwtContainer>>((_, item) =>
+                GetOnSwitchAuthType(item));
+
+            // 6. (optional) upgrade to passcode
+            AddHandler<UpgradeToPasscodeTransitionHandler, TransitionInput<JwtContainer>>((_, item) =>
+                FrontendBehavior.CreateSuccessFinish(item.ChallengeType));
+
+            // 6. (optional) upgrade to fido
+            AddHandler<UpgradeToFido2TransitionHandler, TransitionInput<string>>((_, item) =>
                 FrontendBehavior.CreateSuccessFinish(item.ChallengeType));
         }
 
@@ -67,8 +75,19 @@ namespace OwnID.Flow.Setups.Partial
 
         private FrontendBehavior GetOnInstantAuthorizeBehavior(CacheItem cacheItem)
         {
-            return GetReferenceToExistingStep(StepType.InstantAuthorize, cacheItem.Context,
-                cacheItem.ChallengeType);
+            return GetReferenceToExistingStep(StepType.InstantAuthorize, cacheItem.Context, cacheItem.ChallengeType);
+        }
+
+        private FrontendBehavior GetOnSwitchAuthType(CacheItem item)
+        {
+            var nextStepType = item.NewAuthType switch
+            {
+                ConnectionAuthType.Fido2 => StepType.UpgradeToFido2,
+                ConnectionAuthType.Passcode => StepType.UpgradeToPasscode,
+                _ => throw new ArgumentOutOfRangeException(nameof(item), "Not supported new Auth Type")
+            };
+
+            return GetReferenceToExistingStep(nextStepType, item.Context, item.ChallengeType);
         }
     }
 }

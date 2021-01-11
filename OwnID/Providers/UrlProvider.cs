@@ -2,6 +2,7 @@ using System;
 using System.Web;
 using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Flow;
+using OwnID.Extensibility.Flow.Contracts.Start;
 using OwnID.Extensibility.Providers;
 
 namespace OwnID.Providers
@@ -80,6 +81,11 @@ namespace OwnID.Providers
         public Uri GetStopFlowUrl(string context)
         {
             return GetBaseActionUrl(context, "stop");
+        }
+
+        public Uri GetSwitchAuthTypeUrl(string context, ConnectionAuthType authType)
+        {
+            return GetBaseActionUrl(context, $"upgrade-auth-type/{authType.ToString().ToLower()}");
         }
 
         public Uri GetWebAppConnectionsUrl()

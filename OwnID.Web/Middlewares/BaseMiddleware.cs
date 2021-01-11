@@ -8,14 +8,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using OwnID.Commands;
 using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Flow.Contracts.Jwt;
 using OwnID.Extensibility.Flow.Contracts.Start;
 using OwnID.Extensibility.Json;
 using OwnID.Extensions;
-using OwnID.Flow;
 using OwnID.Web.Attributes;
 
 namespace OwnID.Web.Middlewares
