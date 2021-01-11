@@ -3,15 +3,14 @@ using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Moq;
+using OwnID.Commands.Pin;
 using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow;
+using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Flow.Contracts.Jwt;
 using OwnID.Flow;
-using OwnID.Flow.Commands;
 using OwnID.Flow.Interfaces;
-using OwnID.Flow.Steps;
-using OwnID.Services;
 using OwnID.Tests.TestUtils;
 using Xunit;
 
@@ -27,7 +26,7 @@ namespace OwnID.Tests.Flow.Commands
             var jwtComposer = fixture.Create<Mock<IJwtComposer>>();
             var flowController = fixture.Create<Mock<IFlowController>>();
 
-            var input = fixture.Create<ICommandInput>();
+            var input = fixture.Create<ITransitionInput>();
             var relatedItem = new CacheItem
             {
                 Context = input.Context,
@@ -47,7 +46,7 @@ namespace OwnID.Tests.Flow.Commands
                 new Func<BaseJwtComposeInfo, string, string>((c, d) => expectedString));
 
             var command =
-                new GetSecurityCheckCommand(cacheItemService.Object, jwtComposer.Object, flowController.Object);
+                new SetPinCommand(cacheItemService.Object, jwtComposer.Object, flowController.Object);
 
             var actual = await command.ExecuteAsync(input, relatedItem, currentStepType);
 
@@ -80,7 +79,7 @@ namespace OwnID.Tests.Flow.Commands
             var jwtComposer = fixture.Create<Mock<IJwtComposer>>();
             var flowController = fixture.Create<Mock<IFlowController>>();
 
-            var input = fixture.Create<ICommandInput>();
+            var input = fixture.Create<ITransitionInput>();
             var item = fixture.Create<CacheItem>();
             item.RequestToken = input.RequestToken;
             item.ResponseToken = input.ResponseToken;
@@ -88,7 +87,7 @@ namespace OwnID.Tests.Flow.Commands
             const StepType currentStepType = StepType.Starting;
 
             var command =
-                new GetSecurityCheckCommand(cacheItemService.Object, jwtComposer.Object, flowController.Object);
+                new SetPinCommand(cacheItemService.Object, jwtComposer.Object, flowController.Object);
             await command.Invoking(x => x.ExecuteAsync(input, item, currentStepType)).Should()
                 .ThrowAsync<CommandValidationException>();
 
@@ -105,12 +104,12 @@ namespace OwnID.Tests.Flow.Commands
             var jwtComposer = fixture.Create<Mock<IJwtComposer>>();
             var flowController = fixture.Create<Mock<IFlowController>>();
 
-            var input = fixture.Create<ICommandInput>();
+            var input = fixture.Create<ITransitionInput>();
             var item = fixture.Create<CacheItem>();
             const StepType currentStepType = StepType.Starting;
 
             var command =
-                new GetSecurityCheckCommand(cacheItemService.Object, jwtComposer.Object, flowController.Object);
+                new SetPinCommand(cacheItemService.Object, jwtComposer.Object, flowController.Object);
 
             await command.Invoking(x => command.ExecuteAsync(input, item, currentStepType)).Should()
                 .ThrowAsync<CommandValidationException>();

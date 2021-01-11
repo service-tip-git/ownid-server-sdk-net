@@ -16,36 +16,18 @@ namespace OwnID.Web.Middlewares
 {
     public class MetricsMiddleware
     {
-        private class ContextStatus
-        {
-            public CacheItemStatus Status { get; set; }
-            public string Context { get; set; }
-
-            public StatusPayload Payload { get; set; }
-
-            public class StatusPayload
-            {
-                public string Error { get; set; }
-            }
-        }
-
-        private class ApprovalStatus
-        {
-            public string Status { get; set; }
-        }
-
-        private readonly RequestDelegate _next;
-        private readonly ICacheItemService _cacheItemService;
+        private static readonly Regex ContextRegex = new(@"ownid\/(?<context>[^\/]*)\/.*", RegexOptions.Compiled);
+        private readonly ICacheItemRepository _cacheItemRepository;
         private readonly IEventsMetricsService _eventsMetricsService;
         private readonly ILogger<MetricsMiddleware> _logger;
 
-        private static readonly Regex ContextRegex = new Regex(@"ownid\/(?<context>[^\/]*)\/.*", RegexOptions.Compiled);
+        private readonly RequestDelegate _next;
 
-        public MetricsMiddleware(RequestDelegate next, ICacheItemService cacheItemService,
+        public MetricsMiddleware(RequestDelegate next, ICacheItemRepository cacheItemRepository,
             IEventsMetricsService eventsMetricsService, ILogger<MetricsMiddleware> logger)
         {
             _next = next;
-            _cacheItemService = cacheItemService;
+            _cacheItemRepository = cacheItemRepository;
             _eventsMetricsService = eventsMetricsService;
             _logger = logger;
         }
@@ -97,16 +79,14 @@ namespace OwnID.Web.Middlewares
                 || httpContext.Request.Method != HttpMethod.Post.Method
                 || !httpContext.Request.Path.Value.EndsWith("/start/state")
             )
-            {
                 return;
-            }
 
             // Do not log if this is second call of "start/state" endpoint
             //
             // TODO: consider rewriting in the way to not use the same endpoint for different actions
             //
             httpContext.Request.EnableBuffering();
-            var request = await (new StreamReader(httpContext.Request.Body)).ReadToEndAsync();
+            var request = await new StreamReader(httpContext.Request.Body).ReadToEndAsync();
             if (request.Contains("\"credId\":\""))
             {
                 httpContext.Request.Body.Position = 0;
@@ -119,7 +99,7 @@ namespace OwnID.Web.Middlewares
             if (string.IsNullOrEmpty(context))
                 return;
 
-            var item = await _cacheItemService.GetCacheItemByContextAsync(context);
+            var item = await _cacheItemRepository.GetAsync(context, false);
             if (item == null)
                 return;
 
@@ -131,26 +111,18 @@ namespace OwnID.Web.Middlewares
             if (!httpContext.Request.Path.HasValue
                 || httpContext.Request.Method != HttpMethod.Post.Method
                 ||
-                (
-                    !httpContext.Request.Path.Value.EndsWith("/status")
-                    && !httpContext.Request.Path.Value.EndsWith("/approval-status")
-                )
+                !httpContext.Request.Path.Value.EndsWith("/status")
+                && !httpContext.Request.Path.Value.EndsWith("/approval-status")
             )
-            {
                 return;
-            }
 
             httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
             var response = await new StreamReader(httpContext.Response.Body).ReadToEndAsync();
 
             if (httpContext.Request.Path.Value.EndsWith("/status"))
-            {
                 await ProcessStatusResponseAsync(response);
-            }
             else if (httpContext.Request.Path.Value.EndsWith("/approval-status"))
-            {
                 await ProcessApprovalStatusResponseAsync(response, httpContext);
-            }
         }
 
         private async Task ProcessApprovalStatusResponseAsync(string response, HttpContext httpContext)
@@ -158,13 +130,11 @@ namespace OwnID.Web.Middlewares
             var approvalStatus = OwnIdSerializer.Deserialize<ApprovalStatus>(response);
             if (!string.Equals(approvalStatus.Status, CacheItemStatus.Declined.ToString(),
                 StringComparison.InvariantCultureIgnoreCase))
-            {
                 return;
-            }
 
             var ownIdContext = GetOwnIdContext(httpContext);
 
-            var cacheItem = await _cacheItemService.GetCacheItemByContextAsync(ownIdContext);
+            var cacheItem = await _cacheItemRepository.GetAsync(ownIdContext, false);
             if (cacheItem == null)
                 return;
 
@@ -176,19 +146,33 @@ namespace OwnID.Web.Middlewares
             var statuses = OwnIdSerializer.Deserialize<List<ContextStatus>>(response);
             foreach (var item in statuses.Where(i => i.Status == CacheItemStatus.Finished))
             {
-                var cacheItem = await _cacheItemService.GetCacheItemByContextAsync(item.Context);
+                var cacheItem = await _cacheItemRepository.GetAsync(item.Context, false);
                 if (cacheItem == null)
                     continue;
 
                 if (string.IsNullOrEmpty(item.Payload?.Error))
-                {
                     await _eventsMetricsService.LogFinishAsync(cacheItem.ChallengeType.ToEventType());
-                }
                 else
-                {
                     await _eventsMetricsService.LogErrorAsync(cacheItem.ChallengeType.ToEventType());
-                }
             }
+        }
+
+        private class ContextStatus
+        {
+            public CacheItemStatus Status { get; set; }
+            public string Context { get; set; }
+
+            public StatusPayload Payload { get; set; }
+
+            public class StatusPayload
+            {
+                public string Error { get; set; }
+            }
+        }
+
+        private class ApprovalStatus
+        {
+            public string Status { get; set; }
         }
     }
 }

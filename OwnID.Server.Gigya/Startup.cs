@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
@@ -126,20 +125,18 @@ namespace OwnID.Server.Gigya
                     x.TFAEnabled = ownIdSection.GetValue("tfa_enabled", true);
                     x.Fido2FallbackBehavior =
                         ownIdSection.GetValue("fido2_fallback_behavior", Fido2FallbackBehavior.Passcode);
+                    
+                    // FIDO2 configuration
+                    if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_passwordless_page_url"]))
+                        x.Fido2.PasswordlessPageUrl = new Uri(ownIdSection["fido2_passwordless_page_url"]);
 
-                    if (x.TFAEnabled)
-                    {
-                        if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_passwordless_page_url"]))
-                            x.Fido2.PasswordlessPageUrl = new Uri(ownIdSection["fido2_passwordless_page_url"]);
+                    x.Fido2.RelyingPartyId = ownIdSection["fido2_relying_party_id"];
+                    x.Fido2.RelyingPartyName = ownIdSection["fido2_relying_party_name"];
+                    x.Fido2.UserName = ownIdSection["fido2_user_name"];
+                    x.Fido2.UserDisplayName = ownIdSection["fido2_user_display_name"];
 
-                        x.Fido2.RelyingPartyId = ownIdSection["fido2_relying_party_id"];
-                        x.Fido2.RelyingPartyName = ownIdSection["fido2_relying_party_name"];
-                        x.Fido2.UserName = ownIdSection["fido2_user_name"];
-                        x.Fido2.UserDisplayName = ownIdSection["fido2_user_display_name"];
-
-                        if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
-                            x.Fido2.Origin = new Uri(ownIdSection["fido2_origin"]);
-                    }
+                    if (!string.IsNullOrWhiteSpace(ownIdSection["fido2_origin"]))
+                        x.Fido2.Origin = new Uri(ownIdSection["fido2_origin"]);
 
                     //for development cases
                     x.IsDevEnvironment = serverMode == ServerMode.Local;
@@ -250,7 +247,7 @@ namespace OwnID.Server.Gigya
         private ElasticsearchSinkOptions ConfigureElasticSink(IConfigurationSection configuration, string environment)
         {
             var env = (environment ?? "development").ToLower().Replace(".", "-");
-            
+
             return new ElasticsearchSinkOptions(new Uri(configuration["Uri"]))
             {
                 AutoRegisterTemplate = true,

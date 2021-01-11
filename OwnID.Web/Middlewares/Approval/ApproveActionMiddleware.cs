@@ -1,10 +1,9 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using OwnID.Commands.Pin;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Json;
-using OwnID.Flow.Commands;
-using OwnID.Flow.Commands.Approval;
 using OwnID.Web.Attributes;
 
 namespace OwnID.Web.Middlewares.Approval
@@ -15,8 +14,7 @@ namespace OwnID.Web.Middlewares.Approval
         private readonly ApproveActionCommand _approveActionCommand;
 
         public ApproveActionMiddleware(RequestDelegate next, ApproveActionCommand approveActionCommand,
-            ILogger<ApproveActionMiddleware> logger, StopFlowCommand stopFlowCommand)
-            : base(next, logger, stopFlowCommand)
+            ILogger<ApproveActionMiddleware> logger) : base(next, logger)
         {
             _approveActionCommand = approveActionCommand;
         }

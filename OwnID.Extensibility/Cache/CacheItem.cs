@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using OwnID.Extensibility.Flow;
+using OwnID.Extensibility.Flow.Contracts.Start;
 
 namespace OwnID.Extensibility.Cache
 {
@@ -41,32 +42,15 @@ namespace OwnID.Extensibility.Cache
         public FlowType FlowType { get; set; }
 
         /// <summary>
-        ///     Indicate if current flow is Stateless flow
+        ///     Indicate if current flow is FIDO2 flow
         /// </summary>
-        public bool IsStateless =>
+        public bool IsFido2Flow =>
             FlowType == FlowType.Fido2Login
             || FlowType == FlowType.Fido2Register
             || FlowType == FlowType.Fido2Link
             || FlowType == FlowType.Fido2LinkWithPin
             || FlowType == FlowType.Fido2Recover
             || FlowType == FlowType.Fido2RecoverWithPin;
-
-        /// <summary>
-        ///     Get CacheItem auth type string representation
-        /// </summary>
-        /// <returns>auth type string representation</returns>
-        public string GetAuthType()
-        {
-            if (FlowType == FlowType.Fido2Login
-                || FlowType == FlowType.Fido2Register
-                || FlowType == FlowType.Fido2Link
-                || FlowType == FlowType.Fido2LinkWithPin
-                || FlowType == FlowType.Fido2Recover
-                || FlowType == FlowType.Fido2RecoverWithPin)
-                return "FIDO2";
-
-            return "Basic";
-        }
 
         /// <summary>
         ///     Request Token from Web App
@@ -140,21 +124,9 @@ namespace OwnID.Extensibility.Cache
         public string Error { get; set; }
 
         /// <summary>
-        ///     Passwordless recovery token part
+        ///     Recovery Token
         /// </summary>
-        public string PasswordlessRecoveryToken { get; set; }
-
-        /// <summary>
-        ///     WebApp recovery token part
-        /// </summary>
-        public string WebAppRecoveryToken { get; set; }
-
-        /// <summary>
-        ///     Connection recovery token
-        /// </summary>
-        public string RecoveryToken => !string.IsNullOrEmpty(WebAppRecoveryToken)
-            ? $"{PasswordlessRecoveryToken}:::{WebAppRecoveryToken}"
-            : string.Empty;
+        public string RecoveryToken { get; set; }
 
         /// <summary>
         ///     Connection recovery data
@@ -162,21 +134,30 @@ namespace OwnID.Extensibility.Cache
         public string RecoveryData { get; set; }
 
         /// <summary>
-        ///     Connection recovery token
+        ///     Private key encryption passphrase ending indicator
         /// </summary>
-        public string EncToken => $"{PasswordlessEncToken}:::{WebAppEncToken}";
+        public string EncTokenEnding { get; set; }
 
         /// <summary>
         ///     Private key encryption passphrase
         /// </summary>
-        public string PasswordlessEncToken { get; set; }
-
-        /// <summary>
-        ///     Private key encryption passphrase
-        /// </summary>
-        public string WebAppEncToken { get; set; }
+        public string EncToken { get; set; }
 
         public ChallengeType InitialChallengeType { get; set; }
+        
+        /// <summary>
+        ///     New auth type
+        /// </summary>
+        /// <remarks>Used during connection upgrade process (for example, from basic to fido2)</remarks>
+        public ConnectionAuthType NewAuthType { get; set; }
+        
+        /// <summary>
+        ///     Old public key
+        /// </summary>
+        /// <remarks>Used during connection upgrade process (for example, from basic to fido2)</remarks>
+        public string OldPublicKey { get; set; }
+        
+        public bool IsDesktop { get; set; }
 
         /// <summary>
         ///     Creates new instance of <see cref="CacheItem" /> based on <see cref="Nonce" /> and <see cref="DID" />
@@ -202,11 +183,29 @@ namespace OwnID.Extensibility.Cache
                 Fido2CredentialId = Fido2CredentialId,
                 Error = Error,
                 RecoveryData = RecoveryData,
-                PasswordlessRecoveryToken = PasswordlessRecoveryToken,
-                WebAppRecoveryToken = WebAppRecoveryToken,
-                PasswordlessEncToken = PasswordlessEncToken,
-                WebAppEncToken = WebAppEncToken
+                RecoveryToken = RecoveryToken,
+                EncToken = EncToken,
+                IsDesktop = IsDesktop,
+                NewAuthType = NewAuthType,
+                OldPublicKey = OldPublicKey
             };
+        }
+
+        /// <summary>
+        ///     Get CacheItem auth type string representation
+        /// </summary>
+        /// <returns>auth type string representation</returns>
+        public string GetAuthType()
+        {
+            if (FlowType == FlowType.Fido2Login
+                || FlowType == FlowType.Fido2Register
+                || FlowType == FlowType.Fido2Link
+                || FlowType == FlowType.Fido2LinkWithPin
+                || FlowType == FlowType.Fido2Recover
+                || FlowType == FlowType.Fido2RecoverWithPin)
+                return "FIDO2";
+
+            return "Basic";
         }
     }
 }

@@ -1,9 +1,9 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using OwnID.Commands.MagicLink;
 using OwnID.Configuration;
 using OwnID.Extensibility.Configuration;
-using OwnID.Flow.Commands.MagicLink;
 using OwnID.Web.Attributes;
 using OwnID.Web.Extensibility;
 

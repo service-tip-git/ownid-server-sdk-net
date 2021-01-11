@@ -196,7 +196,7 @@ namespace OwnID.Web.Gigya.ApiClient
             string[] objectsToGet = null)
             where TResult : BaseGigyaResponse
         {
-            objectsToGet ??= new[] {"UID", "data.ownIdConnections"};
+            objectsToGet ??= new[] {"UID", "data.ownIdConnections", "data.userSettings"};
 
             var parameters = ParametersFactory.CreateAuthParameters(_configuration).AddParameter("query",
                 $"SELECT {string.Join(", ", objectsToGet)} FROM accounts WHERE {searchKey} = \"{searchValue}\" LIMIT 1");

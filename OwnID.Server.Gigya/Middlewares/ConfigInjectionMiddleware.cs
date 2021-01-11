@@ -23,11 +23,10 @@ namespace OwnID.Server.Gigya.Middlewares
 
             context.Response.StatusCode = StatusCodes.Status204NoContent;
         }
-        
+
         private class ConfigToInject
         {
             public bool TFAEnabled { get; set; }
-            
             public Fido2FallbackBehavior Fido2FallbackBehavior { get; set; }
         }
     }

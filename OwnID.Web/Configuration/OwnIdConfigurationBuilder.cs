@@ -9,7 +9,6 @@ using OwnID.Configuration;
 using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Flow.Abstractions;
-using OwnID.Extensibility.Services;
 using OwnID.Web.Extensibility;
 using OwnID.Web.Features;
 

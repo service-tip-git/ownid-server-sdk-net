@@ -1,37 +1,61 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using OwnID.Flow.Commands;
-using OwnID.Flow.Interfaces;
-using OwnID.Flow.Steps;
-using OwnID.Services;
-using OwnID.Extensibility.Exceptions;
+using Microsoft.Extensions.DependencyInjection;
+using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Flow;
+using OwnID.Extensibility.Flow.Contracts;
+using OwnID.Flow.Interfaces;
+using OwnID.Flow.Setups;
+using OwnID.Flow.Setups.Fido2;
+using OwnID.Flow.Setups.Partial;
+using OwnID.Services;
 
 namespace OwnID.Flow
 {
     public class FlowRunner : IFlowRunner
     {
-        private readonly ICacheItemService _cacheItemService;
-        private readonly IFlowController _flowController;
+        private readonly ICacheItemRepository _cacheItemRepository;
         private readonly IServiceProvider _serviceProvider;
 
-        public FlowRunner(IFlowController flowController, ICacheItemService cacheItemService,
-            IServiceProvider serviceProvider)
+        public FlowRunner(ICacheItemRepository cacheItemRepository, IServiceProvider serviceProvider, IOwnIdCoreConfiguration coreConfiguration)
         {
-            _flowController = flowController;
-            _cacheItemService = cacheItemService;
+            _cacheItemRepository = cacheItemRepository;
             _serviceProvider = serviceProvider;
+
+            Flows = new Dictionary<FlowType, BaseFlow>();
+            // TODO: check features for flows
+            AddFlow<PartialAuthorizeFlow>();
+            AddFlow<LinkFlow>();
+            AddFlow<LinkWithPinFlow>();
+            AddFlow<RecoveryFlow>();
+            AddFlow<RecoveryWithPinFlow>();
+
+            if (coreConfiguration.Fido2.IsEnabled)
+            {
+                AddFlow<Fido2RegisterFlow>();
+                AddFlow<Fido2LoginFlow>();
+                AddFlow<Fido2LinkFlow>();
+                AddFlow<Fido2RecoveryFlow>();
+                AddFlow<Fido2LinkFlow>(FlowType.Fido2LinkWithPin);
+                AddFlow<Fido2RecoveryFlow>(FlowType.Fido2RecoverWithPin);
+            }
         }
 
-        public async Task<ICommandResult> RunAsync(ICommandInput input, StepType currentStep)
+        private Dictionary<FlowType, BaseFlow> Flows { get; }
+
+        // TODO: change return type
+        public async Task<ITransitionResult> RunAsync(ITransitionInput input, StepType currentStep)
         {
-            var item = await _cacheItemService.GetCacheItemByContextAsync(input.Context);
-            var commandType = _flowController.GetStep(item.FlowType, currentStep).GetRelatedCommandType();
+            var item = await _cacheItemRepository.GetAsync(input.Context);
+            input.IsDesktop = item.IsDesktop;
+            return await Flows[item.FlowType].RunAsync(input, currentStep, item);
+        }
 
-            if (!(_serviceProvider.GetService(commandType) is BaseFlowCommand command))
-                throw new InternalLogicException("Can not inject command");
-
-            return await command.ExecuteAsync(input, item, currentStep, commandType != typeof(StartFlowCommand));
+        private void AddFlow<TFlow>(FlowType? flowType  = null) where TFlow : BaseFlow
+        {
+            var flow = _serviceProvider.GetService<TFlow>();
+            Flows.TryAdd(flowType ?? flow.Type, flow);
         }
     }
 }

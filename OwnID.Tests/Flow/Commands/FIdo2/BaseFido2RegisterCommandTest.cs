@@ -5,15 +5,14 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Fido2NetLib;
 using Moq;
+using OwnID.Commands.Fido2;
 using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Providers;
-using OwnID.Flow.Commands;
-using OwnID.Flow.Commands.Fido2;
+using OwnID.Flow;
 using OwnID.Flow.Interfaces;
-using OwnID.Flow.Steps;
 using OwnID.Services;
 using Xunit;
 
@@ -42,7 +41,7 @@ namespace OwnID.Tests.Flow.Commands.FIdo2
         private readonly CultureInfo _culture;
         private readonly DateTime _date;
 
-        private readonly BaseFido2RegisterCommand _sut;
+        private readonly Fido2RegisterCommand _sut;
 
 
         public BaseFido2RegisterCommandTest()
@@ -75,7 +74,7 @@ namespace OwnID.Tests.Flow.Commands.FIdo2
             _culture = _fixture.Freeze<CultureInfo>();
             _date = _fixture.Freeze<DateTime>();
 
-            _sut = new BaseFido2RegisterCommand(_fido2.Object, _cacheItemService.Object, _jwtComposer.Object,
+            _sut = new Fido2RegisterCommand(_fido2.Object, _cacheItemService.Object, _jwtComposer.Object,
                 _flowController.Object, _ownIdCoreConfiguration.Object, _identitiesProvider.Object,
                 _encodingService.Object);
         }
@@ -84,7 +83,7 @@ namespace OwnID.Tests.Flow.Commands.FIdo2
         [Fact]
         public async Task FailWithWrongInputType()
         {
-            var input = _fixture.Freeze<CommandInput<object>>();
+            var input = _fixture.Freeze<TransitionInput<object>>();
 
             await Assert.ThrowsAsync<InternalLogicException>(async () =>
             {
@@ -92,9 +91,9 @@ namespace OwnID.Tests.Flow.Commands.FIdo2
             });
         }
 
-        private CommandInput<string> GetInput(string data)
+        private TransitionInput<string> GetInput(string data)
         {
-            return new CommandInput<string>(_requestIdentity, _culture, data, _date);
+            return new TransitionInput<string>(_requestIdentity, _culture, data, _date);
         }
 
 

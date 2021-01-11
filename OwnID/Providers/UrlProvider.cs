@@ -2,6 +2,7 @@ using System;
 using System.Web;
 using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Flow;
+using OwnID.Extensibility.Flow.Contracts.Start;
 using OwnID.Extensibility.Providers;
 
 namespace OwnID.Providers
@@ -19,12 +20,12 @@ namespace OwnID.Providers
             _coreConfiguration = coreConfiguration;
         }
 
-        public Uri GetStartFlowUrl(string context)
+        public Uri GetAcceptStartFlowUrl(string context)
         {
-            return GetBaseActionUrl(context, "start");
+            return GetBaseActionUrl(context, "start/accept");
         }
 
-        //prefix param is workaround for partial flow
+        // prefix param is workaround for partial flow
         public Uri GetChallengeUrl(string context, ChallengeType challengeType, string prefix = null)
         {
             var action = challengeType switch
@@ -42,39 +43,22 @@ namespace OwnID.Providers
             return GetBaseActionUrl(context, "approval-status");
         }
 
-        public Uri GetWebAppSignWithCallbackUrl(Uri subUrl, string language)
+        public Uri GetWebAppSignWithCallbackUrl(Uri subUrl, string language, string requestToken = null,
+            string responseToken = null)
         {
             var deepLink = new UriBuilder(new Uri(_coreConfiguration.OwnIdApplicationUrl, "sign"));
             var query = HttpUtility.ParseQueryString(deepLink.Query);
             query[QueryStringParameters.CallBackUrl] = $"{subUrl.Authority}{subUrl.PathAndQuery}";
-            if (!string.IsNullOrWhiteSpace(language))
-                query[QueryStringParameters.Language] = language;
-            deepLink.Query = query.ToString() ?? string.Empty;
-            return deepLink.Uri;
-        }
 
-        public Uri GetFido2Url(Uri subUrl, ChallengeType requestType, string language)
-        {
-            var deepLink = new UriBuilder(_coreConfiguration.Fido2.PasswordlessPageUrl);
-            var query = HttpUtility.ParseQueryString(deepLink.Query);
-            switch (requestType)
+            if (!string.IsNullOrEmpty(requestToken) && !string.IsNullOrEmpty(responseToken))
             {
-                case ChallengeType.Link:
-                case ChallengeType.Recover:
-                case ChallengeType.Register:
-                    query[QueryStringParameters.RequestType] = "r";
-                    break;
-                case ChallengeType.Login:
-                    query[QueryStringParameters.RequestType] = "l";
-                    break;
+                query[QueryStringParameters.RequestToken] = requestToken;
+                query[QueryStringParameters.ResponseToken] = responseToken;
             }
 
-            query[QueryStringParameters.CallBackUrl] = $"{subUrl.Authority}{subUrl.PathAndQuery}";
-            query[QueryStringParameters.StateSuffix] = "state";
-            
             if (!string.IsNullOrWhiteSpace(language))
                 query[QueryStringParameters.Language] = language;
-            
+
             deepLink.Query = query.ToString() ?? string.Empty;
             return deepLink.Uri;
         }
@@ -94,9 +78,43 @@ namespace OwnID.Providers
             return GetBaseActionUrl(context, "passcode");
         }
 
+        public Uri GetStopFlowUrl(string context)
+        {
+            return GetBaseActionUrl(context, "stop");
+        }
+
+        public Uri GetSwitchAuthTypeUrl(string context, ConnectionAuthType authType)
+        {
+            return GetBaseActionUrl(context, $"upgrade-auth-type/{authType.ToString().ToLower()}");
+        }
+
         public Uri GetWebAppConnectionsUrl()
         {
-            return new Uri(_coreConfiguration.OwnIdApplicationUrl, "account");
+            return new(_coreConfiguration.OwnIdApplicationUrl, "account");
+        }
+
+        public Uri GetFido2Url(string context, string requestToken, string language)
+        {
+            var fido2Url = new UriBuilder(_coreConfiguration.Fido2.PasswordlessPageUrl);
+            var query = HttpUtility.ParseQueryString(fido2Url.Query);
+
+            // settings url
+            var settingsUrl = new UriBuilder(GetBaseActionUrl(context, "fido2/settings"));
+            var settingsQuery = HttpUtility.ParseQueryString(fido2Url.Query);
+            settingsQuery[QueryStringParameters.RequestToken] = requestToken;
+            settingsUrl.Query = settingsQuery.ToString() ?? string.Empty;
+            query[QueryStringParameters.CallBackUrl] = settingsUrl.Uri.ToString();
+
+            if (!string.IsNullOrWhiteSpace(language))
+                query[QueryStringParameters.Language] = language;
+
+            fido2Url.Query = query.ToString() ?? string.Empty;
+            return fido2Url.Uri;
+        }
+
+        public Uri GetStartFlowUrl(string context)
+        {
+            return GetBaseActionUrl(context, "start");
         }
 
         private Uri GetBaseActionUrl(string context, string action)
@@ -115,8 +133,8 @@ namespace OwnID.Providers
         {
             public const string CallBackUrl = "q";
             public const string Language = "l";
-            public const string RequestType = "t";
-            public const string StateSuffix = "s";
+            public const string RequestToken = "rt";
+            public const string ResponseToken = "rst";
         }
     }
 }

@@ -6,13 +6,23 @@ namespace OwnID.Extensibility.Exceptions
     public enum ErrorType
     {
         /// <summary>
-        ///     User not found
+        ///     User already exits
         /// </summary>
         UserAlreadyExists,
         
         /// <summary>
+        ///     User not found
+        /// </summary>
+        UserNotFound,
+        
+        /// <summary>
         ///     Recover token expired
         /// </summary>
-        RecoveryTokenExpired
+        RecoveryTokenExpired,
+        
+        /// <summary>
+        ///     Requires FIDO2
+        /// </summary>
+        RequiresBiometricInput,
     }
 }

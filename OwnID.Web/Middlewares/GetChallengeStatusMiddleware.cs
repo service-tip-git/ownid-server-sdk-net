@@ -3,9 +3,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using OwnID.Commands;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Json;
-using OwnID.Flow.Commands;
 
 namespace OwnID.Web.Middlewares
 {
@@ -14,8 +14,7 @@ namespace OwnID.Web.Middlewares
         private readonly GetStatusCommand _getStatusCommand;
 
         public GetChallengeStatusMiddleware(RequestDelegate next, GetStatusCommand getStatusCommand,
-            ILogger<GetChallengeStatusMiddleware> logger, StopFlowCommand stopFlowCommand) : base(next, logger,
-            stopFlowCommand)
+            ILogger<GetChallengeStatusMiddleware> logger) : base(next, logger)
         {
             _getStatusCommand = getStatusCommand;
         }

@@ -8,6 +8,8 @@ namespace OwnID.Extensibility.Flow.Contracts
         
         public string Value { get; set; }
         
+        public bool Remove { get; set; }
+        
         public CookieOptions Options { get; set; }
     }
 }

@@ -8,6 +8,7 @@ namespace OwnID.Extensibility.Flow
         Register,
         Login,
         Link,
-        Recover
+        Recover,
+        LinkOnLogin
     }
 }

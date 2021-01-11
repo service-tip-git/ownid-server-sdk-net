@@ -2,14 +2,13 @@ using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Moq;
+using OwnID.Commands;
 using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Abstractions;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Flow.Contracts.Link;
 using OwnID.Extensibility.Providers;
-using OwnID.Flow.Commands;
-using OwnID.Services;
 using OwnID.Tests.TestUtils;
 using Xunit;
 

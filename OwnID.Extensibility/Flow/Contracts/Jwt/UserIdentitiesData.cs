@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using OwnID.Extensibility.Flow.Contracts.Start;
 
 namespace OwnID.Extensibility.Flow.Contracts.Jwt
 {
@@ -27,5 +28,17 @@ namespace OwnID.Extensibility.Flow.Contracts.Jwt
         /// </remarks>
         [JsonPropertyName("pubKey")]
         public string PublicKey { get; set; }
+        
+        /// <summary>
+        ///     Existing connection auth type
+        /// </summary>
+        [JsonPropertyName("authType")]
+        public ConnectionAuthType? AuthType { get; set; }
+        
+        /// <summary>
+        ///     Indicate if user's client supports FIDO2
+        /// </summary>
+        [JsonPropertyName("supportsFido2")]
+        public bool SupportsFido2 { get; set; }
     }
 }

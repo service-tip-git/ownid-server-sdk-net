@@ -120,5 +120,24 @@ namespace OwnID.Extensibility.Flow.Abstractions
         /// <param name="email">Email to search</param>
         /// <returns>User ID if there is a user with such email or null if not</returns>
         Task<string> GetUserIdByEmail(string email);
+
+        /// <summary>
+        ///     Get user settings
+        /// </summary>
+        /// <param name="publicKey">user public key</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation.
+        ///     The task result contains user settings if user with provided public key exists,
+        ///     otherwise null
+        /// </returns>
+        Task<UserSettings> GetUserSettingsAsync(string publicKey);
+
+        /// <summary>
+        ///     Upgrade connection
+        /// </summary>
+        /// <param name="did"></param>
+        /// <param name="newConnection"></param>
+        /// <returns></returns>
+        Task UpgradeConnectionAsync(string did, OwnIdConnection newConnection);
     }
 }

@@ -1,11 +1,9 @@
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using OwnID.Extensibility.Exceptions;
+using OwnID.Commands;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Json;
-using OwnID.Flow.Commands;
 
 namespace OwnID.Web.Middlewares
 {
@@ -14,8 +12,7 @@ namespace OwnID.Web.Middlewares
         private readonly AddConnectionCommand _addConnectionCommand;
 
         public AddConnectionMiddleware(RequestDelegate next, ILogger<AddConnectionMiddleware> logger,
-            StopFlowCommand stopFlowCommand, AddConnectionCommand addConnectionCommand) : base(next, logger,
-            stopFlowCommand)
+            AddConnectionCommand addConnectionCommand) : base(next, logger)
         {
             _addConnectionCommand = addConnectionCommand;
         }
@@ -36,7 +33,7 @@ namespace OwnID.Web.Middlewares
 
             await _addConnectionCommand.ExecuteAsync(request);
             OkNoContent(httpContext.Response);
-            
+
             // TODO: add proper error handling for gigya handling -> client app
             // catch (CommandValidationException e)
             // {

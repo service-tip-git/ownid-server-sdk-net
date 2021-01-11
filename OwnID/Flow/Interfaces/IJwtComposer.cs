@@ -33,7 +33,7 @@ namespace OwnID.Flow.Interfaces
         /// <param name="info">Base composition info</param>
         /// <param name="did">User unique identifier</param>
         /// <returns>Base64 encoded string that contains JWT</returns>
-        string GenerateBaseStepJwt(BaseJwtComposeInfo info, string did);
+        string GenerateBaseStepJwt(BaseJwtComposeInfo info, string did = null);
 
         /// <summary>
         ///     Generates JWT for performing recovery process

@@ -1,10 +1,9 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
+using OwnID.Commands.Pin;
 using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow.Contracts;
-using OwnID.Flow.Commands.Approval;
-using OwnID.Services;
 using OwnID.Tests.TestUtils;
 using Xunit;
 

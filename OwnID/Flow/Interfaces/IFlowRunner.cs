@@ -1,12 +1,10 @@
 using System.Threading.Tasks;
-using OwnID.Flow.Commands;
-using OwnID.Flow.Steps;
-using OwnID.Extensibility.Flow;
+using OwnID.Extensibility.Flow.Contracts;
 
 namespace OwnID.Flow.Interfaces
 {
     public interface IFlowRunner
     {
-        Task<ICommandResult> RunAsync(ICommandInput input, StepType currentStep);
+        Task<ITransitionResult> RunAsync(ITransitionInput input, StepType currentStep);
     }
 }
