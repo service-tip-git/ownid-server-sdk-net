@@ -48,12 +48,9 @@ namespace OwnID.Flow.TransitionHandlers.Partial
         {
             relatedItem = await _saveRecoveredAccountConnectionCommand.ExecuteAsync(input.Data, relatedItem);
 
-            var composeInfo = new BaseJwtComposeInfo
+            var composeInfo = new BaseJwtComposeInfo(input)
             {
-                Context = relatedItem.Context,
-                ClientTime = input.ClientDate,
                 Behavior = GetNextBehaviorFunc(input, relatedItem),
-                Locale = input.CultureInfo?.Name
             };
 
             var jwt = JwtComposer.GenerateFinalStepJwt(composeInfo);

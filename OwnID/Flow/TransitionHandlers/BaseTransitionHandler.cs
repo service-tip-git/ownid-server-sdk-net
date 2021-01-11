@@ -74,11 +74,8 @@ namespace OwnID.Flow.TransitionHandlers
 
         protected ITransitionResult CreateErrorResponse(ITransitionInput input, ErrorType errorType)
         {
-            var composeInfo = new BaseJwtComposeInfo
+            var composeInfo = new BaseJwtComposeInfo(input)
             {
-                Context = input.Context,
-                ClientTime = input.ClientDate,
-                Locale = input.CultureInfo?.Name,
                 Behavior = FrontendBehavior.CreateError(errorType)
             };
 

@@ -43,11 +43,8 @@ namespace OwnID.Flow.TransitionHandlers
             if (result)
                 throw new OwnIdException(ErrorType.UserAlreadyExists);
 
-            var composeInfo = new BaseJwtComposeInfo
+            var composeInfo = new BaseJwtComposeInfo(input)
             {
-                Context = relatedItem.Context,
-                ClientTime = input.ClientDate,
-                Locale = input.CultureInfo?.Name,
                 Behavior = GetNextBehaviorFunc(input, relatedItem)
             };
 

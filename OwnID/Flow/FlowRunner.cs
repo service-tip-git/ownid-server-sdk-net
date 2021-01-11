@@ -48,6 +48,7 @@ namespace OwnID.Flow
         public async Task<ITransitionResult> RunAsync(ITransitionInput input, StepType currentStep)
         {
             var item = await _cacheItemRepository.GetAsync(input.Context);
+            input.IsDesktop = item.IsDesktop;
             return await Flows[item.FlowType].RunAsync(input, currentStep, item);
         }
 

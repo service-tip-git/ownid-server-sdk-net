@@ -46,12 +46,9 @@ namespace OwnID.Flow.TransitionHandlers.Partial
 
             await _savePartialConnectionCommand.ExecuteAsync(userData, relatedItem);
 
-            var composeInfo = new BaseJwtComposeInfo
+            var composeInfo = new BaseJwtComposeInfo(input)
             {
-                Context = relatedItem.Context,
-                ClientTime = input.ClientDate,
                 Behavior = GetNextBehaviorFunc(input, relatedItem),
-                Locale = input.CultureInfo?.Name
             };
             var jwt = JwtComposer.GenerateFinalStepJwt(composeInfo);
             return new StateResult(jwt, _cookieService.CreateAuthCookies(relatedItem));

@@ -50,11 +50,8 @@ namespace OwnID.Flow.TransitionHandlers
         protected override async Task<ITransitionResult> ExecuteInternalAsync(TransitionInput<AcceptStartRequest> input,
             CacheItem relatedItem)
         {
-            var composeInfo = new BaseJwtComposeInfo
+            var composeInfo = new BaseJwtComposeInfo(input)
             {
-                Context = input.Context,
-                ClientTime = input.ClientDate,
-                Locale = input.CultureInfo?.Name,
                 IncludeFido2FallbackBehavior = true
             };
 

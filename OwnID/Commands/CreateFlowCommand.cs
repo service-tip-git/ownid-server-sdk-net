@@ -72,7 +72,8 @@ namespace OwnID.Commands
                 Context = challengeContext,
                 DID = did,
                 Payload = payload,
-                FlowType = flowType
+                FlowType = flowType,
+                IsDesktop = request.IsQr 
             });
             
             var startFlowUrl = _urlProvider.GetStartFlowUrl(challengeContext);

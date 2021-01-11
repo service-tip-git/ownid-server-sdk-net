@@ -86,11 +86,8 @@ namespace OwnID.Flow.TransitionHandlers.Partial
                     ? ConnectionAuthType.Fido2
                     : ConnectionAuthType.Passcode;
 
-            var composeInfo = new BaseJwtComposeInfo
+            var composeInfo = new BaseJwtComposeInfo(input)
             {
-                Context = relatedItem.Context,
-                ClientTime = input.ClientDate,
-                Locale = input.CultureInfo?.Name,
                 EncToken = relatedItem.EncToken,
             };
 
@@ -127,12 +124,9 @@ namespace OwnID.Flow.TransitionHandlers.Partial
         {
             await _savePartialConnectionCommand.ExecuteAsync(userData, relatedItem);
 
-            var composeInfo = new BaseJwtComposeInfo
+            var composeInfo = new BaseJwtComposeInfo(input)
             {
-                Context = relatedItem.Context,
-                ClientTime = input.ClientDate,
                 Behavior = FrontendBehavior.CreateSuccessFinish(relatedItem.ChallengeType),
-                Locale = input.CultureInfo?.Name
             };
 
             var jwt = JwtComposer.GenerateFinalStepJwt(composeInfo);

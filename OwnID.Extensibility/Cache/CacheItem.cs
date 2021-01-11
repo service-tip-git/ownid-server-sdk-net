@@ -156,6 +156,8 @@ namespace OwnID.Extensibility.Cache
         /// </summary>
         /// <remarks>Used during connection upgrade process (for example, from basic to fido2)</remarks>
         public string OldPublicKey { get; set; }
+        
+        public bool IsDesktop { get; set; }
 
         /// <summary>
         ///     Creates new instance of <see cref="CacheItem" /> based on <see cref="Nonce" /> and <see cref="DID" />
@@ -183,6 +185,7 @@ namespace OwnID.Extensibility.Cache
                 RecoveryData = RecoveryData,
                 RecoveryToken = RecoveryToken,
                 EncToken = EncToken,
+                IsDesktop = IsDesktop,
                 NewAuthType = NewAuthType,
                 OldPublicKey = OldPublicKey
             };

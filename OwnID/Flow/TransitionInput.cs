@@ -16,6 +16,8 @@ namespace OwnID.Flow
         public CultureInfo CultureInfo { get; set; }
 
         public DateTime ClientDate { get; set; }
+        
+        public bool IsDesktop { get; set; }
     }
 
     [DebuggerDisplay("{" + nameof(Context) + "}")]
@@ -39,6 +41,7 @@ namespace OwnID.Flow
         public CultureInfo CultureInfo { get; set; }
 
         public DateTime ClientDate { get; set; }
+        public bool IsDesktop { get; set; }
     }
 
     [DebuggerDisplay("{" + nameof(Context) + "}: {" + nameof(Data) + "}")]

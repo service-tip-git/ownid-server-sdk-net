@@ -32,12 +32,10 @@ namespace OwnID.Flow.Setups.Partial
                 GetOnSwitchAuthType(item));
 
             // 6. (optional) upgrade to passcode
-            AddHandler<UpgradeToPasscodeTransitionHandler, TransitionInput<JwtContainer>>((_, item) =>
-                FrontendBehavior.CreateSuccessFinish(item.ChallengeType));
+            AddHandler<UpgradeToPasscodeTransitionHandler, TransitionInput<JwtContainer>>(OnSuccess);
 
             // 6. (optional) upgrade to fido
-            AddHandler<UpgradeToFido2TransitionHandler, TransitionInput<string>>((_, item) =>
-                FrontendBehavior.CreateSuccessFinish(item.ChallengeType));
+            AddHandler<UpgradeToFido2TransitionHandler, TransitionInput<string>>(OnSuccess);
         }
 
         private FrontendBehavior GetOnStartAcceptBehavior(TransitionInput<AcceptStartRequest> input,
@@ -81,6 +79,15 @@ namespace OwnID.Flow.Setups.Partial
             };
 
             return GetReferenceToExistingStep(nextStepType, item.Context, item.ChallengeType);
+        }
+        
+        private FrontendBehavior OnSuccess<T>(TransitionInput<T> _, CacheItem item)
+        {
+            var challengeType = item.ChallengeType;
+            if (item.ChallengeType == ChallengeType.Register && item.InitialChallengeType == ChallengeType.Login)
+                challengeType = ChallengeType.LinkOnLogin;
+
+            return FrontendBehavior.CreateSuccessFinish(challengeType);
         }
     }
 }

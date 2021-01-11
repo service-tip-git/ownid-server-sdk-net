@@ -34,12 +34,9 @@ namespace OwnID.Flow.TransitionHandlers
         {
             // TODO: add text localization
             await _stopFlowCommand.ExecuteAsync(input.Context, "User stopped auth process");
-            var composeInfo = new BaseJwtComposeInfo
+            var composeInfo = new BaseJwtComposeInfo(input)
             {
-                Context = relatedItem.Context,
-                ClientTime = input.ClientDate,
                 Behavior = GetNextBehaviorFunc(input, relatedItem),
-                Locale = input.CultureInfo?.Name
             };
 
             return new JwtContainer(JwtComposer.GenerateFinalStepJwt(composeInfo));

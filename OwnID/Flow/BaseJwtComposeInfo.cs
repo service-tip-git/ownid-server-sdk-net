@@ -5,6 +5,14 @@ namespace OwnID.Flow
 {
     public class BaseJwtComposeInfo
     {
+        public BaseJwtComposeInfo(ITransitionInput input)
+        {
+            Context = input.Context;
+            ClientTime = input.ClientDate;
+            Locale = input.CultureInfo?.Name;
+            IsDesktop = input.IsDesktop;
+        }
+        
         /// <summary>
         ///     User data encryption token
         /// </summary>
@@ -44,5 +52,10 @@ namespace OwnID.Flow
         ///     Include FIDO2 fallback behavior configuration
         /// </summary>
         public bool IncludeFido2FallbackBehavior { get; set; }
+        
+        /// <summary>
+        ///     Is desktop
+        /// </summary>
+        public bool IsDesktop { get; set; }
     }
 }

@@ -44,12 +44,9 @@ namespace OwnID.Flow.TransitionHandlers.Fido2
 
         protected StateResult GenerateResult(TransitionInput<string> input, CacheItem relatedItem)
         {
-            var composeInfo = new BaseJwtComposeInfo
+            var composeInfo = new BaseJwtComposeInfo(input)
             {
-                Context = relatedItem.Context,
-                ClientTime = input.ClientDate,
                 Behavior = GetNextBehaviorFunc(input, relatedItem),
-                Locale = input.CultureInfo?.Name
             };
 
             var jwt = JwtComposer.GenerateBaseStepJwt(composeInfo, relatedItem.DID);

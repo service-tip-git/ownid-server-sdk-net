@@ -46,12 +46,9 @@ namespace OwnID.Flow.TransitionHandlers
             CacheItem relatedItem)
         {
             var wasContinued = CheckIfContinued(input, relatedItem);
-            var composeInfo = new BaseJwtComposeInfo
+            var composeInfo = new BaseJwtComposeInfo(input)
             {
-                Context = relatedItem.Context,
-                ClientTime = input.ClientDate,
                 Behavior = GetNextBehaviorFunc(input, relatedItem),
-                Locale = input.CultureInfo?.Name,
                 IncludeRequester = true
             };
 
