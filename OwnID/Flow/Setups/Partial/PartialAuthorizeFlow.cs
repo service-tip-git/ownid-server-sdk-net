@@ -1,7 +1,6 @@
 using System;
 using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Configuration;
-using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Flow.Contracts.Jwt;
@@ -45,15 +44,9 @@ namespace OwnID.Flow.Setups.Partial
             CacheItem cacheItem)
         {
             // Recover connection if there is no such but recovery token is available
-            if (!input.Data.AuthType.HasValue)
-            {
-                if (!string.IsNullOrEmpty(cacheItem.RecoveryToken))
-                    return GetReferenceToExistingStep(StepType.InternalConnectionRecovery, cacheItem.Context,
-                        cacheItem.ChallengeType);
-
-                if (cacheItem.ChallengeType == ChallengeType.Login)
-                    throw new OwnIdException(ErrorType.UserNotFound);
-            }
+            if (!input.Data.AuthType.HasValue && !string.IsNullOrEmpty(cacheItem.RecoveryToken))
+                return GetReferenceToExistingStep(StepType.InternalConnectionRecovery, cacheItem.Context,
+                    cacheItem.ChallengeType);
 
             return GetOnRecoveryConnectionPassedBehavior(cacheItem);
         }
