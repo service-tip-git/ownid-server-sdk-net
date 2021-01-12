@@ -23,6 +23,6 @@ spec:
             - name: OWNID__TOP_DOMAIN
               value: demo3.staging.ownid.com
             - name: OWNID__MAGIC_LINK__ENABLED
-              value: 'true'
+              value: 'false'
             - name: OWNID__MAGIC_LINK__REDIRECT_URL
               value: https://demo3.staging.ownid.com/login
