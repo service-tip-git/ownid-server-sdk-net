@@ -140,7 +140,7 @@ namespace OwnID.Web.Features
 
             if (_configuration.Fido2.Origin == null)
                 _configuration.Fido2.Origin = _configuration.Fido2.PasswordlessPageUrl;
-
+            
             return this;
         }
 
@@ -152,9 +152,6 @@ namespace OwnID.Web.Features
 
             if (result.Failed)
                 throw new InvalidOperationException(result.FailureMessage);
-
-            if (_configuration.Fido2.PasswordlessPageUrl != null)
-                _configuration.Fido2.IsEnabled = true;
         }
 
         public CoreFeature WithConfiguration(Action<IOwnIdCoreConfiguration> setupAction)
