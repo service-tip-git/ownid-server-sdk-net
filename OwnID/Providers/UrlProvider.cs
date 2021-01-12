@@ -85,7 +85,7 @@ namespace OwnID.Providers
 
         public Uri GetSwitchAuthTypeUrl(string context, ConnectionAuthType authType)
         {
-            return GetBaseActionUrl(context, $"upgrade-auth-type/{authType.ToString().ToLower()}");
+            return GetBaseActionUrl(context, $"auth-type/{authType.ToString().ToLower()}");
         }
 
         public Uri GetWebAppConnectionsUrl()
