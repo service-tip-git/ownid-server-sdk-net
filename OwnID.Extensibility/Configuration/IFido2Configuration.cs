@@ -7,8 +7,8 @@ namespace OwnID.Extensibility.Configuration
         /// <summary>
         ///     Indicate if FIDO2 can be enabled for current server or particular user
         /// </summary>
-        public bool IsEnabled { get; set; }
-        
+        public bool IsEnabled { get; }
+
         /// <summary>
         ///     Fido2 origin
         /// </summary>
