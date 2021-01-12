@@ -15,8 +15,7 @@ namespace OwnID.Flow.TransitionHandlers.Fido2
         private readonly ICookieService _cookieService;
 
         protected Fido2BaseTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
-            IUrlProvider urlProvider, ICookieService cookieService) : base(StepType.Fido2Authorize, jwtComposer,
-            stopFlowCommand, urlProvider)
+            IUrlProvider urlProvider, ICookieService cookieService) : base(jwtComposer, stopFlowCommand, urlProvider)
         {
             _cookieService = cookieService;
         }

@@ -13,12 +13,17 @@ namespace OwnID.Flow.TransitionHandlers.Fido2
     {
         private readonly Fido2LinkCommand _fido2LinkCommand;
 
-        public Fido2LinkTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand, IUrlProvider urlProvider, ICookieService cookieService, Fido2LinkCommand fido2LinkCommand) : base(jwtComposer, stopFlowCommand, urlProvider, cookieService)
+        public override StepType StepType => StepType.Fido2Authorize;
+
+        public Fido2LinkTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
+            IUrlProvider urlProvider, ICookieService cookieService, Fido2LinkCommand fido2LinkCommand) : base(
+            jwtComposer, stopFlowCommand, urlProvider, cookieService)
         {
             _fido2LinkCommand = fido2LinkCommand;
         }
 
-        protected override async Task<ITransitionResult> ExecuteInternalAsync(TransitionInput<string> input, CacheItem relatedItem)
+        protected override async Task<ITransitionResult> ExecuteInternalAsync(TransitionInput<string> input,
+            CacheItem relatedItem)
         {
             relatedItem = await _fido2LinkCommand.ExecuteAsync(input.Data, relatedItem);
             return GenerateResult(input, relatedItem);

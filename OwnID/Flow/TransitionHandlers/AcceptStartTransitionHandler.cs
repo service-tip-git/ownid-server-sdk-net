@@ -23,13 +23,16 @@ namespace OwnID.Flow.TransitionHandlers
         private readonly VerifyFido2CredentialIdCommand _verifyFido2CredentialIdCommand;
         private readonly SetNewEncryptionTokenCommand _setNewEncryptionTokenCommand;
         private readonly TrySwitchToFido2FlowCommand _trySwitchToFido2FlowCommand;
+        
+        public override StepType StepType => StepType.AcceptStart;
+
 
         public AcceptStartTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
             IUrlProvider urlProvider, IOwnIdCoreConfiguration coreConfiguration,
             TrySwitchToFido2FlowCommand trySwitchToFido2FlowCommand,
             SetNewEncryptionTokenCommand setNewEncryptionTokenCommand, IIdentitiesProvider identitiesProvider,
-            VerifyFido2CredentialIdCommand verifyFido2CredentialIdCommand) : base(StepType.AcceptStart, jwtComposer,
-            stopFlowCommand, urlProvider)
+            VerifyFido2CredentialIdCommand verifyFido2CredentialIdCommand) : base(jwtComposer, stopFlowCommand,
+            urlProvider)
         {
             _coreConfiguration = coreConfiguration;
             _trySwitchToFido2FlowCommand = trySwitchToFido2FlowCommand;
@@ -37,7 +40,7 @@ namespace OwnID.Flow.TransitionHandlers
             _identitiesProvider = identitiesProvider;
             _verifyFido2CredentialIdCommand = verifyFido2CredentialIdCommand;
         }
-
+        
         public override FrontendBehavior GetOwnReference(string context, ChallengeType challengeType)
         {
             return new(StepType, challengeType, new CallAction(UrlProvider.GetAcceptStartFlowUrl(context)));

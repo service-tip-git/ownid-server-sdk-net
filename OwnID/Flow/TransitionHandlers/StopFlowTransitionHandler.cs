@@ -14,8 +14,10 @@ namespace OwnID.Flow.TransitionHandlers
     {
         private readonly StopFlowCommand _stopFlowCommand;
 
+        public override StepType StepType => StepType.Stopped;
+
         public StopFlowTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
-            IUrlProvider urlProvider) : base(StepType.Stopped, jwtComposer, stopFlowCommand, urlProvider)
+            IUrlProvider urlProvider) : base(jwtComposer, stopFlowCommand, urlProvider)
         {
             _stopFlowCommand = stopFlowCommand;
         }

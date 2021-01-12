@@ -19,9 +19,11 @@ namespace OwnID.Flow.TransitionHandlers.Partial
         private readonly ICookieService _cookieService;
         private readonly SaveRecoveredAccountConnectionCommand _saveRecoveredAccountConnectionCommand;
 
+        public override StepType StepType => StepType.Recover;
+
         public RecoveryTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
             IUrlProvider urlProvider, SaveRecoveredAccountConnectionCommand saveRecoveredAccountConnectionCommand,
-            ICookieService cookieService) : base(StepType.Recover, jwtComposer, stopFlowCommand, urlProvider)
+            ICookieService cookieService) : base(jwtComposer, stopFlowCommand, urlProvider)
         {
             _saveRecoveredAccountConnectionCommand = saveRecoveredAccountConnectionCommand;
             _cookieService = cookieService;

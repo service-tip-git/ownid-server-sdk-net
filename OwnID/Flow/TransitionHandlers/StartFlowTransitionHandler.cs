@@ -18,9 +18,11 @@ namespace OwnID.Flow.TransitionHandlers
         protected readonly IIdentitiesProvider IdentitiesProvider;
         protected readonly StartFlowCommand StartFlowCommand;
 
+        public override StepType StepType => StepType.Starting;
+
         public StartFlowTransitionHandler(StartFlowCommand startFlowCommand, StopFlowCommand stopFlowCommand,
             IJwtComposer jwtComposer, IIdentitiesProvider identitiesProvider, IUrlProvider urlProvider) : base(
-            StepType.Starting, jwtComposer, stopFlowCommand, urlProvider, false)
+            jwtComposer, stopFlowCommand, urlProvider, false)
         {
             StartFlowCommand = startFlowCommand;
             IdentitiesProvider = identitiesProvider;
@@ -35,7 +37,7 @@ namespace OwnID.Flow.TransitionHandlers
         protected override void Validate(TransitionInput<StartRequest> input, CacheItem relatedItem)
         {
             var wasContinued = CheckIfContinued(input, relatedItem);
-            
+
             if (wasContinued && relatedItem.RequestToken != input.RequestToken
                              && relatedItem.ResponseToken != input.ResponseToken)
                 throw new CommandValidationException(
@@ -54,7 +56,7 @@ namespace OwnID.Flow.TransitionHandlers
 
             var jwt = JwtComposer.GenerateBaseStepJwt(composeInfo, IdentitiesProvider.GenerateUserId());
 
-            if(!wasContinued)
+            if (!wasContinued)
                 await StartFlowCommand.ExecuteAsync(new StartFlowCommand.Input
                 {
                     Context = input.Context,
@@ -70,7 +72,7 @@ namespace OwnID.Flow.TransitionHandlers
                 Jwt = jwt
             };
         }
-        
+
         protected virtual bool CheckIfContinued(TransitionInput<StartRequest> input, CacheItem relatedItem)
         {
             return !string.IsNullOrWhiteSpace(input.RequestToken) && !string.IsNullOrWhiteSpace(input.ResponseToken);

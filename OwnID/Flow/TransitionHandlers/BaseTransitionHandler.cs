@@ -18,14 +18,15 @@ namespace OwnID.Flow.TransitionHandlers
         private readonly bool _validateSecurityTokens;
         protected readonly IJwtComposer JwtComposer;
         protected readonly IUrlProvider UrlProvider;
+        
+        public abstract StepType StepType { get; }
 
-        protected BaseTransitionHandler(StepType stepType, IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
+        protected BaseTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
             IUrlProvider urlProvider, bool validateSecurityTokens = true)
         {
             JwtComposer = jwtComposer;
             _stopFlowCommand = stopFlowCommand;
             _validateSecurityTokens = validateSecurityTokens;
-            StepType = stepType;
             UrlProvider = urlProvider;
         }
 
@@ -55,11 +56,6 @@ namespace OwnID.Flow.TransitionHandlers
                 return CreateErrorResponse(input, e.ErrorType);
             }
         }
-
-        //
-        // TODO: Rewrite to abstract
-        //
-        public virtual StepType StepType { get; }
 
         protected abstract void Validate(TInput input, CacheItem relatedItem);
 

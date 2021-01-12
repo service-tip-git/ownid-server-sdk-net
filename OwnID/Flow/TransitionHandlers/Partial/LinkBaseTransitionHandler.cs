@@ -18,9 +18,11 @@ namespace OwnID.Flow.TransitionHandlers.Partial
         private readonly ICookieService _cookieService;
         private readonly LinkAccountCommand _linkAccountCommand;
 
+        public override StepType StepType => StepType.Link;
+
         public LinkBaseTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
             IUrlProvider urlProvider, LinkAccountCommand linkAccountCommand, ICookieService cookieService) : base(
-            StepType.Link, jwtComposer, stopFlowCommand, urlProvider)
+            jwtComposer, stopFlowCommand, urlProvider)
         {
             _linkAccountCommand = linkAccountCommand;
             _cookieService = cookieService;

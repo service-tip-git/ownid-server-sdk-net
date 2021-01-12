@@ -18,17 +18,19 @@ namespace OwnID.Flow.TransitionHandlers.Partial
         private readonly SavePartialConnectionCommand _savePartialConnectionCommand;
         private readonly IJwtService _jwtService;
         private readonly ICookieService _cookieService;
+        
+        public override StepType StepType => StepType.UpgradeToPasscode;
 
         public UpgradeToPasscodeTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
             IUrlProvider urlProvider, SavePartialConnectionCommand savePartialConnectionCommand, IJwtService jwtService,
-            ICookieService cookieService, bool validateSecurityTokens = true) : base(StepType.UpgradeToPasscode,
-            jwtComposer, stopFlowCommand, urlProvider, validateSecurityTokens)
+            ICookieService cookieService, bool validateSecurityTokens = true) : base(jwtComposer, stopFlowCommand,
+            urlProvider, validateSecurityTokens)
         {
             _savePartialConnectionCommand = savePartialConnectionCommand;
             _jwtService = jwtService;
             _cookieService = cookieService;
         }
-
+        
         public override FrontendBehavior GetOwnReference(string context, ChallengeType challengeType)
         {
             return new(StepType, challengeType,

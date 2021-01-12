@@ -27,11 +27,13 @@ namespace OwnID.Flow.TransitionHandlers.Partial
         private readonly ICacheItemRepository _cacheItemRepository;
         private readonly SavePartialConnectionCommand _savePartialConnectionCommand;
 
+        public override StepType StepType => StepType.InstantAuthorize;
+
         public InstantAuthorizeBaseTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
             IUrlProvider urlProvider, SavePartialConnectionCommand savePartialConnectionCommand,
             ICookieService cookieService, IJwtService jwtService, IUserHandlerAdapter userHandlerAdapter,
-            IOwnIdCoreConfiguration configuration, ICacheItemRepository cacheItemRepository) : base(
-            StepType.InstantAuthorize, jwtComposer, stopFlowCommand, urlProvider)
+            IOwnIdCoreConfiguration configuration, ICacheItemRepository cacheItemRepository) : base(jwtComposer,
+            stopFlowCommand, urlProvider)
         {
             _savePartialConnectionCommand = savePartialConnectionCommand;
             _cookieService = cookieService;
@@ -40,6 +42,7 @@ namespace OwnID.Flow.TransitionHandlers.Partial
             _configuration = configuration;
             _cacheItemRepository = cacheItemRepository;
         }
+
 
         public override FrontendBehavior GetOwnReference(string context, ChallengeType challengeType)
         {

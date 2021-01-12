@@ -6,7 +6,6 @@ using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Flow.Contracts.Jwt;
 using OwnID.Extensibility.Providers;
-using OwnID.Extensibility.Services;
 using OwnID.Flow.Interfaces;
 using OwnID.Flow.ResultActions;
 
@@ -15,15 +14,14 @@ namespace OwnID.Flow.TransitionHandlers
     public class CheckUserExistenceBaseTransitionHandler : BaseTransitionHandler<TransitionInput<UserIdentification>>
     {
         private readonly CheckUserExistenceCommand _checkUserExistenceCommand;
-        private readonly ILocalizationService _localizationService;
+
+        public override StepType StepType => StepType.CheckUserExistence;
 
         public CheckUserExistenceBaseTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
-            IUrlProvider urlProvider, CheckUserExistenceCommand checkUserExistenceCommand,
-            ILocalizationService localizationService) : base(StepType.CheckUserExistence, jwtComposer, stopFlowCommand,
-            urlProvider)
+            IUrlProvider urlProvider, CheckUserExistenceCommand checkUserExistenceCommand) : base(jwtComposer,
+            stopFlowCommand, urlProvider)
         {
             _checkUserExistenceCommand = checkUserExistenceCommand;
-            _localizationService = localizationService;
         }
 
         public override FrontendBehavior GetOwnReference(string context, ChallengeType challengeType)
