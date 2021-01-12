@@ -37,7 +37,7 @@ namespace OwnID.Web.Gigya
 
         public async Task<AuthResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)
         {
-            var user = await _restApiClient.SearchByPublicKey(publicKey);
+            var user = await _restApiClient.SearchByPublicKey(publicKey, GigyaProfileFields.UID);
 
             if (string.IsNullOrEmpty(user?.UID))
                 return new AuthResult<object>("Can not find user in Gigya search result with provided public key");
@@ -68,7 +68,7 @@ namespace OwnID.Web.Gigya
 
         public async Task UpgradeConnectionAsync(string publicKey, OwnIdConnection newConnection)
         {
-            var user = await _restApiClient.SearchByPublicKey(publicKey);
+            var user = await _restApiClient.SearchByPublicKey(publicKey, GigyaProfileFields.Connections);
             if (user == null)
                 return;
 
@@ -117,7 +117,7 @@ namespace OwnID.Web.Gigya
 
         public async Task<bool> IsUserExists(string publicKey)
         {
-            var user = await _restApiClient.SearchByPublicKey(publicKey);
+            var user = await _restApiClient.SearchByPublicKey(publicKey, GigyaProfileFields.UID);
             return !string.IsNullOrWhiteSpace(user?.UID);
         }
 
@@ -181,11 +181,11 @@ namespace OwnID.Web.Gigya
 
         public async Task<UserSettings> GetUserSettingsAsync(string publicKey)
         {
-            var user = await _restApiClient.SearchByPublicKey(publicKey);
+            var user = await _restApiClient.SearchByPublicKey(publicKey, GigyaProfileFields.Settings);
 
             return user?.Data?.UserSettings;
         }
-        
+
         public async Task CreateProfileAsync(IUserProfileFormContext<TProfile> context, string recoveryToken = null,
             string recoveryData = null)
         {

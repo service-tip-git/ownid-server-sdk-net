@@ -54,16 +54,17 @@ namespace OwnID.Web.Gigya
 
         public async Task RemoveConnectionsAsync(string publicKey)
         {
-            var connection = await _apiClient.SearchByPublicKey(publicKey);
+            var connection = await _apiClient.SearchByPublicKey(publicKey, GigyaProfileFields.UID);
             
             if (string.IsNullOrEmpty(connection?.UID))
                 return;
             
+            // Refactor - looks like we don't need to make second call to the Gigya API
             var profile = await _apiClient.GetUserInfoByUid(connection.UID);
             var connectionToRemove = profile.Data.Connections.Single(c => c.PublicKey == publicKey);
             profile.Data.Connections.Remove(connectionToRemove);
 
-            await _apiClient.SetAccountInfo<TProfile>(connection.UID, profile.Profile, profile.Data);
+            await _apiClient.SetAccountInfo(connection.UID, profile.Profile, profile.Data);
         }
     }
 }
