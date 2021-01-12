@@ -158,7 +158,7 @@ namespace OwnID.Server.Gigya
 
                 var magicLinkSection = ownIdSection.GetSection("magic_link");
 
-                if (magicLinkSection.Exists())
+                if (magicLinkSection.Exists() && magicLinkSection.GetValue("enabled", false))
                     builder.UseMagicLink(ml =>
                     {
                         ml.RedirectUrl = new Uri(magicLinkSection["redirect_url"]);
@@ -212,7 +212,8 @@ namespace OwnID.Server.Gigya
             routeBuilder.MapMiddlewarePost("ownid/log",
                 builder => builder.UseMiddleware<LogMiddleware>());
 
-            if (Configuration.GetValue("ASPNETCORE_ENVIRONMENT", string.Empty) == "dev")
+            var aspEnv = Configuration.GetValue("ASPNETCORE_ENVIRONMENT", string.Empty);
+            if (aspEnv == "dev" || aspEnv == "staging")
                 routeBuilder.MapMiddlewarePut("/ownid/config-injection",
                     builder => builder.UseMiddleware<ConfigInjectionMiddleware>());
 

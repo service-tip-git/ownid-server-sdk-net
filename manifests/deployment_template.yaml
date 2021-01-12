@@ -59,6 +59,8 @@ spec:
               value: https://passwordless.<website domain>
             - name: OWNID__TOP_DOMAIN # Company domain that Passwordless page is tightened to. Example: my-company.com
               value: <company-domain>
+            - name: OWNID__MAGIC_LINK__ENABLED # Magic Link feature flag
+              value: 'true'
             - name: OWNID__MAGIC_LINK__REDIRECT_URL # Magic Link redirect url. It should lead to web page with referenced OWNID UI SDK
               value: https://my-comany.com/login
             - name: OWNID__MAGIC_LINK__TOKEN_LIFETIME # Magic Link token lifetime. In milliseconds. Default is equal to 10 minutes
