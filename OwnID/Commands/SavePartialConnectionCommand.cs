@@ -45,6 +45,8 @@ namespace OwnID.Commands
             
             _logger.LogInformation($"is link on login? {challengeType}");
 
+            relatedItem.ChallengeType = challengeType;
+
 
             await _cacheItemRepository.UpdateAsync(relatedItem.Context, item =>
             {
