@@ -32,7 +32,6 @@ jobs:
         uses: einaregilsson/build-number@v3
         with:
           token: ${{secrets.github_token}}
-          prefix: featurebranch
 
       - name: Version update
         run: bash scripts/set-build-num.sh $BUILD_NUMBER
