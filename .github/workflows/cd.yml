@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - develop
+      - feature
       - 'release/**'
 
 jobs:
@@ -20,55 +21,60 @@ jobs:
       DOCKER_URL: ${{ secrets.DOCKER_URL }}
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v1
+      - name: Checkout
+        uses: actions/checkout@v1
 
-    - uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '5.0.x'
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '5.0.x'
 
-    - name: Generate build number
-      uses: einaregilsson/build-number@v3
-      with:
-        token: ${{secrets.github_token}}
+      - name: Generate build number
+        uses: einaregilsson/build-number@v3
+        with:
+          token: ${{secrets.github_token}}
+          prefix: featurebranch
 
-    - name: Version update
-      run: bash scripts/set-build-num.sh $BUILD_NUMBER
-    
-    - name: Docker login
-      run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD $DOCKER_URL
+      - name: Version update
+        run: bash scripts/set-build-num.sh $BUILD_NUMBER
 
-    # - name: Test
-    #   run: dotnet test /p:CollectCoverage=true /p:Threshold=20
+      - name: Docker login
+        run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD $DOCKER_URL
 
-    - name: Build
-      run: docker build -f gigya-server.Dockerfile -t ownid-server-gigya:latest . --network=host
+      # - name: Test
+      #   run: dotnet test /p:CollectCoverage=true /p:Threshold=20
 
-    - name: Build Webapp Server
-      run: docker build -f webapp-server.Dockerfile -t ownid-server-webapp:latest . --network=host
+      - name: Build
+        run: docker build -f gigya-server.Dockerfile -t ownid-server-gigya:latest . --network=host
 
-    - name: Install XMLLINT
-      run: sudo apt-get install libxml2-utils
+      - name: Build Webapp Server
+        run: docker build -f webapp-server.Dockerfile -t ownid-server-webapp:latest . --network=host
 
-    - name: Deploy DEV
-      if: github.ref == 'refs/heads/develop'
-      run: bash scripts/deploy/not-prod.sh dev
+      - name: Install XMLLINT
+        run: sudo apt-get install libxml2-utils
 
-    - name: Deploy STAGING
-      if: github.ref == 'refs/heads/master'
-      run: bash scripts/deploy/not-prod.sh staging
+      - name: Deploy DEV
+        if: github.ref == 'refs/heads/develop'
+        run: bash scripts/deploy/not-prod.sh dev
 
-    - name: Deploy PROD
-      if: startsWith(github.ref,'refs/heads/release')
-      run: bash scripts/deploy/prod.sh
+      - name: Deploy DEV from feature branch
+        if: github.ref == 'refs/heads/feature'
+        run: bash scripts/deploy/not-prod.sh dev
 
-    - name: Slack Notification
-      uses: rtCamp/action-slack-notify@v2
-      if: failure()
-      env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_ICON: https://ownid.com/images/favicon.png
-        SLACK_COLOR: '#FF0000'
-        SLACK_TITLE: Merge failed
-        SLACK_FOOTER: OwnID by SAP
-        SLACK_USERNAME: SAP/ownid-server-sdk-net
+      - name: Deploy STAGING
+        if: github.ref == 'refs/heads/master'
+        run: bash scripts/deploy/not-prod.sh staging
+
+      - name: Deploy PROD
+        if: startsWith(github.ref,'refs/heads/release')
+        run: bash scripts/deploy/prod.sh
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        if: failure()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_ICON: https://ownid.com/images/favicon.png
+          SLACK_COLOR: '#FF0000'
+          SLACK_TITLE: Merge failed
+          SLACK_FOOTER: OwnID by SAP
+          SLACK_USERNAME: SAP/ownid-server-sdk-net
