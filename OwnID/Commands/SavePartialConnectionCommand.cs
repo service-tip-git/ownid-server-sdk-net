@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Contracts.Jwt;
@@ -13,11 +14,14 @@ namespace OwnID.Commands
     {
         private readonly ICacheItemRepository _cacheItemRepository;
         private readonly IUserHandlerAdapter _userHandlerAdapter;
+        private readonly ILogger<SavePartialConnectionCommand> _logger;
 
-        public SavePartialConnectionCommand(ICacheItemRepository cacheItemRepository, IUserHandlerAdapter userHandlerAdapter)
+        public SavePartialConnectionCommand(ICacheItemRepository cacheItemRepository,
+            IUserHandlerAdapter userHandlerAdapter, ILogger<SavePartialConnectionCommand> logger)
         {
             _cacheItemRepository = cacheItemRepository;
             _userHandlerAdapter = userHandlerAdapter;
+            _logger = logger;
         }
 
         public async Task ExecuteAsync(UserIdentitiesData input, CacheItem relatedItem)
@@ -25,7 +29,7 @@ namespace OwnID.Commands
             var recoveryToken = !string.IsNullOrEmpty(input.RecoveryData) ? Guid.NewGuid().ToString("N") : null;
 
             var challengeType = relatedItem.ChallengeType;
-            
+
             // Credentials created at web app
             if (input.ActualChallengeType.HasValue && input.ActualChallengeType != relatedItem.ChallengeType)
             {
@@ -38,6 +42,9 @@ namespace OwnID.Commands
                 if (!isUserExists)
                     challengeType = ChallengeType.LinkOnLogin;
             }
+            
+            _logger.LogInformation($"is link on login? {challengeType}");
+
 
             await _cacheItemRepository.UpdateAsync(relatedItem.Context, item =>
             {
