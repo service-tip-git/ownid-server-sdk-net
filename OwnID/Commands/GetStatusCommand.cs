@@ -114,13 +114,10 @@ namespace OwnID.Commands
                             cacheItem.Fido2SignatureCounter.Value);
                         break;
                     }
-                    case ChallengeType.Login
-                        when await _userHandlerAdapter.IsUserExistsAsync(cacheItem.PublicKey):
-                    {
+                    case ChallengeType.Login:
                         result.Payload = await _userHandlerAdapter.OnSuccessLoginByPublicKeyAsync(cacheItem.PublicKey);
                         break;
-                    }
-                    case ChallengeType.Login:
+                    case ChallengeType.LinkOnLogin:
                         action = ChallengeType.Link.ToString();
                         result.Payload = SetPartialRegisterResult(cacheItem);
                         break;

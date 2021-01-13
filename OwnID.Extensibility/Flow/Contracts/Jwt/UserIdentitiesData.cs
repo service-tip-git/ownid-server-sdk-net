@@ -40,5 +40,11 @@ namespace OwnID.Extensibility.Flow.Contracts.Jwt
         /// </summary>
         [JsonPropertyName("supportsFido2")]
         public bool SupportsFido2 { get; set; }
+        
+        /// <summary>
+        ///     Actual Challenge Type
+        /// </summary>
+        [JsonPropertyName("actualChallengeType")]
+        public ChallengeType? ActualChallengeType { get; set; }
     }
 }
