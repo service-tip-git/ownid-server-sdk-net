@@ -125,7 +125,7 @@ namespace OwnID.Flow.TransitionHandlers.Partial
         private async Task<ITransitionResult> FinishAuthProcessAsync(UserIdentitiesData userData, CacheItem relatedItem,
             TransitionInput<JwtContainer> input)
         {
-            await _savePartialConnectionCommand.ExecuteAsync(userData, relatedItem);
+            relatedItem = await _savePartialConnectionCommand.ExecuteAsync(userData, relatedItem);
 
             var composeInfo = new BaseJwtComposeInfo(input)
             {

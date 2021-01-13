@@ -24,7 +24,7 @@ namespace OwnID.Commands
             _logger = logger;
         }
 
-        public async Task ExecuteAsync(UserIdentitiesData input, CacheItem relatedItem)
+        public async Task<CacheItem> ExecuteAsync(UserIdentitiesData input, CacheItem relatedItem)
         {
             var recoveryToken = !string.IsNullOrEmpty(input.RecoveryData) ? Guid.NewGuid().ToString("N") : null;
 
@@ -45,8 +45,7 @@ namespace OwnID.Commands
             
             _logger.LogInformation($"is link on login? {challengeType}");
 
-
-            await _cacheItemRepository.UpdateAsync(relatedItem.Context, item =>
+            return await _cacheItemRepository.UpdateAsync(relatedItem.Context, item =>
             {
                 item.ChallengeType = challengeType;
                 item.RecoveryToken = recoveryToken;
