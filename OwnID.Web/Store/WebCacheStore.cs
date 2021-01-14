@@ -27,12 +27,12 @@ namespace OwnID.Web.Store
 
         public CacheItem Get(string key)
         {
-            return Cache.Get<CacheItem>(key);
+            return (CacheItem) Cache.Get<CacheItem>(key).Clone();
         }
 
         public Task<CacheItem> GetAsync(string key)
         {
-            var cachedItem = Cache.Get<CacheItem>(key);
+            var cachedItem = (CacheItem) Cache.Get<CacheItem>(key).Clone();
             return Task.FromResult(cachedItem);
         }
 

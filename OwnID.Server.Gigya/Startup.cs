@@ -256,7 +256,7 @@ namespace OwnID.Server.Gigya
                 {
                     var sunday = DateTime.UtcNow.Date.AddDays(0 - (int) DateTime.UtcNow.DayOfWeek);
                     var saturday = sunday.AddDays(6);
-                    return $"ownid-{env}-{sunday:yyyy-MM-dd}-{saturday:yyyy:MM:dd}";
+                    return $"ownid-{env}-{sunday:yyyy-MM-dd}-{saturday:yyyy-MM-dd}";
                 },
                 ModifyConnectionSettings = x =>
                     x.BasicAuthentication(configuration["Username"], configuration["Password"]),
