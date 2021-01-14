@@ -31,7 +31,7 @@ namespace OwnID.Store
 
         public CacheItem Get(string key)
         {
-            return !_store.TryGetValue(key, out var item) ? null : item;
+            return !_store.TryGetValue(key, out var item) ? null : (CacheItem) item.Clone();
         }
 
         public Task<CacheItem> GetAsync(string key)
