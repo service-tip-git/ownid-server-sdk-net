@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-gigya
+spec:
+  template:
+    spec:
+      containers:
+        - name: server-gigya
+          env:
+            - name: OWNID__CALLBACK_URL
+              value: https://server.demo.staging.ownid.com
+            - name: OWNID__DID
+              value: did:ownid:demo_staging_151850889514
+            - name: OWNID__NAME
+              value: OwnID (Dor's server)
+            - name: OWNID__DESCRIPTION
+              value: OwnID (Dor's server)
+            - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
+              value: https://passwordless.demo.staging.ownid.com
+            - name: OWNID__TOP_DOMAIN
+              value: demo.staging.ownid.com
+            - name: OWNID__MAGIC_LINK__ENABLED
+              value: 'true'
+            - name: OWNID__MAGIC_LINK__REDIRECT_URL
+              value: https://demo.staging.ownid.com/login
+            - name: SERVER_MODE
+              value: pilot
+            - name: GIGYA__DATA_CENTER
+              value: eu1.gigya.com
+            - name: GIGYA__SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: dor-secret
+                  key: gigya_secret
+            - name: GIGYA__API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dor-secret
+                  key: gigya_api_key
+            - name: GIGYA__USER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dor-secret
+                  key: gigya_user_key
+            - name: OWNID__PUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: public_key
+                  name: dor-secret
+            - name: OWNID__PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: private_key
+                  name: dor-secret
