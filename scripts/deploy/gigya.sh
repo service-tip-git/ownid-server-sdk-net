@@ -18,7 +18,7 @@ echo Update IMAGE in base kustomization.yaml
 
 echo Applications update
 
-apps=(demo demo2 demo3 demo4)
+apps=(demo demo2 demo3 demo4 dor)
 
 for app in "${apps[@]}"; do
   echo Deploying $app
