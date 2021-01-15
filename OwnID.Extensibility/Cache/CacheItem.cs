@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using OwnID.Extensibility.Flow;
+using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Flow.Contracts.Start;
 
 namespace OwnID.Extensibility.Cache
@@ -205,7 +206,7 @@ namespace OwnID.Extensibility.Cache
                 || FlowType == FlowType.Fido2RecoverWithPin)
                 return "FIDO2";
 
-            return "Basic";
+            return EncTokenEnding == CookieValuesConstants.PasscodeEnding ? "Passcode" : "Basic";
         }
     }
 }
