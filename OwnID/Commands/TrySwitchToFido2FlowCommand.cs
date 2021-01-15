@@ -114,7 +114,7 @@ namespace OwnID.Commands
 
             // TODO: rework to exclude explicit url creation 
             return new FrontendBehavior(StepType.Fido2Authorize, cacheItem.ChallengeType,
-                new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, cacheItem.ChallengeType, "/fido2")));
+                new CallAction(_urlProvider.GetChallengeUrl(cacheItem.Context, ChallengeType.Register, "/fido2")));
         }
     }
 }
