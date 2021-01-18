@@ -89,6 +89,17 @@ namespace OwnID.Web.Gigya
             await Task.Delay(500);
         }
 
+        public async Task<string> GetUserNameAsync(string did)
+        {
+            var getAccountMessage = await _restApiClient.GetUserInfoByUid(did);
+
+            if (getAccountMessage.ErrorCode != 0)
+                throw new Exception(
+                    $"Gigya.notifyLogin error -> {getAccountMessage.GetFailureMessage()}");
+
+            return getAccountMessage.Profile?.FirstName;
+        }
+
         public async Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey)
         {
             var getAccountMessage = await _restApiClient.GetUserInfoByUid(did);

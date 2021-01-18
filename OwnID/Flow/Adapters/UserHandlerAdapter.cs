@@ -104,6 +104,11 @@ namespace OwnID.Flow.Adapters
             return _adaptee.GetUserSettingsAsync(publicKey);
         }
 
+        public Task<string> GetUserNameAsync(string did)
+        {
+            return _adaptee.GetUserNameAsync(did);
+        }
+
         public Task UpgradeConnectionAsync(string publicKey, OwnIdConnection newConnection)
         {
             return _adaptee.UpgradeConnectionAsync(publicKey, newConnection);

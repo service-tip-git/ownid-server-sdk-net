@@ -116,5 +116,17 @@ namespace OwnID.Web.Resources {
                 return ResourceManager.GetString("Error_UserCanceledAuth", resourceCulture);
             }
         }
+        
+        internal static string Email_MagicLink_Body {
+            get {
+                return ResourceManager.GetString("Email_MagicLink_Body", resourceCulture);
+            }
+        }
+        
+        internal static string Email_MagicLink_Subject {
+            get {
+                return ResourceManager.GetString("Email_MagicLink_Subject", resourceCulture);
+            }
+        }
     }
 }

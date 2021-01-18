@@ -35,4 +35,22 @@
   <data name="Error_UserCanceledAuth" xml:space="preserve">
     <value>Authorization process was canceled by user</value>
   </data>
+  <data name="Email_MagicLink_Body" xml:space="preserve">
+    <value> &lt;div style="font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;"&gt;
+            &lt;p&gt;
+                Hi {0},
+                &lt;br&gt;
+                Use the link below to log in to your account.
+            &lt;/p&gt;
+            &lt;p&gt;
+                &lt;a href="{1}"&gt;Magic link to log in&lt;/a&gt;
+            &lt;/p&gt;
+            &lt;p style="font-size: 12px; line-height: 20px;"&gt;
+                If you did not make this request, please ignore this message or go to the button above to select a new password for your account.
+            &lt;/p&gt;
+        &lt;/div&gt;</value>
+  </data>
+  <data name="Email_MagicLink_Subject" xml:space="preserve">
+    <value>Magic link for {0}</value>
+  </data>
 </root>
