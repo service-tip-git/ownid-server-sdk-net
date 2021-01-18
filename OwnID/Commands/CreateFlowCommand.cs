@@ -13,21 +13,23 @@ namespace OwnID.Commands
 {
     public class CreateFlowCommand
     {
+        private readonly ICacheItemRepository _cacheItemRepository;
         private readonly IOwnIdCoreConfiguration _configuration;
         private readonly IIdentitiesProvider _identitiesProvider;
         private readonly IAccountLinkHandler _linkHandler;
-        private readonly ICacheItemRepository _cacheItemRepository;
+        private readonly bool _magicLinkEnabled;
         private readonly IUrlProvider _urlProvider;
 
         public CreateFlowCommand(ICacheItemRepository cacheItemRepository, IUrlProvider urlProvider,
             IIdentitiesProvider identitiesProvider, IOwnIdCoreConfiguration configuration,
-            IAccountLinkHandler linkHandler = null)
+            IAccountLinkHandler linkHandler = null, IMagicLinkConfiguration magicLinkConfiguration = null)
         {
             _cacheItemRepository = cacheItemRepository;
             _urlProvider = urlProvider;
             _identitiesProvider = identitiesProvider;
             _configuration = configuration;
             _linkHandler = linkHandler;
+            _magicLinkEnabled = magicLinkConfiguration?.RedirectUrl != null;
         }
 
         public async Task<GetChallengeLinkResponse> ExecuteAsync(GenerateContextRequest request)
@@ -51,7 +53,7 @@ namespace OwnID.Commands
                     var state = await GetLinkState(request.Payload.ToString());
                     if (state.ConnectedDevicesCount >= _configuration.MaximumNumberOfConnectedDevices)
                         return new GetChallengeLinkResponse(default, _urlProvider.GetWebAppConnectionsUrl().ToString(),
-                            default, default);
+                            default, default, _magicLinkEnabled);
 
                     did = state.DID;
                     flowType = request.IsQr ? FlowType.LinkWithPin : FlowType.Link;
@@ -73,14 +75,14 @@ namespace OwnID.Commands
                 DID = did,
                 Payload = payload,
                 FlowType = flowType,
-                IsDesktop = request.IsQr 
+                IsDesktop = request.IsQr
             });
-            
+
             var startFlowUrl = _urlProvider.GetStartFlowUrl(challengeContext);
             var destinationUrl = _urlProvider.GetWebAppSignWithCallbackUrl(startFlowUrl, request.Language);
-            
+
             return new GetChallengeLinkResponse(challengeContext, destinationUrl.ToString(), nonce,
-                _configuration.CacheExpirationTimeout);
+                _configuration.CacheExpirationTimeout, _magicLinkEnabled);
         }
 
         private async Task<LinkState> GetLinkState(string payload)
