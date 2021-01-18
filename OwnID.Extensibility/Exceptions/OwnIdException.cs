@@ -26,11 +26,11 @@ namespace OwnID.Extensibility.Exceptions
                 case ErrorType.UserAlreadyExists:
                     return "Error_PhoneAlreadyConnected";
                 case ErrorType.UserNotFound:
-                    return "User was not found"; // TODO: add to resources
+                    return "Error_UserNotFound";
                 case ErrorType.RequiresBiometricInput:
-                    break;
+                    return "Error_RequiresBiometricInput";
                 case ErrorType.RecoveryTokenExpired:
-                    break;
+                    return "Error_RecoveryTokenExpired";
             }
 
             return string.Empty;

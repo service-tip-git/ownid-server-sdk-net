@@ -86,7 +86,7 @@ namespace OwnID.Commands
 
             if (!string.IsNullOrEmpty(cacheItem.Error))
             {
-                result.Payload = new AuthResult<object>(cacheItem.Error);
+                result.Payload = new AuthResult<object>(_localizationService.GetLocalizedString(cacheItem.Error));
                 return result;
             }
 

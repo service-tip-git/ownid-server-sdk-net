@@ -23,4 +23,16 @@
   <data name="Field {0} has incorrect format" xml:space="preserve">Field {0} has incorrect format</data>
   <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">The field {0} must be a string or array type with a maximum length of '{1}'</data>
   <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Your phone is already associated with an account, please go to the login page</data>
+  <data name="Error_UserNotFound" xml:space="preserve">
+    <value>User not found</value>
+  </data>
+  <data name="Error_RequiresBiometricInput" xml:space="preserve">
+    <value>Biometric input required</value>
+  </data>
+  <data name="Error_RecoveryTokenExpired" xml:space="preserve">
+    <value>Recovery token was expired</value>
+  </data>
+  <data name="Error_UserCanceledAuth" xml:space="preserve">
+    <value>Authorization process was canceled by user</value>
+  </data>
 </root>

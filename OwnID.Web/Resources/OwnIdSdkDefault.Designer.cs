@@ -98,5 +98,23 @@ namespace OwnID.Web.Resources {
                 return ResourceManager.GetString("Error_UserNotFound", resourceCulture);
             }
         }
+        
+        internal static string Error_RequiresBiometricInput {
+            get {
+                return ResourceManager.GetString("Error_RequiresBiometricInput", resourceCulture);
+            }
+        }
+        
+        internal static string Error_RecoveryTokenExpired {
+            get {
+                return ResourceManager.GetString("Error_RecoveryTokenExpired", resourceCulture);
+            }
+        }
+        
+        internal static string Error_UserCanceledAuth {
+            get {
+                return ResourceManager.GetString("Error_UserCanceledAuth", resourceCulture);
+            }
+        }
     }
 }

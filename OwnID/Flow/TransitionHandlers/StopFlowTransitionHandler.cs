@@ -34,8 +34,7 @@ namespace OwnID.Flow.TransitionHandlers
         protected override async Task<ITransitionResult> ExecuteInternalAsync(TransitionInput input,
             CacheItem relatedItem)
         {
-            // TODO: add text localization
-            await _stopFlowCommand.ExecuteAsync(input.Context, "User stopped auth process");
+            await _stopFlowCommand.ExecuteAsync(input.Context, "Error_UserCanceledAuth");
             var composeInfo = new BaseJwtComposeInfo(input)
             {
                 Behavior = GetNextBehaviorFunc(input, relatedItem),

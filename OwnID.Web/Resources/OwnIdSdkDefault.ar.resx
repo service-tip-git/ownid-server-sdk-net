@@ -23,4 +23,10 @@
   <data name="Field {0} has incorrect format" xml:space="preserve">الحقل {0} له تنسيق غير صحيح</data>
   <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">الحقل {0} يجب أن يكون من نوع السلسلة أو الصفيف بطول '{1}' كحد أقصى</data>
   <data name="Error_PhoneAlreadyConnected" xml:space="preserve">هاتفك مقترن بالفعل بحساب، يُرجى الانتقال إلى صفحة تسجيل الدخول</data>
+  <data name="Error_UserNotFound" xml:space="preserve">
+    <value>المستخدم غير موجود</value>
+  </data>
+  <data name="Error_RequiresBiometricInput" xml:space="preserve">
+    <value>إدخال تحديد الهوية مطلوب</value>
+  </data>
 </root>

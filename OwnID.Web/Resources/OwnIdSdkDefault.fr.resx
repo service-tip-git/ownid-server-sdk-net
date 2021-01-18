@@ -23,4 +23,10 @@
   <data name="Field {0} has incorrect format" xml:space="preserve">La zone {0} a un format incorrect.</data>
   <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">La zone {0} doit être de type Chaîne ou Tableau, avec une longueur maximale de '{1}'.</data>
   <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Votre téléphone est déjà associé à un compte, accédez à la page de connexion.</data>
+  <data name="Error_UserNotFound" xml:space="preserve">
+    <value>Utilisateur introuvable</value>
+  </data>
+  <data name="Error_RequiresBiometricInput" xml:space="preserve">
+    <value>Saisie biométrique requise</value>
+  </data>
 </root>

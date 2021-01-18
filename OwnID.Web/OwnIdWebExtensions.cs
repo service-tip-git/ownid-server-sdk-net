@@ -35,9 +35,9 @@ namespace OwnID.Web
                 builder => builder.UseMiddleware<AcceptStartFlowMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/users/existence",
                 builder => builder.UseMiddleware<CheckUserExistenceMiddleware>());
-            routeBuilder.MapMiddlewarePost($"ownid/{{context}}/auth-type/fido2",
+            routeBuilder.MapMiddlewarePost("ownid/{context}/auth-type/fido2",
                 builder => builder.UseMiddleware<UpgradeToFIDO2Middleware>());
-            routeBuilder.MapMiddlewarePost($"ownid/{{context}}/auth-type/passcode",
+            routeBuilder.MapMiddlewarePost("ownid/{context}/auth-type/passcode",
                 builder => builder.UseMiddleware<UpgradeToPasscodeMiddleware>());
             routeBuilder.MapMiddlewarePost("ownid/{context}/conn-recovery",
                 builder => builder.UseMiddleware<InternalConnectionRecoveryMiddleware>());

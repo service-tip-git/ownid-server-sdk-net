@@ -23,4 +23,10 @@
   <data name="Field {0} has incorrect format" xml:space="preserve">Поле {0} имеет неправильный формат</data>
   <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">Поле {0} должно быть строкой или массивом с максимальной длиной '{1}'</data>
   <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Ваш телефон уже привязан к учетной записи, перейдите на страницу входа</data>
+  <data name="Error_UserNotFound" xml:space="preserve">
+    <value>Пользователь не найден</value>
+  </data>
+  <data name="Error_RequiresBiometricInput" xml:space="preserve">
+    <value>Требуется использование биометрических данных</value>
+  </data>
 </root>

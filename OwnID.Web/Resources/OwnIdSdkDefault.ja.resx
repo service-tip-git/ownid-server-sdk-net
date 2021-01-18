@@ -23,4 +23,10 @@
   <data name="Field {0} has incorrect format" xml:space="preserve">フィールド {0} の書式が不適切です</data>
   <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">フィールド {0} は最大長 '{1}' の文字列または配列である必要があります</data>
   <data name="Error_PhoneAlreadyConnected" xml:space="preserve">電話とアカウントがすでに関連付けられています、ログインページに進んでください</data>
+  <data name="Error_UserNotFound" xml:space="preserve">
+    <value>ユーザが見つかりません</value>
+  </data>
+  <data name="Error_RequiresBiometricInput" xml:space="preserve">
+    <value>生体認証が必要です</value>
+  </data>
 </root>

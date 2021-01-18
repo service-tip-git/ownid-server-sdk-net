@@ -23,4 +23,10 @@
   <data name="Field {0} has incorrect format" xml:space="preserve">Medan {0} mempunyai format yang tidak betul</data>
   <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">Medan {0} mestilah jenis rentetan atau tatasusunan dengan '{1}' panjang maksimum</data>
   <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Telefon anda telah dipautkan dengan akaun, sila pergi ke halaman log masuk</data>
+  <data name="Error_UserNotFound" xml:space="preserve">
+    <value>Pengguna tidak ditemui</value>
+  </data>
+  <data name="Error_RequiresBiometricInput" xml:space="preserve">
+    <value>Input biometrik diperlukan</value>
+  </data>
 </root>
