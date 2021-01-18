@@ -9,9 +9,9 @@ spec:
         - name: server-gigya
           env:
             - name: OWNID__CALLBACK_URL
-              value: https://server.demo.staging.ownid.com
+              value: https://server.dor.ownid.com
             - name: OWNID__DID
-              value: did:ownid:demo_staging_151850889514
+              value: did:ownid:dor_staging_151850889514
             - name: OWNID__NAME
               value: OwnID (Dor's server)
             - name: OWNID__DESCRIPTION
@@ -19,7 +19,7 @@ spec:
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
               value: https://passwordless.demo.staging.ownid.com
             - name: OWNID__TOP_DOMAIN
-              value: demo.staging.ownid.com
+              value: dor.ownid.com
             - name: OWNID__MAGIC_LINK__ENABLED
               value: 'true'
             - name: OWNID__MAGIC_LINK__REDIRECT_URL
