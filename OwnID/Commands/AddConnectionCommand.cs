@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using OwnID.Extensibility.Cache;
+using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Abstractions;
@@ -14,16 +15,18 @@ namespace OwnID.Commands
         private readonly IAccountLinkHandler _accountLinkHandler;
         private readonly ICacheItemRepository _cacheItemRepository;
         private readonly IUserHandlerAdapter _userHandlerAdapter;
+        private readonly IOwnIdCoreConfiguration _coreConfiguration;
 
         public AddConnectionCommand(IAccountLinkHandler accountLinkHandler, ICacheItemRepository cacheItemRepository,
-            IUserHandlerAdapter userHandlerAdapter)
+            IUserHandlerAdapter userHandlerAdapter, IOwnIdCoreConfiguration coreConfiguration)
         {
             _accountLinkHandler = accountLinkHandler;
             _cacheItemRepository = cacheItemRepository;
             _userHandlerAdapter = userHandlerAdapter;
+            _coreConfiguration = coreConfiguration;
         }
 
-        public async Task ExecuteAsync(AddConnectionRequest request)
+        public async Task<AuthResult> ExecuteAsync(AddConnectionRequest request)
         {
             var cacheItem = await _cacheItemRepository.GetAsync(request.Context);
 
@@ -34,14 +37,20 @@ namespace OwnID.Commands
             if (cacheItem.FlowType != FlowType.Fido2Register && cacheItem.FlowType != FlowType.PartialAuthorize)
                 throw new CommandValidationException($"Wrong flow type {cacheItem.FlowType}");
 
+            var connectionState = await _accountLinkHandler.GetCurrentUserLinkStateAsync(request.Payload);
+
+            if (connectionState.ConnectedDevicesCount >= _coreConfiguration.MaximumNumberOfConnectedDevices)
+                return new AuthResult(
+                    $"Maximum number ({_coreConfiguration.MaximumNumberOfConnectedDevices}) of linked devices reached");
+            
             var connectionExists = !string.IsNullOrEmpty(cacheItem.Fido2CredentialId)
                 ? await _userHandlerAdapter.IsFido2UserExistsAsync(cacheItem.Fido2CredentialId)
                 : await _userHandlerAdapter.IsUserExistsAsync(cacheItem.PublicKey);
 
             if (connectionExists)
-                throw new CommandValidationException("Can not add connection. Connection already exists");
+                return new AuthResult("Can not add connection. Connection already exists");
 
-            await _accountLinkHandler.OnLinkAsync(request.DID, new OwnIdConnection
+            await _accountLinkHandler.OnLinkAsync(connectionState.DID, new OwnIdConnection
             {
                 Fido2CredentialId = cacheItem.Fido2CredentialId,
                 Fido2SignatureCounter = cacheItem.Fido2SignatureCounter.ToString(),
@@ -49,6 +58,8 @@ namespace OwnID.Commands
                 RecoveryToken = cacheItem.RecoveryToken,
                 RecoveryData = cacheItem.RecoveryData
             });
+
+            return new AuthResult();
         }
     }
 }
