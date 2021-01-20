@@ -256,8 +256,7 @@ namespace OwnID.Web.Gigya
 
                 return new AuthResult<object>(new
                 {
-                    sessionInfo = loginResponse.SessionInfo,
-                    identities = loginResponse.Identities.FirstOrDefault()
+                    sessionInfo = loginResponse.SessionInfo
                 });
             }
 
