@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Configuration;
-using OwnID.Extensibility.Flow.Contracts;
+using OwnID.Extensibility.Flow.Contracts.Cookies;
 using OwnID.Services;
 
 namespace OwnID.Commands
@@ -27,20 +27,17 @@ namespace OwnID.Commands
             var vector = new byte[16];
             rng.GetBytes(vector);
             var vectorValue = Convert.ToBase64String(vector);
-            encryptionToken = $"{encryptionToken}{CookieValuesConstants.SubValueSeparator}{CookieValuesConstants.SubValueSeparator}{vectorValue}";
 
             return await _cacheItemRepository.UpdateAsync(context, item =>
             {
-                item.EncToken = encryptionToken;
-                
+                item.EncKey = encryptionToken;
+                item.EncVector = vectorValue;
+
                 if (_coreConfiguration.TFAEnabled
                     && _coreConfiguration.Fido2FallbackBehavior == Fido2FallbackBehavior.Passcode)
-                {
-                    item.EncTokenEnding = CookieValuesConstants.PasscodeEnding;
-                    return;
-                }
-                
-                item.EncTokenEnding = null;
+                    item.AuthCookieType = CookieType.Passcode;
+                else
+                    item.AuthCookieType = CookieType.Basic;
             });
         }
     }

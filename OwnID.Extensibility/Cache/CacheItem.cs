@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Contracts;
+using OwnID.Extensibility.Flow.Contracts.Cookies;
 using OwnID.Extensibility.Flow.Contracts.Start;
 
 namespace OwnID.Extensibility.Cache
@@ -135,14 +136,19 @@ namespace OwnID.Extensibility.Cache
         public string RecoveryData { get; set; }
 
         /// <summary>
-        ///     Private key encryption passphrase ending indicator
+        ///     Cookie type
         /// </summary>
-        public string EncTokenEnding { get; set; }
+        public CookieType AuthCookieType { get; set; }
 
         /// <summary>
         ///     Private key encryption passphrase
         /// </summary>
-        public string EncToken { get; set; }
+        public string EncKey { get; set; }
+        
+        /// <summary>
+        ///     Private key encryption vector
+        /// </summary>
+        public string EncVector { get; set; }
 
         public ChallengeType InitialChallengeType { get; set; }
         
@@ -185,7 +191,9 @@ namespace OwnID.Extensibility.Cache
                 Error = Error,
                 RecoveryData = RecoveryData,
                 RecoveryToken = RecoveryToken,
-                EncToken = EncToken,
+                EncKey = EncKey,
+                EncVector = EncVector,
+                AuthCookieType = AuthCookieType,
                 IsDesktop = IsDesktop,
                 NewAuthType = NewAuthType,
                 OldPublicKey = OldPublicKey
@@ -206,7 +214,7 @@ namespace OwnID.Extensibility.Cache
                 || FlowType == FlowType.Fido2RecoverWithPin)
                 return "FIDO2";
 
-            return EncTokenEnding == CookieValuesConstants.PasscodeEnding ? "Passcode" : "Basic";
+            return AuthCookieType == CookieType.Passcode? "Passcode" : "Basic";
         }
     }
 }

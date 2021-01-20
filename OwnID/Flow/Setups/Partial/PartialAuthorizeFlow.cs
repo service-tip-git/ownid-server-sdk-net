@@ -53,7 +53,7 @@ namespace OwnID.Flow.Setups.Partial
         {
             var authorize = GetOnInstantAuthorizeBehavior(cacheItem);
 
-            if (cacheItem.ChallengeType == ChallengeType.Register && !string.IsNullOrEmpty(cacheItem.EncToken))
+            if (cacheItem.ChallengeType == ChallengeType.Register && !string.IsNullOrEmpty(cacheItem.EncKey))
             {
                 var checkUserExistence = GetReferenceToExistingStep(StepType.CheckUserExistence, cacheItem.Context,
                     cacheItem.ChallengeType);

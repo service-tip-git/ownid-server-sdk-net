@@ -91,7 +91,8 @@ namespace OwnID.Flow.TransitionHandlers.Partial
 
             var composeInfo = new BaseJwtComposeInfo(input)
             {
-                EncToken = relatedItem.EncToken,
+                EncKey = relatedItem.EncKey,
+                EncVector = relatedItem.EncVector
             };
 
             switch (relatedItem.NewAuthType)

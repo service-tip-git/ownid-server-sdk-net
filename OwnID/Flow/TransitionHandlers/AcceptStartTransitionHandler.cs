@@ -8,6 +8,7 @@ using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Contracts;
+using OwnID.Extensibility.Flow.Contracts.Cookies;
 using OwnID.Extensibility.Flow.Contracts.Jwt;
 using OwnID.Extensibility.Flow.Contracts.Start;
 using OwnID.Extensibility.Providers;
@@ -130,7 +131,7 @@ namespace OwnID.Flow.TransitionHandlers
 
                 // go to passcode if such behavior enabled and check if create
                 if (_coreConfiguration.Fido2FallbackBehavior == Fido2FallbackBehavior.Passcode
-                    && (relatedItem.EncTokenEnding == CookieValuesConstants.PasscodeEnding
+                    && (relatedItem.AuthCookieType == CookieType.Passcode
                         || relatedItem.ChallengeType != ChallengeType.Login))
                 {
                     composeInfo.Behavior = NavigateToEnterPasscode(input, relatedItem);
@@ -144,14 +145,16 @@ namespace OwnID.Flow.TransitionHandlers
                 composeInfo.Behavior = GetNextBehaviorFunc(input, relatedItem);
             }
 
-            if (!string.IsNullOrWhiteSpace(relatedItem.EncToken))
+            if (!string.IsNullOrWhiteSpace(relatedItem.EncKey))
             {
-                composeInfo.EncToken = relatedItem.EncToken;
+                composeInfo.EncKey = relatedItem.EncKey;
+                composeInfo.EncVector = relatedItem.EncVector;
             }
             else
             {
                 var updatedItem = await _setNewEncryptionTokenCommand.ExecuteAsync(relatedItem.Context);
-                composeInfo.EncToken = updatedItem.EncToken;
+                composeInfo.EncKey = updatedItem.EncKey;
+                composeInfo.EncVector = updatedItem.EncVector;
                 // TODO: rework
                 relatedItem = updatedItem;
             }

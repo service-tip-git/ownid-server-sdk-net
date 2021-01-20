@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace OwnID.Extensibility.Flow.Contracts
+namespace OwnID.Extensibility.Flow.Contracts.Cookies
 {
     public class CookieInfo
     {

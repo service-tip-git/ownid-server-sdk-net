@@ -14,9 +14,14 @@ namespace OwnID.Flow
         }
         
         /// <summary>
-        ///     User data encryption token
+        ///     User data encryption key
         /// </summary>
-        public string EncToken { get; set; }
+        public string EncKey { get; set; }
+        
+        /// <summary>
+        ///     User data encryption vector
+        /// </summary>
+        public string EncVector { get; set; }
 
         /// <summary>
         ///     Response locale

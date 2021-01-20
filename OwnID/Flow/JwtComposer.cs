@@ -57,7 +57,8 @@ namespace OwnID.Flow
                 {requester.Key, requester.Value}
             };
 
-            if (!string.IsNullOrEmpty(info.EncToken)) data.Add("encToken", info.EncToken);
+            if (!string.IsNullOrEmpty(info.EncKey)) data.Add("encKey", info.EncKey);
+            if (!string.IsNullOrEmpty(info.EncVector)) data.Add("encVector", info.EncVector);
 
             if (info.IncludeFido2FallbackBehavior && _ownIdCoreConfiguration.TFAEnabled)
                 data.Add("fido2FallbackBehavior", _ownIdCoreConfiguration.Fido2FallbackBehavior.ToString().ToLower());
@@ -93,7 +94,8 @@ namespace OwnID.Flow
                 data.Add(reqKey, reqValue);
             }
 
-            if (!string.IsNullOrEmpty(info.EncToken)) data.Add("encToken", info.EncToken);
+            if (!string.IsNullOrEmpty(info.EncKey)) data.Add("encKey", info.EncKey);
+            if (!string.IsNullOrEmpty(info.EncVector)) data.Add("encVector", info.EncVector);
 
             if (info.IncludeFido2FallbackBehavior && _ownIdCoreConfiguration.TFAEnabled)
                 data.Add("fido2FallbackBehavior", _ownIdCoreConfiguration.Fido2FallbackBehavior.ToString().ToLower());
@@ -109,7 +111,8 @@ namespace OwnID.Flow
         {
             var dataDict = new Dictionary<string, object>
             {
-                {"encToken", info.EncToken}
+                {"encKey", info.EncKey},
+                {"encVector", info.EncVector}
             };
 
             if (data != null)

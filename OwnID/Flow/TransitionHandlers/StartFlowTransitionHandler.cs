@@ -61,9 +61,9 @@ namespace OwnID.Flow.TransitionHandlers
                 {
                     Context = input.Context,
                     ResponseJwt = jwt,
-                    CredId = input.Data.CredId,
-                    EncryptionToken = input.Data.EncryptionToken,
-                    RecoveryToken = input.Data.RecoveryToken,
+                    CredIdCookieValue = input.Data.CredId,
+                    EncryptionTokenCookieValue = input.Data.EncryptionToken,
+                    RecoveryTokenCookieValue = input.Data.RecoveryToken,
                     RequestToken = input.RequestToken
                 });
 

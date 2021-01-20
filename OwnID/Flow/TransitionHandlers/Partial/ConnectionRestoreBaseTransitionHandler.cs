@@ -44,7 +44,8 @@ namespace OwnID.Flow.TransitionHandlers.Partial
             var composeInfo = new BaseJwtComposeInfo(input)
             {
                 Behavior = GetNextBehaviorFunc(input, relatedItem),
-                EncToken = relatedItem.EncToken
+                EncKey = relatedItem.EncKey,
+                EncVector = relatedItem.EncVector
             };
 
             var jwt = JwtComposer.GenerateRecoveryDataJwt(composeInfo, result);
