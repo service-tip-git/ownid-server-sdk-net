@@ -71,7 +71,7 @@ namespace OwnID.Flow.TransitionHandlers.Partial
             var settings = await _userHandlerAdapter.GetUserSettingsAsync(userData.PublicKey);
             if (
                 _configuration.TFAEnabled == false
-                && settings?.TFAEnabled == true
+                && settings?.EnforceTFA == true
                 && userData.AuthType == ConnectionAuthType.Basic)
             {
                 return await SwitchConnectionAuthTypeAsync(relatedItem, input, userData.SupportsFido2,

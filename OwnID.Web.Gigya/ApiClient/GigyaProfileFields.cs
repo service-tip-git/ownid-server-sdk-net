@@ -10,11 +10,11 @@ namespace OwnID.Web.Gigya.ApiClient
     {
         [GigyaFields("UID")]
         UID = 1,
-        [GigyaFields("data.ownIdConnections")]
+        [GigyaFields("data.ownId.connections")]
         Connections = 2,
-        [GigyaFields("data.ownIdConnections.pubKey")]
+        [GigyaFields("data.ownId.connections.pubKey")]
         ConnectionPublicKeys = 4,
-        [GigyaFields("data.userSettings")]
+        [GigyaFields("data.ownId.settings")]
         Settings = 8,
 
         Default = UID | Connections,

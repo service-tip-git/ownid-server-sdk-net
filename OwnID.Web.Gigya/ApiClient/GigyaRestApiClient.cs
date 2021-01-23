@@ -45,7 +45,7 @@ namespace OwnID.Web.Gigya.ApiClient
 
             if (data != null)
             {
-                foreach (var connection in data.Connections.Where(connection => string.IsNullOrEmpty(connection.Hash)))
+                foreach (var connection in data.OwnId.Connections.Where(connection => string.IsNullOrEmpty(connection.Hash)))
                     connection.Hash = connection.PublicKey.GetSha256();
 
                 parameters.AddParameter("data", data);
@@ -145,10 +145,10 @@ namespace OwnID.Web.Gigya.ApiClient
         {
             var objectsToGet = GetGigyaProfileFields(fields | GigyaProfileFields.ConnectionPublicKeys);
             var result =
-                await SearchAsync<UidResponse>("data.ownIdConnections.keyHsh", publicKey.GetSha256(), objectsToGet);
+                await SearchAsync<UidResponse>("data.ownId.connections.keyHsh", publicKey.GetSha256(), objectsToGet);
             var user = result.Results?.FirstOrDefault();
 
-            if (result.ErrorCode != 0 || (user?.Data?.Connections?.All(x => x.PublicKey != publicKey) ?? true))
+            if (result.ErrorCode != 0 || (user?.Data?.OwnId.Connections?.All(x => x.PublicKey != publicKey) ?? true))
                 return null;
 
             return user;
@@ -156,11 +156,11 @@ namespace OwnID.Web.Gigya.ApiClient
 
         public async Task<UidContainer> SearchByFido2CredentialId(string fido2CredentialId)
         {
-            var result = await SearchAsync<UidResponse>("data.ownIdConnections.fido2CredentialId", fido2CredentialId);
+            var result = await SearchAsync<UidResponse>("data.ownId.connections.fido2CredentialId", fido2CredentialId);
             var user = result.Results?.FirstOrDefault();
 
             if (result.ErrorCode != 0
-                || (user?.Data?.Connections?.All(x => x.Fido2CredentialId != fido2CredentialId) ?? true))
+                || (user?.Data?.OwnId.Connections?.All(x => x.Fido2CredentialId != fido2CredentialId) ?? true))
                 return null;
 
             return user;
@@ -168,8 +168,8 @@ namespace OwnID.Web.Gigya.ApiClient
 
         public async Task<GetAccountInfoResponse<TProfile>> SearchByRecoveryTokenAsync(string recoveryToken)
         {
-            var result = await SearchAsync<GetAccountInfoResponseList<TProfile>>("data.ownIdConnections.recoveryId",
-                recoveryToken, new[] {"UID", "data.ownIdConnections", "profile"});
+            var result = await SearchAsync<GetAccountInfoResponseList<TProfile>>("data.ownId.connections.recoveryId",
+                recoveryToken, new[] {"UID", "data.ownId.connections", "profile"});
             return result.Results?.FirstOrDefault();
         }
 
@@ -201,7 +201,7 @@ namespace OwnID.Web.Gigya.ApiClient
             string[] objectsToGet = null)
             where TResult : BaseGigyaResponse
         {
-            objectsToGet ??= new[] {"UID", "data.ownIdConnections"};
+            objectsToGet ??= new[] {"UID", "data.ownId.connections"};
 
             objectsToGet = objectsToGet.Distinct().ToArray();
 

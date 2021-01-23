@@ -61,8 +61,8 @@ namespace OwnID.Web.Gigya
             
             // Refactor - looks like we don't need to make second call to the Gigya API
             var profile = await _apiClient.GetUserInfoByUid(connection.UID);
-            var connectionToRemove = profile.Data.Connections.Single(c => c.PublicKey == publicKey);
-            profile.Data.Connections.Remove(connectionToRemove);
+            var connectionToRemove = profile.Data.OwnId.Connections.Single(c => c.PublicKey == publicKey);
+            profile.Data.OwnId.Connections.Remove(connectionToRemove);
 
             await _apiClient.SetAccountInfo(connection.UID, profile.Profile, profile.Data);
         }

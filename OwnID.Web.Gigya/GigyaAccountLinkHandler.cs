@@ -79,7 +79,7 @@ namespace OwnID.Web.Gigya
                 throw new Exception(
                     $"Gigya.getAccountInfo error -> {accountInfo.GetFailureMessage()}");
 
-            return new LinkState(did, (uint) accountInfo.Data.Connections.Count);
+            return new LinkState(did, (uint) accountInfo.Data.OwnId.Connections.Count);
         }
 
         public async Task OnLinkAsync(string did, OwnIdConnection connection)
@@ -90,12 +90,12 @@ namespace OwnID.Web.Gigya
                 throw new Exception(
                     $"Gigya.getAccountInfo error -> {accountInfo.GetFailureMessage()}");
 
-            if (accountInfo.Data.Connections.Count >= _ownIdConfiguration.MaximumNumberOfConnectedDevices)
+            if (accountInfo.Data.OwnId.Connections.Count >= _ownIdConfiguration.MaximumNumberOfConnectedDevices)
                 throw new Exception(
                     $"Gigya.OnLink error -> maximum number ({_ownIdConfiguration.MaximumNumberOfConnectedDevices}) of linked devices reached");
 
             // add new public key to connection 
-            accountInfo.Data.Connections.Add(new GigyaOwnIdConnection(connection));
+            accountInfo.Data.OwnId.Connections.Add(new GigyaOwnIdConnection(connection));
 
             var setAccountMessage =
                 await _restApiClient.SetAccountInfo<TProfile>(did, data: accountInfo.Data);

@@ -52,7 +52,7 @@ namespace OwnID.Web.Gigya
             if (user == null)
                 return new AuthResult<object>("Can not find user in Gigya with provided fido2 user id");
 
-            var connectionToUpdate = user.Data.Connections.First(x => x.Fido2CredentialId == fido2CredentialId);
+            var connectionToUpdate = user.Data.OwnId.Connections.First(x => x.Fido2CredentialId == fido2CredentialId);
 
             // Update signature counter
             connectionToUpdate.Fido2SignatureCounter = fido2SignCounter.ToString();
@@ -73,11 +73,11 @@ namespace OwnID.Web.Gigya
                 return;
 
             // Remove old connection
-            var connectionToRemove = user.Data.Connections.First(x => x.PublicKey == publicKey);
-            user.Data.Connections.Remove(connectionToRemove);
+            var connectionToRemove = user.Data.OwnId.Connections.First(x => x.PublicKey == publicKey);
+            user.Data.OwnId.Connections.Remove(connectionToRemove);
 
             // Add new one
-            user.Data.Connections.Add(new GigyaOwnIdConnection(newConnection));
+            user.Data.OwnId.Connections.Add(new GigyaOwnIdConnection(newConnection));
 
             var setAccountResponse = await _restApiClient.SetAccountInfo(user.UID, (TProfile) null, user.Data);
             if (setAccountResponse.ErrorCode > 0)
@@ -111,13 +111,13 @@ namespace OwnID.Web.Gigya
                 throw new Exception(
                     $"Gigya.notifyLogin error -> {getAccountMessage.GetFailureMessage()}");
 
-            if (getAccountMessage.Data == null || !getAccountMessage.Data.Connections.Any())
+            if (getAccountMessage.Data == null || !getAccountMessage.Data.OwnId.Connections.Any())
             {
                 _logger.LogError($"Found gigya user uid={did} without pubKey");
                 return IdentitiesCheckResult.WrongPublicKey;
             }
 
-            if (getAccountMessage.Data.Connections.All(x => x.PublicKey != publicKey))
+            if (getAccountMessage.Data.OwnId.Connections.All(x => x.PublicKey != publicKey))
             {
                 _logger.LogError("Public key doesn't match any of gigya user keys");
                 return IdentitiesCheckResult.WrongPublicKey;
@@ -144,7 +144,7 @@ namespace OwnID.Web.Gigya
             if (user == null)
                 return null;
 
-            var connection = user.Data.Connections.First(c => c.Fido2CredentialId == fido2CredentialId);
+            var connection = user.Data.OwnId.Connections.First(c => c.Fido2CredentialId == fido2CredentialId);
 
             if (String.IsNullOrEmpty(connection.Fido2SignatureCounter)
                 || !uint.TryParse(connection.Fido2SignatureCounter, out var signatureCounter))
@@ -167,13 +167,13 @@ namespace OwnID.Web.Gigya
         {
             var result = await _restApiClient.SearchByRecoveryTokenAsync(recoveryToken);
 
-            if (result?.Data?.Connections == null)
+            if (result?.Data?.OwnId.Connections == null)
             {
                 _logger.LogError($"Can not find connection recovery token in Gigya {recoveryToken}");
                 return null;
             }
 
-            var connection = result.Data.Connections.First(x => x.RecoveryToken == recoveryToken);
+            var connection = result.Data.OwnId.Connections.First(x => x.RecoveryToken == recoveryToken);
 
             return new ConnectionRecoveryResult<TProfile>
             {
@@ -194,7 +194,7 @@ namespace OwnID.Web.Gigya
         {
             var user = await _restApiClient.SearchByPublicKey(publicKey, GigyaProfileFields.Settings);
 
-            return user?.Data?.UserSettings;
+            return user?.Data?.OwnId.UserSettings;
         }
 
         public async Task CreateProfileAsync(IUserProfileFormContext<TProfile> context, string recoveryToken = null,
