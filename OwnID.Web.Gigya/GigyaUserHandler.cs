@@ -68,7 +68,7 @@ namespace OwnID.Web.Gigya
 
         public async Task UpgradeConnectionAsync(string publicKey, OwnIdConnection newConnection)
         {
-            var user = await _restApiClient.SearchByPublicKey(publicKey, GigyaProfileFields.Connections);
+            var user = await _restApiClient.SearchByPublicKey(publicKey);
             if (user == null)
                 return;
 

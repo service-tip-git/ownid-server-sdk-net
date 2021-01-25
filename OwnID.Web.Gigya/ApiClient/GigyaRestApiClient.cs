@@ -141,7 +141,7 @@ namespace OwnID.Web.Gigya.ApiClient
         }
 
         public async Task<UidContainer> SearchByPublicKey(string publicKey,
-            GigyaProfileFields fields = GigyaProfileFields.Default)
+            GigyaProfileFields fields = GigyaProfileFields.UID | GigyaProfileFields.Connections)
         {
             var objectsToGet = GetGigyaProfileFields(fields | GigyaProfileFields.ConnectionPublicKeys);
             var result =

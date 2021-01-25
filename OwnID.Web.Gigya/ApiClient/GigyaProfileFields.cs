@@ -16,7 +16,5 @@ namespace OwnID.Web.Gigya.ApiClient
         ConnectionPublicKeys = 4,
         [GigyaFields("data.ownId.settings")]
         Settings = 8,
-
-        Default = UID | Connections,
     }
 }
