@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnID.Extensibility", "OwnI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnID.Server.WebApp", "OwnID.Server.WebApp\OwnID.Server.WebApp.csproj", "{EA04C4E8-6765-4404-BB55-1A32AB4A9E8F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwnID.Tests", "OwnID.Tests\OwnID.Tests.csproj", "{A349E500-8886-42DB-ADAD-0C35C2BB4233}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +56,9 @@ Global
 		{EA04C4E8-6765-4404-BB55-1A32AB4A9E8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA04C4E8-6765-4404-BB55-1A32AB4A9E8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA04C4E8-6765-4404-BB55-1A32AB4A9E8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A349E500-8886-42DB-ADAD-0C35C2BB4233}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A349E500-8886-42DB-ADAD-0C35C2BB4233}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A349E500-8886-42DB-ADAD-0C35C2BB4233}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A349E500-8886-42DB-ADAD-0C35C2BB4233}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

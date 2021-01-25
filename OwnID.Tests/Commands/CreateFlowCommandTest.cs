@@ -3,16 +3,18 @@ using AutoFixture;
 using FluentAssertions;
 using Moq;
 using OwnID.Commands;
+using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Abstractions;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Flow.Contracts.Link;
 using OwnID.Extensibility.Providers;
+using OwnID.Services;
 using OwnID.Tests.TestUtils;
 using Xunit;
 
-namespace OwnID.Tests.Flow.Commands
+namespace OwnID.Tests.Commands
 {
     public class CreateFlowCommandTest
     {
@@ -36,7 +38,7 @@ namespace OwnID.Tests.Flow.Commands
         {
             var fixture = new Fixture().SetOwnidSpecificSettings();
 
-            var cacheService = fixture.Freeze<Mock<ICacheItemService>>();
+            var cacheService = fixture.Freeze<Mock<ICacheItemRepository>>();
             var urlProvider = fixture.Freeze<IUrlProvider>();
             var identitiesProvider = fixture.Freeze<IIdentitiesProvider>();
             var configuration = fixture.Freeze<IOwnIdCoreConfiguration>();
@@ -80,16 +82,12 @@ namespace OwnID.Tests.Flow.Commands
             }
 
             cacheService.Verify(
-                x => x.CreateAuthFlowSessionItemAsync(context, nonce, challengeType, expectedFlowType, did, payload),
-                Times.Once);
-
+                x => x.CreateAsync(
+                    It.Is<CacheItem>(y => y.Context == context && y.Nonce == nonce && y.FlowType == expectedFlowType),
+                    null), Times.Once);
 
             var url = urlProvider.GetWebAppSignWithCallbackUrl(urlProvider.GetStartFlowUrl(context), language);
-
-            if (fido2Enabled)
-                url = urlProvider.GetFido2Url(url, challengeType, language);
-
-            var expected = new GetChallengeLinkResponse(context, url.ToString(), nonce, expiration);
+            var expected = new GetChallengeLinkResponse(context, url.ToString(), nonce, expiration, false);
 
             actual.Should().BeEquivalentTo(expected);
         }

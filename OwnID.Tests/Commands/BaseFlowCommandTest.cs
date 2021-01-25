@@ -1,4 +1,4 @@
-namespace OwnID.Tests.Flow.Commands
+namespace OwnID.Tests.Commands
 {
     public class BaseFlowCommandTest
     {
