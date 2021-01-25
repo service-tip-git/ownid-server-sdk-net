@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Flow.Contracts;
+using OwnID.Extensibility.Flow.Contracts.Cookies;
 
 namespace OwnID.Services
 {
@@ -17,5 +18,7 @@ namespace OwnID.Services
         public CookieInfo DeleteCookie(string name);
 
         public List<CookieInfo> CreateAuthCookies(CacheItem cacheItem);
+
+        public (CookieType? Type, string[] Values) GetVersionedCookieValues(string rawCookieValue);
     }
 }

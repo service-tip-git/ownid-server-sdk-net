@@ -23,4 +23,10 @@
   <data name="Field {0} has incorrect format" xml:space="preserve">{0} 필드의 형식이 잘못되었습니다.</data>
   <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">{0} 필드는 문자열 또는 배열 유형이어야 하며 최대 길이는 '{1}'자입니다.</data>
   <data name="Error_PhoneAlreadyConnected" xml:space="preserve">전화기가 계정에 이미 연결되어 있습니다. 로그인 페이지로 이동하십시오.</data>
+  <data name="Error_UserNotFound" xml:space="preserve">
+    <value>사용자 없음</value>
+  </data>
+  <data name="Error_RequiresBiometricInput" xml:space="preserve">
+    <value>생체 인증 입력 필요</value>
+  </data>
 </root>

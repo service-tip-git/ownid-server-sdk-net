@@ -20,18 +20,23 @@ namespace OwnID.Commands.MagicLink
         private readonly IEmailService _emailService;
         private readonly IIdentitiesProvider _identitiesProvider;
         private readonly IMagicLinkConfiguration _magicLinkConfiguration;
+        private readonly IOwnIdCoreConfiguration _ownIdCoreConfiguration;
+        private readonly ILocalizationService _localizationService;
         private readonly TimeSpan _tokenExpiration;
         private readonly IUserHandlerAdapter _userHandlerAdapter;
 
         public SendMagicLinkCommand(ICacheItemRepository cacheItemRepository, IUserHandlerAdapter userHandlerAdapter,
             IIdentitiesProvider identitiesProvider, IEmailService emailService,
-            IMagicLinkConfiguration magicLinkConfiguration)
+            IMagicLinkConfiguration magicLinkConfiguration, IOwnIdCoreConfiguration ownIdCoreConfiguration,
+            ILocalizationService localizationService)
         {
             _cacheItemRepository = cacheItemRepository;
             _userHandlerAdapter = userHandlerAdapter;
             _identitiesProvider = identitiesProvider;
             _emailService = emailService;
             _magicLinkConfiguration = magicLinkConfiguration;
+            _ownIdCoreConfiguration = ownIdCoreConfiguration;
+            _localizationService = localizationService;
             _tokenExpiration = TimeSpan.FromMilliseconds(magicLinkConfiguration.TokenLifetime);
         }
 
@@ -62,14 +67,19 @@ namespace OwnID.Commands.MagicLink
                 result.CheckTokenLifetime = _magicLinkConfiguration.TokenLifetime;
             }
 
+            var userName = await _userHandlerAdapter.GetUserNameAsync(did);
             var link = new UriBuilder(_magicLinkConfiguration.RedirectUrl);
             var query = HttpUtility.ParseQueryString(link.Query);
             query["ownid-mtkn"] = token;
             query["ownid-ctxt"] = context;
             link.Query = query.ToString() ?? string.Empty;
 
-            await _emailService.SendAsync(email, "OwnID - Magic Link",
-                $"Here is your <a href=\"{link.Uri}\">magic link</a> to login. <br>Cmon click me!", true);
+            var subject = string.Format(_localizationService.GetLocalizedString("Email_MagicLink_Subject"),
+                _ownIdCoreConfiguration.Name);
+            var body = string.Format(_localizationService.GetLocalizedString("Email_MagicLink_Body"), userName,
+                link.Uri);
+            
+            await _emailService.SendAsync(email, subject, body, true);
 
             return result;
         }

@@ -23,4 +23,10 @@
   <data name="Field {0} has incorrect format" xml:space="preserve">Alan {0} yanlış biçim içeriyor</data>
   <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">{0} alanı, en fazla '{1}' uzunluğunda bir dizi veya dizilim türü olmalıdır</data>
   <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Telefonunuz zaten bir hesapla ilişkilendirilmiş, lütfen oturum açma sayfasına gidin</data>
+  <data name="Error_UserNotFound" xml:space="preserve">
+    <value>Kullanıcı bulunamadı</value>
+  </data>
+  <data name="Error_RequiresBiometricInput" xml:space="preserve">
+    <value>Biyometrik giriş gerekli</value>
+  </data>
 </root>

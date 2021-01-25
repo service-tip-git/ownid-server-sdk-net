@@ -15,9 +15,11 @@ namespace OwnID.Flow.TransitionHandlers
     {
         private readonly IOwnIdCoreConfiguration _coreConfiguration;
 
+        public override StepType StepType => StepType.ApprovePin;
+
         public PinApprovalStatusTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
-            IUrlProvider urlProvider, IOwnIdCoreConfiguration coreConfiguration) : base(StepType.ApprovePin,
-            jwtComposer, stopFlowCommand, urlProvider)
+            IUrlProvider urlProvider, IOwnIdCoreConfiguration coreConfiguration) : base(jwtComposer, stopFlowCommand,
+            urlProvider)
         {
             _coreConfiguration = coreConfiguration;
         }

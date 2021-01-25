@@ -31,14 +31,8 @@ namespace OwnID.Web.Middlewares
                 return;
             }
 
-            await _addConnectionCommand.ExecuteAsync(request);
-            OkNoContent(httpContext.Response);
-
-            // TODO: add proper error handling for gigya handling -> client app
-            // catch (CommandValidationException e)
-            // {
-            //     await Json(httpContext, new {Error = true, Message = e.Message}, StatusCodes.Status200OK);
-            // }
+            var result = await _addConnectionCommand.ExecuteAsync(request);
+            await JsonAsync(httpContext, result, StatusCodes.Status200OK);
         }
     }
 }

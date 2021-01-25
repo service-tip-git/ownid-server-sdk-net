@@ -73,7 +73,7 @@ namespace OwnID.Extensibility.Flow.Abstractions
         Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey);
 
         /// <summary>
-        ///     Check if user with provided public key already exists
+        ///     Checks if user with provided public key already exists
         /// </summary>
         /// <param name="publicKey">public key</param>
         /// <returns>
@@ -84,7 +84,7 @@ namespace OwnID.Extensibility.Flow.Abstractions
         Task<bool> IsUserExists(string publicKey);
 
         /// <summary>
-        ///     Check if user with provided Fido2 credential id exists
+        ///     Checks if user with provided Fido2 credential id exists
         /// </summary>
         /// <param name="fido2CredentialId">Fido2 credential id</param>
         /// <returns>
@@ -122,7 +122,7 @@ namespace OwnID.Extensibility.Flow.Abstractions
         Task<string> GetUserIdByEmail(string email);
 
         /// <summary>
-        ///     Get user settings
+        ///     Gets user settings
         /// </summary>
         /// <param name="publicKey">user public key</param>
         /// <returns>
@@ -133,11 +133,18 @@ namespace OwnID.Extensibility.Flow.Abstractions
         Task<UserSettings> GetUserSettingsAsync(string publicKey);
 
         /// <summary>
-        ///     Upgrade connection
+        ///     Upgrades connection
         /// </summary>
         /// <param name="did"></param>
         /// <param name="newConnection"></param>
         /// <returns></returns>
         Task UpgradeConnectionAsync(string did, OwnIdConnection newConnection);
+
+        /// <summary>
+        ///     Gets user name
+        /// </summary>
+        /// <param name="did">User unique identifier</param>
+        /// <returns>User name</returns>
+        Task<string> GetUserNameAsync(string did);
     }
 }

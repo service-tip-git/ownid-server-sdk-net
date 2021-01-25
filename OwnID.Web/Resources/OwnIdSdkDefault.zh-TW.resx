@@ -23,4 +23,10 @@
   <data name="Field {0} has incorrect format" xml:space="preserve">欄位 {0} 格式不正確</data>
   <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">欄位 {0} 必須是最大長度為「{1}」的字串或陣列類型。</data>
   <data name="Error_PhoneAlreadyConnected" xml:space="preserve">您的手機已與帳戶相關聯，請前往登入頁面</data>
+  <data name="Error_UserNotFound" xml:space="preserve">
+    <value>找不到使用者</value>
+  </data>
+  <data name="Error_RequiresBiometricInput" xml:space="preserve">
+    <value>需要生物識別輸入</value>
+  </data>
 </root>

@@ -98,5 +98,35 @@ namespace OwnID.Web.Resources {
                 return ResourceManager.GetString("Error_UserNotFound", resourceCulture);
             }
         }
+        
+        internal static string Error_RequiresBiometricInput {
+            get {
+                return ResourceManager.GetString("Error_RequiresBiometricInput", resourceCulture);
+            }
+        }
+        
+        internal static string Error_RecoveryTokenExpired {
+            get {
+                return ResourceManager.GetString("Error_RecoveryTokenExpired", resourceCulture);
+            }
+        }
+        
+        internal static string Error_UserCanceledAuth {
+            get {
+                return ResourceManager.GetString("Error_UserCanceledAuth", resourceCulture);
+            }
+        }
+        
+        internal static string Email_MagicLink_Body {
+            get {
+                return ResourceManager.GetString("Email_MagicLink_Body", resourceCulture);
+            }
+        }
+        
+        internal static string Email_MagicLink_Subject {
+            get {
+                return ResourceManager.GetString("Email_MagicLink_Subject", resourceCulture);
+            }
+        }
     }
 }

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -43,7 +45,7 @@ namespace OwnID.Web.Gigya.ApiClient
 
             if (data != null)
             {
-                foreach (var connection in data.Connections.Where(connection => string.IsNullOrEmpty(connection.Hash)))
+                foreach (var connection in data.OwnId.Connections.Where(connection => string.IsNullOrEmpty(connection.Hash)))
                     connection.Hash = connection.PublicKey.GetSha256();
 
                 parameters.AddParameter("data", data);
@@ -138,12 +140,15 @@ namespace OwnID.Web.Gigya.ApiClient
                 await responseMessage.Content.ReadAsStreamAsync());
         }
 
-        public async Task<UidContainer> SearchByPublicKey(string publicKey)
+        public async Task<UidContainer> SearchByPublicKey(string publicKey,
+            GigyaProfileFields fields = GigyaProfileFields.UID | GigyaProfileFields.Connections)
         {
-            var result = await SearchAsync<UidResponse>("data.ownIdConnections.keyHsh", publicKey.GetSha256());
+            var objectsToGet = GetGigyaProfileFields(fields | GigyaProfileFields.ConnectionPublicKeys);
+            var result =
+                await SearchAsync<UidResponse>("data.ownId.connections.keyHsh", publicKey.GetSha256(), objectsToGet);
             var user = result.Results?.FirstOrDefault();
 
-            if (result.ErrorCode != 0 || (user?.Data?.Connections?.All(x => x.PublicKey != publicKey) ?? true))
+            if (result.ErrorCode != 0 || (user?.Data?.OwnId.Connections?.All(x => x.PublicKey != publicKey) ?? true))
                 return null;
 
             return user;
@@ -151,11 +156,11 @@ namespace OwnID.Web.Gigya.ApiClient
 
         public async Task<UidContainer> SearchByFido2CredentialId(string fido2CredentialId)
         {
-            var result = await SearchAsync<UidResponse>("data.ownIdConnections.fido2CredentialId", fido2CredentialId);
+            var result = await SearchAsync<UidResponse>("data.ownId.connections.fido2CredentialId", fido2CredentialId);
             var user = result.Results?.FirstOrDefault();
 
             if (result.ErrorCode != 0
-                || (user?.Data?.Connections?.All(x => x.Fido2CredentialId != fido2CredentialId) ?? true))
+                || (user?.Data?.OwnId.Connections?.All(x => x.Fido2CredentialId != fido2CredentialId) ?? true))
                 return null;
 
             return user;
@@ -163,8 +168,8 @@ namespace OwnID.Web.Gigya.ApiClient
 
         public async Task<GetAccountInfoResponse<TProfile>> SearchByRecoveryTokenAsync(string recoveryToken)
         {
-            var result = await SearchAsync<GetAccountInfoResponseList<TProfile>>("data.ownIdConnections.recoveryId",
-                recoveryToken, new[] {"UID", "data.ownIdConnections", "profile"});
+            var result = await SearchAsync<GetAccountInfoResponseList<TProfile>>("data.ownId.connections.recoveryId",
+                recoveryToken, new[] {"UID", "data.ownId.connections", "profile"});
             return result.Results?.FirstOrDefault();
         }
 
@@ -196,7 +201,9 @@ namespace OwnID.Web.Gigya.ApiClient
             string[] objectsToGet = null)
             where TResult : BaseGigyaResponse
         {
-            objectsToGet ??= new[] {"UID", "data.ownIdConnections", "data.userSettings"};
+            objectsToGet ??= new[] {"UID", "data.ownId.connections"};
+
+            objectsToGet = objectsToGet.Distinct().ToArray();
 
             var parameters = ParametersFactory.CreateAuthParameters(_configuration).AddParameter("query",
                 $"SELECT {string.Join(", ", objectsToGet)} FROM accounts WHERE {searchKey} = \"{searchValue}\" LIMIT 1");
@@ -206,6 +213,45 @@ namespace OwnID.Web.Gigya.ApiClient
 
             var result = await OwnIdSerializer.DeserializeAsync<TResult>(
                 await responseMessage.Content.ReadAsStreamAsync());
+
+            return result;
+        }
+
+        private readonly ConcurrentDictionary<GigyaProfileFields, string[]> _profileFieldsCache = new();
+
+        private string[] GetGigyaProfileFields(GigyaProfileFields fields)
+        {
+            if (_profileFieldsCache.TryGetValue(fields, out var result))
+                return result;
+
+            var resultFields = new List<string>();
+
+            var enumType = typeof(GigyaProfileFields);
+            foreach (var value in Enum.GetValues<GigyaProfileFields>())
+            {
+                if (!fields.HasFlag(value))
+                    continue;
+
+                var memberInfos = enumType.GetMember(value.ToString());
+
+                var enumValueMemberInfo = memberInfos.First(m => m.DeclaringType == enumType);
+                var valueAttributes = enumValueMemberInfo.GetCustomAttributes(typeof(GigyaFieldsAttribute), false);
+
+                if (valueAttributes.Length == 0)
+                    throw new Exception($"`{nameof(GigyaProfileFields)}.{value}` doesn't has `GigyaFields` attribute");
+
+                var queriedFields = ((GigyaFieldsAttribute) valueAttributes[0]).Fields.Split(",");
+
+                resultFields.AddRange(queriedFields);
+            }
+
+            result = resultFields
+                .Select(x => x.Trim())
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArray();
+
+            _profileFieldsCache.TryAdd(fields, result);
 
             return result;
         }

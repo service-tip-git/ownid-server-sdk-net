@@ -14,8 +14,10 @@ namespace OwnID.Flow.TransitionHandlers
     {
         private readonly StopFlowCommand _stopFlowCommand;
 
+        public override StepType StepType => StepType.Stopped;
+
         public StopFlowTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
-            IUrlProvider urlProvider) : base(StepType.Stopped, jwtComposer, stopFlowCommand, urlProvider)
+            IUrlProvider urlProvider) : base(jwtComposer, stopFlowCommand, urlProvider)
         {
             _stopFlowCommand = stopFlowCommand;
         }
@@ -32,8 +34,7 @@ namespace OwnID.Flow.TransitionHandlers
         protected override async Task<ITransitionResult> ExecuteInternalAsync(TransitionInput input,
             CacheItem relatedItem)
         {
-            // TODO: add text localization
-            await _stopFlowCommand.ExecuteAsync(input.Context, "User stopped auth process");
+            await _stopFlowCommand.ExecuteAsync(input.Context, "Error_UserCanceledAuth");
             var composeInfo = new BaseJwtComposeInfo(input)
             {
                 Behavior = GetNextBehaviorFunc(input, relatedItem),

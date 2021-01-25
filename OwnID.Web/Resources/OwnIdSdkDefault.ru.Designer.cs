@@ -87,9 +87,21 @@ namespace OwnID.Web.Resources {
             }
         }
         
+        internal static string Error_PhoneAlreadyConnected {
+            get {
+                return ResourceManager.GetString("Error_PhoneAlreadyConnected", resourceCulture);
+            }
+        }
+        
         internal static string Error_UserNotFound {
             get {
                 return ResourceManager.GetString("Error_UserNotFound", resourceCulture);
+            }
+        }
+        
+        internal static string Error_RequiresBiometricInput {
+            get {
+                return ResourceManager.GetString("Error_RequiresBiometricInput", resourceCulture);
             }
         }
     }

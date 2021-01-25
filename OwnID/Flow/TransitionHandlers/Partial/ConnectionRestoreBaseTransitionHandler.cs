@@ -14,10 +14,13 @@ namespace OwnID.Flow.TransitionHandlers.Partial
     public class ConnectionRestoreBaseTransitionHandler : BaseTransitionHandler<TransitionInput>
     {
         private readonly InternalConnectionRecoveryCommand _internalConnectionRecoveryCommand;
+        
+        public override StepType StepType => StepType.InternalConnectionRecovery;
+
 
         public ConnectionRestoreBaseTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
             IUrlProvider urlProvider, InternalConnectionRecoveryCommand internalConnectionRecoveryCommand) : base(
-            StepType.InternalConnectionRecovery, jwtComposer, stopFlowCommand, urlProvider)
+            jwtComposer, stopFlowCommand, urlProvider)
         {
             _internalConnectionRecoveryCommand = internalConnectionRecoveryCommand;
         }
@@ -41,7 +44,8 @@ namespace OwnID.Flow.TransitionHandlers.Partial
             var composeInfo = new BaseJwtComposeInfo(input)
             {
                 Behavior = GetNextBehaviorFunc(input, relatedItem),
-                EncToken = relatedItem.EncToken
+                EncKey = relatedItem.EncKey,
+                EncVector = relatedItem.EncVector
             };
 
             var jwt = JwtComposer.GenerateRecoveryDataJwt(composeInfo, result);

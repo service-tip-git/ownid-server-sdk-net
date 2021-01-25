@@ -23,4 +23,10 @@
   <data name="Field {0} has incorrect format" xml:space="preserve">Bidang {0} memiliki format yang salah</data>
   <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">Bidang {0} harus berupa tipe larik atau string dengan panjang maksimum '{1}'</data>
   <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Telepon Anda telah dikaitkan dengan akun, silakan buka halaman login</data>
+  <data name="Error_UserNotFound" xml:space="preserve">
+    <value>Pengguna tidak ditemukan</value>
+  </data>
+  <data name="Error_RequiresBiometricInput" xml:space="preserve">
+    <value>Diperlukan input biometrik</value>
+  </data>
 </root>

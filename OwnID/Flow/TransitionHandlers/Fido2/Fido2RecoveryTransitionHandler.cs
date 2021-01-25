@@ -14,9 +14,11 @@ namespace OwnID.Flow.TransitionHandlers.Fido2
     {
         private readonly Fido2RecoveryCommand _fido2RecoveryCommand;
 
+        public override StepType StepType => StepType.Fido2Authorize;
+
         public Fido2RecoveryTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
-            IUrlProvider urlProvider, ICookieService cookieService, Fido2RecoveryCommand fido2RecoveryCommand) : base(jwtComposer, stopFlowCommand, urlProvider,
-            cookieService)
+            IUrlProvider urlProvider, ICookieService cookieService, Fido2RecoveryCommand fido2RecoveryCommand) : base(
+            jwtComposer, stopFlowCommand, urlProvider, cookieService)
         {
             _fido2RecoveryCommand = fido2RecoveryCommand;
         }

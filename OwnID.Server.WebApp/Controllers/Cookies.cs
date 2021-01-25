@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using OwnID.Extensibility.Flow.Contracts;
+using OwnID.Extensibility.Flow.Contracts.Cookies;
 using OwnID.Server.WebApp.Models;
 
 namespace OwnID.Server.WebApp.Controllers
@@ -93,7 +93,9 @@ namespace OwnID.Server.WebApp.Controllers
 
             foreach (var cookie in Request.Cookies)
             {
-                if (!cookie.Value.EndsWith(CookieValuesConstants.PasscodeEnding))
+                if (!cookie.Value.Contains(
+                    $"{CookieValuesConstants.SubValueSeparator}{CookieValuesConstants.PasscodeCookieType}{CookieValuesConstants.SubValueSeparator}")
+                )
                     continue;
 
                 var connectionId = _connectionIdRegex.Match(cookie.Key).Groups[1].Captures.FirstOrDefault()?.Value;

@@ -23,4 +23,10 @@
   <data name="Field {0} has incorrect format" xml:space="preserve">Trường {0} có định dạng không chính xác</data>
   <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">Trường {0} phải là kiểu chuỗi hoặc mảng với độ dài tối đa '{1}'</data>
   <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Điện thoại của bạn đã liên kết với một tài khoản, vui lòng đi đến trang đăng nhập</data>
+  <data name="Error_UserNotFound" xml:space="preserve">
+    <value>Không tìm thấy người dùng</value>
+  </data>
+  <data name="Error_RequiresBiometricInput" xml:space="preserve">
+    <value>Nhập sinh trắc học được yêu cầu</value>
+  </data>
 </root>

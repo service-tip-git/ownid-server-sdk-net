@@ -11,7 +11,7 @@ namespace OwnID.Web.Gigya
         [Required]
         [MaxLength(200)]
         public string Email { get; set; }
-        
+
         [OwnIdField(Constants.DefaultFirstNameLabel, Constants.DefaultFirstNameLabel)]
         [MaxLength(200)]
         public string FirstName { get; set; }

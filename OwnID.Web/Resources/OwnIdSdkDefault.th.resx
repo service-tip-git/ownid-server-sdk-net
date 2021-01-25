@@ -23,4 +23,10 @@
   <data name="Field {0} has incorrect format" xml:space="preserve">ฟิลด์ {0} มีรูปแบบที่ไม่ถูกต้อง</data>
   <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">ฟิลด์ {0} ต้องเป็นประเภทสตริงหรืออาร์เรย์ที่มีความยาวสูงสุด '{1}'</data>
   <data name="Error_PhoneAlreadyConnected" xml:space="preserve">โทรศัพท์ของคุณเชื่อมโยงกับบัญชีแล้ว กรุณาไปที่หน้าการเข้าสู่ระบบ</data>
+  <data name="Error_UserNotFound" xml:space="preserve">
+    <value>ไม่พบผู้ใช้</value>
+  </data>
+  <data name="Error_RequiresBiometricInput" xml:space="preserve">
+    <value>ต้องมีการตรวจสอบข้อมูลทางกายภาพ</value>
+  </data>
 </root>

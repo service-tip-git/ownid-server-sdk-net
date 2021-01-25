@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Configuration;
-using OwnID.Extensibility.Flow.Contracts;
+using OwnID.Extensibility.Flow.Contracts.Cookies;
 using OwnID.Extensions;
 
 namespace OwnID.Services
@@ -52,17 +53,35 @@ namespace OwnID.Services
         {
             var result = new List<CookieInfo>();
 
-            if (!string.IsNullOrEmpty(cacheItem.EncToken))
+            if (!string.IsNullOrEmpty(cacheItem.EncKey) && !string.IsNullOrEmpty(cacheItem.EncVector))
                 result.Add(CreateCookie(EncryptionCookieName,
-                    $"{cacheItem.EncToken}{cacheItem.EncTokenEnding ?? string.Empty}"));
+                    FormatVersionedCookieValue(cacheItem.AuthCookieType,
+                        new[] {cacheItem.EncKey, cacheItem.EncVector})));
 
             if (!string.IsNullOrEmpty(cacheItem.RecoveryToken))
-                result.Add(CreateCookie(RecoveryCookieName, cacheItem.RecoveryToken));
+                result.Add(CreateCookie(RecoveryCookieName,
+                    FormatVersionedCookieValue(CookieType.Recovery, cacheItem.RecoveryToken)));
 
             if (!string.IsNullOrEmpty(cacheItem.Fido2CredentialId))
-                result.Add(CreateCookie(CredIdCookieName, cacheItem.Fido2CredentialId));
+                result.Add(CreateCookie(CredIdCookieName,
+                    FormatVersionedCookieValue(CookieType.Fido2, cacheItem.Fido2CredentialId)));
 
             return result;
+        }
+
+        public (CookieType? Type, string[] Values) GetVersionedCookieValues(string rawCookieValue)
+        {
+            if (string.IsNullOrWhiteSpace(rawCookieValue))
+                return (null, null);
+
+            var split = rawCookieValue.Split(CookieValuesConstants.SubValueSeparator);
+
+            if (split.Length < 3 || split[0] != CookieValuesConstants.ValueLatestVersion)
+                throw new NotSupportedException($"cookie version is corrupted '{rawCookieValue}'");
+
+            var type = split[1].ToCookieType();
+
+            return (type, split.Skip(2).ToArray());
         }
 
         private CookieOptions GetOptions(DateTimeOffset? expire = null)
@@ -75,6 +94,19 @@ namespace OwnID.Services
                 SameSite = SameSiteMode.Lax,
                 Expires = expire
             };
+        }
+
+        private string FormatVersionedCookieValue(CookieType type, string value, string version = null)
+        {
+            return FormatVersionedCookieValue(type, new[] {value}, version);
+        }
+
+        private string FormatVersionedCookieValue(CookieType type, string[] values, string version = null)
+        {
+            var starting = string.Format(CookieValuesConstants.ValueStarting,
+                version ?? CookieValuesConstants.ValueLatestVersion, type.ToConstantString());
+
+            return $"{starting}{string.Join(CookieValuesConstants.SubValueSeparator, values)}";
         }
     }
 }

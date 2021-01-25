@@ -12,6 +12,8 @@ namespace OwnID.Flow.TransitionHandlers.Fido2
     public class Fido2RegisterTransitionHandler : Fido2BaseTransitionHandler
     {
         private readonly Fido2RegisterCommand _fido2RegisterCommand;
+        
+        public override StepType StepType => StepType.Fido2Authorize;
 
         public Fido2RegisterTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
             IUrlProvider urlProvider, ICookieService cookieService, Fido2RegisterCommand fido2RegisterCommand) : base(

@@ -8,6 +8,7 @@ using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Contracts;
+using OwnID.Extensibility.Flow.Contracts.Cookies;
 using OwnID.Extensibility.Flow.Contracts.Jwt;
 using OwnID.Extensibility.Flow.Contracts.Start;
 using OwnID.Extensibility.Providers;
@@ -23,13 +24,16 @@ namespace OwnID.Flow.TransitionHandlers
         private readonly VerifyFido2CredentialIdCommand _verifyFido2CredentialIdCommand;
         private readonly SetNewEncryptionTokenCommand _setNewEncryptionTokenCommand;
         private readonly TrySwitchToFido2FlowCommand _trySwitchToFido2FlowCommand;
+        
+        public override StepType StepType => StepType.AcceptStart;
+
 
         public AcceptStartTransitionHandler(IJwtComposer jwtComposer, StopFlowCommand stopFlowCommand,
             IUrlProvider urlProvider, IOwnIdCoreConfiguration coreConfiguration,
             TrySwitchToFido2FlowCommand trySwitchToFido2FlowCommand,
             SetNewEncryptionTokenCommand setNewEncryptionTokenCommand, IIdentitiesProvider identitiesProvider,
-            VerifyFido2CredentialIdCommand verifyFido2CredentialIdCommand) : base(StepType.AcceptStart, jwtComposer,
-            stopFlowCommand, urlProvider)
+            VerifyFido2CredentialIdCommand verifyFido2CredentialIdCommand) : base(jwtComposer, stopFlowCommand,
+            urlProvider)
         {
             _coreConfiguration = coreConfiguration;
             _trySwitchToFido2FlowCommand = trySwitchToFido2FlowCommand;
@@ -37,7 +41,7 @@ namespace OwnID.Flow.TransitionHandlers
             _identitiesProvider = identitiesProvider;
             _verifyFido2CredentialIdCommand = verifyFido2CredentialIdCommand;
         }
-
+        
         public override FrontendBehavior GetOwnReference(string context, ChallengeType challengeType)
         {
             return new(StepType, challengeType, new CallAction(UrlProvider.GetAcceptStartFlowUrl(context)));
@@ -127,7 +131,7 @@ namespace OwnID.Flow.TransitionHandlers
 
                 // go to passcode if such behavior enabled and check if create
                 if (_coreConfiguration.Fido2FallbackBehavior == Fido2FallbackBehavior.Passcode
-                    && (relatedItem.EncTokenEnding == CookieValuesConstants.PasscodeEnding
+                    && (relatedItem.AuthCookieType == CookieType.Passcode
                         || relatedItem.ChallengeType != ChallengeType.Login))
                 {
                     composeInfo.Behavior = NavigateToEnterPasscode(input, relatedItem);
@@ -141,14 +145,16 @@ namespace OwnID.Flow.TransitionHandlers
                 composeInfo.Behavior = GetNextBehaviorFunc(input, relatedItem);
             }
 
-            if (!string.IsNullOrWhiteSpace(relatedItem.EncToken))
+            if (!string.IsNullOrWhiteSpace(relatedItem.EncKey))
             {
-                composeInfo.EncToken = relatedItem.EncToken;
+                composeInfo.EncKey = relatedItem.EncKey;
+                composeInfo.EncVector = relatedItem.EncVector;
             }
             else
             {
                 var updatedItem = await _setNewEncryptionTokenCommand.ExecuteAsync(relatedItem.Context);
-                composeInfo.EncToken = updatedItem.EncToken;
+                composeInfo.EncKey = updatedItem.EncKey;
+                composeInfo.EncVector = updatedItem.EncVector;
                 // TODO: rework
                 relatedItem = updatedItem;
             }

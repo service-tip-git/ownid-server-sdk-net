@@ -7,7 +7,7 @@ namespace OwnID.Extensibility.Flow.Contracts
         /// <summary>
         ///     Indicates if TFA is enabled for current user
         /// </summary>
-        [JsonPropertyName("tfaEnabled")]
-        public bool? TFAEnabled { get; set; }
+        [JsonPropertyName("enforceTfa")]
+        public bool? EnforceTFA { get; set; }
     }
 }
