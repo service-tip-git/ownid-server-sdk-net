@@ -5,6 +5,7 @@ using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Abstractions;
 using OwnID.Extensibility.Flow.Contracts;
+using OwnID.Extensibility.Services;
 using OwnID.Flow.Adapters;
 using OwnID.Services;
 
@@ -14,16 +15,19 @@ namespace OwnID.Commands
     {
         private readonly IAccountLinkHandler _accountLinkHandler;
         private readonly ICacheItemRepository _cacheItemRepository;
-        private readonly IUserHandlerAdapter _userHandlerAdapter;
         private readonly IOwnIdCoreConfiguration _coreConfiguration;
+        private readonly ILocalizationService _localizationService;
+        private readonly IUserHandlerAdapter _userHandlerAdapter;
 
         public AddConnectionCommand(IAccountLinkHandler accountLinkHandler, ICacheItemRepository cacheItemRepository,
-            IUserHandlerAdapter userHandlerAdapter, IOwnIdCoreConfiguration coreConfiguration)
+            IUserHandlerAdapter userHandlerAdapter, IOwnIdCoreConfiguration coreConfiguration,
+            ILocalizationService localizationService)
         {
             _accountLinkHandler = accountLinkHandler;
             _cacheItemRepository = cacheItemRepository;
             _userHandlerAdapter = userHandlerAdapter;
             _coreConfiguration = coreConfiguration;
+            _localizationService = localizationService;
         }
 
         public async Task<AuthResult> ExecuteAsync(AddConnectionRequest request)
@@ -40,9 +44,8 @@ namespace OwnID.Commands
             var connectionState = await _accountLinkHandler.GetCurrentUserLinkStateAsync(request.Payload);
 
             if (connectionState.ConnectedDevicesCount >= _coreConfiguration.MaximumNumberOfConnectedDevices)
-                return new AuthResult(
-                    $"Maximum number ({_coreConfiguration.MaximumNumberOfConnectedDevices}) of linked devices reached");
-            
+                return new AuthResult(_localizationService.GetLocalizedString("Error_PhoneAlreadyConnected"));
+
             var connectionExists = !string.IsNullOrEmpty(cacheItem.Fido2CredentialId)
                 ? await _userHandlerAdapter.IsFido2UserExistsAsync(cacheItem.Fido2CredentialId)
                 : await _userHandlerAdapter.IsUserExistsAsync(cacheItem.PublicKey);
