@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-gigya
+spec:
+  template:
+    spec:
+      containers:
+        - name: server-gigya
+          env:
+            - name: OWNID__CALLBACK_URL
+              value: https://server1.multilevel.ownid.com
+            - name: OWNID__DID
+              value: did:ownid:multilevel_195153891
+            - name: OWNID__NAME
+              value: Multilevel site
+            - name: OWNID__DESCRIPTION
+              value: Multilevel site
+            - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
+              value: https://passwordless.multilevel.ownid.com
+            - name: OWNID__TOP_DOMAIN
+              value: multilevel.ownid.com
+            - name: GIGYA__SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: demo-secret
+                  key: multilevel_gigya_secret
+            - name: GIGYA__API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: demo-secret
+                  key: multilevel_gigya_api_key
