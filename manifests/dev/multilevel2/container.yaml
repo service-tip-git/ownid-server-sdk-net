@@ -10,7 +10,7 @@ spec:
         - name: server-gigya
           env:
             - name: OWNID__CALLBACK_URL
-              value: https://multilevel2-server.dev.ownid.com
+              value: https://server2.multilevel.dev.ownid.com
             - name: OWNID__DID
               value: did:ownid:demo_multilevel_195153891
             - name: OWNID__NAME
@@ -18,9 +18,9 @@ spec:
             - name: OWNID__DESCRIPTION
               value: Multilevel site
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
-              value: https://multilevel-passwordless2.dev.ownid.com
+              value: https://passwordless.multilevel.dev.ownid.com
             - name: OWNID__TOP_DOMAIN
-              value: dev.ownid.com
+              value: multilevel.dev.ownid.com
             - name: GIGYA__SECRET
               valueFrom:
                 secretKeyRef:
