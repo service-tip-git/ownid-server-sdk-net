@@ -1,3 +1,4 @@
+# parent site
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,10 +24,20 @@ spec:
             - name: GIGYA__SECRET
               valueFrom:
                 secretKeyRef:
-                  name: demo-secret
-                  key: multilevel_gigya_secret
+                  name: demo-multilevel1-secret
+                  key: gigya_secret
             - name: GIGYA__API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: demo-secret
-                  key: multilevel_gigya_api_key
+                  name: demo-multilevel1-secret
+                  key: gigya_api_key
+            - name: OWNID__PUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: demo-multilevel1-secret
+                  key: public_key
+            - name: OWNID__PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: demo-multilevel1-secret
+                  key: private_key
