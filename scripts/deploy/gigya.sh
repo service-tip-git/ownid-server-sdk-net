@@ -19,7 +19,7 @@ echo Update IMAGE in base kustomization.yaml
 echo Applications update
 
 if [ "$ENV" == "dev" ]; then
-  apps=(demo demo2 multilevel1 multilevel2)
+  apps=(demo demo2 demo3 demo4 multilevel1 multilevel2)
 else
   apps=(demo demo2 demo3 demo4 dor)
 fi
