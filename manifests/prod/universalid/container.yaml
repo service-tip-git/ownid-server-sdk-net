@@ -30,8 +30,6 @@ spec:
                   key: private_key
             - name: OWNID__TFA_ENABLED
               value: 'false'
-            - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
-              value: https://passwordless.<universalid>.com
             - name: OWNID__TOP_DOMAIN
               value: <universalid>.com
             - name: GIGYA__DATA_CENTER
