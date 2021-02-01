@@ -1,4 +1,4 @@
-# OwnId server SDK for NET Core 3
+# OwnId server SDK for .NET 5
 
 ## Description
 OwnID enables your customers to use their phone as a key to instantly login to your websites or apps. Passwords are finally gone.
