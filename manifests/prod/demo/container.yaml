@@ -46,3 +46,28 @@ spec:
               value: 'true'
             - name: Metrics__Namespace
               value: 'Demo Production'
+            - name: SMTP__HOST
+              valueFrom:
+                secretKeyRef:
+                  name: demo-smtp-secret
+                  key: host
+            - name: SMTP__USER_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: demo-smtp-secret
+                  key: user-name
+            - name: SMTP__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: demo-smtp-secret
+                  key: password
+            - name: SMTP__SSL
+              value: 'true'
+            - name: SMTP__FROM_ADDRESS
+              value: no-reply@skipthepassword.com
+            - name: SMTP__FROM_NAME
+              value: Magic Link
+            - name: OWNID__MAGIC_LINK__ENABLED
+              value: 'true'
+            - name: OWNID__MAGIC_LINK__REDIRECT_URL
+              value: https://demo.ownid.com/login
