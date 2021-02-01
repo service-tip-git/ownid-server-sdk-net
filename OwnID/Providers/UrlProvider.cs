@@ -102,12 +102,15 @@ namespace OwnID.Providers
             var settingsUrl = new UriBuilder(GetBaseActionUrl(context, "fido2/settings"));
             var settingsQuery = HttpUtility.ParseQueryString(fido2Url.Query);
             settingsQuery[QueryStringParameters.RequestToken] = requestToken;
+            
+            if (!string.IsNullOrWhiteSpace(language))
+            {
+                query[QueryStringParameters.Language] = language;
+                settingsQuery[QueryStringParameters.Language] = language;
+            }
+
             settingsUrl.Query = settingsQuery.ToString() ?? string.Empty;
             query[QueryStringParameters.CallBackUrl] = settingsUrl.Uri.ToString();
-
-            if (!string.IsNullOrWhiteSpace(language))
-                query[QueryStringParameters.Language] = language;
-
             fido2Url.Query = query.ToString() ?? string.Empty;
             return fido2Url.Uri;
         }
