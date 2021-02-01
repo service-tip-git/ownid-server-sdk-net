@@ -15,18 +15,62 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Email" xml:space="preserve">E-mail</data>
-  <data name="First Name" xml:space="preserve">Nome próprio</data>
-  <data name="Last Name" xml:space="preserve">Apelido</data>
-  <data name="Nickname" xml:space="preserve">Alcunha</data>
-  <data name="Field {0} is required" xml:space="preserve">O campo {0} é obrigatório</data>
-  <data name="Field {0} has incorrect format" xml:space="preserve">O campo {0} tem um formato incorreto</data>
-  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">O campo {0} deve ser uma cadeia ou tipo de matriz com um comprimento máximo de '{1}'</data>
-  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">O seu telefone já está associado a uma conta, vá para a página de início de sessão</data>
+  <data name="Email" xml:space="preserve">
+    <value>E-mail</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>Nome próprio</value>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>Apelido</value>
+  </data>
+  <data name="Nickname" xml:space="preserve">
+    <value>Alcunha</value>
+  </data>
+  <data name="Field {0} is required" xml:space="preserve">
+    <value>O campo {0} é obrigatório</value>
+  </data>
+  <data name="Field {0} has incorrect format" xml:space="preserve">
+    <value>O campo {0} tem um formato incorreto</value>
+  </data>
+  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">
+    <value>O campo {0} deve ser uma cadeia ou tipo de matriz com um comprimento máximo de '{1}'</value>
+  </data>
+  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">
+    <value>O seu telefone já está associado a uma conta, vá para a página de início de sessão</value>
+  </data>
   <data name="Error_UserNotFound" xml:space="preserve">
-    <value>Utilizador não encontrado</value>
+    <value>O utilizador não foi encontrado</value>
   </data>
   <data name="Error_RequiresBiometricInput" xml:space="preserve">
     <value>Entrada biométrica obrigatória</value>
+  </data>
+  <data name="Error_RecoveryTokenExpired" xml:space="preserve">
+    <value>O token de recuperação expirou</value>
+  </data>
+  <data name="Error_UserCanceledAuth" xml:space="preserve">
+    <value>O processo de autorização foi cancelado pelo utilizador</value>
+  </data>
+  <data name="Email_MagicLink_Body" xml:space="preserve">
+    <value>&lt;html&gt;
+    &lt;body&gt;
+        &lt;div style="font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;"&gt;
+            &lt;p&gt;
+                Olá {0},
+                &lt;br&gt;
+                Utilize a ligação abaixo para iniciar sessão na sua conta.
+            &lt;/p&gt;
+            &lt;p&gt;
+                &lt;a href="{1}"&gt;Ligação mágica para iniciar sessão&lt;/a&gt;
+            &lt;/p&gt;
+            &lt;p style="font-size: 12px; line-height: 20px;"&gt;
+                Se não tiver efetuado este pedido, ignore esta mensagem e vá para o botão acima para selecionar uma nova palavra-passe para a sua conta.
+            &lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</value>
+  </data>
+  <data name="Email_MagicLink_Subject" xml:space="preserve">
+    <value>Ligação mágica para {0}</value>
   </data>
 </root>

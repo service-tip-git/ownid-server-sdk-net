@@ -159,10 +159,9 @@ namespace OwnID.Tools.ResourceGenerator
                 var newTranslationElement = new XElement("data"
                     , new XAttribute("name", key)
                     , new XAttribute(XNamespace.Xml + "space", "preserve")
-                )
-                {
-                    Value = value
-                };
+                );
+                
+                newTranslationElement.Add(new XElement("value", value));
 
                 xmlDocument.Root.Add(newTranslationElement);
             }

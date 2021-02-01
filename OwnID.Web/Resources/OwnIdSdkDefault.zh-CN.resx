@@ -15,18 +15,62 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Email" xml:space="preserve">电子邮件</data>
-  <data name="First Name" xml:space="preserve">名</data>
-  <data name="Last Name" xml:space="preserve">姓</data>
-  <data name="Nickname" xml:space="preserve">昵称</data>
-  <data name="Field {0} is required" xml:space="preserve">字段 {0} 为必填字段</data>
-  <data name="Field {0} has incorrect format" xml:space="preserve">字段 {0} 的格式不正确</data>
-  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">字段 {0} 必须为字符串或数组类型，且最大长度为 '{1}'</data>
-  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">您的手机已与某个账户相关联，请转到登录页面</data>
+  <data name="Email" xml:space="preserve">
+    <value>电子邮件</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>名</value>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>姓</value>
+  </data>
+  <data name="Nickname" xml:space="preserve">
+    <value>昵称</value>
+  </data>
+  <data name="Field {0} is required" xml:space="preserve">
+    <value>字段 {0} 为必填字段</value>
+  </data>
+  <data name="Field {0} has incorrect format" xml:space="preserve">
+    <value>字段 {0} 的格式不正确</value>
+  </data>
+  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">
+    <value>字段 {0} 必须为字符串或数组类型，且最大长度为 '{1}'</value>
+  </data>
+  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">
+    <value>您的手机已与某个账户相关联，请转到登录页面</value>
+  </data>
   <data name="Error_UserNotFound" xml:space="preserve">
     <value>未找到用户</value>
   </data>
   <data name="Error_RequiresBiometricInput" xml:space="preserve">
     <value>需要生物测定输入</value>
+  </data>
+  <data name="Error_RecoveryTokenExpired" xml:space="preserve">
+    <value>恢复令牌已过期</value>
+  </data>
+  <data name="Error_UserCanceledAuth" xml:space="preserve">
+    <value>用户已取消授权流程</value>
+  </data>
+  <data name="Email_MagicLink_Body" xml:space="preserve">
+    <value>&lt;html&gt;
+    &lt;body&gt;
+        &lt;div style="font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;"&gt;
+            &lt;p&gt;
+                您好 {0}，
+                &lt;br&gt;
+                使用下面的链接登录到您的账户。
+            &lt;/p&gt;
+            &lt;p&gt;
+                &lt;a href="{1}"&gt;用于登录的智慧链接&lt;/a&gt;
+            &lt;/p&gt;
+            &lt;p style="font-size: 12px; line-height: 20px;"&gt;
+                如果您未提出此请求，请忽略此消息，或转到上面的按钮为您的账户选择新密码。
+            &lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</value>
+  </data>
+  <data name="Email_MagicLink_Subject" xml:space="preserve">
+    <value>{0} 的智慧链接</value>
   </data>
 </root>

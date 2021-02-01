@@ -15,18 +15,62 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Email" xml:space="preserve">電子郵件</data>
-  <data name="First Name" xml:space="preserve">名</data>
-  <data name="Last Name" xml:space="preserve">姓</data>
-  <data name="Nickname" xml:space="preserve">暱稱</data>
-  <data name="Field {0} is required" xml:space="preserve">需要欄位 {0}</data>
-  <data name="Field {0} has incorrect format" xml:space="preserve">欄位 {0} 格式不正確</data>
-  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">欄位 {0} 必須是最大長度為「{1}」的字串或陣列類型。</data>
-  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">您的手機已與帳戶相關聯，請前往登入頁面</data>
+  <data name="Email" xml:space="preserve">
+    <value>電子郵件</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>名</value>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>姓</value>
+  </data>
+  <data name="Nickname" xml:space="preserve">
+    <value>暱稱</value>
+  </data>
+  <data name="Field {0} is required" xml:space="preserve">
+    <value>需要欄位 {0}</value>
+  </data>
+  <data name="Field {0} has incorrect format" xml:space="preserve">
+    <value>欄位 {0} 格式不正確</value>
+  </data>
+  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">
+    <value>欄位 {0} 必須是最大長度為「{1}」的字串或陣列類型。</value>
+  </data>
+  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">
+    <value>您的手機已與帳戶相關聯，請前往登入頁面</value>
+  </data>
   <data name="Error_UserNotFound" xml:space="preserve">
     <value>找不到使用者</value>
   </data>
   <data name="Error_RequiresBiometricInput" xml:space="preserve">
     <value>需要生物識別輸入</value>
+  </data>
+  <data name="Error_RecoveryTokenExpired" xml:space="preserve">
+    <value>復原記號已到期</value>
+  </data>
+  <data name="Error_UserCanceledAuth" xml:space="preserve">
+    <value>使用者已取消權限處理</value>
+  </data>
+  <data name="Email_MagicLink_Body" xml:space="preserve">
+    <value>&lt;html&gt;
+    &lt;body&gt;
+        &lt;div style="font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;"&gt;
+            &lt;p&gt;
+                Hi {0},
+                &lt;br&gt;
+                請使用下方連結登入您的帳戶。
+            &lt;/p&gt;
+            &lt;p&gt;
+                &lt;a href="{1}"&gt;使用 Magic Link 登入&lt;/a&gt;
+            &lt;/p&gt;
+            &lt;p style="font-size: 12px; line-height: 20px;"&gt;
+                若您沒有提出此請求，請忽略此訊息或前往上述按鈕，選擇您帳戶的新密碼。
+            &lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</value>
+  </data>
+  <data name="Email_MagicLink_Subject" xml:space="preserve">
+    <value>{0} 的 Magic Link</value>
   </data>
 </root>

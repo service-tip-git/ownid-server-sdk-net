@@ -15,18 +15,62 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Email" xml:space="preserve">電子メール</data>
-  <data name="First Name" xml:space="preserve">名</data>
-  <data name="Last Name" xml:space="preserve">姓</data>
-  <data name="Nickname" xml:space="preserve">ニックネーム</data>
-  <data name="Field {0} is required" xml:space="preserve">フィールド {0} は必須です</data>
-  <data name="Field {0} has incorrect format" xml:space="preserve">フィールド {0} の書式が不適切です</data>
-  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">フィールド {0} は最大長 '{1}' の文字列または配列である必要があります</data>
-  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">電話とアカウントがすでに関連付けられています、ログインページに進んでください</data>
+  <data name="Email" xml:space="preserve">
+    <value>電子メール</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>名</value>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>姓</value>
+  </data>
+  <data name="Nickname" xml:space="preserve">
+    <value>ニックネーム</value>
+  </data>
+  <data name="Field {0} is required" xml:space="preserve">
+    <value>フィールド {0} は必須です</value>
+  </data>
+  <data name="Field {0} has incorrect format" xml:space="preserve">
+    <value>フィールド {0} の書式が不適切です</value>
+  </data>
+  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">
+    <value>フィールド {0} は最大長 '{1}' の文字列または配列である必要があります</value>
+  </data>
+  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">
+    <value>電話とアカウントがすでに関連付けられています、ログインページに進んでください</value>
+  </data>
   <data name="Error_UserNotFound" xml:space="preserve">
-    <value>ユーザが見つかりません</value>
+    <value>ユーザが見つかりませんでした</value>
   </data>
   <data name="Error_RequiresBiometricInput" xml:space="preserve">
     <value>生体認証が必要です</value>
+  </data>
+  <data name="Error_RecoveryTokenExpired" xml:space="preserve">
+    <value>リカバリトークンの有効期限を超過しました</value>
+  </data>
+  <data name="Error_UserCanceledAuth" xml:space="preserve">
+    <value>認証プロセスはユーザによってキャンセルされました</value>
+  </data>
+  <data name="Email_MagicLink_Body" xml:space="preserve">
+    <value>&lt;html&gt;
+    &lt;body&gt;
+        &lt;div style="font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;"&gt;
+            &lt;p&gt;
+                こんにちは{0}
+                &lt;br&gt;
+                以下のリンクを使用して、アカウントにログインしてください。
+            &lt;/p&gt;
+            &lt;p&gt;
+                &lt;a href="{1}"&gt;ログイン用のリンク&lt;/a&gt;
+            &lt;/p&gt;
+            &lt;p style="font-size: 12px; line-height: 20px;"&gt;
+                この申請を行っていない場合は、このメッセージを無視するか、または上部のボタンを使用して、アカウント用の新しいパスワードを選択してください。
+            &lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</value>
+  </data>
+  <data name="Email_MagicLink_Subject" xml:space="preserve">
+    <value>{0} 用のリンク</value>
   </data>
 </root>

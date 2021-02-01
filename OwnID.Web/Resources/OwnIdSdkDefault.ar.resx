@@ -15,18 +15,62 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Email" xml:space="preserve">البريد الإلكتروني</data>
-  <data name="First Name" xml:space="preserve">الاسم الأول</data>
-  <data name="Last Name" xml:space="preserve">اسم العائلة</data>
-  <data name="Nickname" xml:space="preserve">الكنية</data>
-  <data name="Field {0} is required" xml:space="preserve">الحقل {0} مطلوب</data>
-  <data name="Field {0} has incorrect format" xml:space="preserve">الحقل {0} له تنسيق غير صحيح</data>
-  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">الحقل {0} يجب أن يكون من نوع السلسلة أو الصفيف بطول '{1}' كحد أقصى</data>
-  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">هاتفك مقترن بالفعل بحساب، يُرجى الانتقال إلى صفحة تسجيل الدخول</data>
+  <data name="Email" xml:space="preserve">
+    <value>البريد الإلكتروني</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>الاسم الأول</value>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>الاسم الأخير</value>
+  </data>
+  <data name="Nickname" xml:space="preserve">
+    <value>الكنية</value>
+  </data>
+  <data name="Field {0} is required" xml:space="preserve">
+    <value>الحقل {0} مطلوب</value>
+  </data>
+  <data name="Field {0} has incorrect format" xml:space="preserve">
+    <value>الحقل {0} له تنسيق غير صحيح</value>
+  </data>
+  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">
+    <value>الحقل {0} يجب أن يكون من نوع السلسلة أو الصفيف بطول '{1}' كحد أقصى</value>
+  </data>
+  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">
+    <value>هاتفك مقترن بالفعل بحساب، يُرجى الانتقال إلى صفحة تسجيل الدخول</value>
+  </data>
   <data name="Error_UserNotFound" xml:space="preserve">
-    <value>المستخدم غير موجود</value>
+    <value>لم يتم العثور على المستخدم</value>
   </data>
   <data name="Error_RequiresBiometricInput" xml:space="preserve">
     <value>إدخال تحديد الهوية مطلوب</value>
+  </data>
+  <data name="Error_RecoveryTokenExpired" xml:space="preserve">
+    <value>انتهت صلاحية الرمز المميز للاستعادة</value>
+  </data>
+  <data name="Error_UserCanceledAuth" xml:space="preserve">
+    <value>ألغى المستخدم عملية التفويض</value>
+  </data>
+  <data name="Email_MagicLink_Body" xml:space="preserve">
+    <value>&lt;html&gt;
+    &lt;body&gt;
+        &lt;div style="font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;"&gt;
+            &lt;p&gt;
+                مرحبًا {0}،
+                &lt;br&gt;
+                يمكنك استخدام الارتباط أدناه لتسجيل الدخول إلى حسابك.
+            &lt;/p&gt;
+            &lt;p&gt;
+                &lt;a href="{1}"&gt;الارتباط السحري لتسجيل الدخول&lt;/a&gt;
+            &lt;/p&gt;
+            &lt;p style="font-size: 12px; line-height: 20px;"&gt;
+                إذا لم تنشئ هذا الطلب، يرجى تجاهل هذه الرسالة أو الانتقال إلى الزر أعلاه لتحددي كلمة مرور جديدة لحسابك.
+            &lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</value>
+  </data>
+  <data name="Email_MagicLink_Subject" xml:space="preserve">
+    <value>الارتباط السحري لـ {0}</value>
   </data>
 </root>

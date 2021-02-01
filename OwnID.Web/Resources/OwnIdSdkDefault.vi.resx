@@ -15,18 +15,62 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Email" xml:space="preserve">Thư điện tử</data>
-  <data name="First Name" xml:space="preserve">Tên</data>
-  <data name="Last Name" xml:space="preserve">Họ</data>
-  <data name="Nickname" xml:space="preserve">Biệt danh</data>
-  <data name="Field {0} is required" xml:space="preserve">Trường {0} được yêu cầu</data>
-  <data name="Field {0} has incorrect format" xml:space="preserve">Trường {0} có định dạng không chính xác</data>
-  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">Trường {0} phải là kiểu chuỗi hoặc mảng với độ dài tối đa '{1}'</data>
-  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Điện thoại của bạn đã liên kết với một tài khoản, vui lòng đi đến trang đăng nhập</data>
+  <data name="Email" xml:space="preserve">
+    <value>Thư điện tử</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>Tên</value>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>Họ</value>
+  </data>
+  <data name="Nickname" xml:space="preserve">
+    <value>Biệt danh</value>
+  </data>
+  <data name="Field {0} is required" xml:space="preserve">
+    <value>Trường {0} được yêu cầu</value>
+  </data>
+  <data name="Field {0} has incorrect format" xml:space="preserve">
+    <value>Trường {0} có định dạng không chính xác</value>
+  </data>
+  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">
+    <value>Trường {0} phải là kiểu chuỗi hoặc mảng với độ dài tối đa '{1}'</value>
+  </data>
+  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">
+    <value>Điện thoại của bạn đã liên kết với một tài khoản, vui lòng đi đến trang đăng nhập</value>
+  </data>
   <data name="Error_UserNotFound" xml:space="preserve">
     <value>Không tìm thấy người dùng</value>
   </data>
   <data name="Error_RequiresBiometricInput" xml:space="preserve">
     <value>Nhập sinh trắc học được yêu cầu</value>
+  </data>
+  <data name="Error_RecoveryTokenExpired" xml:space="preserve">
+    <value>Token phục hồi hết hạn</value>
+  </data>
+  <data name="Error_UserCanceledAuth" xml:space="preserve">
+    <value>Quy trình phân quyền bị người dùng hủy</value>
+  </data>
+  <data name="Email_MagicLink_Body" xml:space="preserve">
+    <value>&lt;html&gt;
+    &lt;body&gt;
+        &lt;div style="font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;"&gt;
+            &lt;p&gt;
+                Xin chào {0},
+                &lt;br&gt;
+                Sử dụng liên kết bên dưới để đăng nhập vào tài khoản của bạn.
+            &lt;/p&gt;
+            &lt;p&gt;
+                &lt;a href="{1}"&gt;Magic link để đăng nhập&lt;/a&gt;
+            &lt;/p&gt;
+            &lt;p style="font-size: 12px; line-height: 20px;"&gt;
+                Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua thông báo này hoặc đi đến nút ở trên để chọn mật khẩu mới cho tài khoản của bạn.
+            &lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</value>
+  </data>
+  <data name="Email_MagicLink_Subject" xml:space="preserve">
+    <value>Magic link cho {0}</value>
   </data>
 </root>

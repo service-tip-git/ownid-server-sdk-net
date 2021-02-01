@@ -15,18 +15,62 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Email" xml:space="preserve">E-Mail</data>
-  <data name="First Name" xml:space="preserve">Vorname</data>
-  <data name="Last Name" xml:space="preserve">Nachname</data>
-  <data name="Nickname" xml:space="preserve">Spitzname</data>
-  <data name="Field {0} is required" xml:space="preserve">Feld {0} ist erforderlich</data>
-  <data name="Field {0} has incorrect format" xml:space="preserve">Feld {0} hat falsches Format</data>
-  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">Das Feld {0} muss ein Zeichenfolgen- oder Array-Typ mit einer maximalen Länge von "{1}" sein</data>
-  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Ihr Telefon ist bereits einem Konto zugeordnet, gehen Sie zur Anmeldeseite</data>
+  <data name="Email" xml:space="preserve">
+    <value>E-Mail</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>Vorname</value>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>Nachname</value>
+  </data>
+  <data name="Nickname" xml:space="preserve">
+    <value>Spitzname</value>
+  </data>
+  <data name="Field {0} is required" xml:space="preserve">
+    <value>Feld {0} ist erforderlich</value>
+  </data>
+  <data name="Field {0} has incorrect format" xml:space="preserve">
+    <value>Feld {0} hat falsches Format</value>
+  </data>
+  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">
+    <value>Das Feld {0} muss ein Zeichenfolgen- oder Array-Typ mit einer maximalen Länge von "{1}" sein</value>
+  </data>
+  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">
+    <value>Ihr Telefon ist bereits einem Konto zugeordnet, gehen Sie zur Anmeldeseite</value>
+  </data>
   <data name="Error_UserNotFound" xml:space="preserve">
-    <value>Benutzer nicht gefunden</value>
+    <value>Benutzer wurde nicht gefunden</value>
   </data>
   <data name="Error_RequiresBiometricInput" xml:space="preserve">
     <value>Biometrische Eingabe erforderlich</value>
+  </data>
+  <data name="Error_RecoveryTokenExpired" xml:space="preserve">
+    <value>Wiederherstellungs-Token war abgelaufen</value>
+  </data>
+  <data name="Error_UserCanceledAuth" xml:space="preserve">
+    <value>Autorisierungsvorgang wurde von Benutzer abgebrochen</value>
+  </data>
+  <data name="Email_MagicLink_Body" xml:space="preserve">
+    <value>&lt;html&gt;
+    &lt;body&gt;
+        &lt;div style="font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;"&gt;
+            &lt;p&gt;
+                Hallo {0},
+                &lt;br&gt;
+                melden Sie sich über den nachfolgenden Link an Ihrem Konto an.
+            &lt;/p&gt;
+            &lt;p&gt;
+                &lt;a href="{1}"&gt;Zauberlink zur Anmeldung&lt;/a&gt;
+            &lt;/p&gt;
+            &lt;p style="font-size: 12px; line-height: 20px;"&gt;
+                Wenn Sie dies nicht angefordert haben, ignorieren Sie diese Meldung oder wählen Sie über die Drucktaste oben ein neues Kennwort für Ihr Konto aus.
+            &lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</value>
+  </data>
+  <data name="Email_MagicLink_Subject" xml:space="preserve">
+    <value>Zauberlink für {0}</value>
   </data>
 </root>

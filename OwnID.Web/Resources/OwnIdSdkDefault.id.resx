@@ -15,18 +15,62 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Email" xml:space="preserve">Email</data>
-  <data name="First Name" xml:space="preserve">Nama Depan</data>
-  <data name="Last Name" xml:space="preserve">Nama Belakang</data>
-  <data name="Nickname" xml:space="preserve">Nama Panggilan</data>
-  <data name="Field {0} is required" xml:space="preserve">Bidang {0} wajib diisi</data>
-  <data name="Field {0} has incorrect format" xml:space="preserve">Bidang {0} memiliki format yang salah</data>
-  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">Bidang {0} harus berupa tipe larik atau string dengan panjang maksimum '{1}'</data>
-  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Telepon Anda telah dikaitkan dengan akun, silakan buka halaman login</data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>Nama Depan</value>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>Nama Belakang</value>
+  </data>
+  <data name="Nickname" xml:space="preserve">
+    <value>Nama Panggilan</value>
+  </data>
+  <data name="Field {0} is required" xml:space="preserve">
+    <value>Bidang {0} wajib diisi</value>
+  </data>
+  <data name="Field {0} has incorrect format" xml:space="preserve">
+    <value>Bidang {0} memiliki format yang salah</value>
+  </data>
+  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">
+    <value>Bidang {0} harus berupa tipe larik atau string dengan panjang maksimum '{1}'</value>
+  </data>
+  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">
+    <value>Telepon Anda telah dikaitkan dengan akun, silakan buka halaman login</value>
+  </data>
   <data name="Error_UserNotFound" xml:space="preserve">
     <value>Pengguna tidak ditemukan</value>
   </data>
   <data name="Error_RequiresBiometricInput" xml:space="preserve">
     <value>Diperlukan input biometrik</value>
+  </data>
+  <data name="Error_RecoveryTokenExpired" xml:space="preserve">
+    <value>Token pemulihan kedaluwarsa</value>
+  </data>
+  <data name="Error_UserCanceledAuth" xml:space="preserve">
+    <value>Proses otorisasi dibatalkan oleh pengguna</value>
+  </data>
+  <data name="Email_MagicLink_Body" xml:space="preserve">
+    <value>&lt;html&gt;
+    &lt;body&gt;
+        &lt;div style="font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;"&gt;
+            &lt;p&gt;
+                Hai {0},
+                &lt;br&gt;
+                Gunakan tautan di bawah untuk masuk ke akun Anda.
+            &lt;/p&gt;
+            &lt;p&gt;
+                &lt;a href="{1}"&gt;Tautan ajaib untuk masuk&lt;/a&gt;
+            &lt;/p&gt;
+            &lt;p style="font-size: 12px; line-height: 20px;"&gt;
+                Jika Anda tidak membuat permintaan ini, silakan abaikan pesan ini atau tekan tombol di atas untuk memilih kata sandi baru untuk akun Anda.
+            &lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</value>
+  </data>
+  <data name="Email_MagicLink_Subject" xml:space="preserve">
+    <value>Tautan ajaib untuk {0}</value>
   </data>
 </root>

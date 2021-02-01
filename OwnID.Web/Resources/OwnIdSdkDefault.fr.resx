@@ -15,18 +15,62 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Email" xml:space="preserve">E-mail</data>
-  <data name="First Name" xml:space="preserve">Prénom</data>
-  <data name="Last Name" xml:space="preserve">Nom de famille</data>
-  <data name="Nickname" xml:space="preserve">Pseudonyme</data>
-  <data name="Field {0} is required" xml:space="preserve">La zone {0} est obligatoire.</data>
-  <data name="Field {0} has incorrect format" xml:space="preserve">La zone {0} a un format incorrect.</data>
-  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">La zone {0} doit être de type Chaîne ou Tableau, avec une longueur maximale de '{1}'.</data>
-  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">Votre téléphone est déjà associé à un compte, accédez à la page de connexion.</data>
+  <data name="Email" xml:space="preserve">
+    <value>E-mail</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>Prénom</value>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>Nom de famille</value>
+  </data>
+  <data name="Nickname" xml:space="preserve">
+    <value>Pseudonyme</value>
+  </data>
+  <data name="Field {0} is required" xml:space="preserve">
+    <value>La zone {0} est obligatoire.</value>
+  </data>
+  <data name="Field {0} has incorrect format" xml:space="preserve">
+    <value>La zone {0} a un format incorrect.</value>
+  </data>
+  <data name="The field {0} must be a string or array type with a maximum length of '{1}'" xml:space="preserve">
+    <value>La zone {0} doit être de type Chaîne ou Tableau, avec une longueur maximale de '{1}'.</value>
+  </data>
+  <data name="Error_PhoneAlreadyConnected" xml:space="preserve">
+    <value>Votre téléphone est déjà associé à un compte, accédez à la page de connexion.</value>
+  </data>
   <data name="Error_UserNotFound" xml:space="preserve">
     <value>Utilisateur introuvable</value>
   </data>
   <data name="Error_RequiresBiometricInput" xml:space="preserve">
     <value>Saisie biométrique requise</value>
+  </data>
+  <data name="Error_RecoveryTokenExpired" xml:space="preserve">
+    <value>Jeton de récupération expiré</value>
+  </data>
+  <data name="Error_UserCanceledAuth" xml:space="preserve">
+    <value>Le processus d'autorisation a été annulé par l'utilisateur.</value>
+  </data>
+  <data name="Email_MagicLink_Body" xml:space="preserve">
+    <value>&lt;html&gt;
+    &lt;body&gt;
+        &lt;div style="font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;"&gt;
+            &lt;p&gt;
+                Bonjour {0},
+                &lt;br&gt;
+                Utilisez le lien ci-dessous pour vous connecter à votre compte.
+            &lt;/p&gt;
+            &lt;p&gt;
+                &lt;a href="{1}"&gt;Lien de téléchargement pour vous connecter&lt;/a&gt;
+            &lt;/p&gt;
+            &lt;p style="font-size: 12px; line-height: 20px;"&gt;
+                Si vous n'êtes pas à l'origine de cette demande, ignorez ce message ou cliquez sur le bouton de commande ci-dessus pour définir un nouveau mot de passe pour votre compte.
+            &lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</value>
+  </data>
+  <data name="Email_MagicLink_Subject" xml:space="preserve">
+    <value>Lien de téléchargement pour {0}</value>
   </data>
 </root>
