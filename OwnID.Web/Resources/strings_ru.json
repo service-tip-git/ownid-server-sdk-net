@@ -7,6 +7,12 @@
     "Field {0} is required" : "Поле {0} обязательное",
     "Field {0} has incorrect format" : "Поле {0} имеет неправильный формат",
     "The field {0} must be a string or array type with a maximum length of '{1}'" : "Поле {0} должно быть строкой или массивом с максимальной длиной '{1}'",
-    "Error_PhoneAlreadyConnected" : "Ваш телефон уже привязан к учетной записи, перейдите на страницу входа"
+    "Error_PhoneAlreadyConnected" : "Ваш телефон уже привязан к учетной записи, перейдите на страницу входа",
+    "Error_UserNotFound" : "Пользователь не найден",
+    "Error_RequiresBiometricInput" : "Требуется использование биометрических данных",
+    "Error_RecoveryTokenExpired" : "Срок действия маркера восстановления истек",
+    "Error_UserCanceledAuth" : "Процесс авторизации отменен пользователем",
+    "Email_MagicLink_Body" : "<html>\n    <body>\n        <div style=\"font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;\">\n            <p>\n                Здравствуйте, {0},\n                <br>\n                Для входа в учетную запись используйте ссылку ниже.\n            </p>\n            <p>\n                <a href=\"{1}\">Ссылка для входа</a>\n            </p>\n            <p style=\"font-size: 12px; line-height: 20px;\">\n                Если вы не запрашивали ссылку, игнорируйте это сообщение или нажмите кнопку выше для выбора нового пароля для вашей учетной записи.\n            </p>\n        </div>\n    </body>\n</html>",
+    "Email_MagicLink_Subject" : "Ссылка для {0}"
   }
 }

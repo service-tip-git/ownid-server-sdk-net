@@ -7,6 +7,12 @@
     "Field {0} is required" : "Trường {0} được yêu cầu",
     "Field {0} has incorrect format" : "Trường {0} có định dạng không chính xác",
     "The field {0} must be a string or array type with a maximum length of '{1}'" : "Trường {0} phải là kiểu chuỗi hoặc mảng với độ dài tối đa '{1}'",
-    "Error_PhoneAlreadyConnected" : "Điện thoại của bạn đã liên kết với một tài khoản, vui lòng đi đến trang đăng nhập"
+    "Error_PhoneAlreadyConnected" : "Điện thoại của bạn đã liên kết với một tài khoản, vui lòng đi đến trang đăng nhập",
+    "Error_UserNotFound" : "Không tìm thấy người dùng",
+    "Error_RequiresBiometricInput" : "Nhập sinh trắc học được yêu cầu",
+    "Error_RecoveryTokenExpired" : "Token phục hồi hết hạn",
+    "Error_UserCanceledAuth" : "Quy trình phân quyền bị người dùng hủy",
+    "Email_MagicLink_Body" : "<html>\n    <body>\n        <div style=\"font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;\">\n            <p>\n                Xin chào {0},\n                <br>\n                Sử dụng liên kết bên dưới để đăng nhập vào tài khoản của bạn.\n            </p>\n            <p>\n                <a href=\"{1}\">Magic link để đăng nhập</a>\n            </p>\n            <p style=\"font-size: 12px; line-height: 20px;\">\n                Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua thông báo này hoặc đi đến nút ở trên để chọn mật khẩu mới cho tài khoản của bạn.\n            </p>\n        </div>\n    </body>\n</html>",
+    "Email_MagicLink_Subject" : "Magic link cho {0}"
   }
 }

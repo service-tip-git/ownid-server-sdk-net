@@ -7,6 +7,12 @@
     "Field {0} is required" : "Alan {0} gerekli",
     "Field {0} has incorrect format" : "Alan {0} yanlış biçim içeriyor",
     "The field {0} must be a string or array type with a maximum length of '{1}'" : "{0} alanı, en fazla '{1}' uzunluğunda bir dizi veya dizilim türü olmalıdır",
-    "Error_PhoneAlreadyConnected" : "Telefonunuz zaten bir hesapla ilişkilendirilmiş, lütfen oturum açma sayfasına gidin"
+    "Error_PhoneAlreadyConnected" : "Telefonunuz zaten bir hesapla ilişkilendirilmiş, lütfen oturum açma sayfasına gidin",
+    "Error_UserNotFound" : "Kullanıcı bulunamadı",
+    "Error_RequiresBiometricInput" : "Biyometrik giriş gerekli",
+    "Error_RecoveryTokenExpired" : "Kurtarma simgesinin süresi doldu",
+    "Error_UserCanceledAuth" : "Yetkilendirme süreci kullanıcı tarafından iptal edildi",
+    "Email_MagicLink_Body" : "<html>\n    <body>\n        <div style=\"font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;\">\n            <p>\n            Merhaba {0},\n                <br>\n                Hesabınızda oturumu açmak için aşağıdaki bağlantıyı kullanın.\n            </p>\n            <p>\n                <a href=\"{1}\">Oturum açmak için sihirli bağlantı</a>\n            </p>\n            <p style=\"font-size: 12px; line-height: 20px;\">\n                Bunu siz talep etmediyseniz bu iletiyi yoksayın veya hesabınız için yeni parola seçmek amacıyla yukarıdaki düğmeye gidin.\n            </p>\n        </div>\n    </body>\n</html>",
+    "Email_MagicLink_Subject" : "{0} için sihirli bağlantı"
   }
 }

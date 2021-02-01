@@ -7,6 +7,12 @@
     "Field {0} is required" : "Medan {0} diperlukan",
     "Field {0} has incorrect format" : "Medan {0} mempunyai format yang tidak betul",
     "The field {0} must be a string or array type with a maximum length of '{1}'" : "Medan {0} mestilah jenis rentetan atau tatasusunan dengan '{1}' panjang maksimum",
-    "Error_PhoneAlreadyConnected" : "Telefon anda telah dipautkan dengan akaun, sila pergi ke halaman log masuk"
+    "Error_PhoneAlreadyConnected" : "Telefon anda telah dipautkan dengan akaun, sila pergi ke halaman log masuk",
+    "Error_UserNotFound" : "Pengguna tidak ditemui",
+    "Error_RequiresBiometricInput" : "Input biometrik diperlukan",
+    "Error_RecoveryTokenExpired" : "Token pemulihan telah tamat tempoh",
+    "Error_UserCanceledAuth" : "Proses sah kuasa dibatalkan oleh pengguna",
+    "Email_MagicLink_Body" : "<html>\n    <body>\n        <div style=\"font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;\">\n            <p>\n                Hai {0},\n                <br>\n                Gunakan pautan di bawah untuk log masuk ke akaun anda.\n            </p>\n            <p>\n                <a href=\"{1}\">Pautan ajaib untuk log masuk</a>\n            </p>\n            <p style=\"font-size: 12px; line-height: 20px;\">\n                Jika anda tidak membuat permintaan ini, sila abaikan mesej ini atau pergi ke butang di atas untuk memilih kata laluan baharu akaun anda.\n            </p>\n        </div>\n    </body>\n</html>",
+    "Email_MagicLink_Subject" : "Pautan ajaib untuk {0}"
   }
 }

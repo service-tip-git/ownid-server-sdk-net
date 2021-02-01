@@ -7,6 +7,12 @@
     "Field {0} is required" : "O campo {0} é obrigatório",
     "Field {0} has incorrect format" : "O campo {0} tem um formato incorreto",
     "The field {0} must be a string or array type with a maximum length of '{1}'" : "O campo {0} deve ser uma cadeia ou tipo de matriz com um comprimento máximo de '{1}'",
-    "Error_PhoneAlreadyConnected" : "O seu telefone já está associado a uma conta, vá para a página de início de sessão"
+    "Error_PhoneAlreadyConnected" : "O seu telefone já está associado a uma conta, vá para a página de início de sessão",
+    "Error_UserNotFound" : "O utilizador não foi encontrado",
+    "Error_RequiresBiometricInput" : "Entrada biométrica obrigatória",
+    "Error_RecoveryTokenExpired" : "O token de recuperação expirou",
+    "Error_UserCanceledAuth" : "O processo de autorização foi cancelado pelo utilizador",
+    "Email_MagicLink_Body" : "<html>\n    <body>\n        <div style=\"font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;\">\n            <p>\n                Olá {0},\n                <br>\n                Utilize a ligação abaixo para iniciar sessão na sua conta.\n            </p>\n            <p>\n                <a href=\"{1}\">Ligação mágica para iniciar sessão</a>\n            </p>\n            <p style=\"font-size: 12px; line-height: 20px;\">\n                Se não tiver efetuado este pedido, ignore esta mensagem e vá para o botão acima para selecionar uma nova palavra-passe para a sua conta.\n            </p>\n        </div>\n    </body>\n</html>",
+    "Email_MagicLink_Subject" : "Ligação mágica para {0}"
   }
 }

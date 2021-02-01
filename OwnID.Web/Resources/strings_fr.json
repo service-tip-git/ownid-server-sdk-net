@@ -7,6 +7,12 @@
     "Field {0} is required" : "La zone {0} est obligatoire.",
     "Field {0} has incorrect format" : "La zone {0} a un format incorrect.",
     "The field {0} must be a string or array type with a maximum length of '{1}'" : "La zone {0} doit être de type Chaîne ou Tableau, avec une longueur maximale de '{1}'.",
-    "Error_PhoneAlreadyConnected" : "Votre téléphone est déjà associé à un compte, accédez à la page de connexion."
+    "Error_PhoneAlreadyConnected" : "Votre téléphone est déjà associé à un compte, accédez à la page de connexion.",
+    "Error_UserNotFound" : "Utilisateur introuvable",
+    "Error_RequiresBiometricInput" : "Saisie biométrique requise",
+    "Error_RecoveryTokenExpired" : "Jeton de récupération expiré",
+    "Error_UserCanceledAuth" : "Le processus d'autorisation a été annulé par l'utilisateur.",
+    "Email_MagicLink_Body" : "<html>\n    <body>\n        <div style=\"font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;\">\n            <p>\n                Bonjour {0},\n                <br>\n                Utilisez le lien ci-dessous pour vous connecter à votre compte.\n            </p>\n            <p>\n                <a href=\"{1}\">Lien de téléchargement pour vous connecter</a>\n            </p>\n            <p style=\"font-size: 12px; line-height: 20px;\">\n                Si vous n'êtes pas à l'origine de cette demande, ignorez ce message ou cliquez sur le bouton de commande ci-dessus pour définir un nouveau mot de passe pour votre compte.\n            </p>\n        </div>\n    </body>\n</html>",
+    "Email_MagicLink_Subject" : "Lien de téléchargement pour {0}"
   }
 }

@@ -7,6 +7,12 @@
     "Field {0} is required" : "字段 {0} 为必填字段",
     "Field {0} has incorrect format" : "字段 {0} 的格式不正确",
     "The field {0} must be a string or array type with a maximum length of '{1}'" : "字段 {0} 必须为字符串或数组类型，且最大长度为 '{1}'",
-    "Error_PhoneAlreadyConnected" : "您的手机已与某个账户相关联，请转到登录页面"
+    "Error_PhoneAlreadyConnected" : "您的手机已与某个账户相关联，请转到登录页面",
+    "Error_UserNotFound" : "未找到用户",
+    "Error_RequiresBiometricInput" : "需要生物测定输入",
+    "Error_RecoveryTokenExpired" : "恢复令牌已过期",
+    "Error_UserCanceledAuth" : "用户已取消授权流程",
+    "Email_MagicLink_Body" : "<html>\n    <body>\n        <div style=\"font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;\">\n            <p>\n                您好 {0}，\n                <br>\n                使用下面的链接登录到您的账户。\n            </p>\n            <p>\n                <a href=\"{1}\">用于登录的智慧链接</a>\n            </p>\n            <p style=\"font-size: 12px; line-height: 20px;\">\n                如果您未提出此请求，请忽略此消息，或转到上面的按钮为您的账户选择新密码。\n            </p>\n        </div>\n    </body>\n</html>",
+    "Email_MagicLink_Subject" : "{0} 的智慧链接"
   }
 }

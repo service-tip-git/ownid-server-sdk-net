@@ -7,6 +7,12 @@
     "Field {0} is required" : "需要欄位 {0}",
     "Field {0} has incorrect format" : "欄位 {0} 格式不正確",
     "The field {0} must be a string or array type with a maximum length of '{1}'" : "欄位 {0} 必須是最大長度為「{1}」的字串或陣列類型。",
-    "Error_PhoneAlreadyConnected" : "您的手機已與帳戶相關聯，請前往登入頁面"
+    "Error_PhoneAlreadyConnected" : "您的手機已與帳戶相關聯，請前往登入頁面",
+    "Error_UserNotFound" : "找不到使用者",
+    "Error_RequiresBiometricInput" : "需要生物識別輸入",
+    "Error_RecoveryTokenExpired" : "復原記號已到期",
+    "Error_UserCanceledAuth" : "使用者已取消權限處理",
+    "Email_MagicLink_Body" : "<html>\n    <body>\n        <div style=\"font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;\">\n            <p>\n                Hi {0},\n                <br>\n                請使用下方連結登入您的帳戶。\n            </p>\n            <p>\n                <a href=\"{1}\">使用 Magic Link 登入</a>\n            </p>\n            <p style=\"font-size: 12px; line-height: 20px;\">\n                若您沒有提出此請求，請忽略此訊息或前往上述按鈕，選擇您帳戶的新密碼。\n            </p>\n        </div>\n    </body>\n</html>",
+    "Email_MagicLink_Subject" : "{0} 的 Magic Link"
   }
 }

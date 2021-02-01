@@ -2,11 +2,17 @@
   "OwnIdSdkDefault" : {
     "Email" : "Correo electrónico",
     "First Name" : "Nombre",
-    "Last Name" : "Apellido",
+    "Last Name" : "Apellidos",
     "Nickname" : "Apodo",
     "Field {0} is required" : "El campo {0} es obligatorio",
     "Field {0} has incorrect format" : "El campo {0} tiene un formato incorrecto",
     "The field {0} must be a string or array type with a maximum length of '{1}'" : "El campo {0} debe ser un string o un tipo de matriz con una longitud máxima de \"{1}\"",
-    "Error_PhoneAlreadyConnected" : "Su teléfono ya se ha vinculado con una cuenta. Vaya a la página de inicio de sesión"
+    "Error_PhoneAlreadyConnected" : "Su teléfono ya se ha vinculado con una cuenta. Vaya a la página de inicio de sesión",
+    "Error_UserNotFound" : "No existe el usuario",
+    "Error_RequiresBiometricInput" : "Entrada biométrica obligatoria",
+    "Error_RecoveryTokenExpired" : "Ha expirado el token de recuperación",
+    "Error_UserCanceledAuth" : "Proceso de autorización cancelado por el usuario",
+    "Email_MagicLink_Body" : "<html>\n    <body>\n        <div style=\"font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;\">\n            <p>\n                Hola {0}:\n                <br>\n                Utilice el siguiente enlace para acceder a su cuenta.\n            </p>\n            <p>\n                <a href=\"{1}\">Enlace mágico para iniciar sesión</a>\n            </p>\n            <p style=\"font-size: 12px; line-height: 20px;\">\n                Si no ha solicitado esto, ignore este mensaje o vaya al botón anterior para seleccionar una nueva contraseña para su cuenta.\n            </p>\n        </div>\n    </body>\n</html>",
+    "Email_MagicLink_Subject" : "Enlace mágico para {0}"
   }
 }

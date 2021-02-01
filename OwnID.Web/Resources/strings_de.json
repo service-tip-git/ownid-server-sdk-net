@@ -7,6 +7,12 @@
     "Field {0} is required" : "Feld {0} ist erforderlich",
     "Field {0} has incorrect format" : "Feld {0} hat falsches Format",
     "The field {0} must be a string or array type with a maximum length of '{1}'" : "Das Feld {0} muss ein Zeichenfolgen- oder Array-Typ mit einer maximalen Länge von \"{1}\" sein",
-    "Error_PhoneAlreadyConnected" : "Ihr Telefon ist bereits einem Konto zugeordnet, gehen Sie zur Anmeldeseite"
+    "Error_PhoneAlreadyConnected" : "Ihr Telefon ist bereits einem Konto zugeordnet, gehen Sie zur Anmeldeseite",
+    "Error_UserNotFound" : "Benutzer wurde nicht gefunden",
+    "Error_RequiresBiometricInput" : "Biometrische Eingabe erforderlich",
+    "Error_RecoveryTokenExpired" : "Wiederherstellungs-Token war abgelaufen",
+    "Error_UserCanceledAuth" : "Autorisierungsvorgang wurde von Benutzer abgebrochen",
+    "Email_MagicLink_Body" : "<html>\n    <body>\n        <div style=\"font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;\">\n            <p>\n                Hallo {0},\n                <br>\n                melden Sie sich über den nachfolgenden Link an Ihrem Konto an.\n            </p>\n            <p>\n                <a href=\"{1}\">Zauberlink zur Anmeldung</a>\n            </p>\n            <p style=\"font-size: 12px; line-height: 20px;\">\n                Wenn Sie dies nicht angefordert haben, ignorieren Sie diese Meldung oder wählen Sie über die Drucktaste oben ein neues Kennwort für Ihr Konto aus.\n            </p>\n        </div>\n    </body>\n</html>",
+    "Email_MagicLink_Subject" : "Zauberlink für {0}"
   }
 }

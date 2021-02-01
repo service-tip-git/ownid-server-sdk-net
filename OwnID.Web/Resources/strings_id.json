@@ -7,6 +7,12 @@
     "Field {0} is required" : "Bidang {0} wajib diisi",
     "Field {0} has incorrect format" : "Bidang {0} memiliki format yang salah",
     "The field {0} must be a string or array type with a maximum length of '{1}'" : "Bidang {0} harus berupa tipe larik atau string dengan panjang maksimum '{1}'",
-    "Error_PhoneAlreadyConnected" : "Telepon Anda telah dikaitkan dengan akun, silakan buka halaman login"
+    "Error_PhoneAlreadyConnected" : "Telepon Anda telah dikaitkan dengan akun, silakan buka halaman login",
+    "Error_UserNotFound" : "Pengguna tidak ditemukan",
+    "Error_RequiresBiometricInput" : "Diperlukan input biometrik",
+    "Error_RecoveryTokenExpired" : "Token pemulihan kedaluwarsa",
+    "Error_UserCanceledAuth" : "Proses otorisasi dibatalkan oleh pengguna",
+    "Email_MagicLink_Body" : "<html>\n    <body>\n        <div style=\"font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;\">\n            <p>\n                Hai {0},\n                <br>\n                Gunakan tautan di bawah untuk masuk ke akun Anda.\n            </p>\n            <p>\n                <a href=\"{1}\">Tautan ajaib untuk masuk</a>\n            </p>\n            <p style=\"font-size: 12px; line-height: 20px;\">\n                Jika Anda tidak membuat permintaan ini, silakan abaikan pesan ini atau tekan tombol di atas untuk memilih kata sandi baru untuk akun Anda.\n            </p>\n        </div>\n    </body>\n</html>",
+    "Email_MagicLink_Subject" : "Tautan ajaib untuk {0}"
   }
 }

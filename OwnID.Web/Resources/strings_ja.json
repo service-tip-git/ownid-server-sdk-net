@@ -7,6 +7,12 @@
     "Field {0} is required" : "フィールド {0} は必須です",
     "Field {0} has incorrect format" : "フィールド {0} の書式が不適切です",
     "The field {0} must be a string or array type with a maximum length of '{1}'" : "フィールド {0} は最大長 '{1}' の文字列または配列である必要があります",
-    "Error_PhoneAlreadyConnected" : "電話とアカウントがすでに関連付けられています、ログインページに進んでください"
+    "Error_PhoneAlreadyConnected" : "電話とアカウントがすでに関連付けられています、ログインページに進んでください",
+    "Error_UserNotFound" : "ユーザが見つかりませんでした",
+    "Error_RequiresBiometricInput" : "生体認証が必要です",
+    "Error_RecoveryTokenExpired" : "リカバリトークンの有効期限を超過しました",
+    "Error_UserCanceledAuth" : "認証プロセスはユーザによってキャンセルされました",
+    "Email_MagicLink_Body" : "<html>\n    <body>\n        <div style=\"font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;\">\n            <p>\n                こんにちは{0}\n                <br>\n                以下のリンクを使用して、アカウントにログインしてください。\n            </p>\n            <p>\n                <a href=\"{1}\">ログイン用のリンク</a>\n            </p>\n            <p style=\"font-size: 12px; line-height: 20px;\">\n                この申請を行っていない場合は、このメッセージを無視するか、または上部のボタンを使用して、アカウント用の新しいパスワードを選択してください。\n            </p>\n        </div>\n    </body>\n</html>",
+    "Email_MagicLink_Subject" : "{0} 用のリンク"
   }
 }

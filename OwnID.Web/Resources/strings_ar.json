@@ -2,11 +2,17 @@
   "OwnIdSdkDefault" : {
     "Email" : "البريد الإلكتروني",
     "First Name" : "الاسم الأول",
-    "Last Name" : "اسم العائلة",
+    "Last Name" : "الاسم الأخير",
     "Nickname" : "الكنية",
     "Field {0} is required" : "الحقل {0} مطلوب",
     "Field {0} has incorrect format" : "الحقل {0} له تنسيق غير صحيح",
     "The field {0} must be a string or array type with a maximum length of '{1}'" : "الحقل {0} يجب أن يكون من نوع السلسلة أو الصفيف بطول '{1}' كحد أقصى",
-    "Error_PhoneAlreadyConnected" : "هاتفك مقترن بالفعل بحساب، يُرجى الانتقال إلى صفحة تسجيل الدخول"
+    "Error_PhoneAlreadyConnected" : "هاتفك مقترن بالفعل بحساب، يُرجى الانتقال إلى صفحة تسجيل الدخول",
+    "Error_UserNotFound" : "لم يتم العثور على المستخدم",
+    "Error_RequiresBiometricInput" : "إدخال تحديد الهوية مطلوب",
+    "Error_RecoveryTokenExpired" : "انتهت صلاحية الرمز المميز للاستعادة",
+    "Error_UserCanceledAuth" : "ألغى المستخدم عملية التفويض",
+    "Email_MagicLink_Body" : "<html>\n    <body>\n        <div style=\"font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;\">\n            <p>\n                مرحبًا {0}،\n                <br>\n                يمكنك استخدام الارتباط أدناه لتسجيل الدخول إلى حسابك.\n            </p>\n            <p>\n                <a href=\"{1}\">الارتباط السحري لتسجيل الدخول</a>\n            </p>\n            <p style=\"font-size: 12px; line-height: 20px;\">\n                إذا لم تنشئ هذا الطلب، يرجى تجاهل هذه الرسالة أو الانتقال إلى الزر أعلاه لتحددي كلمة مرور جديدة لحسابك.\n            </p>\n        </div>\n    </body>\n</html>",
+    "Email_MagicLink_Subject" : "الارتباط السحري لـ {0}"
   }
 }
