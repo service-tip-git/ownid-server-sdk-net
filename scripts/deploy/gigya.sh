@@ -18,7 +18,12 @@ echo Update IMAGE in base kustomization.yaml
 
 echo Applications update
 
-apps=(demo demo2 demo3 demo4 dor)
+if [ "$ENV" == "dev" ]; then
+  apps=(demo demo2 demo3 demo4 multilevel1 multilevel2)
+else
+  apps=(demo demo2 demo3 demo4 dor)
+fi
+
 
 for app in "${apps[@]}"; do
   echo Deploying $app
