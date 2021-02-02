@@ -49,7 +49,6 @@ namespace OwnID.Web.Features
             services.TryAddSingleton<AddConnectionCommand>();
             services.TryAddSingleton<CheckUserExistenceCommand>();
             services.TryAddSingleton<CreateFlowCommand>();
-            services.TryAddSingleton<ErrorFlowResponseCommand>();
             services.TryAddSingleton<GetStatusCommand>();
             services.TryAddSingleton<InternalConnectionRecoveryCommand>();
             services.TryAddSingleton<LinkAccountCommand>();

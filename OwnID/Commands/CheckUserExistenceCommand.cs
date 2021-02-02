@@ -34,18 +34,6 @@ namespace OwnID.Commands
                     _ => false
                 };
 
-            // if (result && input.Data.ErrorOnExisting)
-            // {
-            //     var localizedError = _localizationService.GetLocalizedString("Error_PhoneAlreadyConnected");
-            //     await _cacheItemService.FinishFlowWithErrorAsync(input.Context, localizedError);
-            // }
-            //
-            // if (!result && input.Data.ErrorOnNoEntry)
-            // {
-            //     var localizedError = _localizationService.GetLocalizedString("Error_UserNotFound");
-            //     await _cacheItemService.FinishFlowWithErrorAsync(input.Context, localizedError);
-            // }
-
             return result;
         }
     }

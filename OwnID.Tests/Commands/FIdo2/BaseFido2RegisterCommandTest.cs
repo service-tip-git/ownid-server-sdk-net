@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using AutoFixture;
 using Fido2NetLib;
+using Fido2NetLib.Objects;
 using Moq;
 using OwnID.Commands.Fido2;
 using OwnID.Extensibility.Cache;
@@ -12,36 +13,33 @@ using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow.Contracts;
 using OwnID.Extensibility.Providers;
 using OwnID.Flow;
-using OwnID.Flow.Interfaces;
 using OwnID.Services;
 using Xunit;
 
-namespace OwnID.Tests.Flow.Commands.FIdo2
+namespace OwnID.Tests.Commands.FIdo2
 {
     public class BaseFido2RegisterCommandTest
     {
-        private readonly Fixture _fixture;
-
-        private readonly Mock<IFido2> _fido2;
-        private readonly Mock<ICacheItemService> _cacheItemService;
-        private readonly Mock<IJwtComposer> _jwtComposer;
-        private readonly Mock<IFlowController> _flowController;
-        private readonly Mock<IOwnIdCoreConfiguration> _ownIdCoreConfiguration;
-        private readonly Mock<IFido2Configuration> _fido2Configuration;
-        private readonly Mock<IEncodingService> _encodingService;
-
-        private readonly string _userId;
-        private readonly Mock<IIdentitiesProvider> _identitiesProvider;
+        private readonly Mock<ICacheItemRepository> _cacheItemRepository;
+        private readonly CultureInfo _culture;
 
         private readonly StepType _currentStepType;
+        private readonly DateTime _date;
+        private readonly Mock<IEncodingService> _encodingService;
+
+        private readonly Mock<IFido2> _fido2;
+        private readonly Mock<IFido2Configuration> _fido2Configuration;
+        private readonly Fixture _fixture;
+        private readonly Mock<IIdentitiesProvider> _identitiesProvider;
         private readonly bool _isStateless;
+        private readonly Mock<IOwnIdCoreConfiguration> _ownIdCoreConfiguration;
         private readonly CacheItem _relatedItem;
 
         private readonly RequestIdentity _requestIdentity;
-        private readonly CultureInfo _culture;
-        private readonly DateTime _date;
 
         private readonly Fido2RegisterCommand _sut;
+
+        private readonly string _userId;
 
 
         public BaseFido2RegisterCommandTest()
@@ -51,9 +49,7 @@ namespace OwnID.Tests.Flow.Commands.FIdo2
 
             // Dependencies
             _fido2 = new Mock<IFido2>();
-            _cacheItemService = new Mock<ICacheItemService>();
-            _jwtComposer = new Mock<IJwtComposer>();
-            _flowController = new Mock<IFlowController>();
+            _cacheItemRepository = new Mock<ICacheItemRepository>();
             _ownIdCoreConfiguration = new Mock<IOwnIdCoreConfiguration>();
             _fido2Configuration = new Mock<IFido2Configuration>();
             _ownIdCoreConfiguration.Setup(c => c.Fido2).Returns(_fido2Configuration.Object);
@@ -74,42 +70,29 @@ namespace OwnID.Tests.Flow.Commands.FIdo2
             _culture = _fixture.Freeze<CultureInfo>();
             _date = _fixture.Freeze<DateTime>();
 
-            _sut = new Fido2RegisterCommand(_fido2.Object, _cacheItemService.Object, _jwtComposer.Object,
-                _flowController.Object, _ownIdCoreConfiguration.Object, _identitiesProvider.Object,
+            _sut = new Fido2RegisterCommand(_fido2.Object, _cacheItemRepository.Object, _ownIdCoreConfiguration.Object,
+                _identitiesProvider.Object,
                 _encodingService.Object);
-        }
-
-
-        [Fact]
-        public async Task FailWithWrongInputType()
-        {
-            var input = _fixture.Freeze<TransitionInput<object>>();
-
-            await Assert.ThrowsAsync<InternalLogicException>(async () =>
-            {
-                await _sut.ExecuteAsync(input, _relatedItem, _currentStepType, false);
-            });
         }
 
         private TransitionInput<string> GetInput(string data)
         {
-            return new TransitionInput<string>(_requestIdentity, _culture, data, _date);
+            return new(_requestIdentity, _culture, data, _date);
         }
-
 
         [Theory]
         [InlineData(typeof(ArgumentNullException), null)]
         [InlineData(typeof(JsonException), "invalid JSON")]
-        [InlineData(typeof(InternalLogicException),
+        [InlineData(typeof(CommandValidationException),
             "{\"clientDataJSON\": \"\", \"attestationObject\": \"AttestationObject\"}")]
-        [InlineData(typeof(InternalLogicException),
+        [InlineData(typeof(CommandValidationException),
             "{\"clientDataJSON\": \"clientDataJSON\", \"attestationObject\": \"\"}")]
         public async Task FailsWithInvalidFido2Request(Type expectedException, string inputJson)
         {
             var input = GetInput(inputJson);
 
             await Assert.ThrowsAsync(expectedException,
-                async () => { await _sut.ExecuteAsync(input, _relatedItem, _currentStepType, false); });
+                async () => { await _sut.ExecuteAsync(input.Data, _relatedItem); });
         }
 
         [Fact]
@@ -120,7 +103,7 @@ namespace OwnID.Tests.Flow.Commands.FIdo2
 
             await Assert.ThrowsAsync<InternalLogicException>(async () =>
             {
-                await _sut.ExecuteAsync(input, _relatedItem, _currentStepType, false);
+                await _sut.ExecuteAsync(input.Data, _relatedItem);
             });
         }
 
@@ -131,20 +114,21 @@ namespace OwnID.Tests.Flow.Commands.FIdo2
         //         "{\"clientDataJSON\": \"clientDataJSON\", \"attestationObject\": \"AttestationObject\"}");
         //
         //     var attRes = new Mock<AttestationVerificationSuccess>();
-        //     
+        //
         //     //
         //     // TODO: Setup .Result with some public key
         //     // 
         //     var fido2Result = new Mock<Fido2.CredentialMakeResult>();
-        //     fido2Result.Setup(x => x.Result).Returns(attRes.Object);
         //     
+        //     fido2Result.Setup(x => x.Result).Returns(attRes.Object);
+        //
         //     _fido2.Setup(x => x.MakeNewCredentialAsync(It.IsAny<AuthenticatorAttestationRawResponse>(),
         //         It.IsAny<CredentialCreateOptions>(), It.IsAny<IsCredentialIdUniqueToUserAsyncDelegate>(),
         //         It.IsAny<byte[]>())).ReturnsAsync(fido2Result.Object);
         //
         //     await Assert.ThrowsAsync<InternalLogicException>(async () =>
         //     {
-        //         await _sut.ExecuteAsync(input, _relatedItem, _currentStepType, false, _isStateless);
+        //         await _sut.ExecuteAsync(input.Data, _relatedItem);
         //     });
         // }
     }
