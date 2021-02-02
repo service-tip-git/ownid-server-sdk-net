@@ -9,6 +9,7 @@ using OwnID.Extensibility.Flow.Contracts.Jwt;
 using OwnID.Extensibility.Flow.Contracts.Link;
 using OwnID.Extensibility.Json;
 using OwnID.Web.Gigya.ApiClient;
+using OwnID.Web.Gigya.Contracts;
 using OwnID.Web.Gigya.Contracts.Accounts;
 
 namespace OwnID.Web.Gigya
@@ -73,32 +74,42 @@ namespace OwnID.Web.Gigya
 
             var did = token.Subject;
 
-            var accountInfo = await _restApiClient.GetUserInfoByUid(did);
+            var accountInfo = await _restApiClient.SearchAsync<AccountInfoResponse<TProfile>>(GigyaFields.UID, did);
 
-            if (accountInfo.ErrorCode != 0)
-                throw new Exception(
-                    $"Gigya.getAccountInfo error -> {accountInfo.GetFailureMessage()}");
+            if (!accountInfo.IsSuccess)
+            {
+                if (accountInfo.ErrorCode != 0)
+                    throw new Exception(accountInfo.GetFailureMessage());
+                
+                throw new Exception($"Can't find user with did = {did}");
+            }
 
-            return new LinkState(did, (uint) accountInfo.Data.OwnId.Connections.Count);
+            return new LinkState(did, (uint) (accountInfo.First.Data?.OwnId?.Connections?.Count ?? 0));
         }
 
         public async Task OnLinkAsync(string did, OwnIdConnection connection)
         {
-            var accountInfo = await _restApiClient.GetUserInfoByUid(did);
+            var accountInfo = await _restApiClient.SearchAsync<UidContainer>(GigyaFields.UID, did);
 
-            if (accountInfo.ErrorCode != 0)
-                throw new Exception(
-                    $"Gigya.getAccountInfo error -> {accountInfo.GetFailureMessage()}");
+            if (!accountInfo.IsSuccess)
+            {
+                if (accountInfo.ErrorCode != 0)
+                    throw new Exception(accountInfo.GetFailureMessage());
+                
+                throw new Exception($"Can't find user with did = {did}");
+            }
 
-            if (accountInfo.Data.OwnId.Connections.Count >= _ownIdConfiguration.MaximumNumberOfConnectedDevices)
+            accountInfo.First.Data ??= new AccountData();
+
+            if (accountInfo.First.Data.OwnId.Connections.Count >= _ownIdConfiguration.MaximumNumberOfConnectedDevices)
                 throw new Exception(
                     $"Gigya.OnLink error -> maximum number ({_ownIdConfiguration.MaximumNumberOfConnectedDevices}) of linked devices reached");
 
             // add new public key to connection 
-            accountInfo.Data.OwnId.Connections.Add(new GigyaOwnIdConnection(connection));
+            accountInfo.First.Data.OwnId.Connections.Add(new GigyaOwnIdConnection(connection));
 
             var setAccountMessage =
-                await _restApiClient.SetAccountInfo<TProfile>(did, data: accountInfo.Data);
+                await _restApiClient.SetAccountInfoAsync<TProfile>(did, data: accountInfo.First.Data);
 
             if (setAccountMessage.ErrorCode != 0)
                 throw new Exception(

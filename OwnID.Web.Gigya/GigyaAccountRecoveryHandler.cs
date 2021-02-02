@@ -46,7 +46,7 @@ namespace OwnID.Web.Gigya
             var gigyaOwnIdConnection = new GigyaOwnIdConnection(connection);
 
             var responseMessage =
-                await _apiClient.SetAccountInfo<TProfile>(did, data: new AccountData(gigyaOwnIdConnection));
+                await _apiClient.SetAccountInfoAsync<TProfile>(did, data: new AccountData(gigyaOwnIdConnection));
 
             if (responseMessage.ErrorCode != 0)
                 throw new Exception($"Gigya.setAccountInfo error -> {responseMessage.GetFailureMessage()}");
@@ -54,17 +54,15 @@ namespace OwnID.Web.Gigya
 
         public async Task RemoveConnectionsAsync(string publicKey)
         {
-            var connection = await _apiClient.SearchByPublicKey(publicKey, GigyaProfileFields.UID);
-            
-            if (string.IsNullOrEmpty(connection?.UID))
-                return;
-            
-            // Refactor - looks like we don't need to make second call to the Gigya API
-            var profile = await _apiClient.GetUserInfoByUid(connection.UID);
-            var connectionToRemove = profile.Data.OwnId.Connections.Single(c => c.PublicKey == publicKey);
-            profile.Data.OwnId.Connections.Remove(connectionToRemove);
+            var result = await _apiClient.SearchByPublicKey(publicKey);
 
-            await _apiClient.SetAccountInfo(connection.UID, profile.Profile, profile.Data);
+            if (string.IsNullOrEmpty(result?.UID))
+                return;
+
+            var connectionToRemove = result.Data.OwnId.Connections.Single(c => c.PublicKey == publicKey);
+            result.Data.OwnId.Connections.Remove(connectionToRemove);
+
+            await _apiClient.SetAccountInfoAsync<TProfile>(result.UID, data: result.Data);
         }
     }
 }

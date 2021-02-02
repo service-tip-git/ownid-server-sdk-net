@@ -37,7 +37,7 @@ namespace OwnID.Web.Gigya
 
         public async Task<AuthResult<object>> OnSuccessLoginByPublicKeyAsync(string publicKey)
         {
-            var user = await _restApiClient.SearchByPublicKey(publicKey, GigyaProfileFields.UID);
+            var user = await _restApiClient.SearchByPublicKey(publicKey, GigyaFields.UID);
 
             if (string.IsNullOrEmpty(user?.UID))
                 return new AuthResult<object>("Can not find user in Gigya search result with provided public key");
@@ -48,22 +48,29 @@ namespace OwnID.Web.Gigya
         public async Task<AuthResult<object>> OnSuccessLoginByFido2Async(string fido2CredentialId,
             uint fido2SignCounter)
         {
-            var user = await _restApiClient.SearchByFido2CredentialId(fido2CredentialId);
-            if (user == null)
+            var searchResult = await _restApiClient.SearchAsync<UidContainer>(GigyaFields.ConnectionFido2CredentialId,
+                fido2CredentialId);
+            
+            if (!searchResult.IsSuccess)
+            {
+                if (searchResult.ErrorCode != 0)
+                    throw new Exception(searchResult.GetFailureMessage());
+                
                 return new AuthResult<object>("Can not find user in Gigya with provided fido2 user id");
+            }
 
-            var connectionToUpdate = user.Data.OwnId.Connections.First(x => x.Fido2CredentialId == fido2CredentialId);
+            var connectionToUpdate = searchResult.First.Data.OwnId.Connections.First(x => x.Fido2CredentialId == fido2CredentialId);
 
             // Update signature counter
             connectionToUpdate.Fido2SignatureCounter = fido2SignCounter.ToString();
 
-            var setAccountResponse = await _restApiClient.SetAccountInfo(user.UID, (TProfile) null, user.Data);
+            var setAccountResponse = await _restApiClient.SetAccountInfoAsync(searchResult.First.UID, (TProfile) null, searchResult.First.Data);
             if (setAccountResponse.ErrorCode > 0)
                 throw new Exception(
-                    $"did: {user.UID} " +
+                    $"did: {searchResult.First.UID} " +
                     $"Gigya.setAccountInfo for EXISTING user error -> {setAccountResponse.GetFailureMessage()}");
 
-            return await OnSuccessLoginInternalAsync(user.UID);
+            return await OnSuccessLoginInternalAsync(searchResult.First.UID);
         }
 
         public async Task UpgradeConnectionAsync(string publicKey, OwnIdConnection newConnection)
@@ -79,25 +86,26 @@ namespace OwnID.Web.Gigya
             // Add new one
             user.Data.OwnId.Connections.Add(new GigyaOwnIdConnection(newConnection));
 
-            var setAccountResponse = await _restApiClient.SetAccountInfo(user.UID, (TProfile) null, user.Data);
+            var setAccountResponse = await _restApiClient.SetAccountInfoAsync(user.UID, (TProfile) null, user.Data);
             if (setAccountResponse.ErrorCode > 0)
                 throw new Exception(
                     $"did: {user.UID} " +
                     $"Gigya.setAccountInfo for EXISTING user error -> {setAccountResponse.GetFailureMessage()}");
-
-            // Fix update delay withing Gigya
-            await Task.Delay(500);
         }
 
         public async Task<string> GetUserNameAsync(string did)
         {
-            var getAccountMessage = await _restApiClient.GetUserInfoByUid(did);
+            var getAccountMessage =
+                await _restApiClient.SearchAsync<AccountInfoResponse<TProfile>>(GigyaFields.UID, did,
+                    GigyaFields.Profile);
 
+            if (getAccountMessage.IsSuccess) 
+                return getAccountMessage.First.Profile?.FirstName;
+            
             if (getAccountMessage.ErrorCode != 0)
-                throw new Exception(
-                    $"Gigya.notifyLogin error -> {getAccountMessage.GetFailureMessage()}");
-
-            return getAccountMessage.Profile?.FirstName;
+                throw new Exception(getAccountMessage.GetFailureMessage());
+                
+            throw new Exception($"Can't find user with did = {did}");
         }
 
         public async Task<IdentitiesCheckResult> CheckUserIdentitiesAsync(string did, string publicKey)
@@ -128,34 +136,39 @@ namespace OwnID.Web.Gigya
 
         public async Task<bool> IsUserExists(string publicKey)
         {
-            var user = await _restApiClient.SearchByPublicKey(publicKey, GigyaProfileFields.UID);
+            var user = await _restApiClient.SearchByPublicKey(publicKey, GigyaFields.UID);
             return !string.IsNullOrWhiteSpace(user?.UID);
         }
 
         public async Task<bool> IsFido2UserExists(string fido2CredentialId)
         {
-            var user = await _restApiClient.SearchByFido2CredentialId(fido2CredentialId);
-            return user != null;
+            if (string.IsNullOrWhiteSpace(fido2CredentialId))
+                return false;
+
+            var searchResult = await _restApiClient.SearchAsync<AccountInfoResponse<TProfile>>(
+                GigyaFields.ConnectionFido2CredentialId, fido2CredentialId);
+            return searchResult.IsSuccess;
         }
 
         public async Task<Fido2Info> FindFido2Info(string fido2CredentialId)
         {
-            var user = await _restApiClient.SearchByFido2CredentialId(fido2CredentialId);
-            if (user == null)
+            var searchResult = await _restApiClient.SearchAsync<AccountInfoResponse<TProfile>>(
+                GigyaFields.ConnectionFido2CredentialId, fido2CredentialId);
+
+            if (!searchResult.IsSuccess)
                 return null;
 
-            var connection = user.Data.OwnId.Connections.First(c => c.Fido2CredentialId == fido2CredentialId);
+            var connection =
+                searchResult.First.Data.OwnId.Connections.FirstOrDefault(c => c.Fido2CredentialId == fido2CredentialId);
 
-            if (String.IsNullOrEmpty(connection.Fido2SignatureCounter)
+            if (string.IsNullOrEmpty(connection?.Fido2SignatureCounter)
                 || !uint.TryParse(connection.Fido2SignatureCounter, out var signatureCounter))
-            {
                 throw new Exception(
                     $"connection with fido2 credential id '{fido2CredentialId}' doesn't have signature count");
-            }
 
             return new Fido2Info
             {
-                UserId = user.UID,
+                UserId = searchResult.First.DID,
                 PublicKey = connection.PublicKey,
                 SignatureCounter = signatureCounter,
                 CredentialId = connection.Fido2CredentialId
@@ -165,36 +178,47 @@ namespace OwnID.Web.Gigya
         public async Task<ConnectionRecoveryResult<TProfile>> GetConnectionRecoveryDataAsync(string recoveryToken,
             bool includingProfile = false)
         {
-            var result = await _restApiClient.SearchByRecoveryTokenAsync(recoveryToken);
+            var resultSet = GigyaFields.UID | GigyaFields.Connections;
 
-            if (result?.Data?.OwnId.Connections == null)
+            if (includingProfile)
+                resultSet |= GigyaFields.Profile;
+
+            var result =
+                await _restApiClient.SearchAsync<AccountInfoResponse<TProfile>>(GigyaFields.ConnectionRecoveryId,
+                    recoveryToken, resultSet);
+
+            if (!result.IsSuccess)
             {
-                _logger.LogError($"Can not find connection recovery token in Gigya {recoveryToken}");
+                if (result.ErrorCode != 0)
+                    _logger.LogError(result.GetFailureMessage());
+                else
+                    _logger.LogError($"Can not find connection recovery token in Gigya {recoveryToken}");
+
                 return null;
             }
 
-            var connection = result.Data.OwnId.Connections.First(x => x.RecoveryToken == recoveryToken);
+            var connection = result.First.Data.OwnId.Connections.First(x => x.RecoveryToken == recoveryToken);
 
             return new ConnectionRecoveryResult<TProfile>
             {
                 PublicKey = connection.PublicKey,
-                DID = result.DID,
+                DID = result.First.DID,
                 RecoveryData = connection.RecoveryData,
-                UserProfile = includingProfile ? result.Profile : null
+                UserProfile = includingProfile ? result.First.Profile : null
             };
         }
 
         public async Task<string> GetUserIdByEmail(string email)
         {
-            var result = await _restApiClient.SearchByEmailAsync(email);
-            return result?.UID;
+            var result =
+                await _restApiClient.SearchAsync<UidContainer>(GigyaFields.ProfileEmail, email, GigyaFields.UID);
+            return result.First?.UID;
         }
 
         public async Task<UserSettings> GetUserSettingsAsync(string publicKey)
         {
-            var user = await _restApiClient.SearchByPublicKey(publicKey, GigyaProfileFields.Settings);
-
-            return user?.Data?.OwnId.UserSettings;
+            var user = await _restApiClient.SearchByPublicKey(publicKey, GigyaFields.Settings);
+            return user?.Data?.OwnId?.UserSettings;
         }
 
         public async Task CreateProfileAsync(IUserProfileFormContext<TProfile> context, string recoveryToken = null,
@@ -214,7 +238,7 @@ namespace OwnID.Web.Gigya
             };
 
             var setAccountMessage =
-                await _restApiClient.SetAccountInfo(context.DID, context.Profile, new AccountData(connection));
+                await _restApiClient.SetAccountInfoAsync(context.DID, context.Profile, new AccountData(connection));
 
             if (setAccountMessage.ErrorCode > 0)
             {
@@ -233,7 +257,7 @@ namespace OwnID.Web.Gigya
 
         public async Task UpdateProfileAsync(IUserProfileFormContext<TProfile> context)
         {
-            var setAccountResponse = await _restApiClient.SetAccountInfo(context.DID, context.Profile);
+            var setAccountResponse = await _restApiClient.SetAccountInfoAsync(context.DID, context.Profile);
 
             if (setAccountResponse.ErrorCode > 0)
             {

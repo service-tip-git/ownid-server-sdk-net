@@ -11,4 +11,14 @@ namespace OwnID.Web.Gigya.Contracts.Accounts
 
         public TProfile Profile { get; set; }
     }
+
+    public class AccountInfoResponse<TProfile>
+    {
+        [JsonPropertyName("UID")]
+        public string DID { get; set; }
+
+        public AccountData Data { get; set; }
+
+        public TProfile Profile { get; set; }
+    }
 }

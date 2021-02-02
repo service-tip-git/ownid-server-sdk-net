@@ -18,6 +18,8 @@ namespace OwnID.Web.Gigya.ApiClient
         private readonly GigyaConfiguration _configuration;
         private readonly HttpClient _httpClient;
 
+        private readonly ConcurrentDictionary<GigyaFields, string> _profileFieldsCache = new();
+
         public GigyaRestApiClient(GigyaConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
             _configuration = configuration;
@@ -26,15 +28,21 @@ namespace OwnID.Web.Gigya.ApiClient
 
         public async Task<GetAccountInfoResponse<TProfile>> GetUserInfoByUid(string uid)
         {
-            return await GetUserProfile(uid);
+            var parameters = ParametersFactory.CreateAuthParameters(_configuration);
+
+            if (!string.IsNullOrEmpty(uid))
+                parameters.AddParameter("UID", uid);
+
+            var getAccountMessage = await _httpClient.PostAsync(
+                new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getAccountInfo"),
+                new FormUrlEncodedContent(parameters));
+
+            return
+                await OwnIdSerializer.DeserializeAsync<GetAccountInfoResponse<TProfile>>(await getAccountMessage.Content
+                    .ReadAsStreamAsync());
         }
 
-        public async Task<GetAccountInfoResponse<TProfile>> GetUserInfoByToken(string regToken)
-        {
-            return await GetUserProfile(regToken: regToken);
-        }
-
-        public async Task<BaseGigyaResponse> SetAccountInfo<T>(string did, T profile = null,
+        public async Task<BaseGigyaResponse> SetAccountInfoAsync<T>(string did, T profile = null,
             AccountData data = null) where T : class, IGigyaUserProfile
         {
             var parameters = ParametersFactory.CreateAuthParameters(_configuration)
@@ -45,7 +53,8 @@ namespace OwnID.Web.Gigya.ApiClient
 
             if (data != null)
             {
-                foreach (var connection in data.OwnId.Connections.Where(connection => string.IsNullOrEmpty(connection.Hash)))
+                foreach (var connection in data.OwnId.Connections.Where(connection =>
+                    string.IsNullOrEmpty(connection.Hash)))
                     connection.Hash = connection.PublicKey.GetSha256();
 
                 parameters.AddParameter("data", data);
@@ -141,93 +150,43 @@ namespace OwnID.Web.Gigya.ApiClient
         }
 
         public async Task<UidContainer> SearchByPublicKey(string publicKey,
-            GigyaProfileFields fields = GigyaProfileFields.UID | GigyaProfileFields.Connections)
+            GigyaFields fields = GigyaFields.UID | GigyaFields.Connections)
         {
-            var objectsToGet = GetGigyaProfileFields(fields | GigyaProfileFields.ConnectionPublicKeys);
+            var objectsToGet = fields | GigyaFields.ConnectionPublicKeys;
             var result =
-                await SearchAsync<UidResponse>("data.ownId.connections.keyHsh", publicKey.GetSha256(), objectsToGet);
-            var user = result.Results?.FirstOrDefault();
+                await SearchAsync<UidContainer>(GigyaFields.ConnectionPublicKeysHash, publicKey.GetSha256(),
+                    objectsToGet);
 
-            if (result.ErrorCode != 0 || (user?.Data?.OwnId.Connections?.All(x => x.PublicKey != publicKey) ?? true))
+            if (!result.IsSuccess || (result.First.Data?.OwnId?.Connections?.All(x => x.PublicKey != publicKey) ?? true))
                 return null;
 
-            return user;
+            return result.First;
         }
 
-        public async Task<UidContainer> SearchByFido2CredentialId(string fido2CredentialId)
+        public async Task<SearchGigyaResponse<TResult>> SearchAsync<TResult>(GigyaFields searchKey, string searchValue,
+            GigyaFields resultSet = GigyaFields.UID | GigyaFields.Connections) where TResult : class
         {
-            var result = await SearchAsync<UidResponse>("data.ownId.connections.fido2CredentialId", fido2CredentialId);
-            var user = result.Results?.FirstOrDefault();
-
-            if (result.ErrorCode != 0
-                || (user?.Data?.OwnId.Connections?.All(x => x.Fido2CredentialId != fido2CredentialId) ?? true))
-                return null;
-
-            return user;
-        }
-
-        public async Task<GetAccountInfoResponse<TProfile>> SearchByRecoveryTokenAsync(string recoveryToken)
-        {
-            var result = await SearchAsync<GetAccountInfoResponseList<TProfile>>("data.ownId.connections.recoveryId",
-                recoveryToken, new[] {"UID", "data.ownId.connections", "profile"});
-            return result.Results?.FirstOrDefault();
-        }
-
-        public async Task<UidContainer> SearchByEmailAsync(string email)
-        {
-            var result = await SearchAsync<UidResponse>("profile.email", email, new[] {"UID"});
-            return result.Results?.FirstOrDefault();
-        }
-
-        private async Task<GetAccountInfoResponse<TProfile>> GetUserProfile(string uid = null, string regToken = null)
-        {
-            var parameters = ParametersFactory.CreateAuthParameters(_configuration);
-
-            if (!string.IsNullOrEmpty(uid))
-                parameters.AddParameter("UID", uid);
-            else
-                parameters.AddParameter("regToken", regToken);
-
-            var getAccountMessage = await _httpClient.PostAsync(
-                new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getAccountInfo"),
-                new FormUrlEncodedContent(parameters));
-
-            return
-                await OwnIdSerializer.DeserializeAsync<GetAccountInfoResponse<TProfile>>(await getAccountMessage.Content
-                    .ReadAsStreamAsync());
-        }
-
-        private async Task<TResult> SearchAsync<TResult>(string searchKey, string searchValue,
-            string[] objectsToGet = null)
-            where TResult : BaseGigyaResponse
-        {
-            objectsToGet ??= new[] {"UID", "data.ownId.connections"};
-
-            objectsToGet = objectsToGet.Distinct().ToArray();
-
             var parameters = ParametersFactory.CreateAuthParameters(_configuration).AddParameter("query",
-                $"SELECT {string.Join(", ", objectsToGet)} FROM accounts WHERE {searchKey} = \"{searchValue}\" LIMIT 1");
+                $"SELECT {GetGigyaProfileFields(resultSet)} FROM accounts WHERE {GetGigyaProfileFields(searchKey)} = \"{searchValue}\" LIMIT 1");
             var responseMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.search"),
                 new FormUrlEncodedContent(parameters));
 
-            var result = await OwnIdSerializer.DeserializeAsync<TResult>(
+            var result = await OwnIdSerializer.DeserializeAsync<SearchGigyaResponse<TResult>>(
                 await responseMessage.Content.ReadAsStreamAsync());
 
             return result;
         }
 
-        private readonly ConcurrentDictionary<GigyaProfileFields, string[]> _profileFieldsCache = new();
-
-        private string[] GetGigyaProfileFields(GigyaProfileFields fields)
+        private string GetGigyaProfileFields(GigyaFields fields)
         {
             if (_profileFieldsCache.TryGetValue(fields, out var result))
                 return result;
 
             var resultFields = new List<string>();
 
-            var enumType = typeof(GigyaProfileFields);
-            foreach (var value in Enum.GetValues<GigyaProfileFields>())
+            var enumType = typeof(GigyaFields);
+            foreach (var value in Enum.GetValues<GigyaFields>())
             {
                 if (!fields.HasFlag(value))
                     continue;
@@ -238,18 +197,18 @@ namespace OwnID.Web.Gigya.ApiClient
                 var valueAttributes = enumValueMemberInfo.GetCustomAttributes(typeof(GigyaFieldsAttribute), false);
 
                 if (valueAttributes.Length == 0)
-                    throw new Exception($"`{nameof(GigyaProfileFields)}.{value}` doesn't has `GigyaFields` attribute");
+                    throw new Exception($"`{nameof(GigyaFields)}.{value}` doesn't has `GigyaFields` attribute");
 
                 var queriedFields = ((GigyaFieldsAttribute) valueAttributes[0]).Fields.Split(",");
 
                 resultFields.AddRange(queriedFields);
             }
 
-            result = resultFields
+            result = string.Join(", ", resultFields
                 .Select(x => x.Trim())
                 .Distinct()
                 .OrderBy(x => x)
-                .ToArray();
+                .ToArray());
 
             _profileFieldsCache.TryAdd(fields, result);
 
