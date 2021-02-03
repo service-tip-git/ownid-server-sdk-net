@@ -16,6 +16,7 @@ namespace OwnID.Web.Gigya.Contracts.Accounts
             RecoveryData = ownIdConnection.RecoveryData;
             Fido2CredentialId = ownIdConnection.Fido2CredentialId;
             Fido2SignatureCounter = ownIdConnection.Fido2SignatureCounter;
+            AuthType = ownIdConnection.AuthType;
         }
 
         [JsonPropertyName("pubKey")]

@@ -5,6 +5,8 @@ using OwnID.Extensibility.Exceptions;
 using OwnID.Extensibility.Flow;
 using OwnID.Extensibility.Flow.Abstractions;
 using OwnID.Extensibility.Flow.Contracts;
+using OwnID.Extensibility.Flow.Contracts.Cookies;
+using OwnID.Extensibility.Flow.Contracts.Start;
 using OwnID.Extensibility.Services;
 using OwnID.Flow.Adapters;
 using OwnID.Services;
@@ -59,7 +61,13 @@ namespace OwnID.Commands
                 Fido2SignatureCounter = cacheItem.Fido2SignatureCounter.ToString(),
                 PublicKey = cacheItem.PublicKey,
                 RecoveryToken = cacheItem.RecoveryToken,
-                RecoveryData = cacheItem.RecoveryData
+                RecoveryData = cacheItem.RecoveryData,
+                AuthType = cacheItem.AuthCookieType switch
+                {
+                    CookieType.Fido2 => ConnectionAuthType.Fido2,
+                    CookieType.Passcode => ConnectionAuthType.Passcode,
+                    _ => ConnectionAuthType.Basic
+                }
             });
 
             return new AuthResult();

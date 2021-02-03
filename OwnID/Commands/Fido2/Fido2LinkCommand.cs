@@ -4,6 +4,7 @@ using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Flow.Abstractions;
 using OwnID.Extensibility.Flow.Contracts;
+using OwnID.Extensibility.Flow.Contracts.Start;
 using OwnID.Extensibility.Providers;
 using OwnID.Extensions;
 using OwnID.Services;
@@ -29,7 +30,8 @@ namespace OwnID.Commands.Fido2
             {
                 PublicKey = publicKey,
                 Fido2CredentialId = credentialId,
-                Fido2SignatureCounter = signatureCounter.ToString()
+                Fido2SignatureCounter = signatureCounter.ToString(),
+                AuthType = ConnectionAuthType.Fido2
             });
 
             return await CacheItemRepository.UpdateAsync(relatedItem.Context, item =>

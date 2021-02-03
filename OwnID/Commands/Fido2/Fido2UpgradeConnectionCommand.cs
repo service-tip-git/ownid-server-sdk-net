@@ -3,6 +3,7 @@ using Fido2NetLib;
 using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Flow.Contracts;
+using OwnID.Extensibility.Flow.Contracts.Start;
 using OwnID.Extensibility.Providers;
 using OwnID.Flow.Adapters;
 using OwnID.Services;
@@ -29,8 +30,7 @@ namespace OwnID.Commands.Fido2
                 PublicKey = publicKey,
                 Fido2CredentialId = credentialId,
                 Fido2SignatureCounter = signatureCounter.ToString(),
-                RecoveryToken = relatedItem.RecoveryToken,
-                RecoveryData = relatedItem.RecoveryData
+                AuthType = ConnectionAuthType.Fido2
             });
 
             return await base.ProcessFido2RegisterResponseAsync(relatedItem, publicKey, signatureCounter, credentialId);

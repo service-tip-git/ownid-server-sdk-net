@@ -1,3 +1,5 @@
+using OwnID.Extensibility.Flow.Contracts.Start;
+
 namespace OwnID.Extensibility.Flow.Contracts
 {
     public class OwnIdConnection
@@ -26,5 +28,10 @@ namespace OwnID.Extensibility.Flow.Contracts
         ///     Recovery data. Encrypted
         /// </summary>
         public string RecoveryData { get; set; }
+        
+        /// <summary>
+        /// Auth type
+        /// </summary>
+        public ConnectionAuthType AuthType { get; set; }
     }
 }

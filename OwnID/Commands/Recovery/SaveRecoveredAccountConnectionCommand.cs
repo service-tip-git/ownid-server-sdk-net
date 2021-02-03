@@ -5,7 +5,9 @@ using OwnID.Extensibility.Cache;
 using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Flow.Abstractions;
 using OwnID.Extensibility.Flow.Contracts;
+using OwnID.Extensibility.Flow.Contracts.Cookies;
 using OwnID.Extensibility.Flow.Contracts.Jwt;
+using OwnID.Extensibility.Flow.Contracts.Start;
 using OwnID.Extensions;
 using OwnID.Services;
 
@@ -45,7 +47,10 @@ namespace OwnID.Commands.Recovery
             {
                 PublicKey = userData.PublicKey,
                 RecoveryToken = recoveryToken,
-                RecoveryData = userData.RecoveryData
+                RecoveryData = userData.RecoveryData,
+                AuthType = relatedItem.AuthCookieType == CookieType.Passcode
+                    ? ConnectionAuthType.Passcode
+                    : ConnectionAuthType.Basic
             });
 
             return await _cacheItemRepository.UpdateAsync(relatedItem.Context, item =>
