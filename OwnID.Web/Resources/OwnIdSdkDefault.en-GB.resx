@@ -37,7 +37,7 @@
     <value>The field {0} must be a string or array type with a maximum length of '{1}'</value>
   </data>
   <data name="Error_PhoneAlreadyConnected" xml:space="preserve">
-    <value>Your phone is already associated with an account, please go to the login page</value>
+    <value>There’s another phone associated with this account. If you wish to use this phone, reset your account in the login page.</value>
   </data>
   <data name="Error_UserNotFound" xml:space="preserve">
     <value>User wasn't found</value>
