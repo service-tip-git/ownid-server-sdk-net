@@ -30,6 +30,8 @@ spec:
                   key: private_key
             - name: TFA_ENABLED
               value: 'false'
+            - name: OWNID__FIDO2_FALLBACK_BEHAVIOR
+              value: Basic
             - name: OWNID__TOP_DOMAIN
               value: bayer.com
             - name: GIGYA__DATA_CENTER
