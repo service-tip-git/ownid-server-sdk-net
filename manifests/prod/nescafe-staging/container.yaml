@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-gigya
+spec:
+  template:
+    spec:
+      containers:
+        - name: server-gigya
+          env:
+            - name: OWNID__CALLBACK_URL
+              value: httpы://server.nescafe-staging.ownid.com
+            - name: OWNID__DID
+              value: did:nescafe-staging:prod_822386385
+            - name: OWNID__NAME
+              value: Nescafé UK
+            - name: OWNID__DESCRIPTION
+              value: Start your day with a NESCAFÉ
+            - name: OWNID__ICON
+              value: https://test.nescafe.com/be/themes/custom/nescafe_foundation/favicon.ico
+            - name: OWNID__PUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nescafe-staging-secret
+                  key: public_key
+            - name: OWNID__PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nescafe-secret
+                  key: private_key
+            - name: OWNID__TFA_ENABLED
+              value: 'true'
+            - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
+              value: https://passwordless.nescafe-staging.ownid.com
+            - name: OWNID__FIDO2_FALLBACK_BEHAVIOR
+              value: Block
+            - name: OWNID__TOP_DOMAIN
+              value: nescafe-staging.ownid.com
+            - name: GIGYA__DATA_CENTER
+              value: eu1.gigya.com
+            - name: GIGYA__SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nescafe-staging-secret
+                  key: gigya_secret
+            - name: GIGYA__API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nescafe-staging-secret
+                  key: gigya_api_key
+            - name: GIGYA__USER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nescafe-staging-secret
+                  key: gigya_user_key
+            - name: SERVER_MODE
+              value: pilot
+            - name: Metrics__Enable
+              value: 'true'
+            - name: Metrics__Namespace
+              value: 'Nescafe-Staging'

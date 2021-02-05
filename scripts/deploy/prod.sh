@@ -17,7 +17,7 @@ aws eks --region us-east-2 update-kubeconfig --name ownid-eks
 echo
 
 # Add new client to the list. It's name of folder in manifests/prod/
-apps=( demo pilot nestle-hipster bayer universalid gigyapoc-gigyainsurance sap-commerce daimani )
+apps=( demo pilot nestle-hipster bayer universalid gigyapoc-gigyainsurance sap-commerce daimani nescafe-staging )
 
 echo Prod A Deployment
 kubectl config use-context arn:aws:eks:us-east-1:571861302935:cluster/ownid-production-cluster
