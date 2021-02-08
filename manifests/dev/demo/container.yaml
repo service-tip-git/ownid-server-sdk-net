@@ -23,7 +23,7 @@ spec:
             - name: OWNID__MAGIC_LINK__ENABLED
               value: 'true'
             - name: OWNID__MAGIC_LINK__REDIRECT_URL
-              value: https://demo.dev.ownid.com/login
+              value: https://demo-screens.dev.ownid.com
             - name: Metrics__Enable
               value: 'true'
             - name: Metrics__Namespace
