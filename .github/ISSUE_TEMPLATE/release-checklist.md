@@ -1,13 +1,15 @@
 ---
 name: Release Checklist
 about: Checklist of envs config/infrastructure applied changes
-title: "[Release] "
+title: "[Release] <version or another identifier>"
 labels: 'Priority: Critical, Type: Maintenance'
-assignees: ''
+assignees: Tony-Pa, vospitannikov, bdonchenko, akayomov, vitalii-marynkevych
 
 ---
 
-| Feature/Env 	| dev 	| staging 	| prod 	|
-|-------------	|:---:	|:-------:	|:----:	|
-|  Add field 'authType' to schema           	|   <ul><li>- [ ] </li></ul>  	|    <ul><li>- [ ] </li></ul>     	|  <ul><li>- [ ] </li></ul>    	|
-|             	|   :white_check_mark:  	|         	|     	|
+:white_check_mark:   -  when is done
+<br>
+| Change / Env 	| dev 	| staging 	| prod 	|
+|--------------	|:---:	|:-------:	|:----:	|
+|              	|     	|         	|      	|
+|              	|     	|         	|      	|
