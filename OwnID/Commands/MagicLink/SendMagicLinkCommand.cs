@@ -76,10 +76,11 @@ namespace OwnID.Commands.MagicLink
 
             var subject = string.Format(_localizationService.GetLocalizedString("Email_MagicLink_Subject"),
                 _ownIdCoreConfiguration.Name);
-            var body = string.Format(_localizationService.GetLocalizedString("Email_MagicLink_Body"), userName,
-                link.Uri);
-            
-            await _emailService.SendAsync(email, subject, body, true);
+            var body = _localizationService.GetLocalizedString("Email_MagicLink_Body")
+                .Replace("{userName}", userName)
+                .Replace("{link}", link.Uri.ToString());
+
+            await _emailService.SendAsync(email, subject, body, true, userName);
 
             return result;
         }

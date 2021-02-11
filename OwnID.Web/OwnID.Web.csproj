@@ -81,5 +81,10 @@
         <None Remove="Resources\strings_vi.json" />
         <None Remove="Resources\strings_zh_CN.json" />
         <None Remove="Resources\strings_zh_TW.json" />
+        <None Remove="Resources\strings_en-GB.json" />
+        <None Remove="Resources\strings_es-MX.json" />
+        <None Remove="Resources\strings_pt-PT.json" />
+        <None Remove="Resources\strings_zh-CN.json" />
+        <None Remove="Resources\strings_zh-TW.json" />
     </ItemGroup>
 </Project>

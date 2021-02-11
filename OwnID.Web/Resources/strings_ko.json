@@ -12,7 +12,7 @@
     "Error_RequiresBiometricInput" : "생체 인증 입력 필요",
     "Error_RecoveryTokenExpired" : "복구 토큰이 만료되었습니다.",
     "Error_UserCanceledAuth" : "권한 프로세스가 사용자에 의해 취소되었습니다.",
-    "Email_MagicLink_Body" : "<html>\n    <body>\n        <div style=\"font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;\">\n            <p>\n                {0} 님, 안녕하십니까?\n                <br>\n                사용자 계정에 로그인하려면 아래 링크를 사용하십시오.\n            </p>\n            <p>\n                <a href=\"{1}\"></a>에 로그인하기 위한 매직 링크\n            </p>\n            <p style=\"font-size: 12px; line-height: 20px;\">\n                이 요청을 하지 않은 경우 이 메시지를 무시하거나 위의 버튼으로 이동하여 계정의 신규 비밀번호를 선택하십시오.\n            </p>\n        </div>\n    </body>\n</html>",
+    "Email_MagicLink_Body" : "<!DOCTYPE html><html><head><style> body {font-family: 72;font-style: normal;font-weight: normal;font-size: 14px;line-height: 24px;} div {margin-bottom: 20px;} .rounded-link {background: #0070F2;color: #FFFFFF!important;display: block;padding: 8px 26px;text-align: center;text-decoration: none;border-radius: 4px;font-weight: bold;width: auto;}</style></head><body><div>Hi {userName},<br>Click the link below to log in to your account.</div><div style=\"display: flex\"><a target=\"_blank\" class=\"rounded-link\" href=\"{link}\">Your Magic Link</a></div><div>For security reasons, this link will only be valid in the same browser that initiated this request. If the link above doesn't work, try copy and pasting the following URL in the browser:<br/>{link}</div><div>If you didn’t make this magic link request, please disregard this email.</div></body></html>",
     "Email_MagicLink_Subject" : "{0}에 대한 매직 링크"
   }
 }

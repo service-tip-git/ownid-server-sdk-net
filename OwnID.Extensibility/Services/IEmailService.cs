@@ -4,6 +4,6 @@ namespace OwnID.Extensibility.Services
 {
     public interface IEmailService
     {
-        Task SendAsync(string to, string subject, string body, bool isHtml = false);
+        Task SendAsync(string toAddress, string subject, string body, bool isHtml = false, string toName = "");
     }
 }

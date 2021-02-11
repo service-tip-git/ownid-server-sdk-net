@@ -1,3 +1,5 @@
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using MimeKit;
@@ -16,11 +18,11 @@ namespace OwnID.Services
             _configuration = configuration;
         }
         
-        public async Task SendAsync(string to, string subject, string body, bool isHtml = false)
+        public async Task SendAsync(string toAddress, string subject, string body, bool isHtml = false, string toName = "")
         {
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(_configuration.FromName, _configuration.FromAddress));
-            message.To.Add(new MailboxAddress(string.Empty, to));
+            message.To.Add(new MailboxAddress(toName, toAddress));
             message.Subject = subject;
             message.Body = new TextPart(isHtml ? TextFormat.Html : TextFormat.Plain)
             {

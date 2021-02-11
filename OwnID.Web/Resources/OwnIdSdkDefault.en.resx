@@ -52,23 +52,7 @@
     <value>Authorization process was canceled by user</value>
   </data>
   <data name="Email_MagicLink_Body" xml:space="preserve">
-    <value>&lt;html&gt;
-    &lt;body&gt;
-        &lt;div style="font-size: 14px; font-family: 72; font-style: normal; font-weight: 400; line-height: 24px;"&gt;
-            &lt;p&gt;
-                Hi {0},
-                &lt;br&gt;
-                Use the link below to log in to your account.
-            &lt;/p&gt;
-            &lt;p&gt;
-                &lt;a href="{1}"&gt;Magic link to log in&lt;/a&gt;
-            &lt;/p&gt;
-            &lt;p style="font-size: 12px; line-height: 20px;"&gt;
-                If you did not make this request, please ignore this message or go to the button above to select a new password for your account.
-            &lt;/p&gt;
-        &lt;/div&gt;
-    &lt;/body&gt;
-&lt;/html&gt;</value>
+    <value><![CDATA[<!DOCTYPE html><html><head><style> body {font-family: 72;font-style: normal;font-weight: normal;font-size: 14px;line-height: 24px;} div {margin-bottom: 20px;} .rounded-link {background: #0070F2;color: #FFFFFF!important;display: block;padding: 8px 26px;text-align: center;text-decoration: none;border-radius: 4px;font-weight: bold;width: auto;}</style></head><body><div>Hi {userName},<br>Click the link below to log in to your account.</div><div style="display: flex"><a target="_blank" class="rounded-link" href="{link}">Your Magic Link</a></div><div>For security reasons, this link will only be valid in the same browser that initiated this request. If the link above doesn't work, try copy and pasting the following URL in the browser:<br/>{link}</div><div>If you didn’t make this magic link request, please disregard this email.</div></body></html>]]></value>
   </data>
   <data name="Email_MagicLink_Subject" xml:space="preserve">
     <value>Magic link for {0}</value>
