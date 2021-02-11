@@ -128,5 +128,11 @@ namespace OwnID.Web.Resources {
                 return ResourceManager.GetString("Email_MagicLink_Subject", resourceCulture);
             }
         }
+        
+        internal static string Error_MagicLink_SameBrowser {
+            get {
+                return ResourceManager.GetString("Error_MagicLink_SameBrowser", resourceCulture);
+            }
+        }
     }
 }

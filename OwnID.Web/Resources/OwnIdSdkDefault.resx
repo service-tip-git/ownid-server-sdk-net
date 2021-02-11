@@ -73,4 +73,7 @@
   <data name="Email_MagicLink_Subject" xml:space="preserve">
     <value>Magic link for {0}</value>
   </data>
+  <data name="Error_MagicLink_SameBrowser" xml:space="preserve">
+    <value>Magic link login failed. Make sure you’re using the same browser that initiated the magic link request.</value>
+  </data>
 </root>
