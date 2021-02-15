@@ -160,8 +160,7 @@ namespace OwnID.Flow.TransitionHandlers
             }
 
             composeInfo.CanBeRecovered = !string.IsNullOrEmpty(relatedItem.RecoveryToken);
-
-
+            
             return new JwtContainer(JwtComposer.GenerateBaseStepJwt(composeInfo,
                 relatedItem.DID ?? _identitiesProvider.GenerateUserId()));
         }

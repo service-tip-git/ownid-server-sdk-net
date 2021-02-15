@@ -32,7 +32,7 @@ namespace OwnID.Commands.Fido2
             if (userExists && cacheItem.ChallengeType != ChallengeType.Login)
                 throw new OwnIdException(ErrorType.UserAlreadyExists);
 
-            if (!userExists && cacheItem.ChallengeType == ChallengeType.Login)
+            if (!userExists)
                 await _cacheItemRepository.UpdateAsync(cacheItem.Context, item =>
                 {
                     item.Fido2CredentialId = null;
