@@ -9,53 +9,47 @@ spec:
         - name: server-gigya
           env:
             - name: OWNID__CALLBACK_URL
-              value: https://server.nescafe-staging.ownid.com
+              value: https://server.roche-staging.ownid.com
             - name: OWNID__DID
-              value: did:nescafe-staging:prod_822386385
+              value: did:roche-staging:prod_822386385
             - name: OWNID__NAME
-              value: Nescafé UK
+              value: Roche Staging
             - name: OWNID__DESCRIPTION
-              value: Start your day with a NESCAFÉ
-            - name: OWNID__ICON
-              value: https://test.nescafe.com/be/themes/custom/nescafe_foundation/favicon.ico
+              value: Roche Staging Environment
             - name: OWNID__PUB_KEY
               valueFrom:
                 secretKeyRef:
-                  name: nescafe-staging-secret
+                  name: roche-staging-secret
                   key: public_key
             - name: OWNID__PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: nescafe-staging-secret
+                  name: roche-staging-secret
                   key: private_key
-            - name: OWNID__TFA_ENABLED
-              value: 'true'
             - name: OWNID__FIDO2_PASSWORDLESS_PAGE_URL
-              value: https://passwordless.nescafe-staging.ownid.com
-            - name: OWNID__FIDO2_FALLBACK_BEHAVIOR
-              value: Block
+              value: https://passwordless.roche-staging.ownid.com
             - name: OWNID__TOP_DOMAIN
-              value: nescafe-staging.ownid.com
+              value: roche-staging.ownid.com
             - name: GIGYA__DATA_CENTER
-              value: eu1.gigya.com
+              value: us1.gigya.com
             - name: GIGYA__SECRET
               valueFrom:
                 secretKeyRef:
-                  name: nescafe-staging-secret
+                  name: roche-staging-secret
                   key: gigya_secret
             - name: GIGYA__API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: nescafe-staging-secret
+                  name: roche-staging-secret
                   key: gigya_api_key
             - name: GIGYA__USER_KEY
               valueFrom:
                 secretKeyRef:
-                  name: nescafe-staging-secret
+                  name: roche-staging-secret
                   key: gigya_user_key
             - name: SERVER_MODE
               value: pilot
             - name: Metrics__Enable
               value: 'true'
             - name: Metrics__Namespace
-              value: 'Nescafe-Staging'
+              value: 'roche-staging'
