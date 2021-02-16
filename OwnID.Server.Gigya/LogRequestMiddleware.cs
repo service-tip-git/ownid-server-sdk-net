@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using OwnID.Extensibility.Json;
 using OwnID.Extensibility.Logs;
 using OwnID.Extensions;
 
@@ -52,8 +53,8 @@ namespace OwnID.Server.Gigya
                         url =
                             $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path.ToString()}{context.Request.QueryString.ToString()}",
                         body,
-                        cookies = context.Request.Cookies.ToDictionary(x => x.Key, x => x.Value),
-                        headers = context.Request.Headers.ToDictionary(x => x.Key, x => x.Value)
+                        cookies = OwnIdSerializer.Serialize(context.Request.Cookies.ToDictionary(x => x.Key, x => x.Value)),
+                        headers = OwnIdSerializer.Serialize(context.Request.Headers.ToDictionary(x => x.Key, x => x.Value))
                     };
 
                     _logger.LogWithData(LogLevel.Debug, "Request log", data);
@@ -91,7 +92,7 @@ namespace OwnID.Server.Gigya
                     {
                         body,
                         statusCode = context.Response.StatusCode,
-                        headers = context.Response.Headers.ToDictionary(x => x.Key, x => x.Value)
+                        headers = OwnIdSerializer.Serialize(context.Response.Headers.ToDictionary(x => x.Key, x => x.Value))
                     };
 
                     _logger.LogWithData(LogLevel.Debug, "Response  log", data);
