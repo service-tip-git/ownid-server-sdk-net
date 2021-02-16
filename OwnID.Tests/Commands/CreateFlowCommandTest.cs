@@ -88,6 +88,7 @@ namespace OwnID.Tests.Commands
 
             var url = urlProvider.GetWebAppSignWithCallbackUrl(urlProvider.GetStartFlowUrl(context), language);
             var expected = new GetChallengeLinkResponse(context, url.ToString(), nonce, expiration, false);
+            expected.Config.LogLevel = "0";
 
             actual.Should().BeEquivalentTo(expected);
         }

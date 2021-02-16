@@ -1,5 +1,6 @@
 using System;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Logging;
 using OwnID.Configuration.Profile;
 using OwnID.Extensibility.Configuration;
 using OwnID.Extensibility.Configuration.Profile;
@@ -96,6 +97,8 @@ namespace OwnID.Configuration
         public Fido2FallbackBehavior Fido2FallbackBehavior { get; set; } = Fido2FallbackBehavior.Passcode;
 
         public IFido2Configuration Fido2 { get; } = new Fido2Configuration();
+
+        public LogLevel LogLevel { get; set; } = LogLevel.Information;
 
         /// <summary>
         ///     Sets <see cref="ProfileConfiguration" /> based on <typeparamref name="TProfile" />

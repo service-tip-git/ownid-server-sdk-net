@@ -56,6 +56,8 @@ namespace OwnID.Extensibility.Flow.Contracts
         {
             [JsonPropertyName("magicLink")]
             public bool MagicLinkEnabled { get; set; }
+            
+            public string LogLevel { get; set; }
         }
     }
 }

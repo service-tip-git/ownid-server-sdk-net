@@ -80,9 +80,12 @@ namespace OwnID.Commands
 
             var startFlowUrl = _urlProvider.GetStartFlowUrl(challengeContext);
             var destinationUrl = _urlProvider.GetWebAppSignWithCallbackUrl(startFlowUrl, request.Language);
-
-            return new GetChallengeLinkResponse(challengeContext, destinationUrl.ToString(), nonce,
+            
+            var result = new GetChallengeLinkResponse(challengeContext, destinationUrl.ToString(), nonce,
                 _configuration.CacheExpirationTimeout, _magicLinkEnabled);
+            result.Config.LogLevel = ((int) _configuration.LogLevel).ToString();
+
+            return result;
         }
 
         private async Task<LinkState> GetLinkState(string payload)

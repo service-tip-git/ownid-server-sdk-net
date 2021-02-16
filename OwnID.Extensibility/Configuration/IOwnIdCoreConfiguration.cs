@@ -1,5 +1,6 @@
 using System;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Logging;
 using OwnID.Extensibility.Configuration.Profile;
 
 namespace OwnID.Extensibility.Configuration
@@ -159,5 +160,10 @@ namespace OwnID.Extensibility.Configuration
         ///     FIDO2 configuration
         /// </summary>
         public IFido2Configuration Fido2 { get; }
+
+        /// <summary>
+        ///     Log level
+        /// </summary>
+        public LogLevel LogLevel { get; set; }
     }
 }

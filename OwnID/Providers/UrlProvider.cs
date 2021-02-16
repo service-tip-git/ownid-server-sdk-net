@@ -102,7 +102,7 @@ namespace OwnID.Providers
             var settingsUrl = new UriBuilder(GetBaseActionUrl(context, "fido2/settings"));
             var settingsQuery = HttpUtility.ParseQueryString(fido2Url.Query);
             settingsQuery[QueryStringParameters.RequestToken] = requestToken;
-            
+
             if (!string.IsNullOrWhiteSpace(language))
             {
                 query[QueryStringParameters.Language] = language;
@@ -117,7 +117,8 @@ namespace OwnID.Providers
 
         public Uri GetStartFlowUrl(string context)
         {
-            return GetBaseActionUrl(context, "start");
+            return GetBaseActionUrl(context,
+                $"start?{QueryStringParameters.LogLevel}={(int) _coreConfiguration.LogLevel}");
         }
 
         private Uri GetBaseActionUrl(string context, string action)
@@ -138,6 +139,7 @@ namespace OwnID.Providers
             public const string Language = "l";
             public const string RequestToken = "rt";
             public const string ResponseToken = "rst";
+            public const string LogLevel = "ll";
         }
     }
 }
