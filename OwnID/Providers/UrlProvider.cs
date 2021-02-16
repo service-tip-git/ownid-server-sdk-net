@@ -49,6 +49,7 @@ namespace OwnID.Providers
             var deepLink = new UriBuilder(new Uri(_coreConfiguration.OwnIdApplicationUrl, "sign"));
             var query = HttpUtility.ParseQueryString(deepLink.Query);
             query[QueryStringParameters.CallBackUrl] = $"{subUrl.Authority}{subUrl.PathAndQuery}";
+            query[QueryStringParameters.LogLevel] = ((int) _coreConfiguration.LogLevel).ToString();
 
             if (!string.IsNullOrEmpty(requestToken) && !string.IsNullOrEmpty(responseToken))
             {
@@ -58,7 +59,7 @@ namespace OwnID.Providers
 
             if (!string.IsNullOrWhiteSpace(language))
                 query[QueryStringParameters.Language] = language;
-
+            
             deepLink.Query = query.ToString() ?? string.Empty;
             return deepLink.Uri;
         }
@@ -117,8 +118,7 @@ namespace OwnID.Providers
 
         public Uri GetStartFlowUrl(string context)
         {
-            return GetBaseActionUrl(context,
-                $"start?{QueryStringParameters.LogLevel}={(int) _coreConfiguration.LogLevel}");
+            return GetBaseActionUrl(context, "start");
         }
 
         private Uri GetBaseActionUrl(string context, string action)
