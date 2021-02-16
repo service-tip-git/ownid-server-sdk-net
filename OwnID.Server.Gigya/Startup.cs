@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using OwnID.Extensibility.Configuration;
 using OwnID.Redis;
 using OwnID.Server.Gigya.Metrics;
@@ -167,7 +168,7 @@ namespace OwnID.Server.Gigya
                     });
             });
 
-            // TODO: not for prod
+            // on log level info
             services.AddHostedService<TelemetryLogService>();
         }
 
@@ -203,11 +204,13 @@ namespace OwnID.Server.Gigya
                 .AddStrictTransportSecurityMaxAgeIncludeSubDomains()
                 .AddContentTypeOptionsNoSniff());
 
+            var logger = app.ApplicationServices.GetService<ILogger<LogRequestMiddleware>>();
+            if(logger?.IsEnabled(LogLevel.Debug) ?? false)
+                app.UseMiddleware<LogRequestMiddleware>();
+            
             app.UseMetrics();
             app.UseOwnId();
 
-            // TODO: not for prod
-            app.UseMiddleware<LogRequestMiddleware>();
             var routeBuilder = new RouteBuilder(app);
             routeBuilder.MapMiddlewarePost("ownid/log",
                 builder => builder.UseMiddleware<LogMiddleware>());

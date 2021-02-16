@@ -1,6 +1,7 @@
+using System;
 using Microsoft.Extensions.Logging;
 
-namespace OwnID.Extensions
+namespace OwnID.Extensibility.Logs
 {
     public static class LogExtensions
     {
@@ -10,6 +11,14 @@ namespace OwnID.Extensions
             {
                 logger.Log(logLevel, message);
             }
+        }
+
+        public static void Log(this ILogger logger, LogLevel logLevel, Func<string> messageGenerator)
+        {
+            if (!logger.IsEnabled(logLevel))
+                return;
+            
+            logger.Log(logLevel, messageGenerator());
         }
     }
 }

@@ -10,6 +10,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\OwnID.Web.Extensibility\OwnID.Web.Extensibility.csproj" />
+      <ProjectReference Include="..\OwnID\OwnID.csproj" />
     </ItemGroup>
 
 </Project>

@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using OwnID.Extensibility.Json;
+using OwnID.Extensibility.Logs;
 using OwnID.Web.Gigya.Contracts;
 using OwnID.Web.Gigya.Contracts.Accounts;
 using OwnID.Web.Gigya.Contracts.Jwt;
@@ -17,13 +19,18 @@ namespace OwnID.Web.Gigya.ApiClient
     {
         private readonly GigyaConfiguration _configuration;
         private readonly HttpClient _httpClient;
-
+        private readonly ILogger<GigyaRestApiClient<TProfile>> _logger;
+        private readonly bool _logResponse;
         private readonly ConcurrentDictionary<GigyaFields, string> _profileFieldsCache = new();
 
-        public GigyaRestApiClient(GigyaConfiguration configuration, IHttpClientFactory httpClientFactory)
+
+        public GigyaRestApiClient(GigyaConfiguration configuration, IHttpClientFactory httpClientFactory,
+            ILogger<GigyaRestApiClient<TProfile>> logger)
         {
             _configuration = configuration;
             _httpClient = httpClientFactory.CreateClient();
+            _logger = logger;
+            _logResponse = _logger.IsEnabled(LogLevel.Debug);
         }
 
         public async Task<GetAccountInfoResponse<TProfile>> GetUserInfoByUid(string uid)
@@ -37,9 +44,9 @@ namespace OwnID.Web.Gigya.ApiClient
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getAccountInfo"),
                 new FormUrlEncodedContent(parameters));
 
-            return
-                await OwnIdSerializer.DeserializeAsync<GetAccountInfoResponse<TProfile>>(await getAccountMessage.Content
-                    .ReadAsStreamAsync());
+            return await ParseAsync<GetAccountInfoResponse<TProfile>>(getAccountMessage.Content,
+                () => $"GetUserInfoByUid('{uid}')");
+            ;
         }
 
         public async Task<BaseGigyaResponse> SetAccountInfoAsync<T>(string did, T profile = null,
@@ -64,11 +71,12 @@ namespace OwnID.Web.Gigya.ApiClient
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.setAccountInfo"),
                 new FormUrlEncodedContent(parameters));
 
-            var setAccountResponse = await OwnIdSerializer.DeserializeAsync<BaseGigyaResponse>(
-                await setAccountDataMessage.Content
-                    .ReadAsStreamAsync());
-
-            return setAccountResponse;
+            return await ParseAsync<BaseGigyaResponse>(setAccountDataMessage.Content, () =>
+            {
+                var profileStr = profile != null ? OwnIdSerializer.Serialize(profile) : string.Empty;
+                var dataStr = data != null ? OwnIdSerializer.Serialize(data) : string.Empty;
+                return $"SetAccountInfoAsync('{did}', '{profileStr}', '{dataStr}')";
+            });
         }
 
         public async Task<LoginResponse> NotifyLogin(string did, string targetEnvironment = null)
@@ -84,8 +92,8 @@ namespace OwnID.Web.Gigya.ApiClient
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.notifyLogin"),
                 new FormUrlEncodedContent(parameters));
 
-            return await OwnIdSerializer.DeserializeAsync<LoginResponse>(
-                await responseMessage.Content.ReadAsStreamAsync());
+            return await ParseAsync<LoginResponse>(responseMessage.Content,
+                () => $"NotifyLogin('{did}', '{targetEnvironment}')");
         }
 
         public async Task<JsonWebKey> GetPublicKey()
@@ -95,7 +103,9 @@ namespace OwnID.Web.Gigya.ApiClient
             var responseMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getJWTPublicKey"),
                 new FormUrlEncodedContent(parameters));
-            return new JsonWebKey(await responseMessage.Content.ReadAsStringAsync());
+            var result = await responseMessage.Content.ReadAsStringAsync();
+            _logger.Log(LogLevel.Debug, () => $"GetPublicKey() -> {result}");
+            return new JsonWebKey(result);
         }
 
         public async Task<GetJwtResponse> GetJwt(string did)
@@ -106,8 +116,7 @@ namespace OwnID.Web.Gigya.ApiClient
             var responseMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.getJWT"),
                 new FormUrlEncodedContent(parameters));
-            return await OwnIdSerializer.DeserializeAsync<GetJwtResponse>(
-                await responseMessage.Content.ReadAsStreamAsync());
+            return await ParseAsync<GetJwtResponse>(responseMessage.Content, () => $"GetJwt('${did}')");
         }
 
         /// <summary>
@@ -132,8 +141,8 @@ namespace OwnID.Web.Gigya.ApiClient
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.resetPassword"),
                 new FormUrlEncodedContent(parameters));
 
-            return await OwnIdSerializer.DeserializeAsync<ResetPasswordResponse>(
-                await responseMessage.Content.ReadAsStreamAsync());
+            return await ParseAsync<ResetPasswordResponse>(responseMessage.Content,
+                () => $"ResetPasswordAsync('{resetToken}', '{newPassword}')");
         }
 
         public async Task<BaseGigyaResponse> DeleteAccountAsync(string did)
@@ -145,8 +154,7 @@ namespace OwnID.Web.Gigya.ApiClient
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.deleteAccount"),
                 new FormUrlEncodedContent(parameters));
 
-            return await OwnIdSerializer.DeserializeAsync<BaseGigyaResponse>(
-                await responseMessage.Content.ReadAsStreamAsync());
+            return await ParseAsync<BaseGigyaResponse>(responseMessage.Content, () => $"DeleteAccountAsync('{did}')");
         }
 
         public async Task<UidContainer> SearchByPublicKey(string publicKey,
@@ -157,7 +165,8 @@ namespace OwnID.Web.Gigya.ApiClient
                 await SearchAsync<UidContainer>(GigyaFields.ConnectionPublicKeysHash, publicKey.GetSha256(),
                     objectsToGet);
 
-            if (!result.IsSuccess || (result.First.Data?.OwnId?.Connections?.All(x => x.PublicKey != publicKey) ?? true))
+            if (!result.IsSuccess
+                || (result.First.Data?.OwnId?.Connections?.All(x => x.PublicKey != publicKey) ?? true))
                 return null;
 
             return result.First;
@@ -166,16 +175,14 @@ namespace OwnID.Web.Gigya.ApiClient
         public async Task<SearchGigyaResponse<TResult>> SearchAsync<TResult>(GigyaFields searchKey, string searchValue,
             GigyaFields resultSet = GigyaFields.UID | GigyaFields.Connections) where TResult : class
         {
-            var parameters = ParametersFactory.CreateAuthParameters(_configuration).AddParameter("query",
-                $"SELECT {GetGigyaProfileFields(resultSet)} FROM accounts WHERE {GetGigyaProfileFields(searchKey)} = \"{searchValue}\" LIMIT 1");
+            var query =
+                $"SELECT {GetGigyaProfileFields(resultSet)} FROM accounts WHERE {GetGigyaProfileFields(searchKey)} = \"{searchValue}\" LIMIT 1";
+            var parameters = ParametersFactory.CreateAuthParameters(_configuration).AddParameter("query", query);
             var responseMessage = await _httpClient.PostAsync(
                 new Uri($"https://accounts.{_configuration.DataCenter}/accounts.search"),
                 new FormUrlEncodedContent(parameters));
-
-            var result = await OwnIdSerializer.DeserializeAsync<SearchGigyaResponse<TResult>>(
-                await responseMessage.Content.ReadAsStreamAsync());
-
-            return result;
+            return await ParseAsync<SearchGigyaResponse<TResult>>(responseMessage.Content,
+                () => $"SearchAsync with query '{query}'");
         }
 
         private string GetGigyaProfileFields(GigyaFields fields)
@@ -213,6 +220,21 @@ namespace OwnID.Web.Gigya.ApiClient
             _profileFieldsCache.TryAdd(fields, result);
 
             return result;
+        }
+
+        private async Task<T> ParseAsync<T>(HttpContent content, Func<string> prefixGen = null)
+        {
+            if (!_logResponse)
+                return await OwnIdSerializer.DeserializeAsync<T>(await content.ReadAsStreamAsync());
+
+            var json = await content.ReadAsStringAsync();
+            var prefix = string.Empty;
+
+            if (prefixGen != null)
+                prefix = prefixGen();
+
+            _logger.Log(LogLevel.Debug, $"Call {prefix} -> Response: {json}");
+            return OwnIdSerializer.Deserialize<T>(json);
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using OwnID.Extensibility.Json;
+using OwnID.Extensibility.Logs;
 using OwnID.Extensions;
 using Serilog.Context;
 using Serilog.Core.Enrichers;
@@ -32,16 +33,13 @@ namespace OwnID.Server.Gigya
 
             var logMessage = OwnIdSerializer.Deserialize<LogMessage>(bodyString);
 
-            using (LogContext.Push(new PropertyEnricher("source", "webapp")))
+            using (LogContext.Push(new PropertyEnricher("source", logMessage.Source ?? "client-side")))
             using (LogContext.Push(new PropertyEnricher("version", logMessage.Version)))
             {
                 if (!Enum.TryParse(logMessage.LogLevel, true, out LogLevel logLevel))
-                {
-                    _logger.Log(LogLevel.Warning, "Log with unknown format {logJson}", bodyString);
-                    return;
-                }
+                    logLevel = LogLevel.Debug;
 
-                using (_logger.BeginScope("context: {context}", logMessage.Context))
+                using (_logger.BeginScope($"context: {context}", logMessage.Context))
                 {
                     _logger.LogWithData(logLevel, logMessage.Message, logMessage.Data);
                 }
@@ -65,5 +63,8 @@ namespace OwnID.Server.Gigya
 
         [JsonPropertyName("version")]
         public string Version { get; set; }
+        
+        [JsonPropertyName("source")]
+        public string Source { get; set; }
     }
 }

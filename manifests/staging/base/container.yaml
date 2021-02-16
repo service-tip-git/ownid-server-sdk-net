@@ -36,4 +36,6 @@ spec:
             - name: SMTP__FROM_ADDRESS
               value: no-reply@skipthepassword.com
             - name: SMTP__FROM_NAME
-              value: Magic Link - STAGING
+              value: Magic Link - STAGING            
+            - name: SERILOG__MINIMUMLEVEL__DEFAULT
+              value: Debug

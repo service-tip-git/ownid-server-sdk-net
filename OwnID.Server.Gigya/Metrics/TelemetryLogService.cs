@@ -9,6 +9,7 @@ using Amazon.CloudWatch.Model;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OwnID.Extensibility.Cache;
+using OwnID.Extensibility.Logs;
 using OwnID.Extensions;
 using OwnID.Redis;
 
@@ -49,13 +50,15 @@ namespace OwnID.Server.Gigya.Metrics
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            // TODO: add option to disable it
-            _memoryCpuTimer = new Timer(LogTelemetry, null, TimeSpan.Zero,
-                TimeSpan.FromMinutes(3));
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _memoryCpuTimer = new Timer(LogTelemetry, null, TimeSpan.Zero,
+                    TimeSpan.FromMinutes(3));
 
-            if (_redisStore != null && _amazonCloudWatchClient != null)
-                _redisTimer = new Timer(LogRedisInfo, null, TimeSpan.Zero,
-                    TimeSpan.FromMilliseconds(_metricsConfiguration.Interval));
+                if (_redisStore != null && _amazonCloudWatchClient != null)
+                    _redisTimer = new Timer(LogRedisInfo, null, TimeSpan.Zero,
+                        TimeSpan.FromMilliseconds(_metricsConfiguration.Interval));
+            }
 
             return Task.CompletedTask;
         }
@@ -102,14 +105,14 @@ namespace OwnID.Server.Gigya.Metrics
                 {
                     MetricData = new List<MetricDatum>
                     {
-                        new MetricDatum
+                        new()
                         {
                             Unit = StandardUnit.Count,
                             Value = stats.keysCount,
                             TimestampUtc = timeStamp,
                             MetricName = "Redis.KeysCount"
                         },
-                        new MetricDatum
+                        new()
                         {
                             Unit = StandardUnit.Bytes,
                             Value = stats.itemsSize,

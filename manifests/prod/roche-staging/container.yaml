@@ -53,3 +53,5 @@ spec:
               value: 'true'
             - name: Metrics__Namespace
               value: 'roche-staging'
+            - name: SERILOG__MINIMUMLEVEL__DEFAULT
+              value: Debug

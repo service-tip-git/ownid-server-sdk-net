@@ -1,8 +1,10 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using OwnID.Extensibility.Logs;
 using OwnID.Extensions;
 
 namespace OwnID.Server.Gigya
@@ -26,7 +28,7 @@ namespace OwnID.Server.Gigya
                 return;
             }
 
-            using (_logger.BeginScope("Log request ({requestId})", context.TraceIdentifier))
+            using (_logger.BeginScope(new {requestId = context.TraceIdentifier}))
             await using (var respStream = new MemoryStream())
             {
                 var originalRespStream = context.Response.Body;
@@ -48,8 +50,10 @@ namespace OwnID.Server.Gigya
                         method = context.Request.Method,
                         scheme = context.Request.Scheme,
                         url =
-                            $"{context.Request.Scheme}{context.Request.Host}{context.Request.Path.ToString()}{context.Request.QueryString.ToString()}",
-                        body
+                            $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path.ToString()}{context.Request.QueryString.ToString()}",
+                        body,
+                        cookies = context.Request.Cookies.ToDictionary(x => x.Key, x => x.Value),
+                        headers = context.Request.Headers.ToDictionary(x => x.Key, x => x.Value)
                     };
 
                     _logger.LogWithData(LogLevel.Debug, "Request log", data);
@@ -85,7 +89,9 @@ namespace OwnID.Server.Gigya
 
                     var data = new
                     {
-                        body
+                        body,
+                        statusCode = context.Response.StatusCode,
+                        headers = context.Response.Headers.ToDictionary(x => x.Key, x => x.Value)
                     };
 
                     _logger.LogWithData(LogLevel.Debug, "Response  log", data);

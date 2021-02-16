@@ -59,3 +59,5 @@ spec:
               value: 'true'
             - name: Metrics__Namespace
               value: 'Nescafe-Staging'
+            - name: SERILOG__MINIMUMLEVEL__DEFAULT
+              value: Debug

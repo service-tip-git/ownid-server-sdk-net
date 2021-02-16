@@ -75,3 +75,5 @@ spec:
               value: 'true'
             - name: OWNID__MAGIC_LINK__REDIRECT_URL
               value: https://demo.ownid.com/login
+            - name: SERILOG__MINIMUMLEVEL__DEFAULT
+              value: Debug
