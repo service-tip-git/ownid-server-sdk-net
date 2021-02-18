@@ -1,0 +1,18 @@
+{
+  "OwnIdSdkDefault" : {
+    "Email" : "電子郵件",
+    "First Name" : "名",
+    "Last Name" : "姓",
+    "Nickname" : "暱稱",
+    "Field {0} is required" : "需要欄位 {0}",
+    "Field {0} has incorrect format" : "欄位 {0} 格式不正確",
+    "The field {0} must be a string or array type with a maximum length of '{1}'" : "欄位 {0} 必須是最大長度為「{1}」的字串或陣列類型。",
+    "Error_PhoneAlreadyConnected" : "您的手機已與帳戶相關聯，請前往登入頁面",
+    "Error_UserNotFound" : "找不到使用者",
+    "Error_RequiresBiometricInput" : "需要生物識別輸入",
+    "Error_RecoveryTokenExpired" : "復原記號已到期",
+    "Error_UserCanceledAuth" : "使用者已取消權限處理",
+    "Email_MagicLink_Body" : "<!DOCTYPE html><html><head><style> body {font-family: 72;font-style: normal;font-weight: normal;font-size: 14px;line-height: 24px;} div {margin-bottom: 20px;} .rounded-link {background: #0070F2;color: #FFFFFF!important;display: block;padding: 8px 26px;text-align: center;text-decoration: none;border-radius: 4px;font-weight: bold;width: auto;}</style></head><body><div>Hi {userName},<br>請點選下方連結登入您的帳戶。</div><div style=\"display: flex\"><a target=\"_blank\" class=\"rounded-link\" href=\"{link}\">您的 Magic Link</a></div><div>基於安全原因，此連結只會在起始此請求的同一個瀏覽器中有效。若上述連結無法使用，則在瀏覽器中複製並貼上此 URL：<br/>{link}</div><div>若您沒有提出此 Magic Link 請求，請忽略此電子郵件.</div></body></html>",
+    "Email_MagicLink_Subject" : "{0} 的 Magic Link"
+  }
+}

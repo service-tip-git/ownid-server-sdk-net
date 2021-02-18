@@ -1,0 +1,18 @@
+{
+  "OwnIdSdkDefault" : {
+    "Email" : "E-mail",
+    "First Name" : "Nome próprio",
+    "Last Name" : "Apelido",
+    "Nickname" : "Alcunha",
+    "Field {0} is required" : "O campo {0} é obrigatório",
+    "Field {0} has incorrect format" : "O campo {0} tem um formato incorreto",
+    "The field {0} must be a string or array type with a maximum length of '{1}'" : "O campo {0} deve ser uma cadeia ou tipo de matriz com um comprimento máximo de '{1}'",
+    "Error_PhoneAlreadyConnected" : "O seu telefone já está associado a uma conta, vá para a página de início de sessão",
+    "Error_UserNotFound" : "O utilizador não foi encontrado",
+    "Error_RequiresBiometricInput" : "Entrada biométrica obrigatória",
+    "Error_RecoveryTokenExpired" : "O token de recuperação expirou",
+    "Error_UserCanceledAuth" : "O processo de autorização foi cancelado pelo utilizador",
+    "Email_MagicLink_Body" : "<!DOCTYPE html><html><head><style> body {font-family: 72;font-style: normal;font-weight: normal;font-size: 14px;line-height: 24px;} div {margin-bottom: 20px;} .rounded-link {background: #0070F2;color: #FFFFFF!important;display: block;padding: 8px 26px;text-align: center;text-decoration: none;border-radius: 4px;font-weight: bold;width: auto;}</style></head><body><div>Olá {userName},<br>Clique na ligação abaixo para iniciar sessão na sua conta.</div><div style=\"display: flex\"><a target=\"_blank\" class=\"rounded-link\" href=\"{link}\">A sua ligação mágica</a></div><div>Por motivos de segurança, esta ligação só será válida no mesmo browser que iniciou este pedido. Se a ligação acima não funcionar, tente copiar e colar o URL seguinte no browser:<br/>{link}</div><div>Caso não tenha pedido esta ligação mágica, ignore este e-mail.</div></body></html>",
+    "Email_MagicLink_Subject" : "Ligação mágica para {0}"
+  }
+}
